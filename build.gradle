@@ -24,7 +24,7 @@ subprojects {
     }
 
     repositories {
-        var localPath = System.getenv("LOCAL_MAVEN")
+        var localPath = System.getenv("MAVEN_LOCAL")
         if (localPath != null) {
             maven {
                 name = 'mortuusarsLocal'
@@ -32,16 +32,16 @@ subprojects {
             }
         }
 
-        var resourcesPath = System.getenv("RESOURCES_MAVEN")
+        var resourcesPath = System.getenv("MAVEN_GITHUB_RESOURCES")
         if (resourcesPath != null) {
             maven {
-                name = 'mortuusarsResources'
+                name = 'mortuusarsGithubResources'
                 url = uri(resourcesPath + "/maven")
             }
         }
 
         maven {
-            name = "mortuusars"
+            name = "mortuusars github resources"
             url = "https://raw.githubusercontent.com/mortuusars/resources/main/maven/"
         }
 

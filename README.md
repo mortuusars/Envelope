@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/mortuusars/resources/main/media/thief/main.png" width="225">
-    <br>
   <img src="https://img.shields.io/badge/NeoForge/Fabric-1.21.1-e04e14" alt="NeoForge/Fabric 1.21.1">
     <br>
   <a href="https://curseforge.com/minecraft/mc-mods/envelope"><img src="https://cf.way2muchnoise.eu/839159.svg" alt="curseforge"></a>
