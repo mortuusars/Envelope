@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contact": {
+    "homepage": "${mod_page}",
+    "sources": "${mod_github}"
+  },
+  "license": "${mod_license}",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.mortuusars.envelope.fabric.EnvelopeFabric"
+    ],
+    "client": [
+      "io.github.mortuusars.envelope.fabric.EnvelopeFabricClient"
+    ]
+  },
+  "mixins": [
+    "${mod_id}-fabric.mixins.json",
+    "${mod_id}-common.mixins.json"
+  ],
+  "depends": {
+    "minecraft": ">=1.21.0",
+    "fabric": "*",
+    "fabric-api": "*",
+    "forgeconfigapiport": ">=21.0.0"
+  }
+}

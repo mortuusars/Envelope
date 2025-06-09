@@ -1,0 +1,67 @@
+plugins {
+    id "com.github.johnrengelman.shadow"
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+
+    // Files in this configuration will be bundled into your mod using the Shadow plugin.
+    // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+}
+
+dependencies {
+    neoForge("net.neoforged:neoforge:${neoforge_version}")
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(include("io.github.llamalad7:mixinextras-neoforge:0.4.1"))
+
+    modRuntimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
+    modRuntimeOnly("curse.maven:jade-324717:${jade_neoforge_id}") { transitive = false }
+    modRuntimeOnly("curse.maven:embeddium-908741:6118392")
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
+}
+
+loom {
+    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+
+    runs {
+        create("client2") {
+            inherit(getByName("client"))
+
+            name("Second Client")
+            programArgs("--username", "AnotherDev")
+
+            client()
+        }
+    }
+}
+
+shadowJar {
+    exclude("architectury.common.json")
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    injectAccessWidener = true
+    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+}

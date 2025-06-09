@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "io.github.mortuusars.envelope.neoforge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "plugin": "io.github.mortuusars.envelope.neoforge.EnvelopeMixinPlugin",
+  "client": [
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
