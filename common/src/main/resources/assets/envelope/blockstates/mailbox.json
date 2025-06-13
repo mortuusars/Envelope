@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,hanging=false": {
+      "model": "envelope:block/mailbox"
+    },
+    "facing=east,hanging=false": {
+      "model": "envelope:block/mailbox",
+      "y": 90
+    },
+    "facing=south,hanging=false": {
+      "model": "envelope:block/mailbox",
+      "y": 180
+    },
+    "facing=west,hanging=false": {
+      "model": "envelope:block/mailbox",
+      "y": 270
+    },
+    "facing=north,hanging=true": {
+      "model": "envelope:block/mailbox_hanging"
+    },
+    "facing=east,hanging=true": {
+      "model": "envelope:block/mailbox_hanging",
+      "y": 90
+    },
+    "facing=south,hanging=true": {
+      "model": "envelope:block/mailbox_hanging",
+      "y": 180
+    },
+    "facing=west,hanging=true": {
+      "model": "envelope:block/mailbox_hanging",
+      "y": 270
+    }
+  }
+}

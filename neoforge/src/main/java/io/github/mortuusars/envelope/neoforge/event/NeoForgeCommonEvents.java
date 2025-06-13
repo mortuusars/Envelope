@@ -1,6 +1,8 @@
 package io.github.mortuusars.envelope.neoforge.event;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.EnvelopeServer;
+import io.github.mortuusars.envelope.command.MailCommand;
 import io.github.mortuusars.envelope.neoforge.RegisterImpl;
 import io.github.mortuusars.envelope.network.neoforge.PacketsImpl;
 import io.github.mortuusars.envelope.network.packet.C2SPackets;
@@ -13,9 +15,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -53,9 +59,30 @@ public class NeoForgeCommonEvents {
                         (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
             }
         }
+
+        @SubscribeEvent
+        public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
+                event.accept(Envelope.Items.MAILBOX.get());
+                event.accept(Envelope.Items.CARDBOARD_BOX.get());
+                event.accept(Envelope.Items.PACKAGE.get());
+            }
+            if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
+                event.accept(Envelope.Items.LETTER.get());
+            }
+        }
     }
 
-//    @EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.GAME)
-//    public static class GameBus {
-//    }
+    @EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.GAME)
+    public static class GameBus {
+        @SubscribeEvent
+        public static void registerCommands(RegisterCommandsEvent event) {
+            MailCommand.register(event.getDispatcher());
+        }
+
+        @SubscribeEvent
+        public static void tick(ServerTickEvent.Post tick) {
+            EnvelopeServer.tick(tick.getServer());
+        }
+    }
 }

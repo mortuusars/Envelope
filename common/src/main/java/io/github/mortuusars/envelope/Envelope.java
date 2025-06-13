@@ -2,8 +2,20 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.world.block.MailboxBlock;
+import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
+import io.github.mortuusars.envelope.world.item.LetterItem;
+import io.github.mortuusars.envelope.world.item.PackageItem;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 
 import java.util.function.Supplier;
@@ -35,6 +47,10 @@ public class Envelope {
     }
 
     public static class Blocks {
+        public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
+                () -> new MailboxBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.LECTERN)
+                        .noOcclusion()));
+
         static void init() {
         }
     }
@@ -45,11 +61,24 @@ public class Envelope {
     }
 
     public static class Items {
+        public static final Supplier<BlockItem> MAILBOX = Register.item("mailbox",
+                () -> new BlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
+
+        public static final Supplier<LetterItem> LETTER = Register.item("letter",
+                () -> new LetterItem(new Item.Properties()));
+        public static final Supplier<CardboardBoxItem> CARDBOARD_BOX = Register.item("cardboard_box",
+                () -> new CardboardBoxItem(new Item.Properties()));
+        public static final Supplier<PackageItem> PACKAGE = Register.item("package",
+                () -> new PackageItem(new Item.Properties().stacksTo(1)));
+
         static void init() {
         }
     }
 
     public static class DataComponents {
+        public static final DataComponentType<String> RECIPIENT = Register.dataComponentType("recipient",
+                arg -> arg.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+
         static void init() {
         }
     }
