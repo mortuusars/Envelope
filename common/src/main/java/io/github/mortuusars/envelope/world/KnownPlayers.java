@@ -1,12 +1,15 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.api.mail.Recipient;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,13 +19,33 @@ import java.util.UUID;
 public class KnownPlayers extends SavedData {
     private final Map<String, UUID> players = new HashMap<>();
 
-    public Map<String, UUID> get() {
+    // --
+
+    public Map<String, UUID> getAll() {
         return Collections.unmodifiableMap(players);
     }
 
     public void add(Player player) {
         players.put(player.getScoreboardName().toLowerCase(), player.getUUID());
         setDirty();
+    }
+
+    public @Nullable UUID byName(String playerName) {
+        return players.get(playerName);
+    }
+
+    public boolean isKnown(String playerName) {
+        return byName(playerName) != null;
+    }
+
+    public boolean isKnown(UUID uuid) {
+        return players.containsValue(uuid);
+    }
+
+    // --
+
+    public static KnownPlayers get(MinecraftServer server) {
+        return server.overworld().getDataStorage().computeIfAbsent(KnownPlayers.factory(), "envelope_known_players");
     }
 
     // --
@@ -47,10 +70,6 @@ public class KnownPlayers extends SavedData {
         }
     }
 
-    public static @NotNull KnownPlayers loadOrCreate(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(KnownPlayers.factory(), "horseman_horse_calling");
-    }
-
     private static Factory<KnownPlayers> factory() {
         return new Factory<>(KnownPlayers::new,
                 (tag, provider) -> {
@@ -58,5 +77,12 @@ public class KnownPlayers extends SavedData {
             instance.load(tag, provider);
             return instance;
         }, null);
+    }
+
+    public @Nullable UUID byRecipient(Recipient recipient) {
+        if (recipient.uuid() != null && players.containsValue(recipient.uuid())) {
+            return recipient.uuid();
+        }
+        return byName(recipient.name());
     }
 }

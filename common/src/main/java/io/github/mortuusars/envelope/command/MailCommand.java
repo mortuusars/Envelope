@@ -5,6 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.Mailbox;
+import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Sender;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -24,11 +26,11 @@ public class MailCommand {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
         Mail mail = new Mail(
-                Mail.Sender.of(player),
-                "Dev1",
+                Sender.player(player),
+                new Recipient("Dev1", null, Recipient.Type.PLAYER),
                 new ItemStack(Items.EMERALD),
                 player.level().getGameTime(),
-                100,
+                50,
                 Mail.Status.REGULAR);
 
         Mailbox.send(mail);

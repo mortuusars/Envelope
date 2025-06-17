@@ -1,18 +1,21 @@
 package io.github.mortuusars.envelope.neoforge.event;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.EnvelopeServer;
 import io.github.mortuusars.envelope.command.MailCommand;
+import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.neoforge.RegisterImpl;
 import io.github.mortuusars.envelope.network.neoforge.PacketsImpl;
 import io.github.mortuusars.envelope.network.packet.C2SPackets;
 import io.github.mortuusars.envelope.network.packet.CommonPackets;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.network.packet.S2CPackets;
+import io.github.mortuusars.envelope.world.KnownPlayers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -21,6 +24,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -82,7 +87,14 @@ public class NeoForgeCommonEvents {
 
         @SubscribeEvent
         public static void tick(ServerTickEvent.Post tick) {
-            EnvelopeServer.tick(tick.getServer());
+            ServerEvents.serverTick(tick.getServer());
+        }
+
+        @SubscribeEvent
+        public static void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                ServerEvents.playerLogin(player);
+            }
         }
     }
 }
