@@ -80,11 +80,7 @@ public class MailCoordinator extends SavedData {
     }
 
     protected boolean tryDeliverToPlayer(MinecraftServer server, Mail mail) {
-        if (tryFindOnlineRecipient(server, mail.recipient()) instanceof ServerPlayer player) {
-            return deliveredMail.deliver(player.getUUID(), mail);
-        }
-
-        @Nullable UUID playerUuid = KnownPlayers.get(server).byRecipient(mail.recipient());
+        @Nullable UUID playerUuid = tryGetPlayerUuid(server, mail.recipient());
 
         if (playerUuid == null) {
             Envelope.LOGGER.error("Cannot deliver mail: unknown recipient '{}'.", mail.recipient());
@@ -99,6 +95,13 @@ public class MailCoordinator extends SavedData {
         }
 
         return true;
+    }
+
+    protected @Nullable UUID tryGetPlayerUuid(MinecraftServer server, Recipient recipient) {
+        if (tryFindOnlineRecipient(server, recipient) instanceof ServerPlayer player) {
+            return player.getUUID();
+        }
+        return KnownPlayers.get(server).byRecipient(recipient);
     }
 
     protected @Nullable ServerPlayer tryFindOnlineRecipient(MinecraftServer server, Recipient recipient) {
