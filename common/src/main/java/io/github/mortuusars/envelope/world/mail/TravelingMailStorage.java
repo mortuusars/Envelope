@@ -28,7 +28,7 @@ public class TravelingMailStorage {
 
     public void tick(MinecraftServer server) {
         mail.removeIf(mail -> {
-            if (mail.sentAt() + mail.travelDuration() <= server.overworld().getGameTime()) {
+            if (mail.sentAt() + mail.travelTime() <= server.overworld().getGameTime()) {
                 finishedTravelingBuffer.add(mail);
                 return true;
             }

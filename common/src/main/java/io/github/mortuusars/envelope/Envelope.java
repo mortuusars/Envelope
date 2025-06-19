@@ -3,7 +3,9 @@ package io.github.mortuusars.envelope;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.api.mail.Recipient;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
+import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
@@ -11,6 +13,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -76,8 +79,8 @@ public class Envelope {
     }
 
     public static class DataComponents {
-        public static final DataComponentType<String> RECIPIENT = Register.dataComponentType("recipient",
-                arg -> arg.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+        public static final DataComponentType<Recipient> RECIPIENT = Register.dataComponentType("recipient",
+                arg -> arg.persistent(Recipient.CODEC).networkSynchronized(Recipient.STREAM_CODEC));
 
         static void init() {
         }
@@ -89,6 +92,8 @@ public class Envelope {
     }
 
     public static class MenuTypes {
+        public static final Supplier<MenuType<MailboxMenu>> MAILBOX = Register.menuType("mailbox", MailboxMenu::fromNetwork);
+
         static void init() {
         }
     }

@@ -11,28 +11,28 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
+//TODO: implement SavedData
 public class DeliveredMailStorage {
-    protected final Map<UUID, Set<Mail>> mail = new HashMap<>();
+    protected final Map<UUID, List<Mail>> mail = new HashMap<>();
 
-    public boolean deliver(UUID recipientUuid, Mail mail) {
-        return this.mail.computeIfAbsent(recipientUuid, uuid -> new HashSet<>()).add(mail);
+    public void deliver(UUID ownerUuid, Mail mail) {
+        this.mail.computeIfAbsent(ownerUuid, uuid -> new ArrayList<>()).add(mail);
     }
 
-    public boolean takeOut(UUID recipientUuid, Mail mail) {
-        @Nullable Set<Mail> set = this.mail.get(recipientUuid);
+    public boolean takeOut(UUID ownerUuid, Mail mail) {
+        @Nullable List<Mail> set = this.mail.get(ownerUuid);
         return set != null && set.remove(mail);
     }
 
-    public Set<Mail> getAll(UUID recipientUuid) {
-        Set<Mail> set = mail.getOrDefault(recipientUuid, Collections.emptySet());
-        return Collections.unmodifiableSet(set);
+    public List<Mail> getAll(UUID ownerUuid) {
+        List<Mail> list = mail.getOrDefault(ownerUuid, Collections.emptyList());
+        return Collections.unmodifiableList(list);
     }
 
     // --
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        for (Map.Entry<UUID, Set<Mail>> entry : mail.entrySet()) {
+        for (Map.Entry<UUID, List<Mail>> entry : mail.entrySet()) {
             ListTag list = new ListTag();
             for (Mail item : entry.getValue()) {
                 try {
@@ -61,7 +61,7 @@ public class DeliveredMailStorage {
 
             try {
                 ListTag mailList = tag.getList(id, Tag.TAG_COMPOUND);
-                Set<Mail> mailSet = new HashSet<>();
+                List<Mail> mailSet = new ArrayList<>();
 
                 for (Tag mailTag : mailList) {
                     try {

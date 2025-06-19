@@ -1,0 +1,360 @@
+package io.github.mortuusars.envelope.client.gui.screen;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.api.mail.Mail;
+import io.github.mortuusars.envelope.api.mail.Sender;
+import io.github.mortuusars.envelope.client.gui.Sprites;
+import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.serverbound.MailboxMenuMailActionC2SP;
+import io.github.mortuusars.envelope.util.PrettyGameTime;
+import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Inventory;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/mailbox.png");
+
+    public static final WidgetSprites REGULAR_MAIL_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail"));
+    public static final WidgetSprites SENDER_PLAYER = Sprites.normalAndHighlighted(Envelope.resource("mailbox/sender_player"));
+    public static final WidgetSprites SENDER_NPC = Sprites.normalAndHighlighted(Envelope.resource("mailbox/sender_npc"));
+
+    protected static final int SCROLL_THUMB_TOP_HEIGHT = 3;
+    protected static final int SCROLL_THUMB_MID_HEIGHT = 4;
+    protected static final int SCROLL_THUMB_BOT_HEIGHT = 2;
+    protected static final int SCROLL_THUMB_HEIGHT = SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + SCROLL_THUMB_BOT_HEIGHT;
+
+    protected static final int MAX_BUTTONS = 6;
+
+    @Nullable
+    protected Mail hoveredMail;
+
+    protected Rect2i mailArea = new Rect2i(7, 17, 162, 110);
+
+    protected int scroll = 0;
+    protected int scrollAtDragStart = 0;
+    protected Rect2i scrollBarArea = new Rect2i(162, 18, 6, 108);
+    protected Rect2i scrollThumb = new Rect2i(0, 0, 0, 0);
+    protected boolean isDraggingScrollbar = false;
+    protected double dragDelta = 0;
+
+    public MailboxScreen(MailboxMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+    }
+
+    @Override
+    protected void init() {
+        imageWidth = 176;
+        imageHeight = 225;
+        inventoryLabelY = imageHeight - 94;
+        super.init();
+        mailArea = new Rect2i(leftPos + 7, topPos + 17, 162, 110);
+        scrollBarArea = new Rect2i(leftPos + 162, topPos + 18, 6, 108);
+    }
+
+    protected void updateScrollThumb() {
+        int minSize = SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + SCROLL_THUMB_BOT_HEIGHT;
+
+        int totalButtons = getMenu().getMail().size();
+        float ratio = MAX_BUTTONS / (float) Math.max(totalButtons, 1);
+        int size = Mth.clamp(Mth.ceil(scrollBarArea.getHeight() * ratio), minSize, scrollBarArea.getHeight());
+        int midSize = size - SCROLL_THUMB_TOP_HEIGHT - SCROLL_THUMB_BOT_HEIGHT;
+        int correctedMidSize = Math.max(midSize - (midSize % SCROLL_THUMB_MID_HEIGHT), SCROLL_THUMB_MID_HEIGHT);
+        size = SCROLL_THUMB_TOP_HEIGHT + correctedMidSize + SCROLL_THUMB_BOT_HEIGHT;
+
+        float topRowPos = (float) scroll / Math.max(1, totalButtons - MAX_BUTTONS);
+        int pos = (int) Mth.map(topRowPos, 0f, 1f, 0f, scrollBarArea.getHeight() - size);
+
+        scrollThumb = new Rect2i(scrollBarArea.getX(), scrollBarArea.getY() + pos, scrollBarArea.getWidth(), size);
+    }
+
+    // --
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderTooltip(guiGraphics, mouseX, mouseY);
+
+        if (hoveredMail != null) {
+            if (mouseX >= leftPos + 8 && mouseX < leftPos + 28) {
+                guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail.content()),
+                        Optional.empty(), mouseX, mouseY);
+            } else {
+                List<Component> tooltip = new ArrayList<>();
+                tooltip.add(hoveredMail.content().getHoverName());
+
+                if (font.split(FormattedText.of(hoveredMail.sender().name()), 110).size() > 1) {
+                    tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", hoveredMail.sender().name()));
+                }
+
+                long ageTicks = Minecrft.level().getGameTime() - (hoveredMail.sentAt() + hoveredMail.travelTime());
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.duration(ageTicks)));
+                if (hoveredMail.status() != Mail.Status.REGULAR) {
+                    tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.status",
+                            Component.literal(hoveredMail.status().getSerializedName()).withStyle(Style.EMPTY.withColor(0xFFe1765e))));
+                }
+
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.shift_to_move"));
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.ctrl_shift_to_move_all"));
+
+                guiGraphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
+            }
+        }
+
+        Mail recentlySentMail = getMenu().getRecentlySentMail();
+        if (recentlySentMail != null) {
+            long ticksSinceSent = Minecrft.level().getGameTime() - recentlySentMail.sentAt();
+            if (ticksSinceSent > 20) return;
+
+            float progress = (ticksSinceSent + partialTick) / 6f;
+            progress *= progress * progress * progress * progress;
+
+            float scale = Math.clamp(1f - progress, 0, 1);
+
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(leftPos + 8 + 181, topPos + 8 + 60, 0);
+            guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.pose().translate(-8, -8, 0);
+            guiGraphics.renderItem(recentlySentMail.content(), 0, 0);
+            guiGraphics.pose().popPose();
+        }
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        FormattedCharSequence title = Component.empty()
+                .append(this.title)
+                .append(" - " + (getMenu().getMail().isEmpty()
+                        ? Component.translatable("gui.envelope.mailbox.empty").getString()
+                        : getMenu().getMail().size()))
+                .getVisualOrderText();
+        guiGraphics.drawString(this.font, title, this.titleLabelX, this.titleLabelY, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x404040, false);
+        guiGraphics.drawString(this.font, Component.translatable("gui.envelope.mailbox.send"), 180, 48, 0x404040, false);
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(TEXTURE, leftPos + 176, topPos + 42, 176, 0, 49, 42);
+
+        List<Mail> mail = getMenu().getMail();
+
+        hoveredMail = null;
+
+        scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - 6));
+
+        for (int i = 0; i < Math.min(mail.size(), 6); i++) {
+            int index = i + scroll;
+
+            Mail item = mail.get(index);
+            int x = 8;
+            int y = 18 + 18 * i;
+            boolean isHovering = isHovering(x + 1, y + 1, 152, 16, mouseX, mouseY);
+            if (isHovering) {
+                hoveredMail = item;
+            }
+            renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
+        }
+
+        renderScrollBar(guiGraphics, partialTick, mouseX, mouseY);
+    }
+
+    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, Mail mail, int x, int y) {
+        boolean isHovered = hoveredMail == mail;
+        ResourceLocation sprite = isHovered ? REGULAR_MAIL_SPRITES.enabledFocused() : REGULAR_MAIL_SPRITES.enabled();
+        guiGraphics.blitSprite(sprite, x, y, 0, 154, 18);
+        WidgetSprites senderSprites = mail.sender().type() == Sender.Type.PLAYER
+                ? SENDER_PLAYER
+                : SENDER_NPC;
+        ResourceLocation senderSprite = isHovered ? senderSprites.enabledFocused() : senderSprites.enabled();
+        guiGraphics.blitSprite(senderSprite, x + 23, y + 4, 0, 10, 10);
+        guiGraphics.renderItem(mail.content(), x + 2, y + 1);
+
+        FormattedCharSequence sender;
+        if (font.split(FormattedText.of(mail.sender().name()), 114).size() > 1) {
+            sender = FormattedCharSequence.composite(
+                    font.split(FormattedText.of(mail.sender().name()), 108).getFirst(),
+                    Component.literal("...").getVisualOrderText());
+        } else {
+            sender = Component.literal(mail.sender().name()).getVisualOrderText();
+        }
+        guiGraphics.drawString(font, sender, x + 36, y + 5, 0xFF886447, false);
+    }
+
+    protected void renderScrollBar(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        updateScrollThumb();
+
+        int state = 0;
+        if (!canScroll()) {
+            state = 2;
+        } else if (isDraggingScrollbar || isMouseOver(scrollThumb, mouseX, mouseY)) {
+            state = 1;
+        }
+
+        // Top
+        guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY(),
+                176, 42 + state * SCROLL_THUMB_HEIGHT, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT);
+
+        // Middle
+        int middlePartsCount = (scrollThumb.getHeight() - SCROLL_THUMB_TOP_HEIGHT - SCROLL_THUMB_BOT_HEIGHT) / SCROLL_THUMB_MID_HEIGHT;
+
+        for (int i = 0; i < middlePartsCount; i++) {
+            guiGraphics.blit(TEXTURE, scrollThumb.getX(),
+                    scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + i * SCROLL_THUMB_MID_HEIGHT,
+                    176, 42 + state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                    scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT);
+        }
+
+        if (!canScroll()) {
+            // Special case to allow full size scroll thumb fill all available area.
+            guiGraphics.blit(TEXTURE, scrollThumb.getX(),
+                    scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + middlePartsCount * SCROLL_THUMB_MID_HEIGHT,
+                    176, 42 + state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                    scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT);
+            guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT) + 3,
+                    176, 42 + SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                    scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT);
+        } else {
+            // Bottom
+            guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT),
+                    176, 42 + SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                    scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT);
+        }
+    }
+
+    public boolean canScroll() {
+        return getMenu().getMail().size() > MAX_BUTTONS;
+    }
+
+    public void scroll(int amount) {
+        scrollTo(scroll + amount);
+    }
+
+    public void scrollTo(int buttonIndex) {
+        int maxScrollWhenAtEnd = Math.max(0, getMenu().getMail().size() - MAX_BUTTONS);
+        scroll = Mth.clamp(buttonIndex, 0, maxScrollWhenAtEnd);
+        updateScrollThumb();
+    }
+
+    // -- Input
+
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_HOME) {
+            scroll(Integer.MIN_VALUE);
+            return true;
+        }
+        if (keyCode == InputConstants.KEY_END) {
+            scroll(Integer.MAX_VALUE);
+            return true;
+        }
+        if (keyCode == InputConstants.KEY_UP) {
+            scroll(-1);
+            return true;
+        }
+        if (keyCode == InputConstants.KEY_DOWN) {
+            scroll(1);
+            return true;
+        }
+
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == InputConstants.MOUSE_BUTTON_LEFT && hoveredMail != null) {
+            int index = getMenu().getMail().indexOf(hoveredMail);
+            if (index == -1) return false;
+
+            MailboxMenu.Action action = MailboxMenu.Action.PICK_UP;
+            if (Screen.hasShiftDown()) {
+                if (Screen.hasControlDown()) {
+                    action = MailboxMenu.Action.MOVE_ALL_TO_INVENTORY;
+                } else {
+                    action = MailboxMenu.Action.MOVE_TO_INVENTORY;
+                }
+            }
+
+            if (getMenu().doMailAction(Minecrft.player(), index, action)) {
+                Minecrft.player().playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
+                Packets.sendToServer(new MailboxMenuMailActionC2SP(index, action));
+            }
+        }
+
+        if (canScroll()) {
+            if (isMouseOver(scrollThumb, mouseX, mouseY)) {
+                setDragging(true);
+                isDraggingScrollbar = true;
+                dragDelta = 0;
+                scrollAtDragStart = scroll;
+                return true;
+            } else if (isMouseOver(scrollBarArea, mouseX, mouseY)) {
+                int direction = mouseY < scrollThumb.getY() ? -1 : 1;
+                scroll(MAX_BUTTONS * direction);
+                return true;
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        isDraggingScrollbar = false;
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (!isDraggingScrollbar || button != InputConstants.MOUSE_BUTTON_LEFT) {
+            return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        }
+
+        dragDelta += dragY;
+
+        double threshold = (double) scrollBarArea.getHeight() / Math.max(getMenu().getMail().size(), 1);
+        int amount = (int) (dragDelta / threshold);
+        if (amount != 0 || scroll != scrollAtDragStart) {
+            scrollTo(scrollAtDragStart + amount);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (isMouseOver(mailArea, mouseX, mouseY)) {
+            scroll((int) -scrollY);
+            return true;
+        }
+        return false;
+    }
+
+    // --
+
+    protected boolean isMouseOver(Rect2i rect, double mouseX, double mouseY) {
+        return mouseX >= rect.getX() && mouseX < rect.getX() + rect.getWidth()
+                && mouseY >= rect.getY() && mouseY < rect.getY() + rect.getHeight();
+    }
+
+}

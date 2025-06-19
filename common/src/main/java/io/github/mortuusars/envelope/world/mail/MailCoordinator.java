@@ -105,19 +105,18 @@ public class MailCoordinator extends SavedData {
     }
 
     protected @Nullable ServerPlayer tryFindOnlineRecipient(MinecraftServer server, Recipient recipient) {
-        if (recipient.uuid() != null) {
-            return server.getPlayerList().getPlayer(recipient.uuid());
-        }
-        return server.getPlayerList().getPlayerByName(recipient.name());
+        return recipient.uuid()
+                .map(uuid -> server.getPlayerList().getPlayer(uuid))
+                .orElse(server.getPlayerList().getPlayerByName(recipient.name()));
     }
 
     protected void returnToSender(MinecraftServer server, Mail mail) {
-        send(new Mail(mail.sender(),
-                mail.sender().toRecipient(),
-                mail.content(),
-                server.overworld().getGameTime(),
-                mail.travelDuration(), // Same time to return
-                Mail.Status.RETURNED));
+        send(new Mail(mail.recipient().toSender(),
+                      mail.sender().toRecipient(),
+                      mail.content(),
+                      server.overworld().getGameTime(),
+                      mail.travelTime(), // Same time to return
+                      Mail.Status.RETURNED));
     }
 
     // --

@@ -5,5 +5,22 @@
   "item.envelope.mailbox": "Mailbox",
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
-  "item.envelope.package": "Package"
+  "item.envelope.package": "Package",
+
+  "container.envelope.mailbox": "Mailbox",
+
+  "gui.envelope.mailbox.send": "Send",
+  "gui.envelope.mailbox.empty": "Empty",
+
+  "gui.envelope.mailbox.mail.tooltip.sender": "§7Sender: %s",
+  "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §7ago",
+  "gui.envelope.mailbox.mail.tooltip.status": "§7Status: %s",
+  "gui.envelope.mailbox.mail.tooltip.shift_to_move": "§8[§7Shift+Click§8] to quick-move",
+  "gui.envelope.mailbox.mail.tooltip.ctrl_shift_to_move_all": "§8[§7Ctrl+Shift+Click§8] to quick-move all",
+
+  "gui.envelope.time.months": "%sm",
+  "gui.envelope.time.weeks": "%sw",
+  "gui.envelope.time.days": "%sd",
+  "gui.envelope.time.hours": "%sh",
+  "gui.envelope.time.less_than_one_hour": "<1h"
 }

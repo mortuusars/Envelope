@@ -80,8 +80,8 @@ public class KnownPlayers extends SavedData {
     }
 
     public @Nullable UUID byRecipient(Recipient recipient) {
-        if (recipient.uuid() != null && players.containsValue(recipient.uuid())) {
-            return recipient.uuid();
+        if (recipient.uuid().isPresent() && players.containsValue(recipient.uuid().get())) {
+            return recipient.uuid().get();
         }
         return byName(recipient.name());
     }

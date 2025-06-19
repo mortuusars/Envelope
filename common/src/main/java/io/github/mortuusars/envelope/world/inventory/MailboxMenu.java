@@ -1,0 +1,222 @@
+package io.github.mortuusars.envelope.world.inventory;
+
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.api.mail.Mail;
+import io.github.mortuusars.envelope.api.mail.Mailbox;
+import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Sender;
+import io.github.mortuusars.envelope.world.block.MailboxBlock;
+import io.github.mortuusars.envelope.world.mail.MailCoordinator;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MailboxMenu extends AbstractContainerMenu {
+    protected final Inventory playerInventory;
+    protected final BlockPos mailboxPos;
+    protected final List<Mail> mail;
+
+    @Nullable
+    protected Mail recentlySentMail = null;
+
+    protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<Mail> mail) {
+        super(menuType, id);
+        this.playerInventory = playerInventory;
+        this.mailboxPos = mailboxPos;
+        this.mail = new ArrayList<>(mail);
+
+        Player player = playerInventory.player;
+
+        addSlot(new Slot(new SimpleContainer(1), 0, 181, 60) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return !stack.isEmpty() && stack.get(Envelope.DataComponents.RECIPIENT) != null;
+            }
+
+            @Override
+            public void set(ItemStack stack) {
+                trySendStack(player, stack);
+            }
+        });
+        addPlayerSlots(playerInventory, 8, 143);
+    }
+
+    public MailboxMenu(int id, Inventory playerInventory, BlockPos mailboxPos, List<Mail> mail) {
+        this(Envelope.MenuTypes.MAILBOX.get(), id, playerInventory, mailboxPos, mail);
+    }
+
+    public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
+        BlockPos mailboxPos = buffer.readBlockPos();
+        List<Mail> mail = new ArrayList<>();
+        int mailCount = buffer.readVarInt();
+        for (int i = 0; i < mailCount; i++) {
+            mail.add(Mail.STREAM_CODEC.decode(buffer));
+        }
+        return new MailboxMenu(id, inventory, mailboxPos, mail);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return player.level().getBlockState(mailboxPos).getBlock() instanceof MailboxBlock
+                && player.distanceToSqr(Vec3.atCenterOf(mailboxPos)) <= 64.0D;
+    }
+
+    // --
+
+    public BlockPos getMailboxPosition() {
+        return mailboxPos;
+    }
+
+    public List<Mail> getMail() {
+        return mail;
+    }
+
+    public @Nullable Mail getRecentlySentMail() {
+        return recentlySentMail;
+    }
+
+    // --
+
+    protected void addPlayerSlots(Inventory playerInventory, int x, int y) {
+        // Hotbar
+        for (int slot = 0; slot < 9; slot++) {
+            addSlot(new Slot(playerInventory, slot, x + slot * 18, y + 58));
+        }
+
+        // Inventory
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 9; column++) {
+                addSlot(new Slot(playerInventory, (column + row * 9) + 9, x + column * 18, y + row * 18));
+            }
+        }
+    }
+
+    // --
+
+    protected boolean trySendStack(Player player, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+
+        @Nullable Recipient recipient = stack.get(Envelope.DataComponents.RECIPIENT);
+        if (recipient == null) {
+            Envelope.LOGGER.error("Cannot send mail '{}': no 'exposure:recipient'.", stack);
+            return false;
+        }
+
+        Mail mail = new Mail(Sender.player(player), recipient, stack, player.level().getGameTime(), 50, Mail.Status.REGULAR);
+
+        if (!player.level().isClientSide) {
+            Mailbox.send(mail);
+        }
+        player.level().playSound(player, mailboxPos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1, 1);
+        recentlySentMail = mail;
+
+        return true;
+    }
+
+    @Override
+    public @NotNull ItemStack quickMoveStack(Player player, int index) {
+        Slot slot = slots.get(index);
+        ItemStack clickedStack = slot.getItem();
+        ItemStack returnedStack = clickedStack.copy();
+
+        if (index > 0) { // From player inventory
+            if (!moveItemStackTo(clickedStack, 0, 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        }
+
+        if (clickedStack.isEmpty()) {
+            slot.set(ItemStack.EMPTY);
+        } else {
+            slot.setChanged();
+        }
+
+        return returnedStack;
+    }
+
+    public boolean doMailAction(Player player, int index, Action action) {
+        if (index < 0 || index >= getMail().size()) return false;
+
+        return switch (action) {
+            case PICK_UP -> pickUpMail(player, index);
+            case MOVE_TO_INVENTORY -> moveMailToInventory(player, index);
+            case MOVE_ALL_TO_INVENTORY -> moveAllMailToInventory(player);
+            case REJECT -> rejectMail(player, index);
+        };
+    }
+
+    protected boolean pickUpMail(Player player, int index) {
+        if (!getCarried().isEmpty()) return false;
+
+        Mail mail = getMail().remove(index);
+
+        setCarried(mail.content().copy());
+        if (player.level() instanceof ServerLevel serverLevel) {
+            MailCoordinator.get(serverLevel.getServer()).getDeliveredMail().takeOut(player.getUUID(), mail);
+        }
+        return true;
+    }
+
+    protected boolean moveMailToInventory(Player player, int index) {
+        Mail mail = getMail().get(index);
+
+        if (!PlayerInventoryUtil.tryAddWholeStack(player, mail.content().copy())) {
+            return false;
+        }
+
+        getMail().remove(index);
+
+        if (player.level() instanceof ServerLevel serverLevel) {
+            MailCoordinator.get(serverLevel.getServer()).getDeliveredMail().takeOut(player.getUUID(), mail);
+        }
+
+        return true;
+    }
+
+    protected boolean moveAllMailToInventory(Player player) {
+        boolean movedSomething = false;
+        while (!getMail().isEmpty()) {
+            if (!moveMailToInventory(player, 0)) {
+                return movedSomething;
+            }
+            movedSomething = true;
+        }
+        return true;
+    }
+
+    protected boolean rejectMail(Player player, int index) {
+        throw new NotImplementedException("C.O.D. and rejection of C.O.D. mail is not implemented yet.");
+    }
+
+    // --
+
+    public enum Action {
+        PICK_UP,
+        MOVE_TO_INVENTORY,
+        MOVE_ALL_TO_INVENTORY,
+        REJECT;
+
+        public static final StreamCodec<ByteBuf, Action> STREAM_CODEC = ByteBufCodecs.idMapper(
+                ByIdMap.continuous(Action::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), Action::ordinal);
+    }
+}

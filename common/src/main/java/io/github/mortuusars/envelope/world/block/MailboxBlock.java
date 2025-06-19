@@ -1,9 +1,21 @@
 package io.github.mortuusars.envelope.world.block;
 
+import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.api.mail.Mail;
+import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
+import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -12,11 +24,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Set;
 
 public class MailboxBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -95,5 +111,34 @@ public class MailboxBlock extends Block {
     @Override
     protected @NotNull BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    }
+
+    // --
+
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer()).getDeliveredMail().getAll(player.getUUID());
+
+            PlatformHelper.openMenu(serverPlayer, new MenuProvider() {
+                @Override
+                public @NotNull Component getDisplayName() {
+                    return Component.translatable("container.envelope.mailbox");
+                }
+
+                @Override
+                public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+                    return new MailboxMenu(id, inventory, pos, mail.stream().toList());
+                }
+            }, buffer -> {
+                buffer.writeBlockPos(pos);
+                buffer.writeVarInt(mail.size());
+                for (Mail item : mail) {
+                    Mail.STREAM_CODEC.encode(buffer, item);
+                }
+            });
+        }
+
+        return InteractionResult.SUCCESS;
     }
 }
