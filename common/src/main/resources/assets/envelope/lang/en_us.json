@@ -13,10 +13,16 @@
   "gui.envelope.mailbox.empty": "Empty",
 
   "gui.envelope.mailbox.mail.tooltip.sender": "§7Sender: %s",
-  "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §7ago",
+  "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §fago",
   "gui.envelope.mailbox.mail.tooltip.status": "§7Status: %s",
-  "gui.envelope.mailbox.mail.tooltip.shift_to_move": "§8[§7Shift+Click§8] to quick-move",
-  "gui.envelope.mailbox.mail.tooltip.ctrl_shift_to_move_all": "§8[§7Ctrl+Shift+Click§8] to quick-move all",
+
+  "gui.envelope.mailbox.mail.tooltip.new_mail": "New Mail Arrived",
+  "gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
+
+  "gui.envelope.mail.status.regular": "Regular",
+  "gui.envelope.mail.status.returned": "Returned",
+  "gui.envelope.mail.status.rejected": "Rejected",
+  "gui.envelope.mail.status.unclaimed": "Unclaimed",
 
   "gui.envelope.time.months": "%sm",
   "gui.envelope.time.weeks": "%sw",

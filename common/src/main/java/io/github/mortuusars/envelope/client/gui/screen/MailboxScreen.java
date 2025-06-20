@@ -11,6 +11,8 @@ import io.github.mortuusars.envelope.network.packet.serverbound.MailboxMenuMailA
 import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -33,8 +35,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/mailbox.png");
 
     public static final WidgetSprites REGULAR_MAIL_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail"));
-    public static final WidgetSprites SENDER_PLAYER = Sprites.normalAndHighlighted(Envelope.resource("mailbox/sender_player"));
-    public static final WidgetSprites SENDER_NPC = Sprites.normalAndHighlighted(Envelope.resource("mailbox/sender_npc"));
+    public static final WidgetSprites SENDER_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/sender_player"));
+    public static final WidgetSprites SENDER_NPC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/sender_npc"));
+    public static final WidgetSprites NEW_MAIL_SPRITES = Sprites.normalOnly(Envelope.resource("mailbox/new_mail"));
 
     protected static final int SCROLL_THUMB_TOP_HEIGHT = 3;
     protected static final int SCROLL_THUMB_MID_HEIGHT = 4;
@@ -47,6 +50,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected Mail hoveredMail;
 
     protected Rect2i mailArea = new Rect2i(7, 17, 162, 110);
+
+    protected ImageButton newMailButton;
 
     protected int scroll = 0;
     protected int scrollAtDragStart = 0;
@@ -67,6 +72,15 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         super.init();
         mailArea = new Rect2i(leftPos + 7, topPos + 17, 162, 110);
         scrollBarArea = new Rect2i(leftPos + 162, topPos + 18, 6, 108);
+
+        newMailButton = new ImageButton(leftPos + 161, topPos + 6, 8, 8, NEW_MAIL_SPRITES, btn -> {
+            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, MailboxMenu.REFRESH_MAIL_BUTTON_ID);
+            scrollTo(0);
+        });
+        newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.mail.tooltip.new_mail")
+                .append("\n")
+                .append(Component.translatable("gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh"))));
+        addRenderableWidget(newMailButton);
     }
 
     protected void updateScrollThumb() {
@@ -89,6 +103,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        newMailButton.visible = getMenu().hasNewMail();
+
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
 
@@ -107,12 +123,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                 long ageTicks = Minecrft.level().getGameTime() - (hoveredMail.sentAt() + hoveredMail.travelTime());
                 tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.duration(ageTicks)));
                 if (hoveredMail.status() != Mail.Status.REGULAR) {
-                    tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.status",
-                            Component.literal(hoveredMail.status().getSerializedName()).withStyle(Style.EMPTY.withColor(0xFFe1765e))));
+                    tooltip.add(hoveredMail.status().translate().withStyle(Style.EMPTY.withColor(0xFFe1765e)));
                 }
-
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.shift_to_move"));
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.ctrl_shift_to_move_all"));
 
                 guiGraphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
             }
@@ -182,8 +194,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         ResourceLocation sprite = isHovered ? REGULAR_MAIL_SPRITES.enabledFocused() : REGULAR_MAIL_SPRITES.enabled();
         guiGraphics.blitSprite(sprite, x, y, 0, 154, 18);
         WidgetSprites senderSprites = mail.sender().type() == Sender.Type.PLAYER
-                ? SENDER_PLAYER
-                : SENDER_NPC;
+                ? SENDER_PLAYER_SPRITES
+                : SENDER_NPC_SPRITES;
         ResourceLocation senderSprite = isHovered ? senderSprites.enabledFocused() : senderSprites.enabled();
         guiGraphics.blitSprite(senderSprite, x + 23, y + 4, 0, 10, 10);
         guiGraphics.renderItem(mail.content(), x + 2, y + 1);

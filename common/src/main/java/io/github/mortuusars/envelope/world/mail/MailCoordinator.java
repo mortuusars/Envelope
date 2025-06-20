@@ -3,10 +3,12 @@ package io.github.mortuusars.envelope.world.mail;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
 import io.github.mortuusars.envelope.world.KnownPlayers;
+import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -90,8 +92,10 @@ public class MailCoordinator extends SavedData {
         deliveredMail.deliver(playerUuid, mail);
         @Nullable ServerPlayer player = server.getPlayerList().getPlayer(playerUuid);
         if (player != null) {
-            player.displayClientMessage(Component.literal("You've got mail! " + mail), false);
-            player.level().playSound(null, player, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.MASTER,1f, 1f);
+            if (player.containerMenu instanceof MailboxMenu) {
+                Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player);
+                player.level().playSound(null, player, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.MASTER, 0.75f, 1f);
+            }
         }
 
         return true;

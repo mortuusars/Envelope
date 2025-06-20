@@ -5,6 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
@@ -65,6 +67,10 @@ public record Mail(Sender sender, Recipient recipient, ItemStack content, long s
         @Override
         public @NotNull String getSerializedName() {
             return name;
+        }
+
+        public MutableComponent translate() {
+            return Component.translatable("gui.envelope.mail.status." + name);
         }
     }
 }

@@ -13,6 +13,10 @@ import java.util.function.Function;
 public class Sprites {
     public static WidgetSprites SCROLL_THUMB = threeStates(Envelope.resource("widgets/scroll_thumb"));
 
+    public static WidgetSprites normalOnly(ResourceLocation base) {
+        return new WidgetSprites(base, base);
+    }
+
     public static WidgetSprites normalAndHighlighted(ResourceLocation base) {
         return new WidgetSprites(base, base,
                 ResourceLocation.fromNamespaceAndPath(base.getNamespace(), base.getPath() + "_highlighted"));

@@ -5,6 +5,8 @@ import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.Mailbox;
 import io.github.mortuusars.envelope.api.mail.Recipient;
 import io.github.mortuusars.envelope.api.mail.Sender;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
 import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import io.netty.buffer.ByteBuf;
@@ -13,6 +15,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
@@ -32,18 +35,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MailboxMenu extends AbstractContainerMenu {
+    public static final int REFRESH_MAIL_BUTTON_ID = 0;
+
     protected final Inventory playerInventory;
     protected final BlockPos mailboxPos;
-    protected final List<Mail> mail;
-
+    protected List<Mail> mail;
     @Nullable
     protected Mail recentlySentMail = null;
+    protected boolean hasNewMail;
 
     protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<Mail> mail) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.mailboxPos = mailboxPos;
-        this.mail = new ArrayList<>(mail);
+        this.mail = new ArrayList<>(mail.reversed());
 
         Player player = playerInventory.player;
 
@@ -91,8 +96,21 @@ public class MailboxMenu extends AbstractContainerMenu {
         return mail;
     }
 
+    public void setMail(List<Mail> mail) {
+        this.mail = new ArrayList<>(mail.reversed());
+        setHasNewMail(false);
+    }
+
     public @Nullable Mail getRecentlySentMail() {
         return recentlySentMail;
+    }
+
+    public boolean hasNewMail() {
+        return hasNewMail;
+    }
+
+    public void setHasNewMail(boolean hasNewMail) {
+        this.hasNewMail = hasNewMail;
     }
 
     // --
@@ -206,6 +224,20 @@ public class MailboxMenu extends AbstractContainerMenu {
 
     protected boolean rejectMail(Player player, int index) {
         throw new NotImplementedException("C.O.D. and rejection of C.O.D. mail is not implemented yet.");
+    }
+
+    // --
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
+            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer())
+                    .getDeliveredMail().getAll(player.getUUID());
+            setMail(mail);
+            Packets.sendToClient(new MailboxMenuMailS2CP(mail), serverPlayer);
+            return true;
+        }
+        return false;
     }
 
     // --
