@@ -121,7 +121,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                 }
 
                 long ageTicks = Minecrft.level().getGameTime() - (hoveredMail.sentAt() + hoveredMail.travelTime());
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.duration(ageTicks)));
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
                 if (hoveredMail.status() != Mail.Status.REGULAR) {
                     tooltip.add(hoveredMail.status().translate().withStyle(Style.EMPTY.withColor(0xFFe1765e)));
                 }

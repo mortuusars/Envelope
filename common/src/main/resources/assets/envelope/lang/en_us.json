@@ -24,9 +24,13 @@
   "gui.envelope.mail.status.rejected": "Rejected",
   "gui.envelope.mail.status.unclaimed": "Unclaimed",
 
-  "gui.envelope.time.months": "%sm",
+  "gui.envelope.time.years": "%sy",
+  "gui.envelope.time.months": "%smo",
   "gui.envelope.time.weeks": "%sw",
   "gui.envelope.time.days": "%sd",
   "gui.envelope.time.hours": "%sh",
-  "gui.envelope.time.less_than_one_hour": "<1h"
+  "gui.envelope.time.minutes": "%sm",
+  "gui.envelope.time.seconds": "%ss",
+  "gui.envelope.time.less_than_one_hour": "<1h",
+  "gui.envelope.time.less_than_one_minute": "<1min"
 }
