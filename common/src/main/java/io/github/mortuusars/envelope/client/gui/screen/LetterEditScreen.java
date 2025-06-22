@@ -69,6 +69,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
             recipientText = recipient.name();
         }
         toBox = new TextBox(font, leftPos + 30, topPos + 20, 140, 9)
+                .setFormattingEnabled(false)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)

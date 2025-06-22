@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.client.gui.widget.textbox.text;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.ChatFormatting;
-import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
@@ -22,6 +21,7 @@ public class FormattedStringEditor {
     protected FormattedString string = new FormattedString();
     protected int cursorPos;
     protected int selectionAnchor;
+    protected boolean formattingEnabled = true;
     protected Predicate<String> validator;
 
     public FormattedStringEditor(Predicate<String> validator) {
@@ -46,6 +46,15 @@ public class FormattedStringEditor {
 
     public int getSelectionAnchor() {
         return selectionAnchor;
+    }
+
+    public boolean isFormattingEnabled() {
+        return formattingEnabled;
+    }
+
+    public FormattedStringEditor setFormattingEnabled(boolean formattingEnabled) {
+        this.formattingEnabled = formattingEnabled;
+        return this;
     }
 
     public Predicate<String> getValidator() {
@@ -151,6 +160,10 @@ public class FormattedStringEditor {
         setCursorPos(end, true);
     }
 
+    public void clearSelection() {
+        setSelectionAnchor(getCursorPos());
+    }
+
     public void selectWord(int index) {
         setSelectionRange(
                 StringSplitter.getWordPosition(getString().toStringWithoutFormatting(), -1, index, false),
@@ -223,10 +236,12 @@ public class FormattedStringEditor {
             return true;
         }
 
-        @Nullable Formatting formatting = handleFormattingKeys(key);
-        if (formatting != null) {
-            applyFormatting(formatting);
-            return true;
+        if (isFormattingEnabled()) {
+            @Nullable Formatting formatting = handleFormattingKeys(key);
+            if (formatting != null) {
+                applyFormatting(formatting);
+                return true;
+            }
         }
 
         return false;

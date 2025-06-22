@@ -39,6 +39,7 @@ public class TextBox extends AbstractWidget {
     protected int selectionColor = 0xFF0000FF;
     protected int selectionUnfocusedColor = 0x880000FF;
     protected Consumer<FormattedString> onTextChanged = text -> { };
+    protected boolean formattingEnabled = true;
 
     protected FormattingToolbar formattingToolbar = new FormattingToolbar(this);
 
@@ -142,6 +143,16 @@ public class TextBox extends AbstractWidget {
         return isFocused() ? selectionColor : selectionUnfocusedColor;
     }
 
+    public boolean isFormattingEnabled() {
+        return formattingEnabled;
+    }
+
+    public TextBox setFormattingEnabled(boolean formattingEnabled) {
+        this.formattingEnabled = formattingEnabled;
+        getEditor().setFormattingEnabled(formattingEnabled);
+        return this;
+    }
+
     public TextBox setTextValidator(Predicate<String> validator) {
         getEditor().setValidator(validator);
         return this;
@@ -179,7 +190,9 @@ public class TextBox extends AbstractWidget {
         renderCursor(guiGraphics, mouseX, mouseY, partialTick, getEditor(), displayCache.getCursor(), cursorColor);
         renderSelection(guiGraphics, mouseX, mouseY, partialTick, displayCache.getSelection(), getCurrentSelectionColor());
 
-        getFormattingToolbar().render(guiGraphics, mouseX, mouseY, partialTick);
+        if (isFormattingEnabled()) {
+            getFormattingToolbar().render(guiGraphics, mouseX, mouseY, partialTick);
+        }
     }
 
     public void renderLines(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, List<Line> lines, int color) {
@@ -230,8 +243,10 @@ public class TextBox extends AbstractWidget {
     }
 
     protected void refreshDisplayCache() {
-        displayCache.scheduleUpdate();
-        formattingToolbar.scheduleUpdate();
+        displayCache.scheduleUpdate(); // This call should reference the field directly, for updating to work properly.
+        if (isFormattingEnabled()) {
+            formattingToolbar.scheduleUpdate(); // This call should reference the field directly, for updating to work properly.
+        }
     }
 
     // -- Input
@@ -251,7 +266,7 @@ public class TextBox extends AbstractWidget {
     }
 
     protected boolean handleKeyPressed(int keyCode, int scanCode, int modifiers) {
-        if (getFormattingToolbar().keyPressed(keyCode, scanCode, modifiers)) {
+        if (isFormattingEnabled() && getFormattingToolbar().keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         } else if (keyCode == InputConstants.KEY_UP) {
             changeLine(-1);
@@ -313,11 +328,16 @@ public class TextBox extends AbstractWidget {
             return true;
         }
 
+        if (!isHovered) {
+            getEditor().clearSelection();
+            refreshDisplayCache();
+        }
+
         return false;
     }
 
     public boolean formattingToolbarMouseClicked(double mouseX, double mouseY, int button) {
-        if (getFormattingToolbar().mouseClicked(mouseX, mouseY, button)) {
+        if (isFormattingEnabled() && getFormattingToolbar().mouseClicked(mouseX, mouseY, button)) {
             refreshDisplayCache();
             onTextChanged().accept(getEditor().getString());
             canDrag = false;
