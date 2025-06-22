@@ -6,6 +6,7 @@
   "client": [
   ],
   "mixins": [
+    "jei.JeiKeyConflictContextMixin"
   ],
   "injectors": {
     "defaultRequire": 1

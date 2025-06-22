@@ -32,5 +32,32 @@
   "gui.envelope.time.minutes": "%sm",
   "gui.envelope.time.seconds": "%ss",
   "gui.envelope.time.less_than_one_hour": "<1h",
-  "gui.envelope.time.less_than_one_minute": "<1min"
+  "gui.envelope.time.less_than_one_minute": "<1min",
+
+  "gui.envelope.letter.to": "To:",
+  "gui.envelope.letter.subject": "Subject:",
+  "gui.envelope.letter.message": "Message:",
+
+  "gui.envelope.formatting.aqua": "Aqua",
+  "gui.envelope.formatting.black": "Black",
+  "gui.envelope.formatting.blue": "Blue",
+  "gui.envelope.formatting.bold": "Bold",
+  "gui.envelope.formatting.dark_aqua": "Dark Aqua",
+  "gui.envelope.formatting.dark_blue": "Dark Blue",
+  "gui.envelope.formatting.dark_gray": "Dark Gray",
+  "gui.envelope.formatting.dark_green": "Dark Green",
+  "gui.envelope.formatting.dark_purple": "Dark Purple",
+  "gui.envelope.formatting.dark_red": "Dark Red",
+  "gui.envelope.formatting.gold": "Gold",
+  "gui.envelope.formatting.gray": "Gray",
+  "gui.envelope.formatting.green": "Green",
+  "gui.envelope.formatting.italic": "Italic",
+  "gui.envelope.formatting.light_purple": "Light Purple",
+  "gui.envelope.formatting.obfuscated": "Obfuscated",
+  "gui.envelope.formatting.red": "Red",
+  "gui.envelope.formatting.reset": "Reset",
+  "gui.envelope.formatting.strikethrough": "Strikethrough",
+  "gui.envelope.formatting.underline": "Underline",
+  "gui.envelope.formatting.white": "White",
+  "gui.envelope.formatting.yellow": "Yellow"
 }
