@@ -6,10 +6,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.LoadingModList;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class PlatformHelperImpl {
@@ -31,5 +33,9 @@ public class PlatformHelperImpl {
 
     public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, Consumer<RegistryFriendlyByteBuf> extraDataWriter) {
         serverPlayer.openMenu(menuProvider, extraDataWriter);
+    }
+
+    public static Path getConfigDirectory() {
+        return FMLPaths.CONFIGDIR.get();
     }
 }

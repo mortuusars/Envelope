@@ -34,9 +34,13 @@
   "gui.envelope.time.less_than_one_hour": "<1h",
   "gui.envelope.time.less_than_one_minute": "<1min",
 
-  "gui.envelope.letter.to": "To:",
-  "gui.envelope.letter.subject": "Subject:",
-  "gui.envelope.letter.message": "Message:",
+  "gui.envelope.letter.placeholder.recipient": "<recipient>",
+  "gui.envelope.letter.placeholder.subject": "<subject>",
+  "gui.envelope.letter.placeholder.message": "<message>",
+
+  "gui.envelope.fill_recipient.tooltip.title": "Recipient",
+  "gui.envelope.fill_recipient.tooltip.click_last_recipient": "§8[§7Click§8] - last recipient",
+  "gui.envelope.fill_recipient.tooltip.shift_click_last_sender": "§8[§7Shift+Click§8] - last sender",
 
   "gui.envelope.formatting.aqua": "Aqua",
   "gui.envelope.formatting.black": "Black",

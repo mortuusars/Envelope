@@ -19,27 +19,32 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class TextBox extends AbstractWidget {
-    protected final Font font;
 
     protected FormattedStringEditor editor = new FormattedStringEditor(() ->
             FormattedStringEditor.Validator.fitInDimensions(getFont(), getWidth(), getHeight()));
     protected FormattedStringDisplayCache displayCache = new FormattedStringDisplayCache(editor);
 
     protected HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
+    protected Font font;
     protected int fontColor = 0xFF000000;
     protected int fontUnfocusedColor = 0xFF000000;
     protected int selectionColor = 0xFF0000FF;
     protected int selectionUnfocusedColor = 0x880000FF;
     protected Consumer<FormattedString> onTextChanged = text -> { };
     protected boolean formattingEnabled = true;
+    protected @Nullable Component hint = null;
+    protected int hintColor = 0x77000000;
 
     protected FormattingToolbar formattingToolbar = new FormattingToolbar(this);
 
@@ -58,6 +63,12 @@ public class TextBox extends AbstractWidget {
 
     public Font getFont() {
         return font;
+    }
+
+    public TextBox setFont(Font font) {
+        this.font = font;
+        refreshDisplayCache();
+        return this;
     }
 
     public FormattedStringEditor getEditor() {
@@ -172,11 +183,34 @@ public class TextBox extends AbstractWidget {
         return this;
     }
 
+    public @Nullable Component getHint() {
+        return hint;
+    }
+
+    public TextBox setHint(Component hint) {
+        this.hint = hint;
+        return this;
+    }
+
+    public int getHintColor() {
+        return hintColor;
+    }
+
+    public TextBox setHintColor(int hintColor) {
+        this.hintColor = hintColor;
+        return this;
+    }
+
     // -- Render
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         FormattedStringDisplayCache displayCache = getDisplayCache();
+
+        if (getHint() != null && !isFocused() && getEditor().getString().toString().isBlank()) {
+            int x = getX() + getHorizontalAlignment().align(getWidth(), font.width(getHint()));
+            guiGraphics.drawString(font, getHint(), x, getY(), getHintColor(), false);
+        }
 
         renderLines(guiGraphics, mouseX, mouseY, partialTick, displayCache.getLines(), getCurrentFontColor());
 

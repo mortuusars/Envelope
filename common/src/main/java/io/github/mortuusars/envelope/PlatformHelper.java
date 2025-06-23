@@ -9,6 +9,7 @@ import net.minecraft.world.MenuProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -39,6 +40,11 @@ public class PlatformHelper {
 
     @ExpectPlatform
     public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, Consumer<RegistryFriendlyByteBuf> extraDataWriter) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static Path getConfigDirectory() {
         throw new AssertionError();
     }
 }

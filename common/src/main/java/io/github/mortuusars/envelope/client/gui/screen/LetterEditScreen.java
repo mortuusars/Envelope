@@ -2,17 +2,24 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.display.HorizontalAlignment;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
+import io.github.mortuusars.envelope.client.state.ClientStateManager;
+import io.github.mortuusars.envelope.client.state.FillRecipientState;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.EditLetterPacketC2SP;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,20 +32,25 @@ import java.util.Optional;
 public class LetterEditScreen extends Screen implements JeiKeyConflictResolverScreen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/letter.png");
 
+    public static final WidgetSprites FILL_RECIPIENT_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("widgets/fill_recipient"));
+
     protected final ItemStack letter;
     protected final InteractionHand hand;
     protected final List<Recipient> knownRecipients;
+    protected final FillRecipientState fillRecipientState;
 
     protected int imageWidth, imageHeight, leftPos, topPos;
-    protected TextBox toBox;
+    protected TextBox recipientBox;
     protected TextBox subjectBox;
     protected TextBox messageBox;
+    protected ImageButton fillRecipientButton;
 
     public LetterEditScreen(ItemStack letter, InteractionHand hand, List<Recipient> knownRecipients) {
         super(Component.empty());
         this.letter = letter;
         this.hand = hand;
         this.knownRecipients = knownRecipients;
+        fillRecipientState = ClientStateManager.getFillRecipientState();
     }
 
     @Override
@@ -54,71 +66,91 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
-//        toBox = new EditBox(font,  leftPos + 30, topPos + 20, 140, 9, Component.empty());
-//        toBox.setBordered(false);
-//        toBox.setTextColor(0xFF886447);
-//        @Nullable Recipient recipient = letter.get(Envelope.DataComponents.RECIPIENT);
-//        if (recipient != null) {
-//            toBox.setValue(recipient.name());
-//        }
-//        addRenderableWidget(toBox);
+        fillRecipientButton = new ImageButton(leftPos + 18, topPos + 18, 11, 9, FILL_RECIPIENT_SPRITES, this::fillRecipient);
+        addRenderableWidget(fillRecipientButton);
 
         @Nullable Recipient recipient = letter.get(Envelope.DataComponents.RECIPIENT);
         String recipientText = "";
         if (recipient != null) {
             recipientText = recipient.name();
         }
-        toBox = new TextBox(font, leftPos + 30, topPos + 20, 140, 9)
+        recipientBox = new TextBox(font, leftPos + 30, topPos + 18, 140, 9)
                 .setFormattingEnabled(false)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                .setText(FormattedString.parse(recipientText));
-        addRenderableWidget(toBox);
+                .setHint(Component.translatable("gui.envelope.letter.placeholder.recipient"))
+                .setHintColor(0xFFC2A57F)
+                .setText(FormattedString.parse(recipientText))
+                .setOnTextChanged(this::recipientTextChanged);
+        addRenderableWidget(recipientBox);
 
-        subjectBox = new TextBox(font, leftPos + 20, topPos + 44, 160, 19)
+        subjectBox = new TextBox(font, leftPos + 20, topPos + 39, 160, 19)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setHint(Component.translatable("gui.envelope.letter.placeholder.subject"))
+                .setHintColor(0xFFC2A57F)
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
         addRenderableWidget(subjectBox);
 
-        messageBox = new TextBox(font, leftPos + 20, topPos + 77, 160, 137)
+        messageBox = new TextBox(font, leftPos + 20, topPos + 69, 160, 137)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setHint(Component.translatable("gui.envelope.letter.placeholder.message"))
+                .setHintColor(0xFFC2A57F)
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_MESSAGE, "")));
         addRenderableWidget(messageBox);
+
+        updateFillRecipientButton();
+    }
+
+    protected void recipientTextChanged(FormattedString chars) {
+        updateFillRecipientButton();
+    }
+
+    private void updateFillRecipientButton() {
+        MutableComponent tooltip = Component.translatable("gui.envelope.fill_recipient.tooltip.title");
+        boolean canFillWithLastRecipient = !fillRecipientState.recipient.isBlank()
+                && recipientBox != null
+                && !fillRecipientState.recipient.equalsIgnoreCase(recipientBox.getEditor().getString().toString());
+        boolean canFillWithLastSender = !fillRecipientState.sender.isBlank()
+                && recipientBox != null
+                && !fillRecipientState.sender.equalsIgnoreCase(recipientBox.getEditor().getString().toString());
+
+        if (canFillWithLastRecipient) {
+            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.click_last_recipient"));
+        }
+        if (canFillWithLastSender) {
+            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.shift_click_last_sender"));
+        }
+
+        fillRecipientButton.setTooltip(Tooltip.create(tooltip));
+
+        fillRecipientButton.active = canFillWithLastRecipient || canFillWithLastSender;
+    }
+
+    protected void fillRecipient(Button button) {
+        recipientBox.setText(Screen.hasShiftDown()
+                ? FormattedString.parse(fillRecipientState.sender)
+                : FormattedString.parse(fillRecipientState.recipient));
+        recipientBox.getDisplayCache().scheduleUpdate();
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderLabels(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-    }
-
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        Component to = Component.translatable("gui.envelope.letter.to");
-        guiGraphics.drawString(font, to, leftPos + 100 - (font.width(to) / 2), topPos + 10, 0xFFCFAF88, false);
-
-        Component subject = Component.translatable("gui.envelope.letter.subject");
-        guiGraphics.drawString(font, subject, leftPos + 100 - (font.width(subject) / 2), topPos + 33, 0xFFCFAF88, false);
-
-        Component message = Component.translatable("gui.envelope.letter.message");
-        guiGraphics.drawString(font, message, leftPos + 100 - (font.width(message) / 2), topPos + 66, 0xFFCFAF88, false);
     }
 
     @Override
@@ -164,7 +196,14 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
     // --
 
     protected void saveChanges() {
-        Optional<Recipient> recipient = getOrCreateRecipient(toBox.getEditor().getString().toStringWithoutFormatting());
+        Optional<Recipient> recipient = getOrCreateRecipient(recipientBox.getEditor().getString().toStringWithoutFormatting());
+
+        recipient.ifPresent(value -> {
+            if (!fillRecipientState.recipient.equals(value.name())) {
+                fillRecipientState.recipient = value.name();
+                ClientStateManager.save();
+            }
+        });
 
         // Local
 

@@ -15,6 +15,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class PlatformHelperImpl {
@@ -65,5 +66,9 @@ public class PlatformHelperImpl {
         };
 
         serverPlayer.openMenu(extendedScreenHandlerFactory);
+    }
+
+    public static Path getConfigDirectory() {
+        return FabricLoader.getInstance().getConfigDir();
     }
 }
