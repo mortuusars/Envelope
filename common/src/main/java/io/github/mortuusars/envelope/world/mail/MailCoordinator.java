@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.mail;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Sender;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
 import io.github.mortuusars.envelope.world.KnownPlayers;
@@ -115,7 +116,7 @@ public class MailCoordinator extends SavedData {
     }
 
     protected void returnToSender(MinecraftServer server, Mail mail) {
-        send(new Mail(mail.recipient().toSender(),
+        send(new Mail(Sender.MAIL_SERVICE,
                       mail.sender().toRecipient(),
                       mail.content(),
                       server.overworld().getGameTime(),

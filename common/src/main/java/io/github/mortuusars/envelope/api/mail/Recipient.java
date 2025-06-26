@@ -33,14 +33,6 @@ public record Recipient(String name, Optional<UUID> uuid, Type type) {
         return new Recipient(player.getScoreboardName(), Optional.of(player.getUUID()), Type.PLAYER);
     }
 
-    public static Recipient npc(String name) {
-        return new Recipient(name, null, Type.NPC);
-    }
-
-    public Sender toSender() {
-        return new Sender(name, uuid, type == Type.PLAYER ? Sender.Type.PLAYER : Sender.Type.NPC);
-    }
-
     public enum Type implements StringRepresentable {
         PLAYER("player"),
         NPC("npc"),

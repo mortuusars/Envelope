@@ -18,6 +18,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -50,7 +51,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         this.letter = letter;
         this.hand = hand;
         this.knownRecipients = knownRecipients;
-        fillRecipientState = ClientStateManager.getFillRecipientState();
+        this.fillRecipientState = ClientStateManager.getFillRecipientState();
     }
 
     @Override
@@ -66,6 +67,8 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
+        Language instance = Language.getInstance();
+
         fillRecipientButton = new ImageButton(leftPos + 18, topPos + 18, 11, 9, FILL_RECIPIENT_SPRITES, this::fillRecipient);
         addRenderableWidget(fillRecipientButton);
 
@@ -80,7 +83,6 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHint(Component.translatable("gui.envelope.letter.placeholder.recipient"))
                 .setHintColor(0xFFC2A57F)
                 .setText(FormattedString.parse(recipientText))
                 .setOnTextChanged(this::recipientTextChanged);
@@ -91,7 +93,6 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHint(Component.translatable("gui.envelope.letter.placeholder.subject"))
                 .setHintColor(0xFFC2A57F)
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
         addRenderableWidget(subjectBox);
@@ -101,7 +102,6 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHint(Component.translatable("gui.envelope.letter.placeholder.message"))
                 .setHintColor(0xFFC2A57F)
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_MESSAGE, "")));
         addRenderableWidget(messageBox);
@@ -123,10 +123,10 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 && !fillRecipientState.sender.equalsIgnoreCase(recipientBox.getEditor().getString().toString());
 
         if (canFillWithLastRecipient) {
-            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.click_last_recipient"));
+            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.lclick_last_recipient"));
         }
         if (canFillWithLastSender) {
-            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.shift_click_last_sender"));
+            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.rclick_last_sender"));
         }
 
         fillRecipientButton.setTooltip(Tooltip.create(tooltip));
@@ -139,6 +139,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 ? FormattedString.parse(fillRecipientState.sender)
                 : FormattedString.parse(fillRecipientState.recipient));
         recipientBox.getDisplayCache().scheduleUpdate();
+        updateFillRecipientButton();
     }
 
     @Override
@@ -185,10 +186,11 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
 
     @Override
     public void setFocused(@Nullable GuiEventListener focused) {
-        GuiEventListener lastFocused = getFocused();
+        @Nullable GuiEventListener lastFocused = getFocused();
         super.setFocused(focused);
-        if (lastFocused instanceof TextBox textBox) {
-            textBox.getEditor().setSelectionAnchor(textBox.getEditor().getCursorPos());
+        // Clear selection if focus changes:
+        if (lastFocused != null && !lastFocused.equals(getFocused()) && lastFocused instanceof TextBox textBox) {
+            textBox.getEditor().clearSelection();
             textBox.getDisplayCache().scheduleUpdate();
         }
     }

@@ -34,13 +34,9 @@
   "gui.envelope.time.less_than_one_hour": "<1h",
   "gui.envelope.time.less_than_one_minute": "<1min",
 
-  "gui.envelope.letter.placeholder.recipient": "<recipient>",
-  "gui.envelope.letter.placeholder.subject": "<subject>",
-  "gui.envelope.letter.placeholder.message": "<message>",
-
   "gui.envelope.fill_recipient.tooltip.title": "Recipient",
-  "gui.envelope.fill_recipient.tooltip.click_last_recipient": "§8[§7Click§8] - last recipient",
-  "gui.envelope.fill_recipient.tooltip.shift_click_last_sender": "§8[§7Shift+Click§8] - last sender",
+  "gui.envelope.fill_recipient.tooltip.lclick_last_recipient": "§8[§7Click§8] - last recipient",
+  "gui.envelope.fill_recipient.tooltip.rclick_last_sender": "§8[§7Right+Click§8] - last sender",
 
   "gui.envelope.formatting.aqua": "Aqua",
   "gui.envelope.formatting.black": "Black",
@@ -63,5 +59,13 @@
   "gui.envelope.formatting.strikethrough": "Strikethrough",
   "gui.envelope.formatting.underline": "Underline",
   "gui.envelope.formatting.white": "White",
-  "gui.envelope.formatting.yellow": "Yellow"
+  "gui.envelope.formatting.yellow": "Yellow",
+
+  "sender.envelope.mail_service": "<Mail Service>",
+
+  "sender.envelope.villager": "Villager",
+
+  юей
+  "sender.envelope.villager": "Селянин",
+  "sender.envelope.pillager": "Розбійник"
 }
