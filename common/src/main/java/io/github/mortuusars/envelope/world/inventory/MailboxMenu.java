@@ -1,10 +1,7 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Mail;
-import io.github.mortuusars.envelope.api.mail.Mailbox;
-import io.github.mortuusars.envelope.api.mail.Recipient;
-import io.github.mortuusars.envelope.api.mail.Sender;
+import io.github.mortuusars.envelope.api.mail.*;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
@@ -134,13 +131,13 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected boolean trySendStack(Player player, ItemStack stack) {
         if (stack.isEmpty()) return false;
 
-        @Nullable Recipient recipient = stack.get(Envelope.DataComponents.RECIPIENT);
+        @Nullable Address recipient = stack.get(Envelope.DataComponents.RECIPIENT);
         if (recipient == null) {
             Envelope.LOGGER.error("Cannot send mail '{}': no 'exposure:recipient'.", stack);
             return false;
         }
 
-        Mail mail = new Mail(Sender.player(player), recipient, stack, player.level().getGameTime(), 50, Mail.Status.REGULAR);
+        Mail mail = new Mail(new Address.Player(player), recipient, stack, player.level().getGameTime(), 50, Mail.Status.REGULAR);
 
         if (!player.level().isClientSide) {
             Mailbox.send(mail);

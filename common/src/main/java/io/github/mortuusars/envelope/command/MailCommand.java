@@ -4,10 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Mail;
-import io.github.mortuusars.envelope.api.mail.Mailbox;
-import io.github.mortuusars.envelope.api.mail.Recipient;
-import io.github.mortuusars.envelope.api.mail.Sender;
+import io.github.mortuusars.envelope.api.mail.*;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -30,12 +27,12 @@ public class MailCommand {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
         ItemStack itemStack = new ItemStack(Envelope.Items.PACKAGE.get());
-        Recipient recipient = new Recipient(RandomStringUtils.randomAlphabetic(
-                ThreadLocalRandom.current().nextInt(30, 60)), Optional.empty(), Recipient.Type.PLAYER);
+        Address recipient = new Address.Npc(RandomStringUtils.randomAlphabetic(
+                ThreadLocalRandom.current().nextInt(30, 60)), Optional.empty());
         itemStack.set(Envelope.DataComponents.RECIPIENT, recipient);
 
         Mail mail = new Mail(
-                Sender.player(player),
+                new Address.Player(player.getScoreboardName(), player.getUUID()),
                 recipient,
                 itemStack,
                 player.level().getGameTime(),

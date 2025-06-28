@@ -61,11 +61,5 @@
   "gui.envelope.formatting.white": "White",
   "gui.envelope.formatting.yellow": "Yellow",
 
-  "sender.envelope.mail_service": "<Mail Service>",
-
-  "sender.envelope.villager": "Villager",
-
-  юей
-  "sender.envelope.villager": "Селянин",
-  "sender.envelope.pillager": "Розбійник"
+  "address.envelope.mail_service": "<Mail Service>"
 }

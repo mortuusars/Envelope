@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
-import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditScreenS2CP;
 import io.github.mortuusars.envelope.world.KnownPlayers;
@@ -13,10 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class LetterItem extends Item {
     public LetterItem(Properties properties) {
@@ -27,10 +24,11 @@ public class LetterItem extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
             Map<String, UUID> knownPlayers = KnownPlayers.get(serverPlayer.serverLevel().getServer()).getAll();
-            List<Recipient> recipients = knownPlayers.entrySet().stream()
-                    .map(e -> new Recipient(e.getKey(), Optional.ofNullable(e.getValue()), Recipient.Type.PLAYER))
-                    .toList();
-            Packets.sendToClient(new OpenLetterEditScreenS2CP(usedHand, recipients), serverPlayer);
+            List<Address> knownRecipients = new ArrayList<>(knownPlayers.entrySet().stream()
+                    .map(e -> new Address.Player(e.getKey(), e.getValue()))
+                    .toList());
+
+            Packets.sendToClient(new OpenLetterEditScreenS2CP(usedHand, knownRecipients), serverPlayer);
         }
 
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);

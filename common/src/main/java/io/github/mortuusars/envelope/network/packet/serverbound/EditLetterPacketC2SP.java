@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.network.packet.serverbound;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -15,13 +15,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record EditLetterPacketC2SP(int slot, Optional<Recipient> recipient, String subject, String message) implements Packet {
+public record EditLetterPacketC2SP(int slot, Optional<Address> recipient, String subject, String message) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("edit_letter_packet");
     public static final Type<EditLetterPacketC2SP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EditLetterPacketC2SP> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, EditLetterPacketC2SP::slot,
-            ByteBufCodecs.optional(Recipient.STREAM_CODEC), EditLetterPacketC2SP::recipient,
+            ByteBufCodecs.optional(Address.STREAM_CODEC), EditLetterPacketC2SP::recipient,
             ByteBufCodecs.stringUtf8(512), EditLetterPacketC2SP::subject,
             ByteBufCodecs.stringUtf8(4096), EditLetterPacketC2SP::message,
             EditLetterPacketC2SP::new

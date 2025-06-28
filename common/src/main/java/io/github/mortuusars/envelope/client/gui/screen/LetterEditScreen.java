@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
@@ -18,7 +18,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -37,7 +36,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
 
     protected final ItemStack letter;
     protected final InteractionHand hand;
-    protected final List<Recipient> knownRecipients;
+    protected final List<Address> knownRecipients;
     protected final FillRecipientState fillRecipientState;
 
     protected int imageWidth, imageHeight, leftPos, topPos;
@@ -46,7 +45,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
     protected TextBox messageBox;
     protected ImageButton fillRecipientButton;
 
-    public LetterEditScreen(ItemStack letter, InteractionHand hand, List<Recipient> knownRecipients) {
+    public LetterEditScreen(ItemStack letter, InteractionHand hand, List<Address> knownRecipients) {
         super(Component.empty());
         this.letter = letter;
         this.hand = hand;
@@ -67,15 +66,13 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
-        Language instance = Language.getInstance();
-
         fillRecipientButton = new ImageButton(leftPos + 18, topPos + 18, 11, 9, FILL_RECIPIENT_SPRITES, this::fillRecipient);
         addRenderableWidget(fillRecipientButton);
 
-        @Nullable Recipient recipient = letter.get(Envelope.DataComponents.RECIPIENT);
+        @Nullable Address recipient = letter.get(Envelope.DataComponents.RECIPIENT);
         String recipientText = "";
         if (recipient != null) {
-            recipientText = recipient.name();
+            recipientText = recipient.id();
         }
         recipientBox = new TextBox(font, leftPos + 30, topPos + 18, 140, 9)
                 .setFormattingEnabled(false)
@@ -198,11 +195,11 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
     // --
 
     protected void saveChanges() {
-        Optional<Recipient> recipient = getOrCreateRecipient(recipientBox.getEditor().getString().toStringWithoutFormatting());
+        Optional<Address> recipient = getOrCreateRecipient(recipientBox.getEditor().getString().toStringWithoutFormatting());
 
         recipient.ifPresent(value -> {
-            if (!fillRecipientState.recipient.equals(value.name())) {
-                fillRecipientState.recipient = value.name();
+            if (!fillRecipientState.recipient.equals(value.id())) {
+                fillRecipientState.recipient = value.id();
                 ClientStateManager.save();
             }
         });
@@ -233,19 +230,19 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         Packets.sendToServer(new EditLetterPacketC2SP(slot, recipient, subject, message));
     }
 
-    protected Optional<Recipient> getOrCreateRecipient(String name) {
+    protected Optional<Address> getOrCreateRecipient(String name) {
         if (name.isBlank()) {
             return Optional.empty();
         }
 
         name = name.trim();
-        for (Recipient recipient : knownRecipients) {
-            if (recipient.name().equalsIgnoreCase(name)) {
+        for (Address recipient : knownRecipients) {
+            if (recipient.id().equalsIgnoreCase(name)) {
                 return Optional.of(recipient);
             }
         }
 
-        return Optional.of(new Recipient(name, Optional.empty(), Recipient.Type.UNKNOWN));
+        return Optional.of(new Address.Unknown(name));
     }
 
     // --

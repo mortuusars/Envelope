@@ -47,7 +47,7 @@ public class TravelingMailStorage {
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         for (Mail item : mail) {
             try {
-                tag.put(item.sender().name(), Mail.CODEC.encodeStart(NbtOps.INSTANCE, item).getOrThrow());
+                tag.put(item.sender().id(), Mail.CODEC.encodeStart(NbtOps.INSTANCE, item).getOrThrow());
             } catch (Exception e) {
                 Envelope.LOGGER.error("Cannot save mail '{}': {}", item, e.getMessage());
             }

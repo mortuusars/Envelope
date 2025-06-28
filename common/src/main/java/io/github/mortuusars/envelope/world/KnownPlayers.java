@@ -1,11 +1,10 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Recipient;
+import io.github.mortuusars.envelope.api.mail.Address;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
@@ -79,10 +78,10 @@ public class KnownPlayers extends SavedData {
         }, null);
     }
 
-    public @Nullable UUID byRecipient(Recipient recipient) {
-        if (recipient.uuid().isPresent() && players.containsValue(recipient.uuid().get())) {
-            return recipient.uuid().get();
+    public @Nullable UUID byAddress(Address recipient) {
+        if (recipient instanceof Address.Player player && players.containsValue(player.uuid())) {
+            return player.uuid();
         }
-        return byName(recipient.name());
+        return byName(recipient.id());
     }
 }

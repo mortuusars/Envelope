@@ -1,9 +1,8 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.Mail;
-import io.github.mortuusars.envelope.api.mail.Recipient;
-import io.github.mortuusars.envelope.api.mail.Sender;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
 import io.github.mortuusars.envelope.world.KnownPlayers;
@@ -102,22 +101,26 @@ public class MailCoordinator extends SavedData {
         return true;
     }
 
-    protected @Nullable UUID tryGetPlayerUuid(MinecraftServer server, Recipient recipient) {
+    protected @Nullable UUID tryGetPlayerUuid(MinecraftServer server, Address recipient) {
         if (tryFindOnlineRecipient(server, recipient) instanceof ServerPlayer player) {
             return player.getUUID();
         }
-        return KnownPlayers.get(server).byRecipient(recipient);
+        return KnownPlayers.get(server).byAddress(recipient);
     }
 
-    protected @Nullable ServerPlayer tryFindOnlineRecipient(MinecraftServer server, Recipient recipient) {
-        return recipient.uuid()
-                .map(uuid -> server.getPlayerList().getPlayer(uuid))
-                .orElse(server.getPlayerList().getPlayerByName(recipient.name()));
+    protected @Nullable ServerPlayer tryFindOnlineRecipient(MinecraftServer server, Address recipient) {
+        if (recipient instanceof Address.Player playerAddress) {
+            @Nullable ServerPlayer player = server.getPlayerList().getPlayer(playerAddress.uuid());
+            if (player != null) {
+                return player;
+            }
+        }
+        return server.getPlayerList().getPlayerByName(recipient.id());
     }
 
     protected void returnToSender(MinecraftServer server, Mail mail) {
-        send(new Mail(Sender.MAIL_SERVICE,
-                      mail.sender().toRecipient(),
+        send(new Mail(Address.MAIL_SERVICE,
+                      mail.sender(),
                       mail.content(),
                       server.overworld().getGameTime(),
                       mail.travelTime(), // Same time to return

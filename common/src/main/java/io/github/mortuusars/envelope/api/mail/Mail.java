@@ -14,14 +14,14 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public record Mail(Sender sender, Recipient recipient, ItemStack content, long sentAt, int travelTime, Status status) {
+public record Mail(Address sender, Address recipient, ItemStack content, long sentAt, int travelTime, Status status) {
     public Mail {
         Preconditions.checkArgument(!content.isEmpty(), "Content cannot be empty!");
     }
 
     public static final Codec<Mail> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Sender.CODEC.fieldOf("sender").forGetter(Mail::sender),
-            Recipient.CODEC.fieldOf("recipient").forGetter(Mail::recipient),
+            Address.CODEC.fieldOf("sender").forGetter(Mail::sender),
+            Address.CODEC.fieldOf("recipient").forGetter(Mail::recipient),
             ItemStack.CODEC.fieldOf("content").forGetter(Mail::content),
             Codec.LONG.fieldOf("sent_at").forGetter(Mail::sentAt),
             Codec.INT.fieldOf("travel_time").forGetter(Mail::travelTime),
@@ -30,16 +30,16 @@ public record Mail(Sender sender, Recipient recipient, ItemStack content, long s
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Mail> STREAM_CODEC = StreamCodec.of(
             (buffer, mail) -> {
-                Sender.STREAM_CODEC.encode(buffer, mail.sender());
-                Recipient.STREAM_CODEC.encode(buffer, mail.recipient());
+                Address.STREAM_CODEC.encode(buffer, mail.sender());
+                Address.STREAM_CODEC.encode(buffer, mail.recipient());
                 ItemStack.STREAM_CODEC.encode(buffer, mail.content());
                 ByteBufCodecs.VAR_LONG.encode(buffer, mail.sentAt());
                 ByteBufCodecs.VAR_INT.encode(buffer, mail.travelTime());
                 Status.STREAM_CODEC.encode(buffer, mail.status());
             },
             buffer -> new Mail(
-                    Sender.STREAM_CODEC.decode(buffer),
-                    Recipient.STREAM_CODEC.decode(buffer),
+                    Address.STREAM_CODEC.decode(buffer),
+                    Address.STREAM_CODEC.decode(buffer),
                     ItemStack.STREAM_CODEC.decode(buffer),
                     ByteBufCodecs.VAR_LONG.decode(buffer),
                     ByteBufCodecs.VAR_INT.decode(buffer),
