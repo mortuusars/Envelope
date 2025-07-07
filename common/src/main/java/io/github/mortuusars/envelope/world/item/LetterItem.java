@@ -23,10 +23,12 @@ public class LetterItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
-            Map<String, UUID> knownPlayers = KnownPlayers.get(serverPlayer.serverLevel().getServer()).getAll();
-            List<Address> knownRecipients = new ArrayList<>(knownPlayers.entrySet().stream()
-                    .map(e -> new Address.Player(e.getKey(), e.getValue()))
-                    .toList());
+//            Map<String, UUID> knownPlayers = KnownPlayers.get(serverPlayer.serverLevel().getServer()).getAll();
+//            List<Address> knownRecipients = new ArrayList<>(knownPlayers.entrySet().stream()
+//                    .map(e -> new Address.Player(e.getKey(), e.getValue()))
+//                    .toList());
+
+            List<Address> knownRecipients = new ArrayList<>();
 
             Packets.sendToClient(new OpenLetterEditScreenS2CP(usedHand, knownRecipients), serverPlayer);
         }

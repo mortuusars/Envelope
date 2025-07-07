@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.api.mail.*;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
+import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MailboxMenu extends AbstractContainerMenu {
     public static final int REFRESH_MAIL_BUTTON_ID = 0;
@@ -37,6 +39,8 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected final Inventory playerInventory;
     protected final BlockPos mailboxPos;
     protected List<Mail> mail;
+    protected final MailboxBlockEntity blockEntity;
+    protected final String address;
     @Nullable
     protected Mail recentlySentMail = null;
     protected boolean hasNewMail;
@@ -46,6 +50,13 @@ public class MailboxMenu extends AbstractContainerMenu {
         this.playerInventory = playerInventory;
         this.mailboxPos = mailboxPos;
         this.mail = new ArrayList<>(mail.reversed());
+
+        if (!(playerInventory.player.level().getBlockEntity(mailboxPos) instanceof MailboxBlockEntity be)) {
+            throw new IllegalStateException("MailboxBlockEntity is not available at " + mailboxPos);
+        }
+
+        this.blockEntity = be;
+        this.address = blockEntity.getAddress();
 
         Player player = playerInventory.player;
 
@@ -137,7 +148,7 @@ public class MailboxMenu extends AbstractContainerMenu {
             return false;
         }
 
-        Mail mail = new Mail(new Address.Player(player), recipient, stack, player.level().getGameTime(), 50, Mail.Status.REGULAR);
+        Mail mail = new Mail(new Address(blockEntity.getAddress(), Optional.empty()), recipient, stack, player.level().getGameTime(), 50, Mail.Status.REGULAR);
 
         if (!player.level().isClientSide) {
             Mailbox.send(mail);
@@ -187,7 +198,7 @@ public class MailboxMenu extends AbstractContainerMenu {
 
         setCarried(mail.content().copy());
         if (player.level() instanceof ServerLevel serverLevel) {
-            MailCoordinator.get(serverLevel.getServer()).getDeliveredMail().takeOut(player.getUUID(), mail);
+            MailCoordinator.get(serverLevel.getServer()).getMailboxes().takeOut(address, mail);
         }
         return true;
     }
@@ -202,7 +213,7 @@ public class MailboxMenu extends AbstractContainerMenu {
         getMail().remove(index);
 
         if (player.level() instanceof ServerLevel serverLevel) {
-            MailCoordinator.get(serverLevel.getServer()).getDeliveredMail().takeOut(player.getUUID(), mail);
+            MailCoordinator.get(serverLevel.getServer()).getMailboxes().takeOut(address, mail);
         }
 
         return true;
@@ -228,8 +239,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer())
-                    .getDeliveredMail().getAll(player.getUUID());
+            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer()).getMailboxes().getAll(address);
             setMail(mail);
             Packets.sendToClient(new MailboxMenuMailS2CP(mail), serverPlayer);
             return true;

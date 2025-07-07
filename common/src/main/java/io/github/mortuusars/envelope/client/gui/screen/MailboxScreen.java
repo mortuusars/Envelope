@@ -168,12 +168,12 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         guiGraphics.renderItem(mail.content(), x + 2, y + 1);
 
         FormattedCharSequence sender;
-        if (font.split(FormattedText.of(mail.sender().id()), 114).size() > 1) {
+        if (font.split(FormattedText.of(mail.sender().name()), 114).size() > 1) {
             sender = FormattedCharSequence.composite(
-                    font.split(FormattedText.of(mail.sender().id()), 108).getFirst(),
+                    font.split(FormattedText.of(mail.sender().name()), 108).getFirst(),
                     Component.literal("...").getVisualOrderText());
         } else {
-            sender = Component.literal(mail.sender().id()).getVisualOrderText();
+            sender = Component.literal(mail.sender().name()).getVisualOrderText();
         }
         guiGraphics.drawString(font, sender, x + 36, y + 5, 0xFF886447, false);
     }
@@ -254,8 +254,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(hoveredMail.content().getHoverName());
 
-            if (font.split(FormattedText.of(hoveredMail.sender().id()), 110).size() > 1) {
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", hoveredMail.sender().id()));
+            if (font.split(FormattedText.of(hoveredMail.sender().name()), 110).size() > 1) {
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", hoveredMail.sender().name()));
             }
 
             long ageTicks = Minecrft.level().getGameTime() - (hoveredMail.sentAt() + hoveredMail.travelTime());
@@ -388,9 +388,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             case RETURNED -> ICON_RETURNED_SPRITES;
             case REJECTED -> ICON_REJECTED_SPRITES;
             case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
-            case REGULAR -> mail.sender().type() == Address.Type.PLAYER
+            case REGULAR -> /*mail.sender().type() == Address.Type.PLAYER
                     ? ICON_PLAYER_SPRITES
-                    : ICON_NPC_SPRITES;
+                    :*/ ICON_NPC_SPRITES;
         };
     }
 

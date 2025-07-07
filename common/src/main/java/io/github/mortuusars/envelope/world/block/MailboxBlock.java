@@ -16,10 +16,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -28,13 +26,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class MailboxBlock extends Block {
+public class MailboxBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty HANGING = BooleanProperty.create("hanging");
 
@@ -117,13 +116,13 @@ public class MailboxBlock extends Block {
 
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer()).getDeliveredMail().getAll(player.getUUID());
+        if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
+            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer()).getMailboxes().getAll(blockEntity.getAddress());
 
             PlatformHelper.openMenu(serverPlayer, new MenuProvider() {
                 @Override
                 public @NotNull Component getDisplayName() {
-                    return Component.translatable("container.envelope.mailbox");
+                    return Component.literal(blockEntity.getAddress());
                 }
 
                 @Override
@@ -140,5 +139,22 @@ public class MailboxBlock extends Block {
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        if (!(level.getBlockEntity(pos) instanceof MailboxBlockEntity be)) {
+            throw new IllegalStateException("MailboxBlockEntity is not available at " + pos);
+        }
+
+        if (be.getAddress().isBlank()) {
+            be.setAddress(RandomStringUtils.randomAlphabetic(ThreadLocalRandom.current().nextInt(3, 6)));
+        }
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new MailboxBlockEntity(pos, state);
     }
 }

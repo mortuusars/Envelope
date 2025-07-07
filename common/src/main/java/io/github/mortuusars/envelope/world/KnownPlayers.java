@@ -79,9 +79,10 @@ public class KnownPlayers extends SavedData {
     }
 
     public @Nullable UUID byAddress(Address recipient) {
-        if (recipient instanceof Address.Player player && players.containsValue(player.uuid())) {
-            return player.uuid();
-        }
-        return byName(recipient.id());
+        return null;
+//        if (recipient instanceof Address.Player player && players.containsValue(player.uuid())) {
+//            return player.uuid();
+//        }
+//        return byName(recipient.id());
     }
 }

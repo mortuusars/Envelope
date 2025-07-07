@@ -5,6 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
+import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
@@ -16,6 +17,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 
@@ -57,6 +59,9 @@ public class Envelope {
     }
 
     public static class BlockEntityTypes {
+        public static final Supplier<BlockEntityType<MailboxBlockEntity>> MAILBOX =
+                Register.blockEntityType("mailbox", () -> Register.newBlockEntityType(MailboxBlockEntity::new, Blocks.MAILBOX.get()));
+
         static void init() {
         }
     }

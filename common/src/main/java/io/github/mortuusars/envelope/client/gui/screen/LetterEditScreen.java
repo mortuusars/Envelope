@@ -72,7 +72,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         @Nullable Address recipient = letter.get(Envelope.DataComponents.RECIPIENT);
         String recipientText = "";
         if (recipient != null) {
-            recipientText = recipient.id();
+            recipientText = recipient.name();
         }
         recipientBox = new TextBox(font, leftPos + 30, topPos + 18, 140, 9)
                 .setFormattingEnabled(false)
@@ -198,8 +198,8 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         Optional<Address> recipient = getOrCreateRecipient(recipientBox.getEditor().getString().toStringWithoutFormatting());
 
         recipient.ifPresent(value -> {
-            if (!fillRecipientState.recipient.equals(value.id())) {
-                fillRecipientState.recipient = value.id();
+            if (!fillRecipientState.recipient.equals(value.name())) {
+                fillRecipientState.recipient = value.name();
                 ClientStateManager.save();
             }
         });
@@ -237,12 +237,12 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
 
         name = name.trim();
         for (Address recipient : knownRecipients) {
-            if (recipient.id().equalsIgnoreCase(name)) {
+            if (recipient.name().equalsIgnoreCase(name)) {
                 return Optional.of(recipient);
             }
         }
 
-        return Optional.of(new Address.Unknown(name));
+        return Optional.of(new Address(name, Optional.empty()));
     }
 
     // --

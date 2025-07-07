@@ -12,27 +12,34 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 //TODO: implement SavedData
-public class DeliveredMailStorage {
-    protected final Map<UUID, List<Mail>> mail = new HashMap<>();
+public class MailboxStorage {
+    protected final Map<String, List<Mail>> mailboxes = new HashMap<>();
 
-    public void deliver(UUID ownerUuid, Mail mail) {
-        this.mail.computeIfAbsent(ownerUuid, uuid -> new ArrayList<>()).add(mail);
+    public boolean exists(String address) {
+        return mailboxes.containsKey(address);
     }
 
-    public boolean takeOut(UUID ownerUuid, Mail mail) {
-        @Nullable List<Mail> set = this.mail.get(ownerUuid);
+    public void deliver(String address, Mail mail) {
+        this.mailboxes.computeIfAbsent(address, uuid -> new ArrayList<>()).add(mail);
+    }
+
+    public boolean takeOut(String address, Mail mail) {
+        @Nullable List<Mail> set = this.mailboxes.get(address);
         return set != null && set.remove(mail);
     }
 
-    public List<Mail> getAll(UUID ownerUuid) {
-        List<Mail> list = mail.getOrDefault(ownerUuid, Collections.emptyList());
+    public List<Mail> getAll(String address) {
+        @Nullable List<Mail> list = mailboxes.get(address);
+        if (list == null) {
+            return Collections.emptyList();
+        }
         return Collections.unmodifiableList(list);
     }
 
     // --
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        for (Map.Entry<UUID, List<Mail>> entry : mail.entrySet()) {
+        for (Map.Entry<String, List<Mail>> entry : mailboxes.entrySet()) {
             ListTag list = new ListTag();
             for (Mail item : entry.getValue()) {
                 try {
@@ -41,26 +48,18 @@ public class DeliveredMailStorage {
                     Envelope.LOGGER.error("Cannot save mail '{}': {}", item, e.getMessage());
                 }
             }
-            tag.put(entry.getKey().toString(), list);
+            tag.put(entry.getKey(), list);
         }
 
         return tag;
     }
 
     public void load(CompoundTag tag, HolderLookup.Provider registries) {
-        mail.clear();
+        mailboxes.clear();
 
-        for (String id : tag.getAllKeys()) {
-            UUID uuid;
+        for (String address : tag.getAllKeys()) {
             try {
-                uuid = UUID.fromString(id);
-            } catch (Exception e) {
-                Envelope.LOGGER.error("Cannot parse owner uuid from '{}': {}", id, e.getMessage());
-                return;
-            }
-
-            try {
-                ListTag mailList = tag.getList(id, Tag.TAG_COMPOUND);
+                ListTag mailList = tag.getList(address, Tag.TAG_COMPOUND);
                 List<Mail> mailSet = new ArrayList<>();
 
                 for (Tag mailTag : mailList) {
@@ -71,10 +70,14 @@ public class DeliveredMailStorage {
                     }
                 }
 
-                mail.put(uuid, mailSet);
+                mailboxes.put(address, mailSet);
             } catch (Exception e) {
-                Envelope.LOGGER.error("Cannot load mail of '{}': {}", uuid, e.getMessage());
+                Envelope.LOGGER.error("Cannot load mail of '{}': {}", address, e.getMessage());
             }
         }
+    }
+
+    public void create(String address) {
+        mailboxes.computeIfAbsent(address, a -> new ArrayList<>());
     }
 }
