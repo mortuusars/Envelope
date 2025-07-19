@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class PlatformHelper {
@@ -22,6 +23,10 @@ public class PlatformHelper {
     @ExpectPlatform
     public static @Nullable MinecraftServer getCurrentServer() {
         throw new AssertionError();
+    }
+
+    public static Optional<MinecraftServer> getServer() {
+        return Optional.ofNullable(getCurrentServer());
     }
 
     public static @NotNull MinecraftServer getCurrentServerOrThrow() {

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.api.mail.Address;
+import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
@@ -82,9 +83,39 @@ public class Envelope {
     }
 
     public static class DataComponents {
+        /**
+         * 'From' address of the mail. Used to know return place if mail cannot be delivered to recipient, amongst other purposes.
+         * This component is temporary and should not be depended on.
+         */
+        public static final DataComponentType<Address> SENDER = Register.dataComponentType("sender",
+                arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
+        /**
+         * 'To' address of the mail. Can change in the process of traveling (if the mail is returned or rejected, for example).
+         * This component is temporary and should not be depended on.
+         * If the item needs to have persistent recipient, it should use another 'recipient' component,
+         * like Letters do with 'envelope:letter_recipient'.
+         */
         public static final DataComponentType<Address> RECIPIENT = Register.dataComponentType("recipient",
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
+        /**
+         * GameTime at which mail has been sent. Used to calculate mail travel, etc.
+         */
+        public static final DataComponentType<Long> SENT_AT = Register.dataComponentType("sent_at",
+                arg -> arg.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+        /**
+         * Duration of the trip from sender to recipient. Returning (or rejecting, etc.) a mail will use this for travel back duration as well.
+         */
+        public static final DataComponentType<Integer> TRAVEL_DURATION = Register.dataComponentType("travel_duration",
+                arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+        /**
+         * Log of all steps that mail has been through. Used to show details to the player.
+         */
+        public static final DataComponentType<MailTravelingLog> MAIL_TRAVELING_LOG = Register.dataComponentType("mail_traveling_log",
+                arg -> arg.persistent(MailTravelingLog.CODEC).networkSynchronized(MailTravelingLog.STREAM_CODEC));
+
+        public static final DataComponentType<Address> LETTER_RECIPIENT = Register.dataComponentType("letter_recipient",
+                arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<String> LETTER_SUBJECT = Register.dataComponentType("letter_subject",
                 arg -> arg.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.stringUtf8(512)));
         public static final DataComponentType<String> LETTER_MESSAGE = Register.dataComponentType("letter_message",

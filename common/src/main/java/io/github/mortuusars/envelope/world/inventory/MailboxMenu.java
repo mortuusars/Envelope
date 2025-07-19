@@ -2,17 +2,17 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.*;
+import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
-import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class MailboxMenu extends AbstractContainerMenu {
@@ -38,14 +39,15 @@ public class MailboxMenu extends AbstractContainerMenu {
 
     protected final Inventory playerInventory;
     protected final BlockPos mailboxPos;
-    protected List<Mail> mail;
+    protected List<ItemStack> mail;
     protected final MailboxBlockEntity blockEntity;
     protected final String address;
     @Nullable
-    protected Mail recentlySentMail = null;
+    protected ItemStack recentlySentMail = null;
+    protected long recentlySentAt = 0L;
     protected boolean hasNewMail;
 
-    protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<Mail> mail) {
+    protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.mailboxPos = mailboxPos;
@@ -68,22 +70,31 @@ public class MailboxMenu extends AbstractContainerMenu {
 
             @Override
             public void set(ItemStack stack) {
-                trySendStack(player, stack);
+                if (stack.isEmpty()) return;
+                if (!blockEntity.sendMail(stack, player)) {
+                    if (player.level().isClientSide) {
+                        player.level().playSound(player, player, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 1);
+                    }
+                } else {
+                    player.level().playSound(player, MailboxMenu.this.mailboxPos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1, 1);
+                    recentlySentMail = stack;
+                    recentlySentAt = player.level().getGameTime();
+                }
             }
         });
         addPlayerSlots(playerInventory, 8, 143);
     }
 
-    public MailboxMenu(int id, Inventory playerInventory, BlockPos mailboxPos, List<Mail> mail) {
+    public MailboxMenu(int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
         this(Envelope.MenuTypes.MAILBOX.get(), id, playerInventory, mailboxPos, mail);
     }
 
     public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
-        List<Mail> mail = new ArrayList<>();
+        List<ItemStack> mail = new ArrayList<>();
         int mailCount = buffer.readVarInt();
         for (int i = 0; i < mailCount; i++) {
-            mail.add(Mail.STREAM_CODEC.decode(buffer));
+            mail.add(ItemStack.STREAM_CODEC.decode(buffer));
         }
         return new MailboxMenu(id, inventory, mailboxPos, mail);
     }
@@ -100,17 +111,33 @@ public class MailboxMenu extends AbstractContainerMenu {
         return mailboxPos;
     }
 
-    public List<Mail> getMail() {
+    public MailboxBlockEntity getBlockEntity() {
+        return blockEntity;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public List<ItemStack> getMail() {
         return mail;
     }
 
-    public void setMail(List<Mail> mail) {
+    public void setMail(List<ItemStack> mail) {
         this.mail = new ArrayList<>(mail.reversed());
         setHasNewMail(false);
     }
 
-    public @Nullable Mail getRecentlySentMail() {
+    public @Nullable ItemStack getRecentlySentMail() {
         return recentlySentMail;
+    }
+
+    public long getRecentlySentAt() {
+        return recentlySentAt;
+    }
+
+    public int ticksSinceLastSend() {
+        return (int) (Objects.requireNonNull(blockEntity.getLevel()).getGameTime() - recentlySentAt);
     }
 
     public boolean hasNewMail() {
@@ -138,26 +165,6 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     // --
-
-    protected boolean trySendStack(Player player, ItemStack stack) {
-        if (stack.isEmpty()) return false;
-
-        @Nullable Address recipient = stack.get(Envelope.DataComponents.RECIPIENT);
-        if (recipient == null) {
-            Envelope.LOGGER.error("Cannot send mail '{}': no 'exposure:recipient'.", stack);
-            return false;
-        }
-
-        Mail mail = new Mail(new Address(blockEntity.getAddress(), Optional.empty()), recipient, stack, player.level().getGameTime(), 50, Mail.Status.REGULAR);
-
-        if (!player.level().isClientSide) {
-            Mailbox.send(mail);
-        }
-        player.level().playSound(player, mailboxPos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1, 1);
-        recentlySentMail = mail;
-
-        return true;
-    }
 
     @Override
     public @NotNull ItemStack quickMoveStack(Player player, int index) {
@@ -194,26 +201,28 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected boolean pickUpMail(Player player, int index) {
         if (!getCarried().isEmpty()) return false;
 
-        Mail mail = getMail().remove(index);
+        ItemStack mail = getMail().remove(index);
 
-        setCarried(mail.content().copy());
-        if (player.level() instanceof ServerLevel serverLevel) {
-            MailCoordinator.get(serverLevel.getServer()).getMailboxes().takeOut(address, mail);
+        if (!player.level().isClientSide && Mail.getMailboxes().takeOut(address, mail)) {
+            MailTravelingLog.addRecords(mail, TravelingRecord.receivedAt(new Address.Mailbox(address),
+                    player.level().getGameTime(), Optional.of(player.getName())));
+            setCarried(mail.copy());
         }
+
         return true;
     }
 
     protected boolean moveMailToInventory(Player player, int index) {
-        Mail mail = getMail().get(index);
+        ItemStack mail = getMail().get(index);
 
-        if (!PlayerInventoryUtil.tryAddWholeStack(player, mail.content().copy())) {
+        if (!PlayerInventoryUtil.tryAddWholeStack(player, mail.copy())) {
             return false;
         }
 
         getMail().remove(index);
 
-        if (player.level() instanceof ServerLevel serverLevel) {
-            MailCoordinator.get(serverLevel.getServer()).getMailboxes().takeOut(address, mail);
+        if (!player.level().isClientSide) {
+            Mail.getMailboxes().takeOut(address, mail);
         }
 
         return true;
@@ -239,7 +248,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer()).getMailboxes().getAll(address);
+            List<ItemStack> mail = Mail.getMailboxes().getAll(address);
             setMail(mail);
             Packets.sendToClient(new MailboxMenuMailS2CP(mail), serverPlayer);
             return true;

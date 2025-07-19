@@ -1,76 +1,30 @@
 package io.github.mortuusars.envelope.api.mail;
 
-import com.google.common.base.Preconditions;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.ByIdMap;
-import net.minecraft.util.StringRepresentable;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.MailItem;
+import io.github.mortuusars.envelope.world.mail.MailCoordinator;
+import io.github.mortuusars.envelope.world.mail.Mailboxes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public record Mail(Address sender, Address recipient, ItemStack content, long sentAt, int travelTime, Status status) {
-    public Mail {
-        Preconditions.checkArgument(!content.isEmpty(), "Content cannot be empty!");
+public class Mail {
+    public static Mailboxes getMailboxes() {
+        return MailCoordinator.INSTANCE.getMailboxes();
     }
-
-    public static final Codec<Mail> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Address.CODEC.fieldOf("sender").forGetter(Mail::sender),
-            Address.CODEC.fieldOf("recipient").forGetter(Mail::recipient),
-            ItemStack.CODEC.fieldOf("content").forGetter(Mail::content),
-            Codec.LONG.fieldOf("sent_at").forGetter(Mail::sentAt),
-            Codec.INT.fieldOf("travel_time").forGetter(Mail::travelTime),
-            Status.CODEC.fieldOf("status").forGetter(Mail::status)
-    ).apply(instance, Mail::new));
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, Mail> STREAM_CODEC = StreamCodec.of(
-            (buffer, mail) -> {
-                Address.STREAM_CODEC.encode(buffer, mail.sender());
-                Address.STREAM_CODEC.encode(buffer, mail.recipient());
-                ItemStack.STREAM_CODEC.encode(buffer, mail.content());
-                ByteBufCodecs.VAR_LONG.encode(buffer, mail.sentAt());
-                ByteBufCodecs.VAR_INT.encode(buffer, mail.travelTime());
-                Status.STREAM_CODEC.encode(buffer, mail.status());
-            },
-            buffer -> new Mail(
-                    Address.STREAM_CODEC.decode(buffer),
-                    Address.STREAM_CODEC.decode(buffer),
-                    ItemStack.STREAM_CODEC.decode(buffer),
-                    ByteBufCodecs.VAR_LONG.decode(buffer),
-                    ByteBufCodecs.VAR_INT.decode(buffer),
-                    Status.STREAM_CODEC.decode(buffer))
-    );
 
     // --
 
-    public enum Status implements StringRepresentable {
-        REGULAR("regular"),
-        RETURNED("returned"),
-        REJECTED("rejected"),
-        UNCLAIMED("unclaimed");
-
-        public static final Codec<Status> CODEC = StringRepresentable.fromEnum(Status::values);
-        public static final StreamCodec<ByteBuf, Status> STREAM_CODEC =
-                ByteBufCodecs.idMapper(ByIdMap.continuous(Status::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), Status::ordinal);
-
-        private final String name;
-
-        Status(String name) {
-            this.name = name;
+    public static boolean send(ItemStack mail, @Nullable Player senderPlayer) {
+        if (mail.getItem() instanceof MailItem mailItem) {
+            mailItem.updateRecipientBeforeNewSendIfNeeded(mail);
         }
 
-        @Override
-        public @NotNull String getSerializedName() {
-            return name;
-        }
+        mail.remove(Envelope.DataComponents.MAIL_TRAVELING_LOG);
+        return MailCoordinator.INSTANCE.send(mail, senderPlayer);
+    }
 
-        public MutableComponent translate() {
-            return Component.translatable("gui.envelope.mail.status." + name);
-        }
+    public static boolean send(ItemStack mail) {
+        return send(mail, null);
     }
 }

@@ -6,8 +6,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public class ServerEvents {
+    public static void serverStarted(MinecraftServer server) {
+        MailCoordinator.INSTANCE.init(server);
+    }
+
     public static void serverTick(MinecraftServer server) {
-        MailCoordinator.get(server).tick(server);
+        MailCoordinator.INSTANCE.tick(server);
     }
 
     public static void playerLogin(ServerPlayer player) {

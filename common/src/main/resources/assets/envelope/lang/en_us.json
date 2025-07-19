@@ -19,10 +19,24 @@
   "gui.envelope.mailbox.mail.tooltip.new_mail": "New Mail Arrived",
   "gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
 
-  "gui.envelope.mail.status.regular": "Regular",
+  "gui.envelope.mail.status.sent": "Sent",
   "gui.envelope.mail.status.returned": "Returned",
   "gui.envelope.mail.status.rejected": "Rejected",
   "gui.envelope.mail.status.unclaimed": "Unclaimed",
+  "gui.envelope.mail.status.traveling": "Traveling",
+  "gui.envelope.mail.status.arrived": "Arrived",
+  "gui.envelope.mail.status.received": "Received",
+
+  "gui.envelope.mail.log": "Mail Route:",
+  "gui.envelope.mail.log.show_tooltip": "§8Hold [§7Shift§8] to see mail traveling log",
+  "gui.envelope.mail.log.record.sent": "§7Sent from '%s§7'",
+  "gui.envelope.mail.log.record.returned": "§7Returned",
+  "gui.envelope.mail.log.record.rejected": "§7Rejected at '%s§7'",
+  "gui.envelope.mail.log.record.unclaimed": "§7Unclaimed at '%s§7'",
+  "gui.envelope.mail.log.record.traveling": "§7Traveling to '%s§7'",
+  "gui.envelope.mail.log.record.arrived": "§7Arrived to '%s§7'",
+  "gui.envelope.mail.log.record.received": "§7Received at '%s§7'",
+  "gui.envelope.mail.log.record.by": "§7 by '%s§7'",
 
   "gui.envelope.time.years": "%sy",
   "gui.envelope.time.months": "%smo",
@@ -61,5 +75,6 @@
   "gui.envelope.formatting.white": "White",
   "gui.envelope.formatting.yellow": "Yellow",
 
-  "address.envelope.mail_service": "<Mail Service>"
+  "address.envelope.mail_service": "<Mail Service>",
+  "address.envelope.unknown": "<Unknown>"
 }

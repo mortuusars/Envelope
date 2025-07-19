@@ -26,6 +26,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -83,6 +84,11 @@ public class NeoForgeCommonEvents {
         @SubscribeEvent
         public static void registerCommands(RegisterCommandsEvent event) {
             MailCommand.register(event.getDispatcher());
+        }
+
+        @SubscribeEvent
+        public static void tick(ServerStartedEvent event) {
+            ServerEvents.serverStarted(event.getServer());
         }
 
         @SubscribeEvent

@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Address;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -78,11 +77,11 @@ public class KnownPlayers extends SavedData {
         }, null);
     }
 
-    public @Nullable UUID byAddress(Address recipient) {
-        return null;
+//    public @Nullable UUID byAddress(Address recipient) {
+//        return null;
 //        if (recipient instanceof Address.Player player && players.containsValue(player.uuid())) {
 //            return player.uuid();
 //        }
 //        return byName(recipient.id());
-    }
+//    }
 }

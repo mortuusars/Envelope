@@ -1,11 +1,13 @@
 package io.github.mortuusars.envelope.neoforge;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +16,7 @@ public class EnvelopeNeoForge {
     public EnvelopeNeoForge(ModContainer container) {
         Envelope.init();
 
-        /*container.registerConfig(ModConfig.Type.SERVER, Config.Server.SPEC);*/
+        container.registerConfig(ModConfig.Type.SERVER, Config.Server.SPEC);
         /*container.registerConfig(ModConfig.Type.COMMON, Config.Common.SPEC);*/
         /*container.registerConfig(ModConfig.Type.CLIENT, Config.Client.SPEC);*/
 

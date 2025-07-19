@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Address;
-import io.github.mortuusars.envelope.api.mail.Mail;
+import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
@@ -18,13 +18,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected static final int MAX_BUTTONS = 6;
 
     @Nullable
-    protected Mail hoveredMail;
+    protected ItemStack hoveredMail;
 
     protected Rect2i mailArea = new Rect2i(7, 17, 162, 110);
 
@@ -134,7 +133,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
         guiGraphics.blit(TEXTURE, leftPos + 176, topPos + 42, 176, 0, 49, 42);
 
-        List<Mail> mail = getMenu().getMail();
+        List<ItemStack> mail = getMenu().getMail();
 
         hoveredMail = null;
 
@@ -143,7 +142,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         for (int i = 0; i < Math.min(mail.size(), 6); i++) {
             int index = i + scroll;
 
-            Mail item = mail.get(index);
+            ItemStack item = mail.get(index);
             int x = 8;
             int y = 18 + 18 * i;
             boolean isHovering = isHovering(x + 1, y + 1, 152, 16, mouseX, mouseY);
@@ -156,7 +155,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         renderScrollBar(guiGraphics, partialTick, mouseX, mouseY);
     }
 
-    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, Mail mail, int x, int y) {
+    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, ItemStack mail, int x, int y) {
         boolean isHovered = hoveredMail == mail;
 
         guiGraphics.blitSprite(REGULAR_MAIL_BUTTON_SPRITES.get(true, isHovered), x, y, 0, 154, 18);
@@ -165,15 +164,16 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
 
-        guiGraphics.renderItem(mail.content(), x + 2, y + 1);
+        guiGraphics.renderItem(mail, x + 2, y + 1);
 
+        Component senderName = mail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN).getDisplayName();
         FormattedCharSequence sender;
-        if (font.split(FormattedText.of(mail.sender().name()), 114).size() > 1) {
+        if (font.split(senderName, 114).size() > 1) {
             sender = FormattedCharSequence.composite(
-                    font.split(FormattedText.of(mail.sender().name()), 108).getFirst(),
+                    font.split(senderName, 108).getFirst(),
                     Component.literal("...").getVisualOrderText());
         } else {
-            sender = Component.literal(mail.sender().name()).getVisualOrderText();
+            sender = senderName.getVisualOrderText();
         }
         guiGraphics.drawString(font, sender, x + 36, y + 5, 0xFF886447, false);
     }
@@ -220,9 +220,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     }
 
     protected void renderSendAnimation(GuiGraphics guiGraphics, float partialTick) {
-        Mail recentlySentMail = getMenu().getRecentlySentMail();
+        ItemStack recentlySentMail = getMenu().getRecentlySentMail();
         if (recentlySentMail != null) {
-            long ticksSinceSent = Minecrft.level().getGameTime() - recentlySentMail.sentAt();
+            long ticksSinceSent = getMenu().ticksSinceLastSend();
             if (ticksSinceSent > 20) return;
 
             float progress = (ticksSinceSent + partialTick) / 6f;
@@ -234,7 +234,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             guiGraphics.pose().translate(leftPos + 8 + 181, topPos + 8 + 60, 0);
             guiGraphics.pose().scale(scale, scale, scale);
             guiGraphics.pose().translate(-8, -8, 0);
-            guiGraphics.renderItem(recentlySentMail.content(), 0, 0);
+            guiGraphics.renderItem(recentlySentMail, 0, 0);
             guiGraphics.pose().popPose();
         }
     }
@@ -248,21 +248,22 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         }
 
         if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail.content()),
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail),
                     Optional.empty(), x, y);
         } else {
             List<Component> tooltip = new ArrayList<>();
-            tooltip.add(hoveredMail.content().getHoverName());
+            tooltip.add(hoveredMail.getHoverName());
 
-            if (font.split(FormattedText.of(hoveredMail.sender().name()), 110).size() > 1) {
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", hoveredMail.sender().name()));
+            Component senderName = hoveredMail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN).getDisplayName();
+            if (font.split(senderName, 110).size() > 1) {
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", senderName));
             }
 
-            long ageTicks = Minecrft.level().getGameTime() - (hoveredMail.sentAt() + hoveredMail.travelTime());
-            tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
-            if (hoveredMail.status() != Mail.Status.REGULAR) {
-                tooltip.add(hoveredMail.status().translate().withStyle(Style.EMPTY.withColor(0xFFe1765e)));
-            }
+            MailTravelingLog.of(hoveredMail).getLastRecord().ifPresent(record -> {
+                long receivedAt = record.timestamp() + record.duration();
+                long ageTicks = Minecrft.level().getGameTime() - receivedAt;
+                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
+            });
 
             guiGraphics.renderTooltip(font, tooltip, Optional.empty(), x, y);
         }
@@ -383,15 +384,16 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     // --
 
-    protected WidgetSprites getMailIconSprites(Mail mail) {
-        return switch (mail.status()) {
-            case RETURNED -> ICON_RETURNED_SPRITES;
-            case REJECTED -> ICON_REJECTED_SPRITES;
-            case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
-            case REGULAR -> /*mail.sender().type() == Address.Type.PLAYER
-                    ? ICON_PLAYER_SPRITES
-                    :*/ ICON_NPC_SPRITES;
-        };
+    protected WidgetSprites getMailIconSprites(ItemStack mail) {
+        return ICON_NPC_SPRITES;
+//        return switch (mail.status()) {
+//            case RETURNED -> ICON_RETURNED_SPRITES;
+//            case REJECTED -> ICON_REJECTED_SPRITES;
+//            case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
+//            case REGULAR -> /*mail.sender().type() == Address.Type.PLAYER
+//                    ? ICON_PLAYER_SPRITES
+//                    :*/ ICON_NPC_SPRITES;
+//        };
     }
 
     protected boolean isMouseOver(Rect2i rect, double mouseX, double mouseY) {

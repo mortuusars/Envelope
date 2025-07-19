@@ -4,17 +4,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.*;
-import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.lang3.RandomStringUtils;
-
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MailCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -31,20 +24,20 @@ public class MailCommand {
 
 //        MailCoordinator.get(player.serverLevel().getServer()).getMailboxes().;
 
-        Address recipient = new Address("dlh", Optional.empty());
-        itemStack.set(Envelope.DataComponents.RECIPIENT, recipient);
-
-        Mail mail = new Mail(
-                new Address("test", Optional.empty()),
-                recipient,
-                itemStack,
-                player.level().getGameTime(),
-                30,
-                Mail.Status.REGULAR);
+//        Address recipient = new Address("dlh", Optional.empty());
+//        itemStack.set(Envelope.DataComponents.RECIPIENT, recipient);
 //
-        Mailbox.send(mail);
+//        OldMail mail = new OldMail(
+//                new Address("test", Optional.empty()),
+//                recipient,
+//                itemStack,
+//                player.level().getGameTime(),
+//                30,
+//                RouteStep.Status.REGULAR);
+////
+//        Mail.send(mail);
 //
-        context.getSource().sendSuccess(() -> Component.literal("Mail '" + mail + "' has been sent."), true);
+//        context.getSource().sendSuccess(() -> Component.literal("Mail '" + mail + "' has been sent."), true);
 
         return 0;
     }

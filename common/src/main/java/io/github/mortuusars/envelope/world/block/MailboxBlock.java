@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -13,6 +14,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -117,7 +119,7 @@ public class MailboxBlock extends Block implements EntityBlock {
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
-            List<Mail> mail = MailCoordinator.get(serverPlayer.serverLevel().getServer()).getMailboxes().getAll(blockEntity.getAddress());
+            List<ItemStack> mail = Mail.getMailboxes().getAll(blockEntity.getAddress());
 
             PlatformHelper.openMenu(serverPlayer, new MenuProvider() {
                 @Override
@@ -132,8 +134,8 @@ public class MailboxBlock extends Block implements EntityBlock {
             }, buffer -> {
                 buffer.writeBlockPos(pos);
                 buffer.writeVarInt(mail.size());
-                for (Mail item : mail) {
-                    Mail.STREAM_CODEC.encode(buffer, item);
+                for (ItemStack item : mail) {
+                    ItemStack.STREAM_CODEC.encode(buffer, item);
                 }
             });
         }
