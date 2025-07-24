@@ -69,10 +69,10 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         fillRecipientButton = new ImageButton(leftPos + 18, topPos + 18, 11, 9, FILL_RECIPIENT_SPRITES, this::fillRecipient);
         addRenderableWidget(fillRecipientButton);
 
-        @Nullable Address recipient = letter.get(Envelope.DataComponents.RECIPIENT);
+        @Nullable Address recipient = letter.get(Envelope.DataComponents.LETTER_RECIPIENT);
         String recipientText = "";
         if (recipient != null) {
-            recipientText = recipient.name();
+            recipientText = recipient.id();
         }
         recipientBox = new TextBox(font, leftPos + 30, topPos + 18, 140, 9)
                 .setFormattingEnabled(false)
@@ -198,8 +198,8 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         Optional<Address> recipient = getOrCreateRecipient(recipientBox.getEditor().getString().toStringWithoutFormatting());
 
         recipient.ifPresent(value -> {
-            if (!fillRecipientState.recipient.equals(value.name())) {
-                fillRecipientState.recipient = value.name();
+            if (!fillRecipientState.recipient.equals(value.id())) {
+                fillRecipientState.recipient = value.id();
                 ClientStateManager.save();
             }
         });
@@ -207,8 +207,8 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         // Local
 
         recipient.ifPresentOrElse(
-                value -> letter.set(Envelope.DataComponents.RECIPIENT, value),
-                () -> letter.remove(Envelope.DataComponents.RECIPIENT));
+                value -> letter.set(Envelope.DataComponents.LETTER_RECIPIENT, value),
+                () -> letter.remove(Envelope.DataComponents.LETTER_RECIPIENT));
 
         String subject = subjectBox.getEditor().getString().toString();
         if (!subject.isBlank()) {
@@ -237,7 +237,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
 
         name = name.trim();
         for (Address recipient : knownRecipients) {
-            if (recipient.name().equalsIgnoreCase(name)) {
+            if (recipient.id().equalsIgnoreCase(name)) {
                 return Optional.of(recipient);
             }
         }

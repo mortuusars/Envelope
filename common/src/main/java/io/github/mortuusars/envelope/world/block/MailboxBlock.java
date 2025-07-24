@@ -3,10 +3,8 @@ package io.github.mortuusars.envelope.world.block;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
-import io.github.mortuusars.envelope.world.mail.MailCoordinator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -119,7 +117,7 @@ public class MailboxBlock extends Block implements EntityBlock {
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
-            List<ItemStack> mail = Mail.getMailboxes().getAll(blockEntity.getAddress());
+            List<ItemStack> mail = Mail.getMailboxes().getAllMail(blockEntity.getAddress());
 
             PlatformHelper.openMenu(serverPlayer, new MenuProvider() {
                 @Override

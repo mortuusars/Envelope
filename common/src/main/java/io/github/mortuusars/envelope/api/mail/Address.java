@@ -25,17 +25,17 @@ public interface Address {
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
 
     Type type();
-    String name();
+    String id();
     Component getDisplayName();
 
-    record Player(String name, Optional<UUID> uuid) implements Address {
+    record Player(String id, Optional<UUID> uuid) implements Address {
         public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("name").forGetter(Player::name),
+                Codec.STRING.fieldOf("id").forGetter(Player::id),
                 UUIDUtil.CODEC.optionalFieldOf("uuid").forGetter(Player::uuid)
         ).apply(instance, Player::new));
 
         public static final StreamCodec<ByteBuf, Player> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Player::name,
+                ByteBufCodecs.STRING_UTF8, Player::id,
                 ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC), Player::uuid,
                 Player::new
         );
@@ -50,34 +50,34 @@ public interface Address {
         }
 
         @Override
-        public String name() {
-            return name;
+        public String id() {
+            return id;
         }
 
         @Override
         public Component getDisplayName() {
-            return Component.literal(name);
+            return Component.literal(id);
         }
     }
 
-    record Mailbox(String name, Optional<Component> displayName) implements Address {
+    record Mailbox(String id, Optional<Component> displayName) implements Address {
         public static final MapCodec<Mailbox> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("name").forGetter(Mailbox::name),
+                Codec.STRING.fieldOf("id").forGetter(Mailbox::id),
                 ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Mailbox::displayName)
         ).apply(instance, Mailbox::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Mailbox> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Mailbox::name,
+                ByteBufCodecs.STRING_UTF8, Mailbox::id,
                 ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Mailbox::displayName,
                 Mailbox::new
         );
 
-        public Mailbox(String name, Component displayName) {
-            this(name, Optional.ofNullable(displayName));
+        public Mailbox(String id, Component displayName) {
+            this(id, Optional.ofNullable(displayName));
         }
 
-        public Mailbox(String name) {
-            this(name, Optional.empty());
+        public Mailbox(String id) {
+            this(id, Optional.empty());
         }
 
         @Override
@@ -87,35 +87,13 @@ public interface Address {
 
         @Override
         public Component getDisplayName() {
-            return displayName.orElse(Component.literal(name));
+            return displayName.orElse(Component.literal(id));
         }
     }
 
-//    record Unknown(String name) implements Address {
-//        public static final MapCodec<Unknown> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-//                Codec.STRING.optionalFieldOf("name", "").forGetter(Unknown::name)
-//        ).apply(instance, Unknown::new));
-//
-//        public static final StreamCodec<RegistryFriendlyByteBuf, Unknown> STREAM_CODEC = StreamCodec.composite(
-//                ByteBufCodecs.STRING_UTF8, Unknown::name,
-//                Unknown::new
-//        );
-//
-//        @Override
-//        public Type type() {
-//            return Type.UNKNOWN;
-//        }
-//
-//        @Override
-//        public Component getDisplayName() {
-//            return !name.isBlank() ? Component.literal(name) : Component.translatable("address.envelope.unknown");
-//        }
-//    }
-
     enum Type implements StringRepresentable {
         PLAYER("player", Player.CODEC, Player.STREAM_CODEC.cast()),
-        MAILBOX("mailbox", Mailbox.CODEC, Mailbox.STREAM_CODEC)/*,
-        UNKNOWN("unknown", Unknown.CODEC, Unknown.STREAM_CODEC)*/;
+        MAILBOX("mailbox", Mailbox.CODEC, Mailbox.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
         public static final StreamCodec<RegistryFriendlyByteBuf, Type> STREAM_CODEC =
@@ -129,10 +107,6 @@ public interface Address {
             this.name = name;
             this.codec = codec;
             this.streamCodec = streamCodec;
-        }
-
-        public String getName() {
-            return name;
         }
 
         public MapCodec<? extends Address> getCodec() {

@@ -61,6 +61,9 @@ public class MailCoordinator {
 
         long currentGameTime = getCurrentGameTime();
 
+        mail.set(Envelope.DataComponents.TRAVEL_DURATION, travelDuration);
+        mail.set(Envelope.DataComponents.SENT_AT, currentGameTime);
+
         MailTravelingLog.addRecords(mail,
                 TravelingRecord.sentFrom(sender, currentGameTime, Optional.ofNullable(player).map(Player::getName)),
                 TravelingRecord.travelingTo(recipient, currentGameTime, travelDuration));
@@ -75,9 +78,9 @@ public class MailCoordinator {
 
         Mailboxes mailboxes = Mailboxes.get(server);
 
-        if (mailboxes.isKnown(recipient)) {
+        if (mailboxes.exists(recipient)) {
             MailTravelingLog.addRecords(mail, TravelingRecord.arrivedTo(recipient, getCurrentGameTime()));
-            mailboxes.receive(recipient, mail);
+            mailboxes.put(recipient, mail);
             onMailReceived(recipient, mail);
         } else {
             Envelope.LOGGER.error("Cannot receive mail: address {} is not known. {}", recipient, mail);
@@ -106,7 +109,7 @@ public class MailCoordinator {
 
     protected void onMailReceived(Address recipient, ItemStack mail) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if (player.containerMenu instanceof MailboxMenu menu && recipient.name().equals(menu.getAddress())) {
+            if (player.containerMenu instanceof MailboxMenu menu && recipient.id().equals(menu.getBlockEntity().getAddress())) {
                 Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player);
             }
         }

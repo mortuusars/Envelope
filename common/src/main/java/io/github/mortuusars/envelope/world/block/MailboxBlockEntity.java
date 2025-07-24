@@ -3,16 +3,25 @@ package io.github.mortuusars.envelope.world.block;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.Mail;
+import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.util.result.Result;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class MailboxBlockEntity extends BlockEntity {
     protected String address = "";
@@ -41,6 +50,10 @@ public class MailboxBlockEntity extends BlockEntity {
 
     // --
 
+    public List<ItemStack> getAllMail() {
+        return Mail.getMailboxes().getAllMail(address);
+    }
+
     public boolean sendMail(ItemStack mail, @Nullable Player player) {
         if (mail.isEmpty()) {
             Envelope.LOGGER.error("Cannot send empty mail.");
@@ -62,6 +75,21 @@ public class MailboxBlockEntity extends BlockEntity {
         return true;
     }
 
+    public ItemStack takeMail(ItemStack mail, @Nullable Player player) {
+        Result<ItemStack> extractResult = Mail.getMailboxes().extract(address, mail);
+        return extractResult
+                .mapValue(extractedMail -> {
+                    MailTravelingLog.addRecords(extractedMail, TravelingRecord.receivedAt(new Address.Mailbox(address),
+                            getLevelOrThrow().getGameTime(), Optional.ofNullable(player).map(Player::getName)));
+                    extractedMail.remove(Envelope.DataComponents.RECIPIENT);
+                    extractedMail.remove(Envelope.DataComponents.SENDER);
+                    extractedMail.remove(Envelope.DataComponents.SENT_AT);
+                    extractedMail.remove(Envelope.DataComponents.TRAVEL_DURATION);
+                    return extractedMail;
+                })
+                .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
+    }
+
     // --
 
     @Override
@@ -72,5 +100,12 @@ public class MailboxBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         address = tag.getString("Address");
+    }
+
+
+    // --
+
+    public @NotNull Level getLevelOrThrow() {
+        return Objects.requireNonNull(level);
     }
 }

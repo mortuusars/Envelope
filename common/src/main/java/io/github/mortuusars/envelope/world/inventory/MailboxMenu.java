@@ -1,9 +1,6 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.*;
-import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
-import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
@@ -32,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class MailboxMenu extends AbstractContainerMenu {
     public static final int REFRESH_MAIL_BUTTON_ID = 0;
@@ -137,7 +133,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     public int ticksSinceLastSend() {
-        return (int) (Objects.requireNonNull(blockEntity.getLevel()).getGameTime() - recentlySentAt);
+        return (int) (Objects.requireNonNull(blockEntity.getLevel()).getGameTime() - getRecentlySentAt());
     }
 
     public boolean hasNewMail() {
@@ -199,14 +195,15 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     protected boolean pickUpMail(Player player, int index) {
-        if (!getCarried().isEmpty()) return false;
+        if (!getCarried().isEmpty()) {
+            return false;
+        }
 
         ItemStack mail = getMail().remove(index);
 
-        if (!player.level().isClientSide && Mail.getMailboxes().takeOut(address, mail)) {
-            MailTravelingLog.addRecords(mail, TravelingRecord.receivedAt(new Address.Mailbox(address),
-                    player.level().getGameTime(), Optional.of(player.getName())));
-            setCarried(mail.copy());
+        if (!player.level().isClientSide) {
+            ItemStack takenMail = getBlockEntity().takeMail(mail, player);
+            setCarried(takenMail);
         }
 
         return true;
@@ -215,14 +212,17 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected boolean moveMailToInventory(Player player, int index) {
         ItemStack mail = getMail().get(index);
 
-        if (!PlayerInventoryUtil.tryAddWholeStack(player, mail.copy())) {
+        if (!PlayerInventoryUtil.canAddWholeStack(player, mail)) {
             return false;
         }
 
-        getMail().remove(index);
+        mail = getMail().remove(index);
 
         if (!player.level().isClientSide) {
-            Mail.getMailboxes().takeOut(address, mail);
+            ItemStack takenMail = getBlockEntity().takeMail(mail, player);
+            if (!takenMail.isEmpty()) {
+                player.getInventory().add(takenMail);
+            }
         }
 
         return true;
@@ -248,7 +248,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            List<ItemStack> mail = Mail.getMailboxes().getAll(address);
+            List<ItemStack> mail = getBlockEntity().getAllMail();
             setMail(mail);
             Packets.sendToClient(new MailboxMenuMailS2CP(mail), serverPlayer);
             return true;
