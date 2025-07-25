@@ -24,8 +24,8 @@ public class TravelingMail extends SavedData {
     protected Consumer<ItemStack> onFinishedTraveling;
 
     public boolean startTraveling(ItemStack mail) {
-        if (!mail.has(Envelope.DataComponents.SENT_AT) || !mail.has(Envelope.DataComponents.TRAVEL_DURATION)) {
-            Envelope.LOGGER.error("Mail '{}' cannot start traveling: no envelope:sent_at or envelope:travel_duration defined.", mail);
+        if (!mail.has(Envelope.DataComponents.MAIL_SENT_AT) || !mail.has(Envelope.DataComponents.MAIL_TRAVEL_DURATION)) {
+            Envelope.LOGGER.error("Mail '{}' cannot start traveling: no envelope:mail_sent_at or envelope:mail_travel_duration defined.", mail);
             return false;
         }
 
@@ -37,8 +37,8 @@ public class TravelingMail extends SavedData {
     public void tick(MinecraftServer server) {
         long gameTime = server.overworld().getGameTime();
         mail.removeIf(mail -> {
-            long sentAt = mail.getOrDefault(Envelope.DataComponents.SENT_AT, 0L);
-            int duration = mail.getOrDefault(Envelope.DataComponents.TRAVEL_DURATION, 0);
+            long sentAt = mail.getOrDefault(Envelope.DataComponents.MAIL_SENT_AT, 0L);
+            int duration = mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, 0);
             if (sentAt + duration <= gameTime) {
                 finishedBuffer.add(mail);
                 setDirty();

@@ -11,6 +11,7 @@ import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class Envelope {
@@ -83,11 +85,13 @@ public class Envelope {
     }
 
     public static class DataComponents {
+        public static final DataComponentType<UUID> MAIL_ID = Register.dataComponentType("mail_id",
+                arg -> arg.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
         /**
          * 'From' address of the mail. Used to know return place if mail cannot be delivered to recipient, amongst other purposes.
          * This component is temporary and should not be depended on.
          */
-        public static final DataComponentType<Address> SENDER = Register.dataComponentType("sender",
+        public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender",
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         /**
          * 'To' address of the mail. Can change in the process of traveling (if the mail is returned or rejected, for example).
@@ -95,17 +99,17 @@ public class Envelope {
          * If the item needs to have persistent recipient, it should use another 'recipient' component,
          * like Letters do with 'envelope:letter_recipient'.
          */
-        public static final DataComponentType<Address> RECIPIENT = Register.dataComponentType("recipient",
+        public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient",
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         /**
          * GameTime at which mail has been sent. Used to calculate mail travel, etc.
          */
-        public static final DataComponentType<Long> SENT_AT = Register.dataComponentType("sent_at",
+        public static final DataComponentType<Long> MAIL_SENT_AT = Register.dataComponentType("mail_sent_at",
                 arg -> arg.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
         /**
          * Duration of the trip from sender to recipient. Returning (or rejecting, etc.) a mail will use this for travel back duration as well.
          */
-        public static final DataComponentType<Integer> TRAVEL_DURATION = Register.dataComponentType("travel_duration",
+        public static final DataComponentType<Integer> MAIL_TRAVEL_DURATION = Register.dataComponentType("mail_travel_duration",
                 arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
         /**

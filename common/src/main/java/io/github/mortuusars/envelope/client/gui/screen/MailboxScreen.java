@@ -166,7 +166,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
         guiGraphics.renderItem(mail, x + 2, y + 1);
 
-        Component senderName = mail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN).getDisplayName();
+        Component senderName = mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN).getDisplayName();
         FormattedCharSequence sender;
         if (font.split(senderName, 114).size() > 1) {
             sender = FormattedCharSequence.composite(
@@ -254,7 +254,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(hoveredMail.getHoverName());
 
-            Component senderName = hoveredMail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN).getDisplayName();
+            Component senderName = hoveredMail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN).getDisplayName();
             if (font.split(senderName, 110).size() > 1) {
                 tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", senderName));
             }

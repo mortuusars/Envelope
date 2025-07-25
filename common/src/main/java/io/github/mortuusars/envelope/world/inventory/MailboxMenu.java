@@ -61,7 +61,7 @@ public class MailboxMenu extends AbstractContainerMenu {
         addSlot(new Slot(new SimpleContainer(1), 0, 181, 60) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return !stack.isEmpty() && stack.get(Envelope.DataComponents.RECIPIENT) != null;
+                return !stack.isEmpty() && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) != null;
             }
 
             @Override

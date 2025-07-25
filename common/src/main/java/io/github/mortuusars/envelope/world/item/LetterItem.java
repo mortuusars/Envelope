@@ -27,7 +27,7 @@ public class LetterItem extends Item implements MailItem {
     public void updateRecipientBeforeNewSendIfNeeded(ItemStack mail) {
         @Nullable Address letterRecipient = mail.get(Envelope.DataComponents.LETTER_RECIPIENT);
         if (letterRecipient != null) {
-            mail.set(Envelope.DataComponents.RECIPIENT, letterRecipient);
+            mail.set(Envelope.DataComponents.MAIL_RECIPIENT, letterRecipient);
         }
     }
 

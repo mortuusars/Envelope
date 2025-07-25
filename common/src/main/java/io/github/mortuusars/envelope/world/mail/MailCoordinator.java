@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Address;
-import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.network.Packets;
@@ -20,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 public class MailCoordinator {
     public static final MailCoordinator INSTANCE = new MailCoordinator();
@@ -50,19 +50,23 @@ public class MailCoordinator {
     public boolean send(ItemStack mail, @Nullable Player player) {
         validateMail(mail);
 
-        Address sender = mail.get(Envelope.DataComponents.SENDER);
-        Address recipient = mail.get(Envelope.DataComponents.RECIPIENT);
-        int travelDuration = Math.max(1, mail.getOrDefault(Envelope.DataComponents.TRAVEL_DURATION,
-                getTravelDurationBetween(sender, recipient)));
+        Address sender = mail.get(Envelope.DataComponents.MAIL_SENDER);
+        Address recipient = mail.get(Envelope.DataComponents.MAIL_RECIPIENT);
+        int travelDuration = Math.max(1, mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION,
+                getTravelDuration(mail, sender, recipient)));
 
         if (recipient instanceof Address.Player) {
             throw new NotImplementedException("Sending to players is not implemented yet.");
         }
 
+        if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
+            mail.set(Envelope.DataComponents.MAIL_ID, UUID.randomUUID());
+        }
+
         long currentGameTime = getCurrentGameTime();
 
-        mail.set(Envelope.DataComponents.TRAVEL_DURATION, travelDuration);
-        mail.set(Envelope.DataComponents.SENT_AT, currentGameTime);
+        mail.set(Envelope.DataComponents.MAIL_TRAVEL_DURATION, travelDuration);
+        mail.set(Envelope.DataComponents.MAIL_SENT_AT, currentGameTime);
 
         MailTravelingLog.addRecords(mail,
                 TravelingRecord.sentFrom(sender, currentGameTime, Optional.ofNullable(player).map(Player::getName)),
@@ -74,13 +78,17 @@ public class MailCoordinator {
     protected void finishTraveling(ItemStack mail) {
         validateMail(mail);
 
-        Address recipient = Objects.requireNonNull(mail.get(Envelope.DataComponents.RECIPIENT));
+        if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
+            mail.set(Envelope.DataComponents.MAIL_ID, UUID.randomUUID());
+        }
+
+        Address recipient = Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_RECIPIENT));
 
         Mailboxes mailboxes = Mailboxes.get(server);
 
         if (mailboxes.exists(recipient)) {
             MailTravelingLog.addRecords(mail, TravelingRecord.arrivedTo(recipient, getCurrentGameTime()));
-            mailboxes.put(recipient, mail);
+            mailboxes.putMail(recipient, mail);
             onMailReceived(recipient, mail);
         } else {
             Envelope.LOGGER.error("Cannot receive mail: address {} is not known. {}", recipient, mail);
@@ -96,13 +104,13 @@ public class MailCoordinator {
 
         validateMail(mail);
 
-        mail.set(Envelope.DataComponents.RECIPIENT, Objects.requireNonNull(mail.get(Envelope.DataComponents.SENDER)));
-        mail.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
+        mail.set(Envelope.DataComponents.MAIL_RECIPIENT, Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_SENDER)));
+        mail.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
         MailTravelingLog.addRecords(mail, new TravelingRecord(status, Address.MAIL_SERVICE, getCurrentGameTime(), 0, operator));
 
-        Envelope.LOGGER.error("Returning mail back to sender: {}", mail);
+        Envelope.LOGGER.info("Returning mail back to sender: {}", mail);
 
-        Mail.send(mail);
+        send(mail, null);
     }
 
     // --
@@ -121,13 +129,13 @@ public class MailCoordinator {
         return server.overworld().getGameTime();
     }
 
-    public int getTravelDurationBetween(Address from, Address to) {
+    public int getTravelDuration(ItemStack mail, Address from, Address to) {
         //TODO: distance influences duration?
         return Config.Server.TRAVEL_DURATION.get();
     }
 
     private void validateMail(ItemStack mail) {
-        Preconditions.checkArgument(mail.has(Envelope.DataComponents.SENDER) && mail.has(Envelope.DataComponents.RECIPIENT),
-                "Mail must have 'envelope:sender' and 'envelope:recipient' defined. " + mail);
+        Preconditions.checkArgument(mail.has(Envelope.DataComponents.MAIL_SENDER) && mail.has(Envelope.DataComponents.MAIL_RECIPIENT),
+                "Mail must have 'envelope:mail_sender' and 'envelope:mail_recipient' defined. " + mail);
     }
 }

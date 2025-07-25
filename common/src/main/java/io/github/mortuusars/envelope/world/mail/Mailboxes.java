@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.mail;
 
+import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.util.result.Failure;
@@ -19,10 +20,10 @@ import java.util.*;
 public class Mailboxes extends SavedData {
     protected static final String SAVED_DATA_NAME = "envelope_mailboxes";
 
-    protected final Map<String, List<ItemStack>> mailboxes = new HashMap<>();
+    protected final Map<String, Map<UUID, ItemStack>> mailboxes = new HashMap<>();
 
     public void create(String address) {
-        mailboxes.computeIfAbsent(address, a -> new ArrayList<>());
+        mailboxes.computeIfAbsent(address, a -> new HashMap<>());
         setDirty();
     }
 
@@ -35,52 +36,48 @@ public class Mailboxes extends SavedData {
     }
 
     public boolean exists(Address address) {
-        return mailboxes.containsKey(address.id());
+        return exists(address.id());
     }
 
     public List<ItemStack> getAllMail(String address) {
-        @Nullable List<ItemStack> list = mailboxes.get(address);
-        if (list == null) {
+        @Nullable Map<UUID, ItemStack> map = mailboxes.get(address);
+        if (map == null) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList(list);
+        return List.copyOf(map.values());
     }
 
     public List<ItemStack> getAllMail(Address address) {
         return getAllMail(address.id());
     }
 
-    public void put(String address, ItemStack mail) {
-        mailboxes.computeIfAbsent(address, uuid -> new ArrayList<>()).add(mail);
+    public void putMail(String address, ItemStack mail) {
+        Preconditions.checkArgument(mail.has(Envelope.DataComponents.MAIL_ID), "Mail must have 'envelope:mail_id'. " + mail);
+        mailboxes.computeIfAbsent(address, uuid -> new HashMap<>()).put(mail.get(Envelope.DataComponents.MAIL_ID), mail);
         setDirty();
     }
 
-    public void put(Address address, ItemStack mail) {
-        put(address.id(), mail);
+    public void putMail(Address address, ItemStack mail) {
+        putMail(address.id(), mail);
     }
 
-    public Result<ItemStack> extract(String address, ItemStack mail) {
-        @Nullable List<ItemStack> contents = mailboxes.get(address);
+    public Result<ItemStack> removeMail(String address, UUID mailId) {
+        @Nullable Map<UUID, ItemStack> contents = mailboxes.get(address);
         if (contents == null) {
             return Result.failure(new Failure("No mailbox with address '" + address + "' exists."));
         }
 
-        if (contents.remove(mail)) {
+        @Nullable ItemStack mail = contents.remove(mailId);
+        if (mail != null) {
             setDirty();
             return Result.success(mail);
         }
 
-        return Result.failure(new Failure("'" + mail + "' is not in mailbox '" + address + "'."));
+        return Result.failure(new Failure("Mail with mailId '" + mailId.toString() + "' is not in mailbox '" + address + "'."));
     }
 
-    public boolean takeOut(String address, ItemStack mail) {
-        //TODO: Rethink take out
-        @Nullable List<ItemStack> set = this.mailboxes.get(address);
-        boolean removed = set != null && set.remove(mail);
-        if (removed) {
-            setDirty();
-        }
-        return removed;
+    public Result<ItemStack> removeMail(Address address, UUID mailId) {
+        return removeMail(address.id(), mailId);
     }
 
     // --
@@ -90,9 +87,9 @@ public class Mailboxes extends SavedData {
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        for (Map.Entry<String, List<ItemStack>> entry : mailboxes.entrySet()) {
+        for (Map.Entry<String, Map<UUID, ItemStack>> entry : mailboxes.entrySet()) {
             ListTag list = new ListTag();
-            for (ItemStack item : entry.getValue()) {
+            for (ItemStack item : entry.getValue().values()) {
                 try {
                     list.add(item.save(registries, new CompoundTag()));
                 } catch (Exception e) {
@@ -111,17 +108,20 @@ public class Mailboxes extends SavedData {
         for (String address : tag.getAllKeys()) {
             try {
                 ListTag mailList = tag.getList(address, Tag.TAG_COMPOUND);
-                List<ItemStack> mailSet = new ArrayList<>();
+                Map<UUID, ItemStack> mailMap = new HashMap<>();
 
                 for (Tag mailTag : mailList) {
                     try {
-                        mailSet.add(ItemStack.parse(registries, mailTag).orElseThrow());
+                        ItemStack mail = ItemStack.parse(registries, mailTag).orElseThrow();
+                        @Nullable UUID id = mail.get(Envelope.DataComponents.MAIL_ID);
+                        Preconditions.checkState(id != null, "No 'envelope:mail_id' in mail " + mail);
+                        mailMap.put(id, mail);
                     } catch (Exception e) {
                         Envelope.LOGGER.error("Cannot load mail '{}': {}", mailTag, e.getMessage());
                     }
                 }
 
-                mailboxes.put(address, mailSet);
+                mailboxes.put(address, mailMap);
             } catch (Exception e) {
                 Envelope.LOGGER.error("Cannot load mail of '{}': {}", address, e.getMessage());
             }

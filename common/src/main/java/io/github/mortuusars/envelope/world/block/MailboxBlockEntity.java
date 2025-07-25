@@ -60,13 +60,13 @@ public class MailboxBlockEntity extends BlockEntity {
             return false;
         }
 
-        if (!mail.has(Envelope.DataComponents.RECIPIENT)) {
+        if (!mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
             Envelope.LOGGER.error("Cannot send mail: no 'envelope:recipient' defined. {}", mail);
             return false;
         }
 
         Address sender = new Address.Mailbox(address);
-        mail.set(Envelope.DataComponents.SENDER, sender);
+        mail.set(Envelope.DataComponents.MAIL_SENDER, sender);
 
         if (level instanceof ServerLevel) {
             Mail.send(mail, player);
@@ -76,15 +76,20 @@ public class MailboxBlockEntity extends BlockEntity {
     }
 
     public ItemStack takeMail(ItemStack mail, @Nullable Player player) {
-        Result<ItemStack> extractResult = Mail.getMailboxes().extract(address, mail);
+        if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
+            return ItemStack.EMPTY;
+        }
+
+        Result<ItemStack> extractResult = Mail.getMailboxes().removeMail(address, mail.get(Envelope.DataComponents.MAIL_ID));
         return extractResult
                 .mapValue(extractedMail -> {
                     MailTravelingLog.addRecords(extractedMail, TravelingRecord.receivedAt(new Address.Mailbox(address),
                             getLevelOrThrow().getGameTime(), Optional.ofNullable(player).map(Player::getName)));
-                    extractedMail.remove(Envelope.DataComponents.RECIPIENT);
-                    extractedMail.remove(Envelope.DataComponents.SENDER);
-                    extractedMail.remove(Envelope.DataComponents.SENT_AT);
-                    extractedMail.remove(Envelope.DataComponents.TRAVEL_DURATION);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_ID);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_SENDER);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_SENT_AT);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
                     return extractedMail;
                 })
                 .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
