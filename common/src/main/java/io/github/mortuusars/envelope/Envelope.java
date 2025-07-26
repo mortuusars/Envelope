@@ -7,18 +7,28 @@ import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
+import net.minecraft.core.Registry;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
@@ -80,6 +90,9 @@ public class Envelope {
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
                 () -> new PackageItem(new Item.Properties().stacksTo(1)));
 
+        public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
+                () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
+
         static void init() {
         }
     }
@@ -130,6 +143,13 @@ public class Envelope {
     }
 
     public static class EntityTypes {
+        public static final Supplier<EntityType<Pigeon>> PIGEON = Register.entityType("pigeon",
+                Pigeon::new, MobCategory.CREATURE, true, builder -> builder
+                        .sized(0.6F, 0.8F)
+                        .eyeHeight(0.56F)
+                        .passengerAttachments(0.4625F)
+                        .clientTrackingRange(8));
+
         static void init() {
         }
     }
@@ -177,13 +197,14 @@ public class Envelope {
     }
 
     public static class Tags {
+        public static class Blocks {
+            public static final TagKey<Block> PIGEON_SPAWNABLE_ON =
+                    TagKey.create(Registries.BLOCK, resource("pigeon_spawnable_on"));
+        }
     }
 
     public static class ArgumentTypes {
         public static void init() {
         }
-    }
-
-    public static class Registries {
     }
 }

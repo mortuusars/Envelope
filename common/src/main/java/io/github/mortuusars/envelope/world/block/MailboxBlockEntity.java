@@ -9,6 +9,8 @@ import io.github.mortuusars.envelope.util.result.Result;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -19,12 +21,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public class MailboxBlockEntity extends BlockEntity {
     protected String address = "";
+    protected List<ItemStack> mailQueue = new ArrayList<>();
 
     public MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -100,13 +104,24 @@ public class MailboxBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putString("Address", address);
+
+        ListTag mailQueueTag = new ListTag();
+        mailQueue.stream().map(s -> s.save(registries)).forEach(mailQueueTag::add);
+        tag.put("MailQueue", mailQueueTag);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         address = tag.getString("Address");
-    }
 
+        mailQueue.clear();
+        ListTag mailQueueTag = tag.getList("MailQueue", Tag.TAG_COMPOUND);
+        for (Tag mailTag : mailQueueTag) {
+            ItemStack.parse(registries, mailTag)
+                    .ifPresentOrElse(mailQueue::add,
+                            () -> Envelope.LOGGER.error("Cannot load queued mail from tag '{}'", mailTag));
+        }
+    }
 
     // --
 

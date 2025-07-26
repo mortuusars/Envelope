@@ -2,12 +2,16 @@
   "block.envelope.mailbox": "Mailbox",
   "block.envelope.cardboard_box": "Cardboard Box",
   "block.envelope.package": "Package",
+
   "item.envelope.mailbox": "Mailbox",
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
   "item.envelope.package": "Package",
+  "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
   "container.envelope.mailbox": "Mailbox",
+
+  "entity.envelope.pigeon": "Pigeon",
 
   "gui.envelope.mailbox.send": "Send",
   "gui.envelope.mailbox.empty": "Empty",

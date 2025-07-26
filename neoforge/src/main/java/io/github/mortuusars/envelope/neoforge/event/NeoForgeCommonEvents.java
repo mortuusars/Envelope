@@ -9,12 +9,11 @@ import io.github.mortuusars.envelope.network.packet.C2SPackets;
 import io.github.mortuusars.envelope.network.packet.CommonPackets;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.network.packet.S2CPackets;
-import io.github.mortuusars.envelope.world.KnownPlayers;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
@@ -24,7 +23,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -76,6 +75,14 @@ public class NeoForgeCommonEvents {
             if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
                 event.accept(Envelope.Items.LETTER.get());
             }
+            if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
+                event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+            }
+        }
+
+        @SubscribeEvent
+        public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
+            event.put(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
         }
     }
 
