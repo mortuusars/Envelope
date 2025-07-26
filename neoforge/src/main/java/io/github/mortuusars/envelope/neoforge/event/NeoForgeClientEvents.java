@@ -3,6 +3,8 @@ package io.github.mortuusars.envelope.neoforge.event;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
+import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
+import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
@@ -33,7 +35,9 @@ public class NeoForgeClientEvents {
 
         @SubscribeEvent
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON, PigeonModel::createBodyLayer);
+            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON, PigeonModel::createLayerDefinition);
+            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_LEG_BAND, PigeonLegBandModel::createLayerDefinition);
+            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
         }
     }
 

@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.entity;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.entity.ai.goal.PigeonWanderGoal;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -19,6 +18,9 @@ import net.minecraft.util.ByIdMap;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.random.Weight;
+import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -49,6 +51,7 @@ import java.util.function.IntFunction;
 
 public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon.Variant>, FlyingAnimal {
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_IS_HOMING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
 
     public float flap;
     public float flapSpeed;
@@ -64,7 +67,8 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
-        this.setVariant(Util.getRandom(Pigeon.Variant.values(), level.getRandom()));
+        setVariant(Variant.getRandom(random));
+
         if (spawnGroupData == null) {
             spawnGroupData = new AgeableMob.AgeableMobGroupData(false);
         }
@@ -282,30 +286,47 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
         }
     }
 
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_VARIANT_ID, 0);
+        builder.define(DATA_IS_HOMING, false);
+    }
+
     public @NotNull Pigeon.Variant getVariant() {
         return Pigeon.Variant.byId(this.entityData.get(DATA_VARIANT_ID));
     }
 
     public void setVariant(Pigeon.Variant variant) {
-        this.entityData.set(DATA_VARIANT_ID, variant.id);
+        entityData.set(DATA_VARIANT_ID, variant.id);
+    }
+
+    public boolean isHoming() {
+        return entityData.get(DATA_IS_HOMING);
+    }
+
+    public void setHoming(boolean homing) {
+        entityData.set(DATA_IS_HOMING, homing);
+    }
+
+    public boolean hasFancyHat() {
+        //TODO: supporters
+        // return getOwnerUUID()
+        return true;
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_VARIANT_ID, 0);
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("Variant", getVariant().id);
+        tag.putBoolean("Homing", isHoming());
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putInt("Variant", this.getVariant().id);
-    }
-
-    @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        this.setVariant(Pigeon.Variant.byId(compound.getInt("Variant")));
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        setVariant(Pigeon.Variant.byId(tag.getInt("Variant")));
+        setHoming(tag.getBoolean("Homing"));
     }
 
     @Override
@@ -323,31 +344,44 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
         return new Vec3(0.0, 0.5F * getEyeHeight(), getBbWidth() * 0.4F);
     }
 
-    public enum Variant implements StringRepresentable {
-        GRAY(0, "gray"),
-        WHITE(1, "white");
+    public enum Variant implements StringRepresentable, WeightedEntry {
+        GRAY(0, "gray", 12),
+        BROWN(1, "brown", 6),
+        WHITE(2, "white", 1);
 
         public static final Codec<Pigeon.Variant> CODEC = StringRepresentable.fromEnum(Pigeon.Variant::values);
         private static final IntFunction<Pigeon.Variant> BY_ID = ByIdMap.continuous(Pigeon.Variant::getId, values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
-        final int id;
+        public static final WeightedRandomList<Variant> WEIGHTED_LIST = WeightedRandomList.create(Variant.values());
+        private final int id;
         private final String name;
+        private final Weight weight;
 
-        Variant(final int id, final String name) {
+        Variant(final int id, final String name, int weight) {
             this.id = id;
             this.name = name;
+            this.weight = Weight.of(weight);
         }
 
         public int getId() {
             return this.id;
         }
 
-        public static Pigeon.Variant byId(int id) {
-            return BY_ID.apply(id);
+        @Override
+        public @NotNull Weight getWeight() {
+            return weight;
         }
 
         @Override
         public @NotNull String getSerializedName() {
             return this.name;
+        }
+
+        public static Pigeon.Variant byId(int id) {
+            return BY_ID.apply(id);
+        }
+
+        public static Variant getRandom(RandomSource random) {
+            return WEIGHTED_LIST.getRandom(random).orElseThrow();
         }
     }
 }

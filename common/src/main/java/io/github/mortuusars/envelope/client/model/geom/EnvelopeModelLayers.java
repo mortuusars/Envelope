@@ -5,4 +5,6 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 
 public class EnvelopeModelLayers {
     public static final ModelLayerLocation PIGEON = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
+    public static final ModelLayerLocation PIGEON_LEG_BAND = new ModelLayerLocation(Envelope.resource("pigeon_leg_band"), "main");
+    public static final ModelLayerLocation PIGEON_FANCY_HAT = new ModelLayerLocation(Envelope.resource("pigeon_fancy_hat"), "main");
 }

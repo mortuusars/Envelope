@@ -145,8 +145,8 @@ public class Envelope {
     public static class EntityTypes {
         public static final Supplier<EntityType<Pigeon>> PIGEON = Register.entityType("pigeon",
                 Pigeon::new, MobCategory.CREATURE, true, builder -> builder
-                        .sized(0.6F, 0.8F)
-                        .eyeHeight(0.56F)
+                        .sized(0.65F, 0.85F)
+                        .eyeHeight(0.59375F)
                         .passengerAttachments(0.4625F)
                         .clientTrackingRange(8));
 

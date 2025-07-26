@@ -3,6 +3,8 @@ package io.github.mortuusars.envelope.client.renderer.entity;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
+import io.github.mortuusars.envelope.client.renderer.entity.layers.PigeonFancyHatLayer;
+import io.github.mortuusars.envelope.client.renderer.entity.layers.PigeonLegBandLayer;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -12,10 +14,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
     public static final ResourceLocation GRAY = Envelope.resource("textures/entity/pigeon/pigeon_gray.png");
+    public static final ResourceLocation BROWN = Envelope.resource("textures/entity/pigeon/pigeon_brown.png");
     public static final ResourceLocation WHITE = Envelope.resource("textures/entity/pigeon/pigeon_white.png");
 
+    public static final ResourceLocation LEG_BAND = Envelope.resource("textures/entity/pigeon/pigeon_leg_band.png");
+    public static final ResourceLocation FANCY_HAT = Envelope.resource("textures/entity/pigeon/pigeon_fancy_hat.png");
+
     public PigeonRenderer(EntityRendererProvider.Context context) {
-        super(context, new PigeonModel(context.bakeLayer(EnvelopeModelLayers.PIGEON)), 0.5f);
+        super(context, new PigeonModel(context.bakeLayer(EnvelopeModelLayers.PIGEON)), 0.35f);
+        addLayer(new PigeonLegBandLayer(this, context.getModelSet()));
+        addLayer(new PigeonFancyHatLayer(this, context.getModelSet()));
     }
 
     @Override
@@ -35,6 +43,7 @@ public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
     public static @NotNull ResourceLocation getVariantTexture(Pigeon.Variant variant) {
         return switch (variant) {
             case GRAY -> GRAY;
+            case BROWN -> BROWN;
             case WHITE -> WHITE;
         };
     }

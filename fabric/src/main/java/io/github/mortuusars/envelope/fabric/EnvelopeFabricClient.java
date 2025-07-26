@@ -4,6 +4,8 @@ import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactory
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
+import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
+import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
@@ -22,7 +24,9 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         ConfigScreenFactoryRegistry.INSTANCE.register(Envelope.ID, ConfigurationScreen::new);
 
         EntityRendererRegistry.register(Envelope.EntityTypes.PIGEON.get(), PigeonRenderer::new);
-        EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON, PigeonModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON, PigeonModel::createLayerDefinition);
+        EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_LEG_BAND, PigeonLegBandModel::createLayerDefinition);
+        EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
 
