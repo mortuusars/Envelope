@@ -151,7 +151,7 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
                                 this.getX(),
                                 this.getY(),
                                 this.getZ(),
-                                SoundEvents.PARROT_EAT,
+                                Envelope.SoundEvents.PIGEON_EAT.get(),
                                 this.getSoundSource(),
                                 1.0F,
                                 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F
@@ -218,17 +218,17 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
     @Nullable
     @Override
     public SoundEvent getAmbientSound() {
-        return SoundEvents.PARROT_AMBIENT;
+        return Envelope.SoundEvents.PIGEON_AMBIENT.get();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return SoundEvents.PARROT_HURT;
+        return Envelope.SoundEvents.PIGEON_HURT.get();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.PARROT_DEATH;
+        return Envelope.SoundEvents.PIGEON_DEATH.get();
     }
 
     @Override
@@ -243,7 +243,7 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
 
     @Override
     protected void onFlap() {
-        this.playSound(SoundEvents.PARROT_FLY, 0.15F, 1.0F);
+        this.playSound(Envelope.SoundEvents.PIGEON_FLY.get(), 0.15F, 1.0F);
         this.nextFlap = this.flyDist + this.flapSpeed / 2.0F;
     }
 

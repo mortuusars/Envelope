@@ -1,0 +1,103 @@
+{
+  "entity.pigeon.ambient": {
+    "sounds": [
+      {
+        "name": "envelope:mob/pigeon/ambient1",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient2",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient3",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient4",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient5",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient6",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient7",
+        "volume": 0.7
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient8",
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.pigeon.ambient"
+  },
+  "entity.pigeon.death": {
+    "sounds": [
+      {
+        "name": "envelope:mob/pigeon/death1"
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.pigeon.death"
+  },
+  "entity.pigeon.eat": {
+    "sounds": [
+      "mob/parrot/eat1",
+      "mob/parrot/eat2",
+      "mob/parrot/eat3"
+    ],
+    "subtitle": "subtitles.envelope.entity.pigeon.eats"
+  },
+  "entity.pigeon.fly": {
+    "sounds": [
+      {
+        "name": "mob/parrot/fly1",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly2",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly3",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly4",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly5",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly6",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly7",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly8",
+        "pitch": 0.75
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.pigeon.fly"
+  },
+  "entity.pigeon.hurt": {
+    "sounds": [
+      {
+        "name": "envelope:mob/pigeon/hurt1"
+      },
+      {
+        "name": "envelope:mob/pigeon/hurt1"
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.pigeon.hurts"
+  }
+}
