@@ -8,7 +8,8 @@
   ],
   "mixins": [
     "jei.JeiKeyConflictContextMixin",
-    "pigeon_spawner.MinecraftServerMixin"
+    "pigeon_spawner.MinecraftServerMixin",
+    "shoulder_pigeon_sound.PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
