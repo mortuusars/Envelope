@@ -23,6 +23,6 @@ public class MinecraftServerMixin {
     private void addToSpawnersList(ChunkProgressListener listener, CallbackInfo ci, @Local LocalRef<List<CustomSpawner>> spawners) {
         List<CustomSpawner> modifiedSpawnersList = new ArrayList<>(spawners.get());
         modifiedSpawnersList.add(new PigeonSpawner());
-        spawners.set(new ArrayList<>(modifiedSpawnersList));
+        spawners.set(modifiedSpawnersList);
     }
 }
