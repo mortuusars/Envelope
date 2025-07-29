@@ -169,6 +169,7 @@ public class Envelope {
         public static final Supplier<SoundEvent> PIGEON_EAT = register("entity", "pigeon.eat");
         public static final Supplier<SoundEvent> PIGEON_FLY = register("entity", "pigeon.fly");
         public static final Supplier<SoundEvent> PIGEON_HURT = register("entity", "pigeon.hurt");
+        public static final Supplier<SoundEvent> PIGEON_STEP = register("entity", "pigeon.step");
 
         private static Supplier<SoundEvent> register(String category, String key) {
             Preconditions.checkState(category != null && !category.isEmpty(), "'category' should not be empty.");

@@ -11,7 +11,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ByIdMap;
@@ -37,6 +36,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -48,6 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 
 public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon.Variant>, FlyingAnimal {
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
@@ -93,8 +94,8 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 6.0)
-                .add(Attributes.FLYING_SPEED, 0.4F)
+                .add(Attributes.MAX_HEALTH, 8.0)
+                .add(Attributes.FLYING_SPEED, 0.6F)
                 .add(Attributes.MOVEMENT_SPEED, 0.2F)
                 .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
@@ -213,8 +214,6 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
         return null;
     }
 
-
-    //TODO: Sounds
     @Nullable
     @Override
     public SoundEvent getAmbientSound() {
@@ -233,7 +232,7 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
-        this.playSound(SoundEvents.PARROT_STEP, 0.15F, 1.0F);
+        this.playSound(Envelope.SoundEvents.PIGEON_STEP.get(), 0.15F, 1.0F);
     }
 
     @Override

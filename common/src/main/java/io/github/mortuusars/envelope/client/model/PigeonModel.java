@@ -105,7 +105,8 @@ public class PigeonModel extends HierarchicalModel<Pigeon> {
 				leftWing.zRot = -0.3f - 0.0873F - ageInTicks;
 				rightWing.zRot = 0.3f + 0.0873F + ageInTicks;
 
-				if (pigeon != null && pigeon.getId() % 4 == 0) {
+				// Funny sitting
+				if (pigeon != null && pigeon.getUUID().hashCode() % 8 == 0) {
 					leftLeg.xRot = -1.57f;
 					rightLeg.xRot = -1.57f;
 					leftLeg.yRot = -0.3f;
@@ -114,8 +115,6 @@ public class PigeonModel extends HierarchicalModel<Pigeon> {
 					rightLeg.y = -2.1f;
 					leftLeg.z = -4f;
 					rightLeg.z = -4f;
-				} else {
-
 				}
 
 				break;

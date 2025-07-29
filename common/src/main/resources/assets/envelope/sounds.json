@@ -3,35 +3,44 @@
     "sounds": [
       {
         "name": "envelope:mob/pigeon/ambient1",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
         "name": "envelope:mob/pigeon/ambient2",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
         "name": "envelope:mob/pigeon/ambient3",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
         "name": "envelope:mob/pigeon/ambient4",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
         "name": "envelope:mob/pigeon/ambient5",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
         "name": "envelope:mob/pigeon/ambient6",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
         "name": "envelope:mob/pigeon/ambient7",
-        "volume": 0.7
+        "volume": 0.85,
+        "weight": 3
       },
       {
-        "name": "envelope:mob/pigeon/ambient8",
-        "volume": 0.7
+        "name": "envelope:mob/pigeon/ambient8"
+      },
+      {
+        "name": "envelope:mob/pigeon/ambient9"
       }
     ],
     "subtitle": "subtitles.envelope.entity.pigeon.ambient"
@@ -40,6 +49,9 @@
     "sounds": [
       {
         "name": "envelope:mob/pigeon/death1"
+      },
+      {
+        "name": "envelope:mob/pigeon/death2"
       }
     ],
     "subtitle": "subtitles.envelope.entity.pigeon.death"
@@ -95,9 +107,18 @@
         "name": "envelope:mob/pigeon/hurt1"
       },
       {
-        "name": "envelope:mob/pigeon/hurt1"
+        "name": "envelope:mob/pigeon/hurt2"
       }
     ],
     "subtitle": "subtitles.envelope.entity.pigeon.hurts"
+  },
+  "entity.pigeon.step": {
+    "sounds": [
+      "mob/parrot/step1",
+      "mob/parrot/step2",
+      "mob/parrot/step3",
+      "mob/parrot/step4",
+      "mob/parrot/step5"
+    ]
   }
 }
