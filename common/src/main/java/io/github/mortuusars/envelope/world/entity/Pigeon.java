@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.entity.ai.goal.PigeonWanderGoal;
 import net.minecraft.core.BlockPos;
@@ -36,7 +37,6 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -48,7 +48,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntFunction;
-import java.util.function.Predicate;
 
 public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon.Variant>, FlyingAnimal {
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
@@ -65,6 +64,11 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
         super(entityType, level);
         this.moveControl = new FlyingMoveControl(this, 10, false);
     }
+
+    public static boolean checkPigeonSpawnRules(EntityType<Pigeon> pigeon, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
+        return Config.Server.PIGEON_SPAWNS_NATURALLY.get() && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON) && isBrightEnoughToSpawn(level, pos);
+    }
+
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
@@ -193,10 +197,6 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
     @Override
     public boolean isFood(ItemStack stack) {
         return false;
-    }
-
-    public static boolean checkPigeonSpawnRules(EntityType<Pigeon> parrot, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-        return level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON) && isBrightEnoughToSpawn(level, pos);
     }
 
     @Override

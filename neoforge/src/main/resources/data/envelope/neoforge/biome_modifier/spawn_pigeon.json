@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#envelope:allows_pigeon_spawns",
+  "spawners": {
+    "type": "envelope:pigeon",
+    "weight": 2,
+    "minCount": 4,
+    "maxCount": 6
+  }
+}
