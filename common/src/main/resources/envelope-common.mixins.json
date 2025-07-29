@@ -7,7 +7,8 @@
     "add_pigeon_on_shoulder_layer.PlayerRendererMixin"
   ],
   "mixins": [
-    "jei.JeiKeyConflictContextMixin"
+    "jei.JeiKeyConflictContextMixin",
+    "pigeon_spawner.MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:grass_block",
+    "minecraft:air",
+    "#minecraft:leaves",
+    "#minecraft:logs",
+    "#minecraft:base_stone_overworld"
+  ]
+}

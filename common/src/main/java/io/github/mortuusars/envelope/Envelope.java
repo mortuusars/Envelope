@@ -25,9 +25,11 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import org.slf4j.Logger;
 
 import java.util.UUID;
@@ -204,6 +206,16 @@ public class Envelope {
         public static class Blocks {
             public static final TagKey<Block> PIGEON_SPAWNABLE_ON =
                     TagKey.create(Registries.BLOCK, resource("pigeon_spawnable_on"));
+        }
+
+        public static class Biomes {
+            public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
+                    TagKey.create(Registries.BIOME, resource("allows_pigeon_spawns"));
+        }
+
+        public static class Structures {
+            public static final TagKey<Structure> PIGEONS_SPAWN_IN =
+                    TagKey.create(Registries.STRUCTURE, resource("pigeons_spawn_in"));
         }
     }
 
