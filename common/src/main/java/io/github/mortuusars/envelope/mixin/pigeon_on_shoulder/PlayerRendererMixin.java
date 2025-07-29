@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.mixin.add_pigeon_on_shoulder_layer;
+package io.github.mortuusars.envelope.mixin.pigeon_on_shoulder;
 
 import io.github.mortuusars.envelope.client.renderer.entity.layers.PigeonOnShoulderLayer;
 import net.minecraft.client.model.PlayerModel;

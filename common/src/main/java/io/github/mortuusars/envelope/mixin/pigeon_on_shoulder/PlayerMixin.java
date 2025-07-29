@@ -1,14 +1,12 @@
-package io.github.mortuusars.envelope.mixin.shoulder_pigeon_sound;
+package io.github.mortuusars.envelope.mixin.pigeon_on_shoulder;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

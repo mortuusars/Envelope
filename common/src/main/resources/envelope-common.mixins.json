@@ -4,12 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "add_pigeon_on_shoulder_layer.PlayerRendererMixin"
+    "pigeon_on_shoulder.PlayerRendererMixin"
   ],
   "mixins": [
     "jei.JeiKeyConflictContextMixin",
     "pigeon_spawner.MinecraftServerMixin",
-    "shoulder_pigeon_sound.PlayerMixin"
+    "pigeon_on_shoulder.PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
