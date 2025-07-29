@@ -3,38 +3,38 @@
     "sounds": [
       {
         "name": "envelope:mob/pigeon/ambient1",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient2",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient3",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient4",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient5",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient6",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient7",
-        "volume": 0.85,
-        "weight": 3
+        "volume": 0.75,
+        "weight": 4
       },
       {
         "name": "envelope:mob/pigeon/ambient8"
