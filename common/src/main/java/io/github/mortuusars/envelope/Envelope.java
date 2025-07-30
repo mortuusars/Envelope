@@ -8,9 +8,11 @@ import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.inventory.MailboxAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
+import io.github.mortuusars.envelope.world.item.MailboxItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
@@ -79,8 +81,8 @@ public class Envelope {
     }
 
     public static class Items {
-        public static final Supplier<BlockItem> MAILBOX = Register.item("mailbox",
-                () -> new BlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
+        public static final Supplier<MailboxItem> MAILBOX = Register.item("mailbox",
+                () -> new MailboxItem(Blocks.MAILBOX.get(), new Item.Properties()));
 
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
                 () -> new LetterItem(new Item.Properties()));
@@ -154,7 +156,10 @@ public class Envelope {
     }
 
     public static class MenuTypes {
-        public static final Supplier<MenuType<MailboxMenu>> MAILBOX = Register.menuType("mailbox", MailboxMenu::fromNetwork);
+        public static final Supplier<MenuType<MailboxMenu>> MAILBOX =
+                Register.menuType("mailbox", MailboxMenu::fromNetwork);
+        public static final Supplier<MenuType<MailboxAddressMenu>> MAILBOX_ADDRESS =
+                Register.menuType("mailbox_address", MailboxAddressMenu::fromNetwork);
 
         static void init() {
         }

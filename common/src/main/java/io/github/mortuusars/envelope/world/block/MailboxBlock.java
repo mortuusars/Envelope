@@ -119,17 +119,7 @@ public class MailboxBlock extends Block implements EntityBlock {
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
             List<ItemStack> mail = Mail.getMailboxes().getAllMail(blockEntity.getAddress());
 
-            PlatformHelper.openMenu(serverPlayer, new MenuProvider() {
-                @Override
-                public @NotNull Component getDisplayName() {
-                    return Component.literal(blockEntity.getAddress());
-                }
-
-                @Override
-                public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                    return new MailboxMenu(id, inventory, pos, mail.stream().toList());
-                }
-            }, buffer -> {
+            PlatformHelper.openMenu(serverPlayer, blockEntity, buffer -> {
                 buffer.writeBlockPos(pos);
                 buffer.writeVarInt(mail.size());
                 for (ItemStack item : mail) {

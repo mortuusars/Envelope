@@ -11,10 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -56,29 +53,8 @@ public class MailboxMenu extends AbstractContainerMenu {
         this.blockEntity = be;
         this.address = blockEntity.getAddress();
 
-        Player player = playerInventory.player;
-
-        addSlot(new Slot(new SimpleContainer(1), 0, 181, 60) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return !stack.isEmpty() && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) != null;
-            }
-
-            @Override
-            public void set(ItemStack stack) {
-                if (stack.isEmpty()) return;
-                if (!blockEntity.sendMail(stack, player)) {
-                    if (player.level().isClientSide) {
-                        player.level().playSound(player, player, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 1);
-                    }
-                } else {
-                    player.level().playSound(player, MailboxMenu.this.mailboxPos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1, 1);
-                    recentlySentMail = stack;
-                    recentlySentAt = player.level().getGameTime();
-                }
-            }
-        });
-        addPlayerSlots(playerInventory, 8, 143);
+        addSendingSlots(blockEntity, 8, 141);
+        addPlayerSlots(playerInventory, 8, 174);
     }
 
     public MailboxMenu(int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
@@ -145,6 +121,17 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     // --
+
+    protected void addSendingSlots(MailboxBlockEntity blockEntity, int x, int y) {
+        for (int i = 0; i < MailboxBlockEntity.SENDING_SLOTS; i++) {
+            addSlot(new Slot(blockEntity, i, x + i * 18, y) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return blockEntity.canPlaceItemIntoSendingSlot(stack);
+                }
+            });
+        }
+    }
 
     protected void addPlayerSlots(Inventory playerInventory, int x, int y) {
         // Hotbar

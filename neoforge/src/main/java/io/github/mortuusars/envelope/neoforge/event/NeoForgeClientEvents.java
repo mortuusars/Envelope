@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.neoforge.event;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
+import io.github.mortuusars.envelope.client.gui.screen.MailboxAddressScreen;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
@@ -26,6 +27,7 @@ public class NeoForgeClientEvents {
         @SubscribeEvent
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
             event.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
+            event.register(Envelope.MenuTypes.MAILBOX_ADDRESS.get(), MailboxAddressScreen::new);
         }
 
         @SubscribeEvent

@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.fabric;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
+import io.github.mortuusars.envelope.client.gui.screen.MailboxAddressScreen;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
@@ -29,6 +30,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.MAILBOX_ADDRESS.get(), MailboxAddressScreen::new);
 
         FabricS2CPacketHandler.register();
     }

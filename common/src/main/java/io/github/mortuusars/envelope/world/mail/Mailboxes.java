@@ -22,6 +22,8 @@ public class Mailboxes extends SavedData {
 
     protected final Map<String, Map<UUID, ItemStack>> mailboxes = new HashMap<>();
 
+    // --
+
     public void create(String address) {
         mailboxes.computeIfAbsent(address, a -> new HashMap<>());
         setDirty();
@@ -31,6 +33,11 @@ public class Mailboxes extends SavedData {
         create(address.id());
     }
 
+    public void remove(String address) {
+        mailboxes.remove(address);
+        setDirty();
+    }
+
     public boolean exists(String address) {
         return mailboxes.containsKey(address);
     }
@@ -38,6 +45,8 @@ public class Mailboxes extends SavedData {
     public boolean exists(Address address) {
         return exists(address.id());
     }
+
+    // --
 
     public List<ItemStack> getAllMail(String address) {
         @Nullable Map<UUID, ItemStack> map = mailboxes.get(address);

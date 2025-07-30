@@ -24,6 +24,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -48,6 +49,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     protected static final int MAX_BUTTONS = 6;
 
+    protected @NotNull Component sendingQueueTitle = Component.translatable("gui.envelope.mailbox.sending_queue");
+
     @Nullable
     protected ItemStack hoveredMail;
 
@@ -69,7 +72,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     @Override
     protected void init() {
         imageWidth = 176;
-        imageHeight = 225;
+        imageHeight = 256;
         inventoryLabelY = imageHeight - 94;
         super.init();
         mailArea = new Rect2i(leftPos + 7, topPos + 17, 162, 110);
@@ -117,21 +120,19 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        FormattedCharSequence title = Component.empty()
-                .append(this.title)
+        FormattedCharSequence title = Component.literal(getMenu().getAddress())
                 .append(" - " + (getMenu().getMail().isEmpty()
                         ? Component.translatable("gui.envelope.mailbox.empty").getString()
                         : getMenu().getMail().size()))
                 .getVisualOrderText();
-        guiGraphics.drawString(this.font, title, this.titleLabelX, this.titleLabelY, 0x404040, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x404040, false);
-        guiGraphics.drawString(this.font, Component.translatable("gui.envelope.mailbox.send"), 180, 48, 0x404040, false);
+        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
+        guiGraphics.drawString(font, sendingQueueTitle, titleLabelX, 130, 0x404040, false);
+        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-        guiGraphics.blit(TEXTURE, leftPos + 176, topPos + 42, 176, 0, 49, 42);
 
         List<ItemStack> mail = getMenu().getMail();
 
@@ -190,7 +191,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
         // Top
         guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY(),
-                176, 42 + state * SCROLL_THUMB_HEIGHT, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT);
+                176, state * SCROLL_THUMB_HEIGHT, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT);
 
         // Middle
         int middlePartsCount = (scrollThumb.getHeight() - SCROLL_THUMB_TOP_HEIGHT - SCROLL_THUMB_BOT_HEIGHT) / SCROLL_THUMB_MID_HEIGHT;
@@ -198,7 +199,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         for (int i = 0; i < middlePartsCount; i++) {
             guiGraphics.blit(TEXTURE, scrollThumb.getX(),
                     scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + i * SCROLL_THUMB_MID_HEIGHT,
-                    176, 42 + state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                    176, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
                     scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT);
         }
 
@@ -206,15 +207,15 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             // Special case to allow full size scroll thumb fill all available area.
             guiGraphics.blit(TEXTURE, scrollThumb.getX(),
                     scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + middlePartsCount * SCROLL_THUMB_MID_HEIGHT,
-                    176, 42 + state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                    176, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
                     scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT);
             guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT) + 3,
-                    176, 42 + SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                    176, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
                     scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT);
         } else {
             // Bottom
             guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT),
-                    176, 42 + SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                    176, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
                     scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT);
         }
     }

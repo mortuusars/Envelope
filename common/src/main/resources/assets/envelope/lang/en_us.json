@@ -10,11 +10,15 @@
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
   "container.envelope.mailbox": "Mailbox",
+  "gui.envelope.mailbox.address": "Enter Address",
 
   "entity.envelope.pigeon": "Pigeon",
 
-  "gui.envelope.mailbox.send": "Send",
+  "gui.envelope.mailbox.sending_queue": "Sending Queue",
   "gui.envelope.mailbox.empty": "Empty",
+
+  "gui.envelope.confirm": "Confirm",
+  "gui.envelope.cancel": "Cancel",
 
   "gui.envelope.mailbox.mail.tooltip.sender": "§7Sender: %s",
   "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §fago",

@@ -15,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record EditLetterPacketC2SP(int slot, Optional<Address> recipient, String subject, String message) implements Packet {
+public record EditLetterC2SP(int slot, Optional<Address> recipient, String subject, String message) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("edit_letter_packet");
-    public static final Type<EditLetterPacketC2SP> TYPE = new Type<>(ID);
+    public static final Type<EditLetterC2SP> TYPE = new Type<>(ID);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, EditLetterPacketC2SP> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, EditLetterPacketC2SP::slot,
-            ByteBufCodecs.optional(Address.STREAM_CODEC), EditLetterPacketC2SP::recipient,
-            ByteBufCodecs.stringUtf8(512), EditLetterPacketC2SP::subject,
-            ByteBufCodecs.stringUtf8(4096), EditLetterPacketC2SP::message,
-            EditLetterPacketC2SP::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, EditLetterC2SP> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, EditLetterC2SP::slot,
+            ByteBufCodecs.optional(Address.STREAM_CODEC), EditLetterC2SP::recipient,
+            ByteBufCodecs.stringUtf8(512), EditLetterC2SP::subject,
+            ByteBufCodecs.stringUtf8(4096), EditLetterC2SP::message,
+            EditLetterC2SP::new
     );
 
     @Override
