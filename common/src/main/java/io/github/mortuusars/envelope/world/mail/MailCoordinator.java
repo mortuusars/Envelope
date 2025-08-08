@@ -86,14 +86,14 @@ public class MailCoordinator {
 
         Mailboxes mailboxes = Mailboxes.get(server);
 
-        if (mailboxes.exists(recipient)) {
-            MailTravelingLog.addRecords(mail, TravelingRecord.arrivedTo(recipient, getCurrentGameTime()));
-            mailboxes.putMail(recipient, mail);
-            onMailReceived(recipient, mail);
-        } else {
-            Envelope.LOGGER.error("Cannot receive mail: address {} is not known. {}", recipient, mail);
-            returnToSender(mail, TravelingRecord.Status.RETURNED, Optional.ofNullable(Address.MAIL_SERVICE.getDisplayName()));
-        }
+//        if (mailboxes.exists(recipient)) {
+//            MailTravelingLog.addRecords(mail, TravelingRecord.arrivedTo(recipient, getCurrentGameTime()));
+//            mailboxes.putMail(recipient, mail);
+//            onMailReceived(recipient, mail);
+//        } else {
+//            Envelope.LOGGER.error("Cannot receive mail: address {} is not known. {}", recipient, mail);
+//            returnToSender(mail, TravelingRecord.Status.RETURNED, Optional.ofNullable(Address.MAIL_SERVICE.getDisplayName()));
+//        }
     }
 
     protected void returnToSender(ItemStack mail, TravelingRecord.Status status, Optional<Component> operator) {
@@ -106,7 +106,7 @@ public class MailCoordinator {
 
         mail.set(Envelope.DataComponents.MAIL_RECIPIENT, Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_SENDER)));
         mail.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
-        MailTravelingLog.addRecords(mail, new TravelingRecord(status, Address.MAIL_SERVICE, getCurrentGameTime(), 0, operator));
+//        MailTravelingLog.addRecords(mail, new TravelingRecord(status, Address.MAIL_SERVICE, getCurrentGameTime(), 0, operator));
 
         Envelope.LOGGER.info("Returning mail back to sender: {}", mail);
 
@@ -117,7 +117,7 @@ public class MailCoordinator {
 
     protected void onMailReceived(Address recipient, ItemStack mail) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if (player.containerMenu instanceof MailboxMenu menu && recipient.id().equals(menu.getBlockEntity().getAddress())) {
+            if (player.containerMenu instanceof MailboxMenu menu && recipient.equals(menu.getBlockEntity().getAddress())) {
                 Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player);
             }
         }

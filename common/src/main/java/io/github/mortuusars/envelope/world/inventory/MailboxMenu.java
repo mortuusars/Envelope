@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MailboxMenu extends AbstractContainerMenu {
     public static final int REFRESH_MAIL_BUTTON_ID = 0;
@@ -34,10 +33,6 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected final BlockPos mailboxPos;
     protected List<ItemStack> mail;
     protected final MailboxBlockEntity blockEntity;
-    protected final String address;
-    @Nullable
-    protected ItemStack recentlySentMail = null;
-    protected long recentlySentAt = 0L;
     protected boolean hasNewMail;
 
     protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
@@ -51,9 +46,7 @@ public class MailboxMenu extends AbstractContainerMenu {
         }
 
         this.blockEntity = be;
-        this.address = blockEntity.getAddress();
 
-        addSendingSlots(blockEntity, 8, 141);
         addPlayerSlots(playerInventory, 8, 174);
     }
 
@@ -87,10 +80,6 @@ public class MailboxMenu extends AbstractContainerMenu {
         return blockEntity;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
     public List<ItemStack> getMail() {
         return mail;
     }
@@ -98,18 +87,6 @@ public class MailboxMenu extends AbstractContainerMenu {
     public void setMail(List<ItemStack> mail) {
         this.mail = new ArrayList<>(mail.reversed());
         setHasNewMail(false);
-    }
-
-    public @Nullable ItemStack getRecentlySentMail() {
-        return recentlySentMail;
-    }
-
-    public long getRecentlySentAt() {
-        return recentlySentAt;
-    }
-
-    public int ticksSinceLastSend() {
-        return (int) (Objects.requireNonNull(blockEntity.getLevel()).getGameTime() - getRecentlySentAt());
     }
 
     public boolean hasNewMail() {
@@ -121,17 +98,6 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     // --
-
-    protected void addSendingSlots(MailboxBlockEntity blockEntity, int x, int y) {
-        for (int i = 0; i < MailboxBlockEntity.SENDING_SLOTS; i++) {
-            addSlot(new Slot(blockEntity, i, x + i * 18, y) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return blockEntity.canPlaceItemIntoSendingSlot(stack);
-                }
-            });
-        }
-    }
 
     protected void addPlayerSlots(Inventory playerInventory, int x, int y) {
         // Hotbar
@@ -151,7 +117,9 @@ public class MailboxMenu extends AbstractContainerMenu {
 
     @Override
     public @NotNull ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
+        return ItemStack.EMPTY;
+
+        /*Slot slot = slots.get(index);
         ItemStack clickedStack = slot.getItem();
         ItemStack returnedStack = clickedStack.copy();
 
@@ -167,7 +135,7 @@ public class MailboxMenu extends AbstractContainerMenu {
             slot.setChanged();
         }
 
-        return returnedStack;
+        return returnedStack;*/
     }
 
     public boolean doMailAction(Player player, int index, Action action) {

@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.mail.Mailboxes;
 import net.minecraft.core.BlockPos;
@@ -95,7 +96,7 @@ public class MailboxAddressMenu extends AbstractContainerMenu {
     }
 
     public void setAddressAndUpdateConfirmState(ServerLevel level, String address) {
-        if (setAddress(address) && !Mailboxes.get(level.getServer()).exists(address)) {
+        if (setAddress(address) && !Mailboxes.get(level.getServer()).exists(new Address.Mailbox(address))) {
             canConfirm.set(1);
         } else {
             canConfirm.set(0);
@@ -126,7 +127,7 @@ public class MailboxAddressMenu extends AbstractContainerMenu {
             blockItem.place(context);
             if (player.level() instanceof ServerLevel
                     && getPlayer().level().getBlockEntity(context.getClickedPos()) instanceof MailboxBlockEntity mailboxBlockEntity) {
-                    mailboxBlockEntity.setAddress(address);
+                mailboxBlockEntity.setAddress(new Address.Mailbox(address));
             }
 
             return true;

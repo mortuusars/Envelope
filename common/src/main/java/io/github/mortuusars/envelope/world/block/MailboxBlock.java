@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import net.minecraft.core.BlockPos;
@@ -129,17 +130,6 @@ public class MailboxBlock extends Block implements EntityBlock {
         }
 
         return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        if (!(level.getBlockEntity(pos) instanceof MailboxBlockEntity be)) {
-            throw new IllegalStateException("MailboxBlockEntity is not available at " + pos);
-        }
-
-        if (be.getAddress().isBlank()) {
-            be.setAddress(RandomStringUtils.randomAlphabetic(ThreadLocalRandom.current().nextInt(3, 6)));
-        }
     }
 
     @Nullable

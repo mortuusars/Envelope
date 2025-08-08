@@ -16,13 +16,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record TravelingRecord(Status status, Address address, long timestamp, int duration, Optional<Component> operator) {
+public record TravelingRecord(Status status, Address address, long timestamp, int duration,
+                              Optional<Component> operator, Optional<Component> message) {
     public static final Codec<TravelingRecord> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Status.CODEC.optionalFieldOf("status", Status.SENT).forGetter(TravelingRecord::status),
             Address.CODEC.fieldOf("address").forGetter(TravelingRecord::address),
             Codec.LONG.fieldOf("timestamp").forGetter(TravelingRecord::timestamp),
             Codec.INT.optionalFieldOf("duration", 0).forGetter(TravelingRecord::duration),
-            ComponentSerialization.CODEC.optionalFieldOf("operator").forGetter(TravelingRecord::operator)
+            ComponentSerialization.CODEC.optionalFieldOf("operator").forGetter(TravelingRecord::operator),
+            ComponentSerialization.CODEC.optionalFieldOf("message").forGetter(TravelingRecord::message)
     ).apply(instance, TravelingRecord::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, TravelingRecord> STREAM_CODEC = StreamCodec.composite(
@@ -31,29 +33,30 @@ public record TravelingRecord(Status status, Address address, long timestamp, in
             ByteBufCodecs.VAR_LONG, TravelingRecord::timestamp,
             ByteBufCodecs.VAR_INT, TravelingRecord::duration,
             ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), TravelingRecord::operator,
+            ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), TravelingRecord::message,
             TravelingRecord::new
     );
 
     // --
 
     public static TravelingRecord sentFrom(Address address, long timestamp, Optional<Component> operator) {
-        return new TravelingRecord(Status.SENT, address, timestamp, 0, operator);
+        return new TravelingRecord(Status.SENT, address, timestamp, 0, operator, Optional.empty());
     }
 
     public static TravelingRecord travelingTo(Address address, long timestamp, int duration) {
-        return new TravelingRecord(Status.TRAVELING, address, timestamp, duration, Optional.empty());
+        return new TravelingRecord(Status.TRAVELING, address, timestamp, duration, Optional.empty(), Optional.empty());
     }
 
-    public static TravelingRecord returned(Address recipientAddress, long timestamp, Optional<Component> operator) {
-        return new TravelingRecord(Status.RETURNED, recipientAddress, timestamp, 0, operator);
+    public static TravelingRecord returned(Address recipientAddress, long timestamp, Optional<Component> operator, Optional<Component> message) {
+        return new TravelingRecord(Status.RETURNED, recipientAddress, timestamp, 0, operator, message);
     }
 
     public static TravelingRecord arrivedTo(Address address, long timestamp) {
-        return new TravelingRecord(Status.ARRIVED, address, timestamp, 0, Optional.empty());
+        return new TravelingRecord(Status.ARRIVED, address, timestamp, 0, Optional.empty(), Optional.empty());
     }
 
     public static TravelingRecord receivedAt(Address address, long timestamp, Optional<Component> operator) {
-        return new TravelingRecord(Status.RECEIVED, address, timestamp, 0, operator);
+        return new TravelingRecord(Status.RECEIVED, address, timestamp, 0, operator, Optional.empty());
     }
 
     // --
@@ -68,12 +71,10 @@ public record TravelingRecord(Status status, Address address, long timestamp, in
 
     public enum Status implements StringRepresentable {
         SENT("sent"),
-        RETURNED("returned"),
         TRAVELING("traveling"),
         ARRIVED("arrived"),
-        RECEIVED("received"),
-        REJECTED("rejected"),
-        UNCLAIMED("unclaimed");
+        RETURNED("returned"),
+        RECEIVED("received");
 
         public static final Codec<Status> CODEC = StringRepresentable.fromEnum(Status::values);
         public static final StreamCodec<ByteBuf, Status> STREAM_CODEC =

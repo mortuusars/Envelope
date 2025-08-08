@@ -11,18 +11,17 @@ import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.mail.Mailboxes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -33,11 +32,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class MailboxBlockEntity extends BaseContainerBlockEntity {
-    public static final int SENDING_SLOTS = 9;
-
-    protected String address = "";
-    protected NonNullList<ItemStack> items = NonNullList.withSize(SENDING_SLOTS, ItemStack.EMPTY);
+public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
+    @Nullable
+    protected Address.Mailbox address = null;
 
     public MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -49,11 +46,12 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity {
 
     // --
 
-    public String getAddress() {
+    public @NotNull Address.Mailbox getAddress() {
+        Preconditions.checkNotNull(address, "Address has not been defined yet.");
         return address;
     }
 
-    public MailboxBlockEntity setAddress(String address) {
+    public MailboxBlockEntity setAddress(@NotNull Address.Mailbox address) {
         this.address = address;
         if (level instanceof ServerLevel) {
             Mail.getMailboxes().create(this.address);
@@ -64,49 +62,26 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity {
     // --
 
     @Override
-    public int getContainerSize() {
-        return SENDING_SLOTS;
-    }
-
-    @Override
-    protected @NotNull NonNullList<ItemStack> getItems() {
-        return items;
-    }
-
-    @Override
-    protected void setItems(NonNullList<ItemStack> items) {
-        this.items = items;
-    }
-
-    @Override
     public @NotNull Component getDisplayName() {
-        return Component.literal(getAddress());
+        return getAddress().getDisplayName();
     }
 
+    @Nullable
     @Override
-    protected @NotNull Component getDefaultName() {
-        return Component.translatable("block.envelope.mailbox");
-    }
-
-    @Override
-    protected @NotNull AbstractContainerMenu createMenu(int id, Inventory inventory) {
+    public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return new MailboxMenu(id, inventory, getBlockPos(), getAllMail());
     }
 
     @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
-        Preconditions.checkElementIndex(slot, SENDING_SLOTS);
-        return canPlaceItemIntoSendingSlot(stack);
-    }
-
-    public boolean canPlaceItemIntoSendingSlot(ItemStack stack) {
-        return stack.has(Envelope.DataComponents.MAIL_RECIPIENT);
+    public void setRemoved() {
+        super.setRemoved();
+        dropOrReturnAllMail();
     }
 
     // --
 
     public List<ItemStack> getAllMail() {
-        return Mail.getMailboxes().getAllMail(address);
+        return Mail.getMailboxes().getAllMail(getAddress());
     }
 
 //    public boolean sendMail(ItemStack mail, @Nullable Player player) {
@@ -138,7 +113,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity {
         Result<ItemStack> extractResult = Mail.getMailboxes().removeMail(address, mail.get(Envelope.DataComponents.MAIL_ID));
         return extractResult
                 .mapValue(extractedMail -> {
-                    MailTravelingLog.addRecords(extractedMail, TravelingRecord.receivedAt(new Address.Mailbox(address),
+                    MailTravelingLog.addRecords(extractedMail, TravelingRecord.receivedAt(getAddress(),
                             getLevelOrThrow().getGameTime(), Optional.ofNullable(player).map(Player::getName)));
                     extractedMail.remove(Envelope.DataComponents.MAIL_ID);
                     extractedMail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
@@ -150,32 +125,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity {
                 .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
     }
 
-    // --
-
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        address = tag.getString("Address");
-        ContainerHelper.loadAllItems(tag, items, registries);
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putString("Address", address);
-        ContainerHelper.saveAllItems(tag, items, registries);
-    }
-
-    // --
-
-    public @NotNull Level getLevelOrThrow() {
-        return Objects.requireNonNull(level);
-    }
-
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
+    protected void dropOrReturnAllMail() {
         if (level instanceof ServerLevel serverLevel) {
-            Containers.dropContents(serverLevel, getBlockPos(), items);
-
             Vec3 p = Vec3.atCenterOf(getBlockPos());
             for (ItemStack itemStack : getAllMail()) {
                 Containers.dropItemStack(serverLevel, p.x, p.y, p.z, itemStack);
@@ -183,5 +134,23 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity {
 
             Mailboxes.get(serverLevel.getServer()).remove(address);
         }
+    }
+
+    // --
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        address = new Address.Mailbox(tag.getString("Address"));
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putString("Address", getAddress().id());
+    }
+
+    // --
+
+    public @NotNull Level getLevelOrThrow() {
+        return Objects.requireNonNull(level);
     }
 }

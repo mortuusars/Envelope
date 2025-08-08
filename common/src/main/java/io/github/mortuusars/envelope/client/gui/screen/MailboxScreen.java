@@ -49,8 +49,6 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     protected static final int MAX_BUTTONS = 6;
 
-    protected @NotNull Component sendingQueueTitle = Component.translatable("gui.envelope.mailbox.sending_queue");
-
     @Nullable
     protected ItemStack hoveredMail;
 
@@ -72,7 +70,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     @Override
     protected void init() {
         imageWidth = 176;
-        imageHeight = 256;
+        imageHeight = 224;
         inventoryLabelY = imageHeight - 94;
         super.init();
         mailArea = new Rect2i(leftPos + 7, topPos + 17, 162, 110);
@@ -115,18 +113,17 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         updateButtons();
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
-        renderSendAnimation(guiGraphics, partialTick);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        FormattedCharSequence title = Component.literal(getMenu().getAddress())
+        FormattedCharSequence title = Component.empty()
+                .append(getTitle())
                 .append(" - " + (getMenu().getMail().isEmpty()
                         ? Component.translatable("gui.envelope.mailbox.empty").getString()
                         : getMenu().getMail().size()))
                 .getVisualOrderText();
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
-        guiGraphics.drawString(font, sendingQueueTitle, titleLabelX, 130, 0x404040, false);
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
 
@@ -217,26 +214,6 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT),
                     176, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
                     scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT);
-        }
-    }
-
-    protected void renderSendAnimation(GuiGraphics guiGraphics, float partialTick) {
-        ItemStack recentlySentMail = getMenu().getRecentlySentMail();
-        if (recentlySentMail != null) {
-            long ticksSinceSent = getMenu().ticksSinceLastSend();
-            if (ticksSinceSent > 20) return;
-
-            float progress = (ticksSinceSent + partialTick) / 6f;
-            progress *= progress * progress * progress * progress;
-
-            float scale = Math.clamp(1f - progress, 0, 1);
-
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(leftPos + 8 + 181, topPos + 8 + 60, 0);
-            guiGraphics.pose().scale(scale, scale, scale);
-            guiGraphics.pose().translate(-8, -8, 0);
-            guiGraphics.renderItem(recentlySentMail, 0, 0);
-            guiGraphics.pose().popPose();
         }
     }
 

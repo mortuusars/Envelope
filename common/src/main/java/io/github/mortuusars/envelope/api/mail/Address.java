@@ -16,10 +16,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public interface Address {
-    Address MAIL_SERVICE = new Mailbox("<Mail Service>", Component.translatable("address.envelope.mail_service"));
-    Address UNKNOWN = new Mailbox("<Unknown>", Component.translatable("address.envelope.unknown"));
+    Address MAIL_SERVICE = new Npc("<Mail Service>", Component.translatable("address.envelope.mail_service"));
+    Address UNKNOWN = new Npc("<Unknown>", Component.translatable("address.envelope.unknown"));
 
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::type, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
@@ -27,6 +29,36 @@ public interface Address {
     Type type();
     String id();
     Component getDisplayName();
+
+    default Address ifPlayer(Consumer<Player> consumer) {
+        if (this instanceof Player player) {
+            consumer.accept(player);
+        }
+        return this;
+    }
+
+    default Address ifNpc(Consumer<Npc> consumer) {
+        if (this instanceof Npc npc) {
+            consumer.accept(npc);
+        }
+        return this;
+    }
+
+    default Address ifMailbox(Consumer<Mailbox> consumer) {
+        if (this instanceof Mailbox mailbox) {
+            consumer.accept(mailbox);
+        }
+        return this;
+    }
+
+    default <R> R map(Function<Player, R> ifPlayer, Function<Npc, R> ifNpc, Function<Mailbox, R> ifMailbox) {
+        return switch (this) {
+            case Player player -> ifPlayer.apply(player);
+            case Npc npc -> ifNpc.apply(npc);
+            case Mailbox mailbox -> ifMailbox.apply(mailbox);
+            default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
+        };
+    }
 
     record Player(String id, Optional<UUID> uuid) implements Address {
         public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -60,25 +92,47 @@ public interface Address {
         }
     }
 
-    record Mailbox(String id, Optional<Component> displayName) implements Address {
+    record Npc(String id, Optional<Component> displayName) implements Address {
+        public static final MapCodec<Npc> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.fieldOf("id").forGetter(Npc::id),
+                ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Npc::displayName)
+        ).apply(instance, Npc::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Npc> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, Npc::id,
+                ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Npc::displayName,
+                Npc::new
+        );
+
+        public Npc(String id, Component displayName) {
+            this(id, Optional.ofNullable(displayName));
+        }
+
+        @Override
+        public Type type() {
+            return Type.PLAYER;
+        }
+
+        @Override
+        public String id() {
+            return id;
+        }
+
+        @Override
+        public Component getDisplayName() {
+            return Component.literal(id);
+        }
+    }
+
+    record Mailbox(String id) implements Address {
         public static final MapCodec<Mailbox> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Mailbox::id),
-                ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Mailbox::displayName)
+                Codec.STRING.fieldOf("id").forGetter(Mailbox::id)
         ).apply(instance, Mailbox::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Mailbox> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, Mailbox::id,
-                ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Mailbox::displayName,
                 Mailbox::new
         );
-
-        public Mailbox(String id, Component displayName) {
-            this(id, Optional.ofNullable(displayName));
-        }
-
-        public Mailbox(String id) {
-            this(id, Optional.empty());
-        }
 
         @Override
         public Type type() {
@@ -87,12 +141,13 @@ public interface Address {
 
         @Override
         public Component getDisplayName() {
-            return displayName.orElse(Component.literal(id));
+            return Component.literal(id);
         }
     }
 
     enum Type implements StringRepresentable {
         PLAYER("player", Player.CODEC, Player.STREAM_CODEC.cast()),
+        NPC("npc", Npc.CODEC, Npc.STREAM_CODEC),
         MAILBOX("mailbox", Mailbox.CODEC, Mailbox.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
