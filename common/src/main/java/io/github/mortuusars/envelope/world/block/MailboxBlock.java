@@ -118,9 +118,8 @@ public class MailboxBlock extends Block implements EntityBlock {
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
-            List<ItemStack> mail = Mail.getMailboxes().getAllMail(blockEntity.getAddress());
-
             PlatformHelper.openMenu(serverPlayer, blockEntity, buffer -> {
+                List<ItemStack> mail = blockEntity.getAllMail();
                 buffer.writeBlockPos(pos);
                 buffer.writeVarInt(mail.size());
                 for (ItemStack item : mail) {

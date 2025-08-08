@@ -115,13 +115,13 @@ public class MailCoordinator {
 
     // --
 
-    protected void onMailReceived(Address recipient, ItemStack mail) {
-        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if (player.containerMenu instanceof MailboxMenu menu && recipient.equals(menu.getBlockEntity().getAddress())) {
-                Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player);
-            }
-        }
-    }
+//    protected void onMailReceived(Address recipient, ItemStack mail) {
+//        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+//            if (player.containerMenu instanceof MailboxMenu menu && recipient.equals(menu.getBlockEntity().getAddress())) {
+//                Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player);
+//            }
+//        }
+//    }
 
     // --
 

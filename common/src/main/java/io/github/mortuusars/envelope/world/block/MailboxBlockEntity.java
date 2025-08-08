@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.world.mail.Mailboxes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
@@ -46,9 +47,8 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
 
     // --
 
-    public @NotNull Address.Mailbox getAddress() {
-        Preconditions.checkNotNull(address, "Address has not been defined yet.");
-        return address;
+    public Optional<Address.Mailbox> getAddress() {
+        return Optional.ofNullable(address);
     }
 
     public MailboxBlockEntity setAddress(@NotNull Address.Mailbox address) {
@@ -56,6 +56,7 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
         if (level instanceof ServerLevel) {
             Mail.getMailboxes().create(this.address);
         }
+        setChanged();
         return this;
     }
 
@@ -63,7 +64,7 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public @NotNull Component getDisplayName() {
-        return getAddress().getDisplayName();
+        return getAddress().map(Address::getDisplayName).orElse(Component.translatable("container.envelope.mailbox"));
     }
 
     @Nullable
@@ -81,7 +82,7 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
     // --
 
     public List<ItemStack> getAllMail() {
-        return Mail.getMailboxes().getAllMail(getAddress());
+        return Mail.getMailboxes().getAllMail(getAddress().orElseThrow());
     }
 
 //    public boolean sendMail(ItemStack mail, @Nullable Player player) {
@@ -113,7 +114,7 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
         Result<ItemStack> extractResult = Mail.getMailboxes().removeMail(address, mail.get(Envelope.DataComponents.MAIL_ID));
         return extractResult
                 .mapValue(extractedMail -> {
-                    MailTravelingLog.addRecords(extractedMail, TravelingRecord.receivedAt(getAddress(),
+                    MailTravelingLog.addRecords(extractedMail, TravelingRecord.receivedAt(getAddress().orElseThrow(),
                             getLevelOrThrow().getGameTime(), Optional.ofNullable(player).map(Player::getName)));
                     extractedMail.remove(Envelope.DataComponents.MAIL_ID);
                     extractedMail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
@@ -140,12 +141,16 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        address = new Address.Mailbox(tag.getString("Address"));
+        if (tag.contains("Address", Tag.TAG_STRING)) {
+            address = new Address.Mailbox(tag.getString("Address"));
+        }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putString("Address", getAddress().id());
+        if (address != null) {
+            tag.putString("Address", address.id());
+        }
     }
 
     // --
