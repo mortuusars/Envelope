@@ -230,6 +230,18 @@ public class Pigeon extends ShoulderRidingEntity implements VariantHolder<Pigeon
         return Envelope.SoundEvents.PIGEON_DEATH.get();
     }
 
+    /**
+     * Overwritten to use entity instead of entity position.
+     * This properly updates sound position for longer sounds and stops ambient sounds when entity dies.
+     * I think that might be a bug that Mojang doesn't use entity overload, but maybe it's for some optimization, idk.
+     */
+    @Override
+    public void playSound(SoundEvent sound, float volume, float pitch) {
+        if (!isSilent()) {
+            level().playSound(null, this, sound, getSoundSource(), volume, pitch);
+        }
+    }
+
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(Envelope.SoundEvents.PIGEON_STEP.get(), 0.15F, 1.0F);
