@@ -1,0 +1,10 @@
+{
+	"parent": "minecraft:block/orientable_with_bottom",
+	"textures": {
+		"bottom": "envelope:block/dovecote_end",
+		"front": "envelope:block/dovecote_front",
+		"particle": "envelope:block/dovecote_side",
+		"side": "envelope:block/dovecote_side",
+		"top": "envelope:block/dovecote_end"
+	}
+}

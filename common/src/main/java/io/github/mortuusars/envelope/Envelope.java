@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.world.block.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.block.DovecoteBlock;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
@@ -29,6 +30,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -68,6 +70,10 @@ public class Envelope {
                 () -> new MailboxBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.LECTERN)
                         .noOcclusion()));
 
+        public static final Supplier<DovecoteBlock> DOVECOTE = Register.block("dovecote",
+                () -> new DovecoteBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
+                        .noOcclusion()));
+
         static void init() {
         }
     }
@@ -83,6 +89,9 @@ public class Envelope {
     public static class Items {
         public static final Supplier<MailboxItem> MAILBOX = Register.item("mailbox",
                 () -> new MailboxItem(Blocks.MAILBOX.get(), new Item.Properties()));
+
+        public static final Supplier<BlockItem> DOVECOTE = Register.item("dovecote",
+                () -> new BlockItem(Blocks.DOVECOTE.get(), new Item.Properties()));
 
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
                 () -> new LetterItem(new Item.Properties()));

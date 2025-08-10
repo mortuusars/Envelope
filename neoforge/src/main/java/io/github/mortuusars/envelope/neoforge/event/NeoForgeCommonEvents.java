@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.SpawnPlacementType;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -73,6 +72,7 @@ public class NeoForgeCommonEvents {
         public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
             if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
                 event.accept(Envelope.Items.MAILBOX.get());
+                event.accept(Envelope.Items.DOVECOTE.get());
                 event.accept(Envelope.Items.CARDBOARD_BOX.get());
                 event.accept(Envelope.Items.PACKAGE.get());
             }
