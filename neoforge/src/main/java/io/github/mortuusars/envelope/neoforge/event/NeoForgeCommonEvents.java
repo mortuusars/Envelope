@@ -23,6 +23,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -71,8 +72,7 @@ public class NeoForgeCommonEvents {
         @SubscribeEvent
         public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
             if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
-                event.accept(Envelope.Items.OAK_PIGEONHOLE.get());
-                event.accept(Envelope.Items.SPRUCE_PIGEONHOLE.get());
+                Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
                 event.accept(Envelope.Items.CARDBOARD_BOX.get());
                 event.accept(Envelope.Items.PACKAGE.get());
             }

@@ -116,7 +116,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
     }
 
     protected void dropOrReturnAllMail() {
-        if (level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel && getAddress().isPresent()) {
             Vec3 p = Vec3.atCenterOf(getBlockPos());
             for (ItemStack itemStack : getAllMail()) {
                 Containers.dropItemStack(serverLevel, p.x, p.y, p.z, itemStack);

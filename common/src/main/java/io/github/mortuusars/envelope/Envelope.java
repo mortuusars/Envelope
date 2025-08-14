@@ -31,9 +31,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class Envelope {
@@ -63,12 +64,20 @@ public class Envelope {
     }
 
     public static class Blocks {
-        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = Register.block("oak_pigeonhole",
-                () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
-                        .noOcclusion()));
-        public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = Register.block("spruce_pigeonhole",
-                () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
-                        .noOcclusion()));
+        public static final Map<ResourceLocation, Supplier<PigeonholeBlock>> PIGEONHOLES = new HashMap<>();
+
+        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak");
+        public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = pigeonhole("spruce");
+        public static final Supplier<PigeonholeBlock> BIRCH_PIGEONHOLE = pigeonhole("birch");
+
+        private static Supplier<PigeonholeBlock> pigeonhole(String type) {
+            String id = type + "_pigeonhole";
+            Supplier<PigeonholeBlock> block = Register.block(id,
+                    () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
+                            .noOcclusion()));
+            PIGEONHOLES.put(Envelope.resource(id), block);
+            return block;
+        }
 
         static void init() {
         }
@@ -78,27 +87,36 @@ public class Envelope {
         public static final Supplier<BlockEntityType<PigeonholeBlockEntity>> PIGEONHOLE =
                 Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(PigeonholeBlockEntity::new,
                         Blocks.OAK_PIGEONHOLE.get(),
-                        Blocks.SPRUCE_PIGEONHOLE.get()));
+                        Blocks.SPRUCE_PIGEONHOLE.get(),
+                        Blocks.BIRCH_PIGEONHOLE.get()
+                        ));
 
         static void init() {
         }
     }
 
     public static class Items {
-        public static final Supplier<BlockItem> OAK_PIGEONHOLE = Register.item("oak_pigeonhole",
-                () -> new BlockItem(Blocks.OAK_PIGEONHOLE.get(), new Item.Properties()));
-        public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = Register.item("spruce_pigeonhole",
-                () -> new BlockItem(Blocks.SPRUCE_PIGEONHOLE.get(), new Item.Properties()));
+        public static final List<Supplier<BlockItem>> PIGEONHOLES = new ArrayList<>();
+
+        public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
+        public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = pigeonhole("spruce", Blocks.SPRUCE_PIGEONHOLE);
+        public static final Supplier<BlockItem> BIRCH_PIGEONHOLE = pigeonhole("birch", Blocks.BIRCH_PIGEONHOLE);
 
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
                 () -> new LetterItem(new Item.Properties()));
+
         public static final Supplier<CardboardBoxItem> CARDBOARD_BOX = Register.item("cardboard_box",
                 () -> new CardboardBoxItem(new Item.Properties()));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
                 () -> new PackageItem(new Item.Properties().stacksTo(1)));
-
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
                 () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
+
+        private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
+            Supplier<BlockItem> item = Register.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
+            PIGEONHOLES.add(item);
+            return item;
+        }
 
         static void init() {
         }

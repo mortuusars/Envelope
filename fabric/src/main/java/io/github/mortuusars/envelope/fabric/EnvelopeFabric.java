@@ -33,8 +33,7 @@ public class EnvelopeFabric implements ModInitializer {
 //        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.CLIENT, Config.Client.SPEC);
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
-            content.accept(Envelope.Items.OAK_PIGEONHOLE.get());
-            content.accept(Envelope.Items.SPRUCE_PIGEONHOLE.get());
+            Envelope.Items.PIGEONHOLES.forEach(item -> content.accept(item.get()));
             content.accept(Envelope.Items.CARDBOARD_BOX.get());
             content.accept(Envelope.Items.PACKAGE.get());
         });

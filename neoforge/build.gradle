@@ -38,6 +38,8 @@ dependencies {
     shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
 
+def datagenPath = file("src/generated")
+
 loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
 
@@ -49,6 +51,12 @@ loom {
             programArgs("--username", "AnotherDev")
 
             client()
+        }
+
+        data {
+            data()
+            programArgs "--all", "--mod", "${mod_id}"
+            programArgs "--output", datagenPath.absolutePath
         }
     }
 }
@@ -64,4 +72,10 @@ remapJar {
     atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
     input.set shadowJar.archiveFile
     dependsOn shadowJar
+}
+
+sourceSets {
+    main {
+        resources.srcDir datagenPath
+    }
 }

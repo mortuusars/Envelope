@@ -1,9 +1,15 @@
 {
+  "block.envelope.oak_pigeonhole": "Oak Pigeonhole",
   "block.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
+  "block.envelope.birch_pigeonhole": "Birch Pigeonhole",
+
   "block.envelope.cardboard_box": "Cardboard Box",
   "block.envelope.package": "Package",
 
+  "item.envelope.oak_pigeonhole": "Oak Pigeonhole",
   "item.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
+  "item.envelope.birch_pigeonhole": "Birch Pigeonhole",
+
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
   "item.envelope.package": "Package",
