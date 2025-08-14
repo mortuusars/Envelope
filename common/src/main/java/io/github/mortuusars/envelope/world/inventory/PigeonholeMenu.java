@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope.world.inventory;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailS2CP;
-import io.github.mortuusars.envelope.world.block.MailboxBlock;
-import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -26,22 +26,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailboxMenu extends AbstractContainerMenu {
+public class PigeonholeMenu extends AbstractContainerMenu {
     public static final int REFRESH_MAIL_BUTTON_ID = 0;
 
     protected final Inventory playerInventory;
     protected final BlockPos mailboxPos;
     protected List<ItemStack> mail;
-    protected final MailboxBlockEntity blockEntity;
+    protected final PigeonholeBlockEntity blockEntity;
     protected boolean hasNewMail;
 
-    protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
+    protected PigeonholeMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.mailboxPos = mailboxPos;
         this.mail = new ArrayList<>(mail.reversed());
 
-        if (!(playerInventory.player.level().getBlockEntity(mailboxPos) instanceof MailboxBlockEntity be)) {
+        if (!(playerInventory.player.level().getBlockEntity(mailboxPos) instanceof PigeonholeBlockEntity be)) {
             throw new IllegalStateException("MailboxBlockEntity is not available at " + mailboxPos);
         }
 
@@ -50,23 +50,23 @@ public class MailboxMenu extends AbstractContainerMenu {
         addPlayerSlots(playerInventory, 8, 174);
     }
 
-    public MailboxMenu(int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
-        this(Envelope.MenuTypes.MAILBOX.get(), id, playerInventory, mailboxPos, mail);
+    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos mailboxPos, List<ItemStack> mail) {
+        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, mailboxPos, mail);
     }
 
-    public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
+    public static PigeonholeMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
         List<ItemStack> mail = new ArrayList<>();
         int mailCount = buffer.readVarInt();
         for (int i = 0; i < mailCount; i++) {
             mail.add(ItemStack.STREAM_CODEC.decode(buffer));
         }
-        return new MailboxMenu(id, inventory, mailboxPos, mail);
+        return new PigeonholeMenu(id, inventory, mailboxPos, mail);
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return player.level().getBlockState(mailboxPos).getBlock() instanceof MailboxBlock
+        return player.level().getBlockState(mailboxPos).getBlock() instanceof PigeonholeBlock
                 && player.distanceToSqr(Vec3.atCenterOf(mailboxPos)) <= 64.0D;
     }
 
@@ -76,7 +76,7 @@ public class MailboxMenu extends AbstractContainerMenu {
         return mailboxPos;
     }
 
-    public MailboxBlockEntity getBlockEntity() {
+    public PigeonholeBlockEntity getBlockEntity() {
         return blockEntity;
     }
 

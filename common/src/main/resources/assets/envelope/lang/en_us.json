@@ -1,32 +1,33 @@
 {
-  "block.envelope.mailbox": "Mailbox",
-  "block.envelope.dovecote": "Dovecote",
+  "block.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
   "block.envelope.cardboard_box": "Cardboard Box",
   "block.envelope.package": "Package",
 
-  "item.envelope.mailbox": "Mailbox",
-  "item.envelope.dovecote": "Dovecote",
+  "item.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
   "item.envelope.package": "Package",
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
-  "container.envelope.mailbox": "Mailbox",
-  "gui.envelope.mailbox.address": "Enter Address",
+  "gui.envelope.pigeonhole": "Pigeonhole",
+  "gui.envelope.pigeonhole.inbox": "Inbox",
+  "gui.envelope.pigeonhole.send": "Send",
+  "gui.envelope.pigeonhole.empty": "Empty",
+
+  "gui.envelope.pigeonhole_address": "Pigeonhole Address",
+  "gui.envelope.pigeonhole_address.enter_address": "Enter Address",
 
   "entity.envelope.pigeon": "Pigeon",
-
-  "gui.envelope.mailbox.empty": "Empty",
 
   "gui.envelope.confirm": "Confirm",
   "gui.envelope.cancel": "Cancel",
 
-  "gui.envelope.mailbox.mail.tooltip.sender": "§7Sender: %s",
-  "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §fago",
-  "gui.envelope.mailbox.mail.tooltip.status": "§7Status: %s",
+  "gui.envelope.pigeonhole.mail.tooltip.sender": "§7Sender: %s",
+  "gui.envelope.pigeonhole.mail.tooltip.age": "§7Received: §c%s §fago",
+  "gui.envelope.pigeonhole.mail.tooltip.status": "§7Status: %s",
 
-  "gui.envelope.mailbox.mail.tooltip.new_mail": "New Mail Arrived",
-  "gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
+  "gui.envelope.pigeonhole.mail.tooltip.new_mail": "New Mail Arrived",
+  "gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
 
   "gui.envelope.mail.status.sent": "Sent",
   "gui.envelope.mail.status.returned": "Returned",
@@ -91,5 +92,7 @@
   "subtitles.envelope.entity.pigeon.death": "Pigeon dies",
   "subtitles.envelope.entity.pigeon.eats": "Pigeon eats",
   "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
-  "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts"
+  "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
+
+  "gui.exposure.pigeonhole.address_box.title": "Address"
 }

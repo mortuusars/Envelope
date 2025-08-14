@@ -7,9 +7,9 @@ import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.MailboxMenuMailActionC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.PigeonholeMenuMailActionC2SP;
 import io.github.mortuusars.envelope.util.PrettyGameTime;
-import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -24,23 +24,22 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/mailbox.png");
+public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/pigeonhole.png");
 
-    public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail_button"));
-    public static final WidgetSprites ICON_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
-    public static final WidgetSprites ICON_NPC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_npc"));
-    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_rejected"));
-    public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_returned"));
-    public static final WidgetSprites ICON_UNCLAIMED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unclaimed"));
-    public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("mailbox/new_mail_indicator"));
+    public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/mail_button"));
+    public static final WidgetSprites ICON_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_player"));
+    public static final WidgetSprites ICON_NPC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_npc"));
+    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_rejected"));
+    public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_returned"));
+    public static final WidgetSprites ICON_UNCLAIMED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_unclaimed"));
+    public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("pigeonhole/new_mail_indicator"));
 
     protected static final int SCROLL_THUMB_TOP_HEIGHT = 3;
     protected static final int SCROLL_THUMB_MID_HEIGHT = 4;
@@ -63,26 +62,27 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected boolean isDraggingScrollbar = false;
     protected double dragDelta = 0;
 
-    public MailboxScreen(MailboxMenu menu, Inventory playerInventory, Component title) {
+    public PigeonholeScreen(PigeonholeMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 
     @Override
     protected void init() {
-        imageWidth = 176;
-        imageHeight = 224;
+        imageWidth = 308;
+        imageHeight = 218;
+        inventoryLabelX = 139;
         inventoryLabelY = imageHeight - 94;
         super.init();
         mailArea = new Rect2i(leftPos + 7, topPos + 17, 162, 110);
         scrollBarArea = new Rect2i(leftPos + 162, topPos + 18, 6, 108);
 
         newMailButton = new ImageButton(leftPos + 161, topPos + 6, 8, 8, NEW_MAIL_INDICATOR_SPRITES, btn -> {
-            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, MailboxMenu.REFRESH_MAIL_BUTTON_ID);
+            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.REFRESH_MAIL_BUTTON_ID);
             scrollTo(0);
         });
-        newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.mail.tooltip.new_mail")
+        newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail")
                 .append("\n")
-                .append(Component.translatable("gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh"))));
+                .append(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh"))));
         addRenderableWidget(newMailButton);
     }
 
@@ -120,7 +120,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         FormattedCharSequence title = Component.empty()
                 .append(getTitle())
                 .append(" - " + (getMenu().getMail().isEmpty()
-                        ? Component.translatable("gui.envelope.mailbox.empty").getString()
+                        ? Component.translatable("gui.envelope.pigeonhole.empty").getString()
                         : getMenu().getMail().size()))
                 .getVisualOrderText();
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
@@ -234,13 +234,13 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
             Component senderName = hoveredMail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN).getDisplayName();
             if (font.split(senderName, 110).size() > 1) {
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.sender", senderName));
+                tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.sender", senderName));
             }
 
             MailTravelingLog.of(hoveredMail).getLastRecord().ifPresent(record -> {
                 long receivedAt = record.timestamp() + record.duration();
                 long ageTicks = Minecrft.level().getGameTime() - receivedAt;
-                tooltip.add(Component.translatable("gui.envelope.mailbox.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
+                tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
             });
 
             guiGraphics.renderTooltip(font, tooltip, Optional.empty(), x, y);
@@ -296,18 +296,18 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             int index = getMenu().getMail().indexOf(hoveredMail);
             if (index == -1) return false;
 
-            MailboxMenu.Action action = MailboxMenu.Action.PICK_UP;
+            PigeonholeMenu.Action action = PigeonholeMenu.Action.PICK_UP;
             if (Screen.hasShiftDown()) {
                 if (Screen.hasControlDown()) {
-                    action = MailboxMenu.Action.MOVE_ALL_TO_INVENTORY;
+                    action = PigeonholeMenu.Action.MOVE_ALL_TO_INVENTORY;
                 } else {
-                    action = MailboxMenu.Action.MOVE_TO_INVENTORY;
+                    action = PigeonholeMenu.Action.MOVE_TO_INVENTORY;
                 }
             }
 
             if (getMenu().doMailAction(Minecrft.player(), index, action)) {
                 Minecrft.player().playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
-                Packets.sendToServer(new MailboxMenuMailActionC2SP(index, action));
+                Packets.sendToServer(new PigeonholeMenuMailActionC2SP(index, action));
             }
         }
 

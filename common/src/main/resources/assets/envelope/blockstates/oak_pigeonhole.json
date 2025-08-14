@@ -1,0 +1,197 @@
+{
+  "variants": {
+    "facing=north,has_address=false,waste=0": {
+      "model": "envelope:block/oak_pigeonhole"
+    },
+    "facing=east,has_address=false,waste=0": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 90
+    },
+    "facing=south,has_address=false,waste=0": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 180
+    },
+    "facing=west,has_address=false,waste=0": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 270
+    },
+
+    "facing=north,has_address=false,waste=1": {
+      "model": "envelope:block/oak_pigeonhole"
+    },
+    "facing=east,has_address=false,waste=1": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 90
+    },
+    "facing=south,has_address=false,waste=1": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 180
+    },
+    "facing=west,has_address=false,waste=1": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 270
+    },
+
+    "facing=north,has_address=false,waste=2": {
+      "model": "envelope:block/oak_pigeonhole"
+    },
+    "facing=east,has_address=false,waste=2": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 90
+    },
+    "facing=south,has_address=false,waste=2": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 180
+    },
+    "facing=west,has_address=false,waste=2": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 270
+    },
+
+    "facing=north,has_address=false,waste=3": {
+      "model": "envelope:block/oak_pigeonhole"
+    },
+    "facing=east,has_address=false,waste=3": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 90
+    },
+    "facing=south,has_address=false,waste=3": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 180
+    },
+    "facing=west,has_address=false,waste=3": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 270
+    },
+
+    "facing=north,has_address=false,waste=4": {
+      "model": "envelope:block/oak_pigeonhole"
+    },
+    "facing=east,has_address=false,waste=4": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 90
+    },
+    "facing=south,has_address=false,waste=4": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 180
+    },
+    "facing=west,has_address=false,waste=4": {
+      "model": "envelope:block/oak_pigeonhole",
+      "y": 270
+    },
+
+    "facing=north,has_address=false,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste"
+    },
+    "facing=east,has_address=false,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste",
+      "y": 90
+    },
+    "facing=south,has_address=false,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste",
+      "y": 180
+    },
+    "facing=west,has_address=false,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste",
+      "y": 270
+    },
+
+
+
+    "facing=north,has_address=true,waste=0": {
+      "model": "envelope:block/oak_pigeonhole_address"
+    },
+    "facing=east,has_address=true,waste=0": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 90
+    },
+    "facing=south,has_address=true,waste=0": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 180
+    },
+    "facing=west,has_address=true,waste=0": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 270
+    },
+
+    "facing=north,has_address=true,waste=1": {
+      "model": "envelope:block/oak_pigeonhole_address"
+    },
+    "facing=east,has_address=true,waste=1": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 90
+    },
+    "facing=south,has_address=true,waste=1": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 180
+    },
+    "facing=west,has_address=true,waste=1": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 270
+    },
+
+    "facing=north,has_address=true,waste=2": {
+      "model": "envelope:block/oak_pigeonhole_address"
+    },
+    "facing=east,has_address=true,waste=2": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 90
+    },
+    "facing=south,has_address=true,waste=2": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 180
+    },
+    "facing=west,has_address=true,waste=2": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 270
+    },
+
+    "facing=north,has_address=true,waste=3": {
+      "model": "envelope:block/oak_pigeonhole_address"
+    },
+    "facing=east,has_address=true,waste=3": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 90
+    },
+    "facing=south,has_address=true,waste=3": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 180
+    },
+    "facing=west,has_address=true,waste=3": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 270
+    },
+
+    "facing=north,has_address=true,waste=4": {
+      "model": "envelope:block/oak_pigeonhole_address"
+    },
+    "facing=east,has_address=true,waste=4": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 90
+    },
+    "facing=south,has_address=true,waste=4": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 180
+    },
+    "facing=west,has_address=true,waste=4": {
+      "model": "envelope:block/oak_pigeonhole_address",
+      "y": 270
+    },
+
+    "facing=north,has_address=true,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste_address"
+    },
+    "facing=east,has_address=true,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste_address",
+      "y": 90
+    },
+    "facing=south,has_address=true,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste_address",
+      "y": 180
+    },
+    "facing=west,has_address=true,waste=5": {
+      "model": "envelope:block/oak_pigeonhole_waste_address",
+      "y": 270
+    }
+  }
+}

@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.UpdateMailboxAddressC2SP;
-import io.github.mortuusars.envelope.world.inventory.MailboxAddressMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -22,30 +22,30 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class MailboxAddressScreen extends AbstractContainerScreen<MailboxAddressMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/mailbox_address.png");
+public class PigeonholeAddressScreen extends AbstractContainerScreen<PigeonholeAddressMenu> {
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/pigeonhole_address.png");
 
     protected EditBox name;
     private ImageButton confirmButton;
 
-    public MailboxAddressScreen(MailboxAddressMenu menu, Inventory playerInventory, Component title) {
+    public PigeonholeAddressScreen(PigeonholeAddressMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 
     @Override
     protected void init() {
-        imageWidth = 206;
+        imageWidth = 164;
         imageHeight = 66;
         inventoryLabelX = -999;
         inventoryLabelY = -999;
         titleLabelX = 28;
         super.init();
 
-        name = new EditBox(this.font, leftPos + 32, topPos + 21, 142, 12, Component.translatable("gui.exposure.item_rename.title"));
+        name = new EditBox(this.font, leftPos + 32, topPos + 21, 142, 12, Component.translatable("gui.exposure.pigeonhole.address_box.title"));
         name.setTextColor(-1);
         name.setTextColorUneditable(-1);
         name.setBordered(false);
-        name.setMaxLength(MailboxAddressMenu.MAX_NAME_LENGTH);
+        name.setMaxLength(PigeonholeAddressMenu.MAX_NAME_LENGTH);
         name.setResponder(this::onAddressChanged);
         name.setValue(getMenu().getAddress());
         addWidget(name);
@@ -73,8 +73,8 @@ public class MailboxAddressScreen extends AbstractContainerScreen<MailboxAddress
             return;
         }
 
-        getMenu().clickMenuButton(Minecraft.getInstance().player, MailboxAddressMenu.APPLY_BUTTON_ID);
-        Objects.requireNonNull(Minecraft.getInstance().gameMode).handleInventoryButtonClick(getMenu().containerId, MailboxAddressMenu.APPLY_BUTTON_ID);
+        getMenu().clickMenuButton(Minecraft.getInstance().player, PigeonholeAddressMenu.APPLY_BUTTON_ID);
+        Objects.requireNonNull(Minecraft.getInstance().gameMode).handleInventoryButtonClick(getMenu().containerId, PigeonholeAddressMenu.APPLY_BUTTON_ID);
         onClose();
     }
 
@@ -104,7 +104,7 @@ public class MailboxAddressScreen extends AbstractContainerScreen<MailboxAddress
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 21, 0, imageWidth, imageHeight);
     }
 
     protected void onAddressChanged(String address) {

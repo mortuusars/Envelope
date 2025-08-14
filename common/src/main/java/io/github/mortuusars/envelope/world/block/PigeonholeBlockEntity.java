@@ -1,13 +1,13 @@
 package io.github.mortuusars.envelope.world.block;
 
-import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.util.result.Result;
-import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.mail.Mailboxes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -33,25 +33,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
+public class PigeonholeBlockEntity extends BlockEntity {
     @Nullable
     protected Address.Mailbox address = null;
 
-    public MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+    public PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }
 
-    public MailboxBlockEntity(BlockPos pos, BlockState blockState) {
-        this(Envelope.BlockEntityTypes.MAILBOX.get(), pos, blockState);
+    public PigeonholeBlockEntity(BlockPos pos, BlockState blockState) {
+        this(Envelope.BlockEntityTypes.PIGEONHOLE.get(), pos, blockState);
     }
 
-    // --
+    // -- Address
 
     public Optional<Address.Mailbox> getAddress() {
         return Optional.ofNullable(address);
     }
 
-    public MailboxBlockEntity setAddress(@NotNull Address.Mailbox address) {
+    public PigeonholeBlockEntity setAddress(@NotNull Address.Mailbox address) {
         this.address = address;
         if (level instanceof ServerLevel) {
             Mail.getMailboxes().create(this.address);
@@ -60,18 +60,7 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
         return this;
     }
 
-    // --
-
-    @Override
-    public @NotNull Component getDisplayName() {
-        return getAddress().map(Address::getDisplayName).orElse(Component.translatable("container.envelope.mailbox"));
-    }
-
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new MailboxMenu(id, inventory, getBlockPos(), getAllMail());
-    }
+    // -- Events
 
     @Override
     public void setRemoved() {
@@ -79,7 +68,7 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
         dropOrReturnAllMail();
     }
 
-    // --
+    // -- Mail
 
     public List<ItemStack> getAllMail() {
         return Mail.getMailboxes().getAllMail(getAddress().orElseThrow());
@@ -137,7 +126,37 @@ public class MailboxBlockEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    // --
+    // -- Menu
+
+    public MenuProvider createMenuProvider() {
+        return new MenuProvider() {
+            @Override
+            public @NotNull Component getDisplayName() {
+                return Component.translatable("gui.envelope.pigeonhole");
+            }
+
+            @Override
+            public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+                return new PigeonholeMenu(id, inventory, getBlockPos(), getAllMail());
+            }
+        };
+    }
+
+    public MenuProvider createAddressMenuProvider(String suggestedAddress) {
+        return new MenuProvider() {
+            @Override
+            public @NotNull Component getDisplayName() {
+                return Component.translatable("gui.envelope.pigeonhole_address.enter_address");
+            }
+
+            @Override
+            public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+                return new PigeonholeAddressMenu(id, inventory, getBlockPos(), suggestedAddress);
+            }
+        };
+    }
+
+    // -- Save/Load
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {

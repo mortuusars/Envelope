@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
@@ -28,12 +28,12 @@ public class MailboxHasNewMailS2CP implements Packet {
 
     @Override
     public boolean handle(PacketFlow flow, Player player) {
-        if (!(player.containerMenu instanceof MailboxMenu mailboxMenu)) {
+        if (!(player.containerMenu instanceof PigeonholeMenu pigeonholeMenu)) {
             Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
             return false;
         }
 
-        mailboxMenu.setHasNewMail(true);
+        pigeonholeMenu.setHasNewMail(true);
         player.level().playSound(player, player, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.MASTER, 0.75f, 1f);
         return true;
     }

@@ -30,7 +30,7 @@ public class Config {
             {
                 builder.push("pigeon");
                 PIGEON_SPAWNS_NATURALLY = builder
-                        .comment("Pigeon can spawn naturally in #envelope:allows_pigeon_spawns biomes. Default: true")
+                        .comment("Pigeon can spawn naturally in '#envelope:allows_pigeon_spawns' biomes. Default: true")
                         .define("spawns_naturally", true);
                 PIGEON_SPAWNS_IN_VILLAGE = builder
                         .comment("Pigeon can spawn in the village (similar to how Cats do). Default: true")

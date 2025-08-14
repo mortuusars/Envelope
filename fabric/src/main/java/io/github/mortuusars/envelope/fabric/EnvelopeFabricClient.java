@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope.fabric;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
-import io.github.mortuusars.envelope.client.gui.screen.MailboxAddressScreen;
-import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
@@ -29,8 +29,8 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_LEG_BAND, PigeonLegBandModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
 
-        MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.MAILBOX_ADDRESS.get(), MailboxAddressScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressScreen::new);
 
         FabricS2CPacketHandler.register();
     }

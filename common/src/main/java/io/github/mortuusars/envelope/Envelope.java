@@ -5,15 +5,13 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
-import io.github.mortuusars.envelope.world.block.MailboxBlock;
-import io.github.mortuusars.envelope.world.block.MailboxBlockEntity;
-import io.github.mortuusars.envelope.world.block.DovecoteBlock;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.inventory.MailboxAddressMenu;
-import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
-import io.github.mortuusars.envelope.world.item.MailboxItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
@@ -30,7 +28,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -66,12 +63,11 @@ public class Envelope {
     }
 
     public static class Blocks {
-        public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
-                () -> new MailboxBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.LECTERN)
+        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = Register.block("oak_pigeonhole",
+                () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
                         .noOcclusion()));
-
-        public static final Supplier<DovecoteBlock> DOVECOTE = Register.block("dovecote",
-                () -> new DovecoteBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
+        public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = Register.block("spruce_pigeonhole",
+                () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
                         .noOcclusion()));
 
         static void init() {
@@ -79,19 +75,20 @@ public class Envelope {
     }
 
     public static class BlockEntityTypes {
-        public static final Supplier<BlockEntityType<MailboxBlockEntity>> MAILBOX =
-                Register.blockEntityType("mailbox", () -> Register.newBlockEntityType(MailboxBlockEntity::new, Blocks.MAILBOX.get()));
+        public static final Supplier<BlockEntityType<PigeonholeBlockEntity>> PIGEONHOLE =
+                Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(PigeonholeBlockEntity::new,
+                        Blocks.OAK_PIGEONHOLE.get(),
+                        Blocks.SPRUCE_PIGEONHOLE.get()));
 
         static void init() {
         }
     }
 
     public static class Items {
-        public static final Supplier<MailboxItem> MAILBOX = Register.item("mailbox",
-                () -> new MailboxItem(Blocks.MAILBOX.get(), new Item.Properties()));
-
-        public static final Supplier<BlockItem> DOVECOTE = Register.item("dovecote",
-                () -> new BlockItem(Blocks.DOVECOTE.get(), new Item.Properties()));
+        public static final Supplier<BlockItem> OAK_PIGEONHOLE = Register.item("oak_pigeonhole",
+                () -> new BlockItem(Blocks.OAK_PIGEONHOLE.get(), new Item.Properties()));
+        public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = Register.item("spruce_pigeonhole",
+                () -> new BlockItem(Blocks.SPRUCE_PIGEONHOLE.get(), new Item.Properties()));
 
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
                 () -> new LetterItem(new Item.Properties()));
@@ -165,10 +162,10 @@ public class Envelope {
     }
 
     public static class MenuTypes {
-        public static final Supplier<MenuType<MailboxMenu>> MAILBOX =
-                Register.menuType("mailbox", MailboxMenu::fromNetwork);
-        public static final Supplier<MenuType<MailboxAddressMenu>> MAILBOX_ADDRESS =
-                Register.menuType("mailbox_address", MailboxAddressMenu::fromNetwork);
+        public static final Supplier<MenuType<PigeonholeAddressMenu>> PIGEONHOLE_ADDRESS =
+                Register.menuType("pigeonhole_address", PigeonholeAddressMenu::fromNetwork);
+        public static final Supplier<MenuType<PigeonholeMenu>> PIGEONHOLE =
+                Register.menuType("pigeonhole", PigeonholeMenu::fromNetwork);
 
         static void init() {
         }

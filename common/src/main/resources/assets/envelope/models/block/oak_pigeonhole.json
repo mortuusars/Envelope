@@ -1,0 +1,10 @@
+{
+	"parent": "minecraft:block/orientable_with_bottom",
+	"textures": {
+		"bottom": "envelope:block/oak_pigeonhole_end",
+		"front": "envelope:block/oak_pigeonhole_front",
+		"particle": "envelope:block/oak_pigeonhole_side",
+		"side": "envelope:block/oak_pigeonhole_side",
+		"top": "envelope:block/oak_pigeonhole_end"
+	}
+}
