@@ -16,6 +16,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -53,7 +54,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     public PigeonholeBlockEntity setAddress(@NotNull Address.Mailbox address) {
         this.address = address;
-        if (level instanceof ServerLevel) {
+        if (!getLevelOrThrow().isClientSide()) {
             Mail.getMailboxes().create(this.address);
         }
         setChanged();
@@ -142,7 +143,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
         };
     }
 
-    public MenuProvider createAddressMenuProvider(String suggestedAddress) {
+    public MenuProvider createAddressMenuProvider(InteractionHand hand, String suggestedAddress) {
         return new MenuProvider() {
             @Override
             public @NotNull Component getDisplayName() {
@@ -151,7 +152,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
             @Override
             public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                return new PigeonholeAddressMenu(id, inventory, getBlockPos(), suggestedAddress);
+                return new PigeonholeAddressMenu(id, inventory, hand, getBlockPos(), suggestedAddress);
             }
         };
     }

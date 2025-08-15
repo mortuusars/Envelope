@@ -17,11 +17,13 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -30,12 +32,14 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Envelope {
     public static final String ID = "envelope";
@@ -44,6 +48,7 @@ public class Envelope {
     public static void init() {
         Blocks.init();
         BlockEntityTypes.init();
+        PoiTypes.init();
         EntityTypes.init();
         Items.init();
         DataComponents.init();
@@ -93,6 +98,23 @@ public class Envelope {
         }
 
         static void init() {
+        }
+    }
+
+    public static class PoiTypes {
+        public static final ResourceKey<PoiType> PIGEONHOLE =
+                ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, resource("pigeonhole"));
+
+        static void init() {
+            Register.poiType(PIGEONHOLE, 0, 1, () -> getPigeonholePoiBlockStates());
+        }
+
+        private static Set<BlockState> getPigeonholePoiBlockStates() {
+            return Blocks.PIGEONHOLES.values().stream()
+                    .map(Supplier::get)
+                    .map(b -> b.getStateDefinition().getPossibleStates())
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
         }
     }
 

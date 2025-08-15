@@ -1,9 +1,13 @@
 package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.api.mail.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -67,12 +71,14 @@ public class PigeonholeBlock extends Block implements EntityBlock {
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.is(Items.NAME_TAG) && !state.getValue(HAS_ADDRESS)) { //TODO: config to require nametag
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                PlatformHelper.openMenu(serverPlayer, blockEntity.createAddressMenuProvider(""),
+                PlatformHelper.openMenu(serverPlayer, blockEntity.createAddressMenuProvider(hand, ""),
                         buffer -> {
+                            buffer.writeEnum(hand);
                             buffer.writeBlockPos(pos);
                             buffer.writeUtf("");
                         });
             }
+            return ItemInteractionResult.SUCCESS;
         }
 
         if (stack.isEmpty() && state.getValue(HAS_ADDRESS)) {
@@ -91,6 +97,19 @@ public class PigeonholeBlock extends Block implements EntityBlock {
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    public void applyAddress(Player player, BlockState state, BlockPos pos, InteractionHand hand, String address) {
+        Level level = player.level();
+
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity mailboxBlockEntity) {
+            mailboxBlockEntity.setAddress(new Address.Mailbox(address));
+            level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
+            player.getItemInHand(hand).shrink(1);
+            player.swing(hand);
+        }
+
+        level.playSound(player, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
     }
 
     @Nullable
