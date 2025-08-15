@@ -160,15 +160,15 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("Address", Tag.TAG_STRING)) {
-            address = new Address.Mailbox(tag.getString("Address"));
+        if (tag.contains("address", Tag.TAG_STRING)) {
+            address = new Address.Mailbox(tag.getString("address"));
         }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (address != null) {
-            tag.putString("Address", address.id());
+            tag.putString("address", address.id());
         }
     }
 

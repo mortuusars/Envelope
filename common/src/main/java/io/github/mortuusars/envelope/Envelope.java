@@ -85,11 +85,12 @@ public class Envelope {
 
     public static class BlockEntityTypes {
         public static final Supplier<BlockEntityType<PigeonholeBlockEntity>> PIGEONHOLE =
-                Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(PigeonholeBlockEntity::new,
-                        Blocks.OAK_PIGEONHOLE.get(),
-                        Blocks.SPRUCE_PIGEONHOLE.get(),
-                        Blocks.BIRCH_PIGEONHOLE.get()
-                        ));
+                Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(
+                        PigeonholeBlockEntity::new, getPigeonholeBlocks()));
+
+        private static PigeonholeBlock[] getPigeonholeBlocks() {
+            return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
+        }
 
         static void init() {
         }

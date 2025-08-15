@@ -38,10 +38,10 @@ public class PigeonholeAddressScreen extends AbstractContainerScreen<PigeonholeA
         imageHeight = 66;
         inventoryLabelX = -999;
         inventoryLabelY = -999;
-        titleLabelX = 28;
+        titleLabelX = 20;
         super.init();
 
-        name = new EditBox(this.font, leftPos + 32, topPos + 21, 142, 12, Component.translatable("gui.exposure.pigeonhole.address_box.title"));
+        name = new EditBox(this.font, leftPos + 11, topPos + 21, 142, 12, Component.translatable("gui.exposure.pigeonhole.address_box.title"));
         name.setTextColor(-1);
         name.setTextColorUneditable(-1);
         name.setBordered(false);
@@ -51,13 +51,13 @@ public class PigeonholeAddressScreen extends AbstractContainerScreen<PigeonholeA
         addWidget(name);
         setInitialFocus(name);
 
-        confirmButton = new ImageButton(leftPos + 133, topPos + 42, 19, 19,
+        confirmButton = new ImageButton(leftPos + 112, topPos + 42, 19, 19,
                 Sprites.CONFIRM_BUTTON_SPRITES,
                 button -> confirm(), Component.translatable("gui.envelope.confirm"));
         confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
         addRenderableWidget(confirmButton);
 
-        ImageButton cancelButton = new ImageButton(leftPos + 154, topPos + 42, 19, 19,
+        ImageButton cancelButton = new ImageButton(leftPos + 133, topPos + 42, 19, 19,
                 Sprites.CANCEL_BUTTON_SPRITES,
                 button -> cancel(), Component.translatable("gui.envelope.cancel"));
         cancelButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.cancel")));
@@ -104,7 +104,7 @@ public class PigeonholeAddressScreen extends AbstractContainerScreen<PigeonholeA
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 21, 0, imageWidth, imageHeight);
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
     protected void onAddressChanged(String address) {
