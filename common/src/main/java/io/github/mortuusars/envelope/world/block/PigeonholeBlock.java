@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.block;
 
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.api.mail.Address;
 import net.minecraft.core.BlockPos;
@@ -7,20 +8,34 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.WitherSkull;
+import net.minecraft.world.entity.vehicle.MinecartTNT;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,14 +82,55 @@ public class PigeonholeBlock extends Block implements EntityBlock {
     // --
 
     @Override
+    protected @NotNull List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        Entity entity = params.getOptionalParameter(LootContextParams.THIS_ENTITY);
+        if (entity instanceof PrimedTnt
+                || entity instanceof Creeper
+                || entity instanceof WitherSkull
+                || entity instanceof WitherBoss
+                || entity instanceof MinecartTNT) {
+            BlockEntity blockEntity = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+            if (blockEntity instanceof PigeonholeBlockEntity beehiveBlockEntity) {
+                beehiveBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
+            }
+        }
+
+        return super.getDrops(state, params);
+    }
+
+    @Override
+    protected @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (level.getBlockState(neighborPos).getBlock() instanceof FireBlock && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity beehiveBlockEntity) {
+            beehiveBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
+        }
+
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    }
+
+    // --
+
+    public void addWaste(Level level, BlockPos pos, BlockState state) {
+        if (!state.hasProperty(WASTE_LEVEL)) return;
+
+        int waste = state.getValue(WASTE_LEVEL);
+        if (waste < MAX_WASTE_LEVEL) {
+            waste += 1;
+            level.setBlockAndUpdate(pos, state.setValue(WASTE_LEVEL, waste));
+        }
+    }
+
+    // -- Interaction
+
+    @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.is(Items.NAME_TAG) && !state.getValue(HAS_ADDRESS)) { //TODO: config to require nametag
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                PlatformHelper.openMenu(serverPlayer, blockEntity.createAddressMenuProvider(hand, ""),
+                String suggestedAddress = "";
+                PlatformHelper.openMenu(serverPlayer, blockEntity.createAddressMenuProvider(hand, suggestedAddress),
                         buffer -> {
                             buffer.writeEnum(hand);
                             buffer.writeBlockPos(pos);
-                            buffer.writeUtf("");
+                            buffer.writeUtf(suggestedAddress);
                         });
             }
             return ItemInteractionResult.SUCCESS;
@@ -93,6 +149,17 @@ public class PigeonholeBlock extends Block implements EntityBlock {
             }
 
             return ItemInteractionResult.SUCCESS;
+        }
+
+        if (stack.is(Envelope.Tags.Items.WASTE_SCOOPABLE) && state.getValue(WASTE_LEVEL) >= MAX_WASTE_LEVEL) {
+            stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+            popResourceFromFace(level, pos, state.getValue(FACING), new ItemStack(Items.BONE_MEAL));
+            level.playSound(player, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+            if (!level.isClientSide()) {
+                player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
+            }
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);

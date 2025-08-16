@@ -124,11 +124,12 @@ public class PigeonModel extends HierarchicalModel<Pigeon> {
 	}
 
 	private PigeonModel.State getState(Pigeon pigeon) {
-		if (pigeon.isInSittingPose()) {
-			return PigeonModel.State.SITTING;
-		} else {
-			return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
-		}
+//		if (pigeon.isInSittingPose()) {
+//			return PigeonModel.State.SITTING;
+//		} else {
+//			return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
+//		}
+		return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
 	}
 
 	public enum State {

@@ -258,13 +258,27 @@ public class Envelope {
         public static class Blocks {
             public static final TagKey<Block> PIGEON_SPAWNABLE_ON =
                     TagKey.create(Registries.BLOCK, resource("pigeon_spawnable_on"));
+            public static final TagKey<Block> PIGEONHOLES =
+                    TagKey.create(Registries.BLOCK, resource("pigeonholes"));
+        }
+
+        public static class Items {
+            public static final TagKey<Item> PIGEON_FOOD =
+                    TagKey.create(Registries.ITEM, resource("pigeon_food"));
+            public static final TagKey<Item> WASTE_SCOOPABLE =
+                    TagKey.create(Registries.ITEM, resource("waste_scoopable"));
+        }
+
+        public static class EntityTypes {
+            public static final TagKey<EntityType<?>> PIGEONHOLE_INHABITORS =
+                    TagKey.create(Registries.ENTITY_TYPE, resource("pigeonhole_inhabitors"));
         }
 
         public static class Biomes {
             public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
                     TagKey.create(Registries.BIOME, resource("allows_pigeon_spawns"));
-        }
 
+        }
         public static class Structures {
             public static final TagKey<Structure> PIGEONS_SPAWN_IN =
                     TagKey.create(Registries.STRUCTURE, resource("pigeons_spawn_in"));
