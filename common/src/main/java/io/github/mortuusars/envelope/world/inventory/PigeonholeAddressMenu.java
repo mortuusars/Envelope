@@ -8,8 +8,6 @@ import io.github.mortuusars.envelope.world.mail.Mailboxes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -91,7 +89,7 @@ public class PigeonholeAddressMenu extends AbstractContainerMenu {
     }
 
     public void setAddressAndUpdateConfirmState(ServerLevel level, String address) {
-        if (setAddress(address) && !Mailboxes.get(level.getServer()).exists(new Address.Mailbox(address))) {
+        if (setAddress(address) && !Mailboxes.get(level.getServer()).exists(new Address.Pigeonhole(address))) {
             canConfirm.set(1);
         } else {
             canConfirm.set(0);

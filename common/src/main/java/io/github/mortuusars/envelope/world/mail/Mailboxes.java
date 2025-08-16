@@ -20,27 +20,27 @@ import java.util.*;
 public class Mailboxes extends SavedData {
     protected static final String SAVED_DATA_NAME = "envelope_mailboxes";
 
-    protected final Map<Address.Mailbox, Map<UUID, ItemStack>> mailboxes = new HashMap<>();
+    protected final Map<Address.Pigeonhole, Map<UUID, ItemStack>> mailboxes = new HashMap<>();
 
     // --
 
-    public void create(Address.Mailbox address) {
+    public void create(Address.Pigeonhole address) {
         mailboxes.computeIfAbsent(address, a -> new HashMap<>());
         setDirty();
     }
 
-    public void remove(Address.Mailbox address) {
+    public void remove(Address.Pigeonhole address) {
         mailboxes.remove(address);
         setDirty();
     }
 
-    public boolean exists(Address.Mailbox address) {
+    public boolean exists(Address.Pigeonhole address) {
         return mailboxes.containsKey(address);
     }
 
     // --
 
-    public List<ItemStack> getAllMail(Address.Mailbox address) {
+    public List<ItemStack> getAllMail(Address.Pigeonhole address) {
         @Nullable Map<UUID, ItemStack> map = mailboxes.get(address);
         if (map == null) {
             return Collections.emptyList();
@@ -48,13 +48,13 @@ public class Mailboxes extends SavedData {
         return List.copyOf(map.values());
     }
 
-    public void putMail(Address.Mailbox address, ItemStack mail) {
+    public void putMail(Address.Pigeonhole address, ItemStack mail) {
         Preconditions.checkArgument(mail.has(Envelope.DataComponents.MAIL_ID), "Mail must have 'envelope:mail_id'. " + mail);
         mailboxes.computeIfAbsent(address, uuid -> new HashMap<>()).put(mail.get(Envelope.DataComponents.MAIL_ID), mail);
         setDirty();
     }
 
-    public Result<ItemStack> removeMail(Address.Mailbox address, UUID mailId) {
+    public Result<ItemStack> removeMail(Address.Pigeonhole address, UUID mailId) {
         @Nullable Map<UUID, ItemStack> contents = mailboxes.get(address);
         if (contents == null) {
             return Result.failure(new Failure("No mailbox with address '" + address + "' exists."));
@@ -76,7 +76,7 @@ public class Mailboxes extends SavedData {
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        for (Map.Entry<Address.Mailbox, Map<UUID, ItemStack>> entry : mailboxes.entrySet()) {
+        for (Map.Entry<Address.Pigeonhole, Map<UUID, ItemStack>> entry : mailboxes.entrySet()) {
             ListTag list = new ListTag();
             for (ItemStack item : entry.getValue().values()) {
                 try {
@@ -110,7 +110,7 @@ public class Mailboxes extends SavedData {
                     }
                 }
 
-                mailboxes.put(new Address.Mailbox(address), mailMap);
+                mailboxes.put(new Address.Pigeonhole(address), mailMap);
             } catch (Exception e) {
                 Envelope.LOGGER.error("Cannot load mail of '{}': {}", address, e.getMessage());
             }

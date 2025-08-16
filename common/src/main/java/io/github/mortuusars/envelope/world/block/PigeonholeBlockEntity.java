@@ -35,8 +35,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class PigeonholeBlockEntity extends BlockEntity {
+    public static final int MAX_OCCUPANTS = 3;
+
     @Nullable
-    protected Address.Mailbox address = null;
+    protected Address.Pigeonhole address = null;
 
     public PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -48,11 +50,11 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     // -- Address
 
-    public Optional<Address.Mailbox> getAddress() {
+    public Optional<Address.Pigeonhole> getAddress() {
         return Optional.ofNullable(address);
     }
 
-    public PigeonholeBlockEntity setAddress(@NotNull Address.Mailbox address) {
+    public PigeonholeBlockEntity setAddress(@NotNull Address.Pigeonhole address) {
         this.address = address;
         if (!getLevelOrThrow().isClientSide()) {
             Mail.getMailboxes().create(this.address);
@@ -162,7 +164,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (tag.contains("address", Tag.TAG_STRING)) {
-            address = new Address.Mailbox(tag.getString("address"));
+            address = new Address.Pigeonhole(tag.getString("address"));
         }
     }
 

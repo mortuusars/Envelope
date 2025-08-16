@@ -242,7 +242,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
             }
         }
 
-        return Optional.of(new Address.Mailbox(name));
+        return Optional.of(new Address.Pigeonhole(name));
     }
 
     // --

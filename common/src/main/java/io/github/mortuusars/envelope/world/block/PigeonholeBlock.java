@@ -4,7 +4,6 @@ import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.api.mail.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -103,7 +102,7 @@ public class PigeonholeBlock extends Block implements EntityBlock {
         Level level = player.level();
 
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity mailboxBlockEntity) {
-            mailboxBlockEntity.setAddress(new Address.Mailbox(address));
+            mailboxBlockEntity.setAddress(new Address.Pigeonhole(address));
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
             player.getItemInHand(hand).shrink(1);
             player.swing(hand);

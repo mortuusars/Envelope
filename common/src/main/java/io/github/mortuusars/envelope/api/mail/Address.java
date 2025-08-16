@@ -44,18 +44,18 @@ public interface Address {
         return this;
     }
 
-    default Address ifMailbox(Consumer<Mailbox> consumer) {
-        if (this instanceof Mailbox mailbox) {
-            consumer.accept(mailbox);
+    default Address ifMailbox(Consumer<Pigeonhole> consumer) {
+        if (this instanceof Pigeonhole pigeonhole) {
+            consumer.accept(pigeonhole);
         }
         return this;
     }
 
-    default <R> R map(Function<Player, R> ifPlayer, Function<Npc, R> ifNpc, Function<Mailbox, R> ifMailbox) {
+    default <R> R map(Function<Player, R> ifPlayer, Function<Npc, R> ifNpc, Function<Pigeonhole, R> ifMailbox) {
         return switch (this) {
             case Player player -> ifPlayer.apply(player);
             case Npc npc -> ifNpc.apply(npc);
-            case Mailbox mailbox -> ifMailbox.apply(mailbox);
+            case Pigeonhole pigeonhole -> ifMailbox.apply(pigeonhole);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
         };
     }
@@ -124,14 +124,14 @@ public interface Address {
         }
     }
 
-    record Mailbox(String id) implements Address {
-        public static final MapCodec<Mailbox> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Mailbox::id)
-        ).apply(instance, Mailbox::new));
+    record Pigeonhole(String id) implements Address {
+        public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
+        ).apply(instance, Pigeonhole::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, Mailbox> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Mailbox::id,
-                Mailbox::new
+        public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, Pigeonhole::id,
+                Pigeonhole::new
         );
 
         @Override
@@ -148,7 +148,7 @@ public interface Address {
     enum Type implements StringRepresentable {
         PLAYER("player", Player.CODEC, Player.STREAM_CODEC.cast()),
         NPC("npc", Npc.CODEC, Npc.STREAM_CODEC),
-        MAILBOX("mailbox", Mailbox.CODEC, Mailbox.STREAM_CODEC);
+        MAILBOX("mailbox", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
         public static final StreamCodec<RegistryFriendlyByteBuf, Type> STREAM_CODEC =
