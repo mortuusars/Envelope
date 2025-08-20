@@ -40,7 +40,6 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -123,6 +122,15 @@ public class PigeonholeBlockEntity extends BlockEntity {
             dropOrReturnAllMail();
             Mail.getMailboxes().remove(address);
         }
+    }
+
+    @Override
+    public void setChanged() {
+        if (isFireNearby()) {
+            releaseAllOccupants(getLevelOrThrow().getBlockState(getBlockPos()), ReleaseReason.EMERGENCY);
+        }
+
+        super.setChanged();
     }
 
     // -- Mail
@@ -213,49 +221,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
         };
     }
 
-    // -- Save/Load
-
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("address", Tag.TAG_STRING)) {
-            address = new Address.Pigeonhole(tag.getString("address"));
-        }
-
-        occupants.clear();
-        if (tag.contains("pigeons")) {
-            Occupant.LIST_CODEC
-                    .parse(NbtOps.INSTANCE, tag.get("pigeons"))
-                    .resultOrPartial(string -> Envelope.LOGGER.error("Failed to parse bees: '{}'", string))
-                    .ifPresent(list -> list.forEach(this::storeOccupant));
-        }
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (address != null) {
-            tag.putString("address", address.id());
-        }
-        tag.put("pigeons", Occupant.LIST_CODEC.encodeStart(NbtOps.INSTANCE, getPigeons()).getOrThrow());
-    }
-
-    private List<Occupant> getPigeons() {
-        return occupants.stream().map(OccupantData::toOccupant).toList();
-    }
-
     // --
-
-    public @NotNull Level getLevelOrThrow() {
-        return Objects.requireNonNull(level);
-    }
-
-    @Override
-    public void setChanged() {
-        if (isFireNearby()) {
-            releaseAllOccupants(getLevelOrThrow().getBlockState(getBlockPos()), ReleaseReason.EMERGENCY);
-        }
-
-        super.setChanged();
-    }
 
     public boolean isFireNearby() {
         if (this.level == null) return false;
@@ -269,7 +235,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
         return false;
     }
 
-    // -- Pigeons
+    // -- Occupants
 
     public boolean isEmpty() {
         return occupants.isEmpty();
@@ -281,6 +247,10 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     public boolean hasSpace() {
         return !isFull();
+    }
+
+    public List<Occupant> getOccupants() {
+        return occupants.stream().map(OccupantData::toOccupant).toList();
     }
 
     public void addOccupant(Entity occupant) {
@@ -364,6 +334,37 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     public SoundEvent getExitSound() {
         return SoundEvents.BEEHIVE_EXIT;
+    }
+
+    // -- Save/Load
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (tag.contains("address", Tag.TAG_STRING)) {
+            address = new Address.Pigeonhole(tag.getString("address"));
+        }
+
+        occupants.clear();
+        if (tag.contains("pigeons")) {
+            Occupant.LIST_CODEC
+                    .parse(NbtOps.INSTANCE, tag.get("pigeons"))
+                    .resultOrPartial(string -> Envelope.LOGGER.error("Failed to parse pigeons: '{}'", string))
+                    .ifPresent(list -> list.forEach(this::storeOccupant));
+        }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (address != null) {
+            tag.putString("address", address.id());
+        }
+        tag.put("pigeons", Occupant.LIST_CODEC.encodeStart(NbtOps.INSTANCE, getOccupants()).getOrThrow());
+    }
+
+    // --
+
+    public @NotNull Level getLevelOrThrow() {
+        return Objects.requireNonNull(level);
     }
 
     // --

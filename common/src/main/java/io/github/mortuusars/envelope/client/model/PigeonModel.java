@@ -1,8 +1,9 @@
 package io.github.mortuusars.envelope.client.model;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -11,7 +12,7 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PigeonModel extends HierarchicalModel<Pigeon> {
+public class PigeonModel extends AgeableListModel<Pigeon> {
 	public final ModelPart root;
 	public final ModelPart body;
 	public final ModelPart torso;
@@ -54,11 +55,6 @@ public class PigeonModel extends HierarchicalModel<Pigeon> {
 		return LayerDefinition.create(meshdefinition, 64, 64);
 	}
 
-	@Override
-	public @NotNull ModelPart root() {
-		return this.root;
-	}
-
 	public void setupAnim(Pigeon entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.setupAnim(getState(entity), entity, entity.tickCount, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 	}
@@ -79,6 +75,16 @@ public class PigeonModel extends HierarchicalModel<Pigeon> {
 		rightLeg.y = -2f;
 		leftLeg.z = 0;
 		rightLeg.z = 0;
+
+		if (pigeon != null && pigeon.isBaby()) {
+			head.xScale = 1.3f;
+			head.yScale = 1.3f;
+			head.zScale = 1.3f;
+		} else {
+			head.xScale = 1f;
+			head.yScale = 1f;
+			head.zScale = 1f;
+		}
 
 		switch (state) {
 			case STANDING:
@@ -130,6 +136,16 @@ public class PigeonModel extends HierarchicalModel<Pigeon> {
 //			return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
 //		}
 		return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
+	}
+
+	@Override
+	protected @NotNull Iterable<ModelPart> headParts() {
+		return ImmutableList.of();
+	}
+
+	@Override
+	protected @NotNull Iterable<ModelPart> bodyParts() {
+		return ImmutableList.of(this.body);
 	}
 
 	public enum State {

@@ -253,7 +253,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public float getVoicePitch() {
-        return getPitch(random);
+        return getPitch(random) + (isBaby() ? 0.3f : 0);
     }
 
     public static float getPitch(RandomSource random) {
@@ -462,7 +462,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                     boolean bl = pathfindDirectlyTowards(getPigeonholePos());
                     if (!bl) {
                         dropAndBlacklistHive();
-                    } else if (lastPath != null && pigeon.navigation.getPath().sameAs(lastPath)) {
+                    } else if (lastPath != null && lastPath.sameAs(pigeon.navigation.getPath())) {
                         ticksStuck++;
                         if (ticksStuck > TICKS_BEFORE_PIGEONHOLE_DROP) {
                             dropHive();
