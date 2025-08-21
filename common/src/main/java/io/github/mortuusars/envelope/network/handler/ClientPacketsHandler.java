@@ -1,8 +1,10 @@
 package io.github.mortuusars.envelope.network.handler;
 
 import io.github.mortuusars.envelope.client.gui.screen.LetterEditScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditScreenS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import net.minecraft.world.item.ItemStack;
 
@@ -11,6 +13,12 @@ public class ClientPacketsHandler {
         ItemStack itemInHand = Minecrft.player().getItemInHand(packet.hand());
         if (itemInHand.getItem() instanceof LetterItem) {
             Minecrft.get().setScreen(new LetterEditScreen(itemInHand, packet.hand(), packet.knownRecipients()));
+        }
+    }
+
+    public static void syncPigeonholeBlockData(PigeonholeSyncBlockDataS2CP packet) {
+        if (Minecrft.get().screen instanceof PigeonholeScreen screen) {
+            screen.setOccupantsData(packet.occupants());
         }
     }
 }

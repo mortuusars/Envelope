@@ -7,6 +7,8 @@ import io.github.mortuusars.envelope.api.mail.Address;
 import io.github.mortuusars.envelope.api.mail.Mail;
 import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
@@ -24,6 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -115,6 +118,42 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     // -- Events
 
+    public static void serverTick(Level level, BlockPos pos, BlockState state, PigeonholeBlockEntity be) {
+        be.serverTick(level, pos, state);
+    }
+
+    protected void serverTick(Level level, BlockPos pos, BlockState state) {
+        tickOccupants(level, pos, state);
+
+        if (!occupants.isEmpty() && level.getRandom().nextDouble() < 0.005) {
+            double x = pos.getX() + 0.5;
+            double y = pos.getY();
+            double z = pos.getZ() + 0.5;
+            //TODO: pigeonhole work sound
+            level.playSound(null, x, y, z, Envelope.SoundEvents.PIGEON_AMBIENT.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
+        }
+    }
+
+    protected void tickOccupants(Level level, BlockPos pos, BlockState state) {
+        Iterator<OccupantData> iterator = occupants.iterator();
+
+        boolean releasedSomeone = false;
+        while (iterator.hasNext()) {
+            OccupantData occupantData = iterator.next();
+            if (occupantData.tick()) {
+                if (releaseOccupant(level, pos, state, occupantData.toOccupant(), ReleaseReason.RELEASED).isPresent()) {
+                    releasedSomeone = true;
+                    iterator.remove();
+                }
+            }
+        }
+
+        if (releasedSomeone) {
+            super.setChanged();
+            onOccupantsChanged();
+        }
+    }
+
     @Override
     public void setRemoved() {
         super.setRemoved();
@@ -131,6 +170,14 @@ public class PigeonholeBlockEntity extends BlockEntity {
         }
 
         super.setChanged();
+    }
+
+    protected void onOccupantsChanged() {
+        for (Player player : getLevelOrThrow().players()) {
+            if (player instanceof ServerPlayer serverPlayer && player.containerMenu instanceof PigeonholeMenu) {
+                Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), serverPlayer);
+            }
+        }
     }
 
     // -- Mail
@@ -197,7 +244,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
         return new MenuProvider() {
             @Override
             public @NotNull Component getDisplayName() {
-                return Component.translatable("gui.envelope.pigeonhole");
+                return getAddress().map(a -> Component.literal(a.id())).orElse(Component.translatable("gui.envelope.pigeonhole"));
             }
 
             @Override
@@ -258,7 +305,8 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
         occupant.stopRiding();
         occupant.ejectPassengers();
-        storeOccupant(Occupant.of(occupant));
+
+        storeOccupant(Occupant.of(occupant, getFirstFreeSlot()));
 
         if (level != null) {
             BlockPos pos = getBlockPos();
@@ -269,9 +317,26 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
         occupant.discard();
         super.setChanged();
+        onOccupantsChanged();
     }
 
-    public void storeOccupant(Occupant occupant) {
+    protected int getFirstFreeSlot() {
+        int slot = 0;
+        while (true) {
+            int s = slot;
+            boolean taken = false;
+            for (OccupantData obj : occupants) {
+                if (obj.occupant.slot == s) {
+                    taken = true;
+                    break;
+                }
+            }
+            if (!taken) return s;
+            slot++;
+        }
+    }
+
+    protected void storeOccupant(Occupant occupant) {
         occupants.add(new OccupantData(occupant));
     }
 
@@ -325,6 +390,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
         if (releasedSomeone) {
             super.setChanged();
+            onOccupantsChanged();
         }
     }
 
@@ -383,14 +449,15 @@ public class PigeonholeBlockEntity extends BlockEntity {
         }
 
         public PigeonholeBlockEntity.Occupant toOccupant() {
-            return new PigeonholeBlockEntity.Occupant(this.occupant.entityData, this.ticksInside, this.occupant.minTicksInPigeonhole);
+            return new PigeonholeBlockEntity.Occupant(this.occupant.entityData, this.occupant.slot, this.ticksInside, this.occupant.minTicksInPigeonhole);
         }
     }
 
-    public record Occupant(CustomData entityData, int ticksInPigeonhole, int minTicksInPigeonhole) {
+    public record Occupant(CustomData entityData, int slot, int ticksInPigeonhole, int minTicksInPigeonhole) {
         public static final Codec<PigeonholeBlockEntity.Occupant> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
                                 CustomData.CODEC.optionalFieldOf("entity_data", CustomData.EMPTY).forGetter(PigeonholeBlockEntity.Occupant::entityData),
+                                Codec.INT.fieldOf("slot").forGetter(PigeonholeBlockEntity.Occupant::slot),
                                 Codec.INT.fieldOf("ticks_in_pigeonhole").forGetter(PigeonholeBlockEntity.Occupant::ticksInPigeonhole),
                                 Codec.INT.fieldOf("min_ticks_in_pigeonhole").forGetter(PigeonholeBlockEntity.Occupant::minTicksInPigeonhole)
                         )
@@ -399,26 +466,28 @@ public class PigeonholeBlockEntity extends BlockEntity {
         public static final Codec<List<PigeonholeBlockEntity.Occupant>> LIST_CODEC = CODEC.listOf();
         @SuppressWarnings("deprecation")
         public static final StreamCodec<ByteBuf, PigeonholeBlockEntity.Occupant> STREAM_CODEC = StreamCodec.composite(
-                CustomData.STREAM_CODEC,
-                PigeonholeBlockEntity.Occupant::entityData,
-                ByteBufCodecs.VAR_INT,
-                PigeonholeBlockEntity.Occupant::ticksInPigeonhole,
-                ByteBufCodecs.VAR_INT,
-                PigeonholeBlockEntity.Occupant::minTicksInPigeonhole,
+                CustomData.STREAM_CODEC, PigeonholeBlockEntity.Occupant::entityData,
+                ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::slot,
+                ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::ticksInPigeonhole,
+                ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::minTicksInPigeonhole,
                 PigeonholeBlockEntity.Occupant::new
         );
 
-        public static PigeonholeBlockEntity.Occupant of(Entity entity) {
+        public static PigeonholeBlockEntity.Occupant of(Entity entity, int slot, int minTicksInPigeonhole) {
             CompoundTag tag = new CompoundTag();
             entity.save(tag);
             PigeonholeBlockEntity.IGNORED_PIGEON_TAGS.forEach(tag::remove);
-            return new PigeonholeBlockEntity.Occupant(CustomData.of(tag), 0, 600);
+            return new PigeonholeBlockEntity.Occupant(CustomData.of(tag), slot, 0, minTicksInPigeonhole);
         }
 
-        public static PigeonholeBlockEntity.Occupant create(int ticksInHive) {
+        public static PigeonholeBlockEntity.Occupant of(Entity entity, int slot) {
+            return of(entity, slot, 600);
+        }
+
+        public static PigeonholeBlockEntity.Occupant create(int slot, int ticksInHive) {
             CompoundTag compoundTag = new CompoundTag();
             compoundTag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(Envelope.EntityTypes.PIGEON.get()).toString());
-            return new PigeonholeBlockEntity.Occupant(CustomData.of(compoundTag), ticksInHive, 600);
+            return new PigeonholeBlockEntity.Occupant(CustomData.of(compoundTag), slot, ticksInHive, 600);
         }
 
         @Nullable

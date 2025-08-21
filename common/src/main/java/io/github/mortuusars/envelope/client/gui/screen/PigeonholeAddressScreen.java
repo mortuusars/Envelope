@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.UpdateMailboxAddressC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.UpdatePigeonholeMenuAddressC2SP;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -109,7 +109,7 @@ public class PigeonholeAddressScreen extends AbstractContainerScreen<PigeonholeA
 
     protected void onAddressChanged(String address) {
         getMenu().setAddress(address);
-        Packets.sendToServer(new UpdateMailboxAddressC2SP(address));
+        Packets.sendToServer(new UpdatePigeonholeMenuAddressC2SP(address));
     }
 
     @Override

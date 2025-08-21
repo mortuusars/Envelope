@@ -15,13 +15,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record MailboxMenuMailS2CP(List<ItemStack> mail) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("mailbox_menu_mail");
-    public static final Type<MailboxMenuMailS2CP> TYPE = new Type<>(ID);
+public record PigeonholeMenuMailS2CP(List<ItemStack> mail) implements Packet {
+    public static final ResourceLocation ID = Envelope.resource("pigeonhole_menu_mail");
+    public static final Type<PigeonholeMenuMailS2CP> TYPE = new Type<>(ID);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, MailboxMenuMailS2CP> STREAM_CODEC = StreamCodec.composite(
-            ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), MailboxMenuMailS2CP::mail,
-            MailboxMenuMailS2CP::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeMenuMailS2CP> STREAM_CODEC = StreamCodec.composite(
+            ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), PigeonholeMenuMailS2CP::mail,
+            PigeonholeMenuMailS2CP::new
     );
 
     @Override
@@ -32,7 +32,7 @@ public record MailboxMenuMailS2CP(List<ItemStack> mail) implements Packet {
     @Override
     public boolean handle(PacketFlow direction, Player player) {
         if (!(player.containerMenu instanceof PigeonholeMenu pigeonholeMenu)) {
-            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
+            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have PigeonholeMenu open.", ID, player);
             return false;
         }
 

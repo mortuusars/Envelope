@@ -13,12 +13,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class MailboxHasNewMailS2CP implements Packet {
-    public static final MailboxHasNewMailS2CP INSTANCE = new MailboxHasNewMailS2CP();
-    public static final ResourceLocation ID = Envelope.resource("mailbox_has_new_mail");
-    public static final Type<MailboxHasNewMailS2CP> TYPE = new Type<>(ID);
-    public static final StreamCodec<FriendlyByteBuf, MailboxHasNewMailS2CP> STREAM_CODEC = StreamCodec.unit(INSTANCE);
-    private MailboxHasNewMailS2CP() {
+public class PigeonholeHasNewMailS2CP implements Packet {
+    public static final PigeonholeHasNewMailS2CP INSTANCE = new PigeonholeHasNewMailS2CP();
+    public static final ResourceLocation ID = Envelope.resource("pigeonhole_has_new_mail");
+    public static final Type<PigeonholeHasNewMailS2CP> TYPE = new Type<>(ID);
+    public static final StreamCodec<FriendlyByteBuf, PigeonholeHasNewMailS2CP> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    private PigeonholeHasNewMailS2CP() {
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MailboxHasNewMailS2CP implements Packet {
     @Override
     public boolean handle(PacketFlow flow, Player player) {
         if (!(player.containerMenu instanceof PigeonholeMenu pigeonholeMenu)) {
-            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
+            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have PigeonholeMenu open.", ID, player);
             return false;
         }
 

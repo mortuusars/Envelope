@@ -1,12 +1,13 @@
 package io.github.mortuusars.envelope.world.block;
 
+import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.api.mail.Address;
-import net.minecraft.advancements.CriteriaTriggers;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,30 +18,26 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.entity.vehicle.MinecartTNT;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
@@ -49,7 +46,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PigeonholeBlock extends Block implements EntityBlock {
+public class PigeonholeBlock extends BaseEntityBlock {
+    public static final MapCodec<BeehiveBlock> CODEC = simpleCodec(BeehiveBlock::new);
+
     public static final int MAX_WASTE_LEVEL = 5;
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -64,6 +63,11 @@ public class PigeonholeBlock extends Block implements EntityBlock {
                 .setValue(WASTE_LEVEL, 0)
                 .setValue(HAS_ADDRESS, false)
                 .setValue(HAS_MAIL, false));
+    }
+
+    @Override
+    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -87,6 +91,11 @@ public class PigeonholeBlock extends Block implements EntityBlock {
     }
 
     // --
+
+    @Override
+    protected @NotNull RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
 
     @Override
     protected boolean hasAnalogOutputSignal(BlockState state) {
@@ -174,6 +183,8 @@ public class PigeonholeBlock extends Block implements EntityBlock {
                         ItemStack.STREAM_CODEC.encode(buffer, item);
                     }
                 });
+
+                Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(blockEntity.getOccupants()), serverPlayer);
             }
 
             return ItemInteractionResult.SUCCESS;
@@ -210,5 +221,13 @@ public class PigeonholeBlock extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new PigeonholeBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return level.isClientSide
+                ? null
+                : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(), PigeonholeBlockEntity::serverTick);
     }
 }

@@ -40,8 +40,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -56,6 +54,8 @@ import java.util.stream.Stream;
 
 public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal {
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_IS_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_IS_SLEEPING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_IS_HOMING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final int COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE = 200;
 
@@ -70,7 +70,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected BlockPos pigeonholePos;
     protected int stayOutOfPigeonholeCountdown;
     protected int remainingCooldownBeforeLocatingNewPigeonhole;
-    private GoToPigeonholeGoal goToPigeonholeGoal;
+    protected GoToPigeonholeGoal goToPigeonholeGoal;
 
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
@@ -101,9 +101,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new EnterPigeonholeGoal());
-        goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        goalSelector.addGoal(2, new BreedGoal(this, 1.0));
-        goalSelector.addGoal(3, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
+        goalSelector.addGoal(1, new BreedGoal(this, 1.0));
+        goalSelector.addGoal(2, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
+        goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(4, new FollowParentGoal(this, 1.25));
         goalSelector.addGoal(4, new LocatePigeonholeGoal());
         goToPigeonholeGoal = new GoToPigeonholeGoal();
@@ -125,9 +125,19 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void aiStep() {
         super.aiStep();
         this.calculateFlapping();
+
+        if (!this.level().isClientSide) {
+            if (this.stayOutOfPigeonholeCountdown > 0) {
+                this.stayOutOfPigeonholeCountdown--;
+            }
+
+            if (this.tickCount % 20 == 0 && !this.isPigeonholeValid()) {
+                this.setPigeonholePos(null);
+            }
+        }
     }
 
-    private void calculateFlapping() {
+    protected void calculateFlapping() {
         this.oFlap = this.flap;
         this.oFlapSpeed = this.flapSpeed;
         this.flapSpeed = this.flapSpeed + (float) (!this.onGround() && !this.isPassenger() ? 4 : -1) * 0.3F;
@@ -150,7 +160,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 8.0)
-                .add(Attributes.FLYING_SPEED, 0.6F)
+                .add(Attributes.FLYING_SPEED, 1.5F)
                 .add(Attributes.MOVEMENT_SPEED, 0.2F)
                 .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
@@ -159,6 +169,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_VARIANT_ID, 0);
+        builder.define(DATA_IS_SITTING, false);
+        builder.define(DATA_IS_SLEEPING, false);
         builder.define(DATA_IS_HOMING, false);
     }
 
@@ -188,18 +200,20 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         nextFlap = flyDist + flapSpeed / 2.0F;
     }
 
-    // --
-
-    public boolean hasPigeonholePos() {
-        return pigeonholePos != null;
+    public boolean isSitting() {
+        return entityData.get(DATA_IS_SITTING);
     }
 
-    public @Nullable BlockPos getPigeonholePos() {
-        return pigeonholePos;
+    public void setSitting(boolean sitting) {
+        entityData.set(DATA_IS_SITTING, sitting);
     }
 
-    public void setPigeonholePos(@Nullable BlockPos pigeonholePos) {
-        this.pigeonholePos = pigeonholePos;
+    public boolean isSleeping() {
+        return entityData.get(DATA_IS_SLEEPING);
+    }
+
+    public void setSleeping(boolean sleeping) {
+        entityData.set(DATA_IS_SLEEPING, sleeping);
     }
 
     public boolean isHoming() {
@@ -214,6 +228,82 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         //TODO: supporters
         // return getOwnerUUID()
         return true;
+    }
+
+    // -- Pigeonhole
+
+    public boolean hasPigeonholePos() {
+        return pigeonholePos != null;
+    }
+
+    public @Nullable BlockPos getPigeonholePos() {
+        return pigeonholePos;
+    }
+
+    public void setPigeonholePos(@Nullable BlockPos pigeonholePos) {
+        this.pigeonholePos = pigeonholePos;
+    }
+
+    public Optional<PigeonholeBlockEntity> getPigeonhole() {
+        BlockPos pos = getPigeonholePos();
+        if (pos != null && level().isLoaded(pos) && level().getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
+            return Optional.of(be);
+        }
+        return Optional.empty();
+    }
+
+    protected boolean wantsToEnterPigeonhole() {
+        if (stayOutOfPigeonholeCountdown > 0) return false;
+        return (level().isNight() || level().isThundering()) && !isPigeonholeNearFire();
+
+        // Probably better to send a signal to pickup mail from Pigeonhole itself.
+        // Because doing it here will cause all nearby pigeons to go into pigeonhole.
+        // return getPigeonhole().filter(PigeonholeBlockEntity::hasMailToDeliver).orElse(false);
+    }
+
+    protected boolean isPigeonholeNearFire() {
+        return getPigeonhole().map(PigeonholeBlockEntity::isFireNearby).orElse(false);
+    }
+
+    protected boolean closerThan(BlockPos pos, int distance) {
+        return pos.closerThan(blockPosition(), distance);
+    }
+
+    protected boolean isTooFarAway(BlockPos pos) {
+        return !this.closerThan(pos, 32);
+    }
+
+    protected boolean isPigeonholeValid() {
+        BlockPos pos = getPigeonholePos();
+        if (pos == null) return false;
+        if (isTooFarAway(pos)) return false;
+        return level().getBlockEntity(pos) instanceof PigeonholeBlockEntity;
+    }
+
+    protected void pathfindRandomlyTowards(BlockPos pos) {
+        Vec3 vec3 = Vec3.atBottomCenterOf(pos);
+        int i = 0;
+        BlockPos blockPos = this.blockPosition();
+        int j = (int)vec3.y - blockPos.getY();
+        if (j > 2) {
+            i = 4;
+        } else if (j < -2) {
+            i = -4;
+        }
+
+        int k = 6;
+        int l = 8;
+        int m = blockPos.distManhattan(pos);
+        if (m < 15) {
+            k = m / 2;
+            l = m / 2;
+        }
+
+        Vec3 vec32 = AirRandomPos.getPosTowards(this, k, l, i, vec3, (float) (Math.PI / 10));
+        if (vec32 != null) {
+            this.navigation.setMaxVisitedNodesMultiplier(0.5F);
+            this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1.0);
+        }
     }
 
     // -- Sound
@@ -276,6 +366,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected void doPush(Entity entity) {
         if (!(entity instanceof Player)) {
             super.doPush(entity);
+
+            //TODO: Wake up
+            setSleeping(false);
         }
     }
 
@@ -286,6 +379,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.addAdditionalSaveData(tag);
         tag.putInt("Variant", getVariant().id);
         tag.putBoolean("Homing", isHoming());
+        tag.putBoolean("Sitting", isSitting());
+        tag.putBoolean("Sleeping", isSleeping());
     }
 
     @Override
@@ -293,6 +388,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.readAdditionalSaveData(tag);
         setVariant(Pigeon.Variant.byId(tag.getInt("Variant")));
         setHoming(tag.getBoolean("Homing"));
+        setSitting(tag.getBoolean("Sitting"));
+        setSleeping(tag.getBoolean("Sleeping"));
     }
 
     @Override
@@ -548,68 +645,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         @Override
         public void start() {
             getPigeonhole().ifPresent(pigeonhole -> pigeonhole.addOccupant(Pigeon.this));
-        }
-    }
-
-    public Optional<PigeonholeBlockEntity> getPigeonhole() {
-        BlockPos pos = getPigeonholePos();
-        if (pos != null && level().isLoaded(pos) && level().getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
-            return Optional.of(be);
-        }
-        return Optional.empty();
-    }
-
-    protected boolean isPigeonholeNearFire() {
-        return getPigeonhole().map(PigeonholeBlockEntity::isFireNearby).orElse(false);
-    }
-
-    public boolean wantsToEnterPigeonhole() {
-        if (stayOutOfPigeonholeCountdown > 0) return false;
-        return (level().isNight() || level().isThundering()) && !isPigeonholeNearFire();
-
-        // Probably better to send a signal to pickup mail from Pigeonhole itself.
-        // Because doing it here will cause all nearby pigeons to go into pigeonhole.
-        // return getPigeonhole().filter(PigeonholeBlockEntity::hasMailToDeliver).orElse(false);
-    }
-
-    boolean closerThan(BlockPos pos, int distance) {
-        return pos.closerThan(blockPosition(), distance);
-    }
-
-    boolean isTooFarAway(BlockPos pos) {
-        return !this.closerThan(pos, 32);
-    }
-
-    boolean isPigeonholeValid() {
-        BlockPos pos = getPigeonholePos();
-        if (pos == null) return false;
-        if (isTooFarAway(pos)) return false;
-        return level().getBlockEntity(pos) instanceof PigeonholeBlockEntity;
-    }
-
-    void pathfindRandomlyTowards(BlockPos pos) {
-        Vec3 vec3 = Vec3.atBottomCenterOf(pos);
-        int i = 0;
-        BlockPos blockPos = this.blockPosition();
-        int j = (int)vec3.y - blockPos.getY();
-        if (j > 2) {
-            i = 4;
-        } else if (j < -2) {
-            i = -4;
-        }
-
-        int k = 6;
-        int l = 8;
-        int m = blockPos.distManhattan(pos);
-        if (m < 15) {
-            k = m / 2;
-            l = m / 2;
-        }
-
-        Vec3 vec32 = AirRandomPos.getPosTowards(this, k, l, i, vec3, (float) (Math.PI / 10));
-        if (vec32 != null) {
-            this.navigation.setMaxVisitedNodesMultiplier(0.5F);
-            this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1.0);
         }
     }
 

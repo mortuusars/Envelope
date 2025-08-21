@@ -44,18 +44,18 @@ public interface Address {
         return this;
     }
 
-    default Address ifMailbox(Consumer<Pigeonhole> consumer) {
+    default Address ifPigeonhole(Consumer<Pigeonhole> consumer) {
         if (this instanceof Pigeonhole pigeonhole) {
             consumer.accept(pigeonhole);
         }
         return this;
     }
 
-    default <R> R map(Function<Player, R> ifPlayer, Function<Npc, R> ifNpc, Function<Pigeonhole, R> ifMailbox) {
+    default <R> R map(Function<Player, R> ifPlayer, Function<Npc, R> ifNpc, Function<Pigeonhole, R> ifPigeonhole) {
         return switch (this) {
             case Player player -> ifPlayer.apply(player);
             case Npc npc -> ifNpc.apply(npc);
-            case Pigeonhole pigeonhole -> ifMailbox.apply(pigeonhole);
+            case Pigeonhole pigeonhole -> ifPigeonhole.apply(pigeonhole);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
         };
     }
@@ -136,7 +136,7 @@ public interface Address {
 
         @Override
         public Type type() {
-            return Type.MAILBOX;
+            return Type.PIGEONHOLE;
         }
 
         @Override
@@ -148,7 +148,7 @@ public interface Address {
     enum Type implements StringRepresentable {
         PLAYER("player", Player.CODEC, Player.STREAM_CODEC.cast()),
         NPC("npc", Npc.CODEC, Npc.STREAM_CODEC),
-        MAILBOX("mailbox", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC);
+        PIGEONHOLE("pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
         public static final StreamCodec<RegistryFriendlyByteBuf, Type> STREAM_CODEC =

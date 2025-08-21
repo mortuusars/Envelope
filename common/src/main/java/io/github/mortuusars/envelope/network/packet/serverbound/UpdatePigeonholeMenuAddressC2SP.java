@@ -13,13 +13,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-public record UpdateMailboxAddressC2SP(String address) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("update_mailbox_address");
-    public static final Type<UpdateMailboxAddressC2SP> TYPE = new Type<>(ID);
+public record UpdatePigeonholeMenuAddressC2SP(String address) implements Packet {
+    public static final ResourceLocation ID = Envelope.resource("update_pigeonhole_menu_address");
+    public static final Type<UpdatePigeonholeMenuAddressC2SP> TYPE = new Type<>(ID);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, UpdateMailboxAddressC2SP> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.stringUtf8(256), UpdateMailboxAddressC2SP::address,
-            UpdateMailboxAddressC2SP::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, UpdatePigeonholeMenuAddressC2SP> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.stringUtf8(256), UpdatePigeonholeMenuAddressC2SP::address,
+            UpdatePigeonholeMenuAddressC2SP::new
     );
 
     @Override

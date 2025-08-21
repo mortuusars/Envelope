@@ -30,7 +30,7 @@ public record PigeonholeMenuMailActionC2SP(int index, PigeonholeMenu.Action acti
     @Override
     public boolean handle(PacketFlow direction, Player player) {
         if (!(player.containerMenu instanceof PigeonholeMenu pigeonholeMenu)) {
-            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
+            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have PigeonholeMenu open.", ID, player);
             return false;
         }
 
