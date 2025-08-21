@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.block;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
@@ -241,6 +242,8 @@ public class PigeonholeBlockEntity extends BlockEntity {
     // -- Menu
 
     public MenuProvider createMenuProvider() {
+        Preconditions.checkNotNull(address, "Cannot open PigeonholeMenu without an address.");
+
         return new MenuProvider() {
             @Override
             public @NotNull Component getDisplayName() {
@@ -249,7 +252,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
             @Override
             public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                return new PigeonholeMenu(id, inventory, getBlockPos(), getAllMail());
+                return new PigeonholeMenu(id, inventory, getBlockPos(), getAllMail(), getAddress().orElseThrow());
             }
         };
     }

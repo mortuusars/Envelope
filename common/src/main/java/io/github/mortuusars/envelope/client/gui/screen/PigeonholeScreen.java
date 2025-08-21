@@ -10,9 +10,9 @@ import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.PigeonholeMenuMailActionC2SP;
 import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -32,6 +32,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -62,9 +64,9 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     protected List<@Nullable LivingEntity> occupants = new ArrayList<>();
     protected Int2ObjectMap<Rect2i> occupantAreas = new Int2ObjectOpenHashMap<>(Map.of(
-            0, new Rect2i(183, 32, 32, 32),
-            1, new Rect2i(145, 49, 32, 32),
-            2, new Rect2i(179, 70, 32, 32)
+            0, new Rect2i(183, 30, 32, 32),
+            1, new Rect2i(145, 47, 32, 32),
+            2, new Rect2i(179, 68, 32, 32)
     ));
 
     @Nullable
@@ -97,6 +99,9 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         for (PigeonholeBlockEntity.Occupant occupant : occupantsData) {
             if (occupant.slot() < 3 && occupant.createEntity(Minecrft.level(), BlockPos.ZERO) instanceof LivingEntity entity) {
                 entity.setOnGround(true);
+                if (entity instanceof Pigeon pigeon) {
+                    pigeon.setSitting(true);
+                }
                 occupants.set(occupant.slot(), entity);
             }
         }
@@ -118,7 +123,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     protected void init() {
         imageWidth = 308;
         imageHeight = 203;
-        titleLabelX = 159 - (font.width(title) / 2) + 6;
+        titleLabelX = Math.max(17, (imageWidth / 2) - (font.width(title) / 2) + 6);
         titleLabelY = 5;
         inventoryLabelX = 140;
         inventoryLabelY = imageHeight - 94;
@@ -184,26 +189,68 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight, 512, 256);
+
+        int addressBarX = titleLabelX - 18;
+        int addressBarWidth = imageWidth - (addressBarX * 2);
+        // Left
+        guiGraphics.blit(TEXTURE, leftPos + addressBarX, topPos, 0, imageHeight, 5, 15, 512, 256);
+        // Middle
+        guiGraphics.blit(TEXTURE, leftPos + addressBarX + 5, topPos, 5, imageHeight, addressBarWidth - 10, 15, 512, 256);
+        // Right
+        guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos, 303, imageHeight, 5, 15, 512, 256);
+
+        List<ItemStack> mail = getMenu().getMail();
+        hoveredMail = null;
+        scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
+
+        for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
+            int index = i + scroll;
+
+            ItemStack item = mail.get(index);
+            int x = 8;
+            int y = 33 + 18 * i;
+            boolean isHovering = isHovering(x + 1, y + 1, 117, 16, mouseX, mouseY);
+            if (isHovering) {
+                hoveredMail = item;
+            }
+            renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
+        }
+
+        //TODO: slot placeholders
+        guiGraphics.blit(TEXTURE, leftPos + 227, topPos + 62, 314, 0, 16, 16, 512, 256);
+        guiGraphics.blit(TEXTURE, leftPos + 247, topPos + 61, 330, 0, 18, 18, 512, 256);
+
+        renderScrollBar(guiGraphics, partialTick, mouseX, mouseY);
+    }
+
     protected void renderOccupants(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // Nest BG
+        occupantAreas.forEach((i, area) -> {
+            guiGraphics.blit(TEXTURE, leftPos + area.getX() - 1, topPos + area.getY() + area.getHeight() - 11,
+                    0, 348, 0, 34, 16, 512, 256);
+        });
+
+        // Entity
         for (int i = 0; i < Math.min(3, occupants.size()); i++) {
             LivingEntity entity = occupants.get(i);
-            if (entity == null) {
-                continue;
-            }
+            if (entity == null) continue;
 
             Rect2i area = occupantAreas.get(i);
 
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0, 0.5, 50);
-            guiGraphics.fill(leftPos + area.getX() + 8, topPos + area.getY() + area.getHeight() - 3,
-                    leftPos + area.getX() + area.getWidth() - 8, topPos + area.getY() + area.getHeight() - 1, 0xFF555555);
-            guiGraphics.pose().popPose();
-
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics,
+            renderEntityFollowsMouse(guiGraphics,
                     leftPos + area.getX(), topPos + area.getY(),
                     leftPos + area.getX() + area.getWidth(), topPos + area.getY() + area.getHeight(),
                     Math.min(area.getWidth(), area.getHeight()), 0, mouseX, mouseY, entity);
         }
+
+        // Nest FG
+        occupantAreas.forEach((i, area) -> {
+            guiGraphics.blit(TEXTURE, leftPos + area.getX() - 1, topPos + area.getY() + area.getHeight() - 11,
+                    300, 348, 16, 34, 16, 512, 256);
+        });
     }
 
     @Override
@@ -223,32 +270,6 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         guiGraphics.drawString(font, sendLabel, sendLabelX, 21, 0x404040, false);
 
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
-    }
-
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight, 512, 256);
-
-        List<ItemStack> mail = getMenu().getMail();
-
-        hoveredMail = null;
-
-        scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
-
-        for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
-            int index = i + scroll;
-
-            ItemStack item = mail.get(index);
-            int x = 8;
-            int y = 33 + 18 * i;
-            boolean isHovering = isHovering(x + 1, y + 1, 117, 16, mouseX, mouseY);
-            if (isHovering) {
-                hoveredMail = item;
-            }
-            renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
-        }
-
-        renderScrollBar(guiGraphics, partialTick, mouseX, mouseY);
     }
 
     protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, ItemStack mail, int x, int y) {
@@ -345,6 +366,41 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         }
     }
 
+    /**
+     * Copy of InventoryScreen#renderEntityInInventoryFollowsMouse but with several changes to entity rotations,
+     * to keep body from rotating that much, as Pigeons are supposed to be sitting in the nest.
+     */
+    public static void renderEntityFollowsMouse(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2,
+                                                int scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
+        float f = (float)(x1 + x2) / 2.0F;
+        float g = (float)(y1 + y2) / 2.0F;
+        guiGraphics.enableScissor(x1, y1, x2, y2);
+        float h = (float)Math.atan((f - mouseX) / 40.0F);
+        float i = (float)Math.atan((g - mouseY) / 40.0F);
+        Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf quaternionf2 = new Quaternionf().rotateX((i - 2f) * 5.0F * (float) (Math.PI / 180.0));
+        quaternionf.mul(quaternionf2);
+        float j = entity.yBodyRot;
+        float k = entity.getYRot();
+        float l = entity.getXRot();
+        float m = entity.yHeadRotO;
+        float n = entity.yHeadRot;
+        entity.yBodyRot = 180.0F + h * 5.0F;
+        entity.setYRot(180.0F + h * 30.0F);
+        entity.setXRot(-i * 30.0F);
+        entity.yHeadRot = entity.getYRot();
+        entity.yHeadRotO = entity.getYRot();
+        float o = entity.getScale();
+        Vector3f vector3f = new Vector3f(0.0F, entity.getBbHeight() / 2.0F + yOffset * o, 0.0F);
+        float p = (float)scale / o;
+        InventoryScreen.renderEntityInInventory(guiGraphics, f, g, p, vector3f, quaternionf, quaternionf2, entity);
+        entity.yBodyRot = j;
+        entity.setYRot(k);
+        entity.setXRot(l);
+        entity.yHeadRotO = m;
+        entity.yHeadRot = n;
+        guiGraphics.disableScissor();
+    }
 
     // -- Scroll
 

@@ -130,12 +130,11 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 	}
 
 	private PigeonModel.State getState(Pigeon pigeon) {
-//		if (pigeon.isInSittingPose()) {
-//			return PigeonModel.State.SITTING;
-//		} else {
-//			return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
-//		}
-		return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
+		if (pigeon.isSitting()) {
+			return PigeonModel.State.SITTING;
+		} else {
+			return pigeon.isFlying() ? PigeonModel.State.FLYING : PigeonModel.State.STANDING;
+		}
 	}
 
 	@Override

@@ -175,6 +175,11 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
         if (stack.isEmpty() && state.getValue(HAS_ADDRESS)) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+                if (blockEntity.getAddress().isEmpty()) {
+                    Envelope.LOGGER.error("Cannot open Pigeonhole: it doesn't have an address.");
+                    return ItemInteractionResult.FAIL;
+                }
+
                 PlatformHelper.openMenu(serverPlayer, blockEntity.createMenuProvider(), buffer -> {
                     List<ItemStack> mail = blockEntity.getAllMail();
                     buffer.writeBlockPos(pos);
@@ -182,6 +187,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                     for (ItemStack item : mail) {
                         ItemStack.STREAM_CODEC.encode(buffer, item);
                     }
+                    Address.STREAM_CODEC.encode(buffer, blockEntity.getAddress().orElseThrow());
                 });
 
                 Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(blockEntity.getOccupants()), serverPlayer);
