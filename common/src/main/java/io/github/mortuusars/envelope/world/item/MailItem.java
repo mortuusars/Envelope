@@ -11,6 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
 public interface MailItem {
+    boolean canSend(ItemStack stack);
     /**
      * 'envelope:recipient' component can be changed or removed from the stack in the traveling process.
      * Due to this, items that specify a recipient (such as Letter or Package) should update 'envelope:recipient' component with proper value.

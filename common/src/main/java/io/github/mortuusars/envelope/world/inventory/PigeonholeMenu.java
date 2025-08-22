@@ -53,6 +53,18 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
         this.mail = new ArrayList<>(mail.reversed());
 
+        addSlot(new Slot(be, 0, 227, 62) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return be.canPlaceItem(0, stack);
+            }
+        });
+        addSlot(new Slot(be, 1, 248, 62) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return be.canPlaceItem(1, stack);
+            }
+        });
         addPlayerSlots(playerInventory, 140, 121);
         addDataSlot(isMain);
 
@@ -135,14 +147,16 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
     @Override
     public @NotNull ItemStack quickMoveStack(Player player, int index) {
-        return ItemStack.EMPTY;
-
-        /*Slot slot = slots.get(index);
+        Slot slot = slots.get(index);
         ItemStack clickedStack = slot.getItem();
         ItemStack returnedStack = clickedStack.copy();
 
-        if (index > 0) { // From player inventory
-            if (!moveItemStackTo(clickedStack, 0, 1, false)) {
+        if (index > 1) {
+            if (!moveItemStackTo(clickedStack, 0, 2, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            if (!moveItemStackTo(clickedStack, 1, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
         }
@@ -153,7 +167,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             slot.setChanged();
         }
 
-        return returnedStack;*/
+        return returnedStack;
     }
 
     public boolean doMailAction(Player player, int index, Action action) {

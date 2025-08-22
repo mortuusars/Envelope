@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -185,6 +186,18 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         updateButtons();
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        if (hoveredSlot != null && hoveredSlot.index == 1) {
+            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x - 1, topPos + hoveredSlot.y - 1,
+                    leftPos + hoveredSlot.x + 17, topPos + hoveredSlot.y, -2130706433, -2130706433, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x - 1, topPos + hoveredSlot.y,
+                    leftPos + hoveredSlot.x, topPos + hoveredSlot.y + 16, -2130706433, -2130706433, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x + 16, topPos + hoveredSlot.y,
+                    leftPos + hoveredSlot.x + 17, topPos + hoveredSlot.y + 16, -2130706433, -2130706433, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x - 1, topPos + hoveredSlot.y + 16,
+                    leftPos + hoveredSlot.x + 17, topPos + hoveredSlot.y + 17, -2130706433, -2130706433, 0);
+        }
+
         renderOccupants(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
@@ -220,8 +233,12 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         }
 
         //TODO: slot placeholders
-        guiGraphics.blit(TEXTURE, leftPos + 227, topPos + 62, 314, 0, 16, 16, 512, 256);
-        guiGraphics.blit(TEXTURE, leftPos + 247, topPos + 61, 330, 0, 18, 18, 512, 256);
+        if (!getMenu().getSlot(0).hasItem()) {
+            guiGraphics.blit(TEXTURE, leftPos + 227, topPos + 62, 314, 0, 16, 16, 512, 256);
+        }
+        if (!getMenu().getSlot(1).hasItem()) {
+            guiGraphics.blit(TEXTURE, leftPos + 247, topPos + 61, 330, 0, 18, 18, 512, 256);
+        }
 
         renderScrollBar(guiGraphics, partialTick, mouseX, mouseY);
     }
@@ -240,10 +257,13 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
             Rect2i area = occupantAreas.get(i);
 
+            int yRotOffset = i == 0 ? 25
+                    : i == 1 ? -25 : 15;
+
             renderEntityFollowsMouse(guiGraphics,
                     leftPos + area.getX(), topPos + area.getY(),
                     leftPos + area.getX() + area.getWidth(), topPos + area.getY() + area.getHeight(),
-                    Math.min(area.getWidth(), area.getHeight()), 0, mouseX, mouseY, entity);
+                    Math.min(area.getWidth(), area.getHeight()), 0, mouseX, mouseY, entity, yRotOffset);
         }
 
         // Nest FG
@@ -371,7 +391,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
      * to keep body from rotating that much, as Pigeons are supposed to be sitting in the nest.
      */
     public static void renderEntityFollowsMouse(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2,
-                                                int scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
+                                                int scale, float yOffset, float mouseX, float mouseY, LivingEntity entity, int yRotOffset) {
         float f = (float)(x1 + x2) / 2.0F;
         float g = (float)(y1 + y2) / 2.0F;
         guiGraphics.enableScissor(x1, y1, x2, y2);
@@ -385,8 +405,8 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         float l = entity.getXRot();
         float m = entity.yHeadRotO;
         float n = entity.yHeadRot;
-        entity.yBodyRot = 180.0F + h * 5.0F;
-        entity.setYRot(180.0F + h * 30.0F);
+        entity.yBodyRot = 180.0F + h * 5.0F + yRotOffset;
+        entity.setYRot(180.0F + h * 40.0F);
         entity.setXRot(-i * 30.0F);
         entity.yHeadRot = entity.getYRot();
         entity.yHeadRotO = entity.getYRot();

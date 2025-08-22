@@ -14,11 +14,13 @@ import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
+import io.github.mortuusars.envelope.world.item.MailItem;
 import io.github.mortuusars.envelope.world.mail.Mailboxes;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -31,9 +33,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.MenuProvider;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
@@ -44,7 +44,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -55,8 +55,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-public class PigeonholeBlockEntity extends BlockEntity {
+public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
     public static final int MAX_OCCUPANTS = 3;
+    public static final int SLOTS = 2;
 
     static final List<String> IGNORED_PIGEON_TAGS = Arrays.asList(
             "Air",
@@ -90,6 +91,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
     );
 
     protected final List<OccupantData> occupants = new ArrayList<>();
+    protected NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
 
     @Nullable
     protected Address.Pigeonhole address = null;
@@ -239,22 +241,51 @@ public class PigeonholeBlockEntity extends BlockEntity {
         }
     }
 
+    // Container
+
+    @Override
+    public int getContainerSize() {
+        return SLOTS;
+    }
+
+    @Override
+    protected @NotNull NonNullList<ItemStack> getItems() {
+        return items;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (slot == 0) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
+        if (slot == 1) return isSendable(stack);
+        return false;
+    }
+
+    public boolean isSendable(ItemStack stack) {
+        return stack.getItem() instanceof MailItem mail
+                ? mail.canSend(stack)
+                : stack.has(Envelope.DataComponents.MAIL_RECIPIENT);
+    }
+
+    @Override
+    public boolean canTakeItem(Container target, int slot, ItemStack stack) {
+        return false;
+    }
+
     // -- Menu
 
-    public MenuProvider createMenuProvider() {
+    @Override
+    protected @NotNull AbstractContainerMenu createMenu(int id, Inventory inventory) {
         Preconditions.checkNotNull(address, "Cannot open PigeonholeMenu without an address.");
+        return new PigeonholeMenu(id, inventory, getBlockPos(), getAllMail(), getAddress().orElseThrow());
+    }
 
-        return new MenuProvider() {
-            @Override
-            public @NotNull Component getDisplayName() {
-                return getAddress().map(a -> Component.literal(a.id())).orElse(Component.translatable("gui.envelope.pigeonhole"));
-            }
-
-            @Override
-            public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                return new PigeonholeMenu(id, inventory, getBlockPos(), getAllMail(), getAddress().orElseThrow());
-            }
-        };
+    public MenuProvider createMenuProvider() {
+        return this;
     }
 
     public MenuProvider createAddressMenuProvider(InteractionHand hand, String suggestedAddress) {
@@ -287,10 +318,6 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     // -- Occupants
 
-    public boolean isEmpty() {
-        return occupants.isEmpty();
-    }
-
     public boolean isFull() {
         return occupants.size() >= MAX_OCCUPANTS;
     }
@@ -309,7 +336,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
         occupant.stopRiding();
         occupant.ejectPassengers();
 
-        storeOccupant(Occupant.of(occupant, getFirstFreeSlot()));
+        storeOccupant(Occupant.of(occupant, getFirstFreeOccupantSlot()));
 
         if (level != null) {
             BlockPos pos = getBlockPos();
@@ -323,7 +350,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
         onOccupantsChanged();
     }
 
-    protected int getFirstFreeSlot() {
+    protected int getFirstFreeOccupantSlot() {
         int slot = 0;
         while (true) {
             int s = slot;
@@ -362,7 +389,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
             return Optional.empty();
         }
 
-        if (entity instanceof Pigeon) {
+        if (entity instanceof Pigeon pigeon) {
             float wasteChance = 0.2f;
             if (releaseStatus != ReleaseReason.EMERGENCY
                     && state.getBlock() instanceof PigeonholeBlock block
@@ -370,12 +397,14 @@ public class PigeonholeBlockEntity extends BlockEntity {
                 block.addWaste(level, pos, state);
             }
 
-            double offset = isFrontBlockedOff ? 0.0 : 0.55 + (double)(entity.getBbWidth() / 2.0F);
-            double x = (double)pos.getX() + 0.5 + offset * (double)direction.getStepX();
-            double y = (double)pos.getY() + 0.5 - (double)(entity.getBbHeight() / 2.0F);
-            double z = (double)pos.getZ() + 0.5 + offset * (double)direction.getStepZ();
-            entity.moveTo(x, y, z, entity.getYRot(), entity.getXRot());
+            pigeon.releasedFromPigeonhole(pos, state, releaseStatus);
         }
+
+        double offset = isFrontBlockedOff ? 0.0 : 0.55 + (double)(entity.getBbWidth() / 2.0F);
+        double x = (double)pos.getX() + 0.5 + offset * (double)direction.getStepX();
+        double y = (double)pos.getY() + 0.5 - (double)(entity.getBbHeight() / 2.0F);
+        double z = (double)pos.getZ() + 0.5 + offset * (double)direction.getStepZ();
+        entity.moveTo(x, y, z, entity.getYRot(), entity.getXRot());
 
         level.playSound(null, pos, getExitSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
         level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
@@ -409,6 +438,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        ContainerHelper.loadAllItems(tag, items, registries);
         if (tag.contains("address", Tag.TAG_STRING)) {
             address = new Address.Pigeonhole(tag.getString("address"));
         }
@@ -424,6 +454,7 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        ContainerHelper.saveAllItems(tag, items, registries);
         if (address != null) {
             tag.putString("address", address.id());
         }
@@ -434,6 +465,11 @@ public class PigeonholeBlockEntity extends BlockEntity {
 
     public @NotNull Level getLevelOrThrow() {
         return Objects.requireNonNull(level);
+    }
+
+    @Override
+    protected @NotNull Component getDefaultName() {
+        return getAddress().map(Address::getDisplayName).orElse(Component.translatable("container.envelope.pigeonhole"));
     }
 
     // --

@@ -43,8 +43,8 @@ public record EditLetterC2SP(int slot, Optional<Address> recipient, String subje
         ItemStack letter = player.getInventory().getItem(slot);
 
         recipient.ifPresentOrElse(
-                value -> letter.set(Envelope.DataComponents.MAIL_RECIPIENT, value),
-                () -> letter.remove(Envelope.DataComponents.MAIL_RECIPIENT));
+                value -> letter.set(Envelope.DataComponents.LETTER_RECIPIENT, value),
+                () -> letter.remove(Envelope.DataComponents.LETTER_RECIPIENT));
 
         if (!subject.isBlank()) {
             letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);

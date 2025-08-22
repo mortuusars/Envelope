@@ -24,6 +24,11 @@ public class LetterItem extends Item implements MailItem {
     }
 
     @Override
+    public boolean canSend(ItemStack stack) {
+        return stack.has(Envelope.DataComponents.LETTER_RECIPIENT);
+    }
+
+    @Override
     public void updateRecipientBeforeNewSendIfNeeded(ItemStack mail) {
         @Nullable Address letterRecipient = mail.get(Envelope.DataComponents.LETTER_RECIPIENT);
         if (letterRecipient != null) {
