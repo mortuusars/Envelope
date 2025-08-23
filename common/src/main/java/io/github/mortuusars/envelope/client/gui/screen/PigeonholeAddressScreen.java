@@ -15,6 +15,8 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
@@ -54,7 +56,16 @@ public class PigeonholeAddressScreen extends AbstractContainerScreen<PigeonholeA
         confirmButton = new ImageButton(leftPos + 112, topPos + 42, 19, 19,
                 Sprites.CONFIRM_BUTTON_SPRITES,
                 button -> confirm(), Component.translatable("gui.envelope.confirm"));
-        confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
+        MutableComponent confirmTooltip = Component.translatable("gui.envelope.confirm");
+        if (getMenu().isRenaming()) {
+            confirmTooltip.append("\n")
+                    .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.inbox")
+                            .withStyle(Style.EMPTY.withColor(0xFFE76A6A)))
+                    .append("\n")
+                    .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.traveling")
+                            .withStyle(Style.EMPTY.withColor(0xFFE76A6A)));
+        }
+        confirmButton.setTooltip(Tooltip.create(confirmTooltip));
         addRenderableWidget(confirmButton);
 
         ImageButton cancelButton = new ImageButton(leftPos + 133, topPos + 42, 19, 19,

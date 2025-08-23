@@ -2,10 +2,7 @@ package io.github.mortuusars.envelope.world.block;
 
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
-import io.github.mortuusars.envelope.api.mail.Address;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
+import io.github.mortuusars.envelope.mail.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -108,6 +105,15 @@ public class PigeonholeBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.getBlock().equals(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
+            pigeonholeBlockEntity.onBlockRemoved();
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         if (!level.isClientSide && blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
@@ -127,8 +133,8 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 || entity instanceof WitherBoss
                 || entity instanceof MinecartTNT) {
             BlockEntity blockEntity = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-            if (blockEntity instanceof PigeonholeBlockEntity beehiveBlockEntity) {
-                beehiveBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
+            if (blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
+                pigeonholeBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
             }
         }
 
@@ -160,51 +166,35 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (stack.is(Items.NAME_TAG) && !state.getValue(HAS_ADDRESS)) { //TODO: config to require nametag
-            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                String suggestedAddress = "";
-                PlatformHelper.openMenu(serverPlayer, blockEntity.createAddressMenuProvider(hand, suggestedAddress),
-                        buffer -> {
-                            buffer.writeEnum(hand);
-                            buffer.writeBlockPos(pos);
-                            buffer.writeUtf(suggestedAddress);
-                        });
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-
-        if (stack.isEmpty() && state.getValue(HAS_ADDRESS)) {
-            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                if (blockEntity.getAddress().isEmpty()) {
-                    Envelope.LOGGER.error("Cannot open Pigeonhole: it doesn't have an address.");
-                    return ItemInteractionResult.FAIL;
-                }
-
-                PlatformHelper.openMenu(serverPlayer, blockEntity.createMenuProvider(), buffer -> {
-                    List<ItemStack> mail = blockEntity.getAllMail();
-                    buffer.writeBlockPos(pos);
-                    buffer.writeVarInt(mail.size());
-                    for (ItemStack item : mail) {
-                        ItemStack.STREAM_CODEC.encode(buffer, item);
-                    }
-                    Address.STREAM_CODEC.encode(buffer, blockEntity.getAddress().orElseThrow());
-                });
-
-                Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(blockEntity.getOccupants()), serverPlayer);
-            }
-
-            return ItemInteractionResult.SUCCESS;
-        }
-
         if (stack.is(Envelope.Tags.Items.WASTE_SCOOPABLE) && state.getValue(WASTE_LEVEL) >= MAX_WASTE_LEVEL) {
-            stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
-            popResourceFromFace(level, pos, state.getValue(FACING), new ItemStack(Items.BONE_MEAL));
-            level.playSound(player, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.BLOCKS, 1.0F, 1.0F);
-
             if (!level.isClientSide()) {
+                popResourceFromFace(level, pos, state.getValue(FACING), new ItemStack(Items.BONE_MEAL));
+                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
             }
+
+            level.playSound(player, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
+
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        if (stack.is(Items.NAME_TAG)) { //TODO: config to require nametag
+            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+                if (!blockEntity.openAddressMenu(serverPlayer, hand)) {
+                    return ItemInteractionResult.FAIL;
+                }
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        if (state.getValue(HAS_ADDRESS)) {
+            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+                if (!blockEntity.openMenu(serverPlayer, hand)) {
+                    return ItemInteractionResult.FAIL;
+                }
+            }
+
+            return ItemInteractionResult.SUCCESS;
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
@@ -216,7 +206,9 @@ public class PigeonholeBlock extends BaseEntityBlock {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity mailboxBlockEntity) {
             mailboxBlockEntity.setAddress(new Address.Pigeonhole(address));
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
-            player.getItemInHand(hand).shrink(1);
+            if (!player.isCreative()) {
+                player.getItemInHand(hand).shrink(1);
+            }
             player.swing(hand);
         }
 

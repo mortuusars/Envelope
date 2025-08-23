@@ -1,23 +1,22 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Address;
+import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.mail.MailId;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.NotImplementedException;
@@ -146,19 +145,21 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     // --
 
     @Override
-    public @NotNull ItemStack quickMoveStack(Player player, int index) {
+    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         Slot slot = slots.get(index);
+        if (!slot.hasItem()) return ItemStack.EMPTY;
+
         ItemStack clickedStack = slot.getItem();
         ItemStack returnedStack = clickedStack.copy();
 
-        if (index > 1) {
-            if (!moveItemStackTo(clickedStack, 0, 2, false)) {
+        if (index < PigeonholeBlockEntity.SLOTS) {
+            if (!moveItemStackTo(clickedStack, PigeonholeBlockEntity.SLOTS, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else {
-            if (!moveItemStackTo(clickedStack, 1, slots.size(), true)) {
+        }
+        else if (index < slots.size()) {
+            if (!moveItemStackTo(clickedStack, 0, PigeonholeBlockEntity.SLOTS, false))
                 return ItemStack.EMPTY;
-            }
         }
 
         if (clickedStack.isEmpty()) {
@@ -188,9 +189,11 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
         ItemStack mail = getMail().remove(index);
 
-        if (!player.level().isClientSide) {
-            ItemStack takenMail = getBlockEntity().takeMail(mail, player);
-            setCarried(takenMail);
+        if (player.level() instanceof ServerLevel) {
+            MailId.from(mail).ifPresent(id -> {
+                ItemStack takenMail = getBlockEntity().takeMail(id, player);
+                setCarried(takenMail);
+            });
         }
 
         return true;
@@ -205,11 +208,13 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
         mail = getMail().remove(index);
 
-        if (!player.level().isClientSide) {
-            ItemStack takenMail = getBlockEntity().takeMail(mail, player);
-            if (!takenMail.isEmpty()) {
-                player.getInventory().add(takenMail);
-            }
+        if (player.level() instanceof ServerLevel) {
+            MailId.from(mail).ifPresent(id -> {
+                ItemStack takenMail = getBlockEntity().takeMail(id, player);
+                if (!takenMail.isEmpty()) {
+                    player.getInventory().add(takenMail);
+                }
+            });
         }
 
         return true;

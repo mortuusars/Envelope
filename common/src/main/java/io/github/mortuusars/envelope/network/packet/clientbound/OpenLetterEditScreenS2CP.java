@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Address;
+import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.network.handler.ClientPacketsHandler;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import net.minecraft.network.RegistryFriendlyByteBuf;

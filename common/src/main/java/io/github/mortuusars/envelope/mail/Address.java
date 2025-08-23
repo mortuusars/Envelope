@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.api.mail;
+package io.github.mortuusars.envelope.mail;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -128,6 +128,8 @@ public interface Address {
         public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
         ).apply(instance, Pigeonhole::new));
+
+        public static final Codec<Pigeonhole> CODEC_STRING = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, Pigeonhole::id,

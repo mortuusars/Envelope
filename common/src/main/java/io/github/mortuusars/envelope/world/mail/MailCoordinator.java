@@ -3,9 +3,9 @@ package io.github.mortuusars.envelope.world.mail;
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Address;
-import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
-import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
@@ -15,19 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 public class MailCoordinator {
     public static final MailCoordinator INSTANCE = new MailCoordinator();
     private MinecraftServer server;
 
     private MailCoordinator() {
-    }
-
-    // --
-
-    public Mailboxes getMailboxes() {
-        return Mailboxes.get(server);
     }
 
     // --
@@ -56,7 +49,7 @@ public class MailCoordinator {
         }
 
         if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
-            mail.set(Envelope.DataComponents.MAIL_ID, UUID.randomUUID());
+//            mail.set(Envelope.DataComponents.MAIL_ID, UUID.randomUUID());
         }
 
         long currentGameTime = getCurrentGameTime();
@@ -72,15 +65,15 @@ public class MailCoordinator {
     }
 
     protected void finishTraveling(ItemStack mail) {
-        validateMail(mail);
+//        validateMail(mail);
+//
+//        if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
+//            mail.set(Envelope.DataComponents.MAIL_ID, UUID.randomUUID());
+//        }
+//
+//        Address recipient = Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_RECIPIENT));
 
-        if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
-            mail.set(Envelope.DataComponents.MAIL_ID, UUID.randomUUID());
-        }
-
-        Address recipient = Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_RECIPIENT));
-
-        Mailboxes mailboxes = Mailboxes.get(server);
+//        Mailboxes mailboxes = Mailboxes.get(server);
 
 //        if (mailboxes.exists(recipient)) {
 //            MailTravelingLog.addRecords(mail, TravelingRecord.arrivedTo(recipient, getCurrentGameTime()));

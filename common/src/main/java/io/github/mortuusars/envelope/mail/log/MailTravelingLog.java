@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.api.mail.log;
+package io.github.mortuusars.envelope.mail.log;
 
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Envelope;

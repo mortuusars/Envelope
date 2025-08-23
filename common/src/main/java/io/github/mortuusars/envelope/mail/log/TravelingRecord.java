@@ -1,8 +1,8 @@
-package io.github.mortuusars.envelope.api.mail.log;
+package io.github.mortuusars.envelope.mail.log;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.api.mail.Address;
+import io.github.mortuusars.envelope.mail.Address;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

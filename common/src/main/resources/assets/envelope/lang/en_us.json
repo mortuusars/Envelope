@@ -17,6 +17,9 @@
 
   "container.envelope.pigeonhole": "Pigeonhole",
 
+  "gui.envelope.pigeonhole_address.rename_warning.inbox": "• Main in inbox will be dropped on the ground.",
+  "gui.envelope.pigeonhole_address.rename_warning.traveling": "• Mail traveling to previous address will be returned.",
+
   "gui.envelope.pigeonhole": "Pigeonhole",
   "gui.envelope.pigeonhole.inbox": "Inbox",
   "gui.envelope.pigeonhole.send": "Send",

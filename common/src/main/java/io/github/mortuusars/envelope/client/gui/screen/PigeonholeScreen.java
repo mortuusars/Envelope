@@ -2,8 +2,8 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Address;
-import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
@@ -132,7 +132,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         mailArea = new Rect2i(leftPos + 8, topPos + 32, 117, 162);
         scrollBarArea = new Rect2i(leftPos + 128, topPos + 33, 6, 161);
 
-        addressButton = new ImageButton(leftPos + titleLabelX - 12, topPos + 4, 10, 10, ADDRESS_BUTTON_SPRITES, btn -> {
+        addressButton = new ImageButton(leftPos + titleLabelX - 13, topPos + 4, 11, 10, ADDRESS_BUTTON_SPRITES, btn -> {
             Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.ADDRESS_BUTTON_ID);
         }, Component.translatable("gui.envelope.pigeonhole.address"));
         addressButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
@@ -141,7 +141,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
         addRenderableWidget(addressButton);
 
-        addressMainButton = new ImageButton(leftPos + titleLabelX - 12, topPos + 4, 10, 10, ADDRESS_MAIN_BUTTON_SPRITES, btn -> {});
+        addressMainButton = new ImageButton(leftPos + titleLabelX - 13, topPos + 4, 11, 10, ADDRESS_MAIN_BUTTON_SPRITES, btn -> {});
         addressMainButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address.main")
                 .append("\n")
                 .append(Component.translatable("gui.envelope.pigeonhole.address.main.tooltip"))));
@@ -232,7 +232,6 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
         }
 
-        //TODO: slot placeholders
         if (!getMenu().getSlot(0).hasItem()) {
             guiGraphics.blit(TEXTURE, leftPos + 227, topPos + 62, 314, 0, 16, 16, 512, 256);
         }

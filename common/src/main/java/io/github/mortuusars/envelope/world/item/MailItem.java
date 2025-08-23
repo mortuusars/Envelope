@@ -1,17 +1,20 @@
 package io.github.mortuusars.envelope.world.item;
 
-import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
-import io.github.mortuusars.envelope.api.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public interface MailItem {
     boolean canSend(ItemStack stack);
+    @Nullable Address getRecipient(ItemStack stack);
     /**
      * 'envelope:recipient' component can be changed or removed from the stack in the traveling process.
      * Due to this, items that specify a recipient (such as Letter or Package) should update 'envelope:recipient' component with proper value.
@@ -35,6 +38,7 @@ public interface MailItem {
             } else {
                 tooltipComponents.add(Component.translatable("gui.envelope.mail.log.show_tooltip"));
             }
+
         }
     }
 }

@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
-import io.github.mortuusars.envelope.api.mail.Address;
-import io.github.mortuusars.envelope.api.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -13,7 +13,7 @@ import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
-import net.minecraft.core.UUIDUtil;
+import io.github.mortuusars.envelope.world.mail.MailId;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -146,8 +146,8 @@ public class Envelope {
     }
 
     public static class DataComponents {
-        public static final DataComponentType<UUID> MAIL_ID = Register.dataComponentType("mail_id",
-                arg -> arg.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
+        public static final DataComponentType<MailId> MAIL_ID = Register.dataComponentType("mail_id",
+                arg -> arg.persistent(MailId.CODEC).networkSynchronized(MailId.STREAM_CODEC));
         /**
          * 'From' address of the mail. Used to know return place if mail cannot be delivered to recipient, amongst other purposes.
          * This component is temporary and should not be depended on.

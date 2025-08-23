@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.api.mail.Address;
+import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditScreenS2CP;
 import net.minecraft.network.chat.Component;
@@ -26,6 +26,11 @@ public class LetterItem extends Item implements MailItem {
     @Override
     public boolean canSend(ItemStack stack) {
         return stack.has(Envelope.DataComponents.LETTER_RECIPIENT);
+    }
+
+    @Override
+    public @Nullable Address getRecipient(ItemStack stack) {
+        return stack.get(Envelope.DataComponents.LETTER_RECIPIENT);
     }
 
     @Override
