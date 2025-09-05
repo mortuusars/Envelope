@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.PigeonDelivery;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
@@ -17,6 +18,7 @@ import io.github.mortuusars.envelope.world.mail.MailId;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -59,6 +61,8 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
+
+        Register.entityDataSerializer("pigeon_delivery", PigeonDelivery.ENTITY_DATA_SERIALIZER);
     }
 
     /**
@@ -146,6 +150,9 @@ public class Envelope {
     }
 
     public static class DataComponents {
+        /**
+         * Used in Pigeonhole inbox to differentiate between mail items.
+         */
         public static final DataComponentType<MailId> MAIL_ID = Register.dataComponentType("mail_id",
                 arg -> arg.persistent(MailId.CODEC).networkSynchronized(MailId.STREAM_CODEC));
         /**

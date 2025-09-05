@@ -28,17 +28,15 @@ public interface MailItem {
 
     default void appendTravelingLogToTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         MailTravelingLog log = MailTravelingLog.of(stack);
+        if (log.isEmpty()) return;
 
-        if (!log.isEmpty()) {
-            if (Screen.hasShiftDown()) {
-                tooltipComponents.add(Component.translatable("gui.envelope.mail.log"));
-                for (TravelingRecord record : log.records()) {
-                    tooltipComponents.add(record.translate());
-                }
-            } else {
-                tooltipComponents.add(Component.translatable("gui.envelope.mail.log.show_tooltip"));
+        if (Screen.hasShiftDown()) {
+            tooltipComponents.add(Component.translatable("gui.envelope.mail.log"));
+            for (TravelingRecord record : log.records()) {
+                tooltipComponents.add(record.translate());
             }
-
+        } else {
+            tooltipComponents.add(Component.translatable("gui.envelope.mail.log.show_tooltip"));
         }
     }
 }

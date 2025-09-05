@@ -57,9 +57,9 @@ public class MailCoordinator {
         mail.set(Envelope.DataComponents.MAIL_TRAVEL_DURATION, travelDuration);
         mail.set(Envelope.DataComponents.MAIL_SENT_AT, currentGameTime);
 
-        MailTravelingLog.addRecords(mail,
-                TravelingRecord.sentFrom(sender, currentGameTime, Optional.ofNullable(player).map(Player::getName)),
-                TravelingRecord.travelingTo(recipient, currentGameTime, travelDuration));
+//        MailTravelingLog.addRecords(mail,
+//                TravelingRecord.sentFrom(sender, currentGameTime, Optional.ofNullable(player).map(Player::getName)),
+//                TravelingRecord.travelingTo(recipient, currentGameTime, travelDuration));
 
         return TravelingMail.get(server).startTraveling(mail);
     }

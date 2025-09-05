@@ -69,9 +69,9 @@ public class PigeonholeNetwork extends SavedData {
     }
 
     public boolean putMail(Address.Pigeonhole address, ItemStack mail) {
-        Preconditions.checkArgument(mail.has(Envelope.DataComponents.MAIL_ID), "Mail must have 'envelope:mail_id'. " + mail);
         return getPigeonholeData(address)
                 .map(data -> {
+                    mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());
                     data.getMail().add(mail);
                     setDirty();
                     return true;
@@ -102,7 +102,7 @@ public class PigeonholeNetwork extends SavedData {
                 .orElseGet(() -> Result.failure(new Failure("No mailbox with address '" + address + "' exists.")));
     }
 
-    protected Optional<PigeonholeData> getPigeonholeData(Address.Pigeonhole address) {
+    public Optional<PigeonholeData> getPigeonholeData(Address.Pigeonhole address) {
         return Optional.ofNullable(pigeonholes.get(address));
     }
 
@@ -149,7 +149,7 @@ public class PigeonholeNetwork extends SavedData {
 
         protected PigeonholeData(BlockPos pos, List<ItemStack> mail) {
             this.pos = pos;
-            this.mail = mail;
+            this.mail = new ArrayList<>(mail);
         }
 
         public PigeonholeData(BlockPos pos) {

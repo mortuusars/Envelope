@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.mixin.pigeon_on_shoulder;
 
-import io.github.mortuusars.envelope.client.renderer.entity.layers.PigeonOnShoulderLayer;
+import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonOnShoulderLayer;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;

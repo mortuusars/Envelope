@@ -15,6 +15,10 @@ public record MailId(UUID id) {
     public static final Codec<MailId> CODEC = UUIDUtil.CODEC.xmap(MailId::new, MailId::id);
     public static final StreamCodec<ByteBuf, MailId> STREAM_CODEC = UUIDUtil.STREAM_CODEC.map(MailId::new, MailId::id);
 
+    public static MailId createRandom() {
+        return new MailId(UUID.randomUUID());
+    }
+
     public static Optional<MailId> from(ItemStack mail) {
         return Optional.ofNullable(mail.get(Envelope.DataComponents.MAIL_ID));
     }

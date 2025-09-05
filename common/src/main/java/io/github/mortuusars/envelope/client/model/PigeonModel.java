@@ -75,6 +75,10 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 		rightLeg.y = -2f;
 		leftLeg.z = 0;
 		rightLeg.z = 0;
+		leftLeg.xRot = 0f;
+		rightLeg.xRot = 0f;
+		leftLeg.yRot = 0f;
+		rightLeg.yRot = 0f;
 
 		if (pigeon != null && pigeon.isBaby()) {
 			head.xScale = 1.3f;
@@ -121,6 +125,15 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 					rightLeg.y = -2.1f;
 					leftLeg.z = -4f;
 					rightLeg.z = -4f;
+				} else {
+					leftLeg.xRot = 0f;
+					rightLeg.xRot = 0f;
+					leftLeg.yRot = 0f;
+					rightLeg.yRot = 0f;
+					leftLeg.y = 0f;
+					rightLeg.y = 0f;
+					leftLeg.z = 0f;
+					rightLeg.z = 0f;
 				}
 
 				break;

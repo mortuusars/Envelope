@@ -1,7 +1,8 @@
-package io.github.mortuusars.envelope.client.renderer.entity.layers;
+package io.github.mortuusars.envelope.client.renderer.entity.layer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import org.joml.Vector3f;
 
 public class PigeonFancyHatLayer extends RenderLayer<Pigeon, PigeonModel> {
     protected final PigeonModel pigeonModel;
@@ -27,7 +29,9 @@ public class PigeonFancyHatLayer extends RenderLayer<Pigeon, PigeonModel> {
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Pigeon pigeon, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         //TODO: fancy hat
-//        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(PigeonRenderer.FANCY_HAT));
-//        hatModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
+        if (!pigeon.getDelivery().isEmpty()) {
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(PigeonRenderer.FANCY_HAT));
+            hatModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
+        }
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record MailTravelingLog(List<TravelingRecord> records) {
-    public static final Codec<MailTravelingLog> CODEC = TravelingRecord.CODEC.listOf(0, 32)
+    public static final Codec<MailTravelingLog> CODEC = TravelingRecord.CODEC.listOf()
             .xmap(MailTravelingLog::new, MailTravelingLog::records);
     public static final StreamCodec<RegistryFriendlyByteBuf, MailTravelingLog> STREAM_CODEC =
             TravelingRecord.STREAM_CODEC.apply(ByteBufCodecs.list(32)).map(MailTravelingLog::new, MailTravelingLog::records);

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.client.renderer.entity.layers;
+package io.github.mortuusars.envelope.client.renderer.entity.layer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -26,9 +26,9 @@ public class PigeonLegBandLayer extends RenderLayer<Pigeon, PigeonModel> {
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Pigeon pigeon, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (pigeon.isHoming()) {
+//        if (!pigeon.getDelivery().isEmpty()) {
             VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(PigeonRenderer.LEG_BAND));
             legBandModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
-        }
+//        }
     }
 }

@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.neoforge.event;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.MailCommand;
+import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.neoforge.RegisterImpl;
 import io.github.mortuusars.envelope.network.neoforge.PacketsImpl;
@@ -27,9 +28,11 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -104,6 +107,11 @@ public class NeoForgeCommonEvents {
         }
 
         @SubscribeEvent
+        public static void tick(LevelTickEvent.Post event) {
+            CommonEvents.levelTick(event.getLevel());
+        }
+
+        @SubscribeEvent
         public static void tick(ServerStartedEvent event) {
             ServerEvents.serverStarted(event.getServer());
         }
@@ -118,6 +126,11 @@ public class NeoForgeCommonEvents {
             if (event.getEntity() instanceof ServerPlayer player) {
                 ServerEvents.playerLogin(player);
             }
+        }
+
+        @SubscribeEvent
+        public static void entityLeaveLevel(EntityLeaveLevelEvent event) {
+            CommonEvents.entityLeaveLevel(event.getLevel(), event.getEntity());
         }
     }
 }

@@ -2,7 +2,9 @@ package io.github.mortuusars.envelope.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
+import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -44,9 +46,11 @@ public class PigeonFancyHatModel extends HierarchicalModel<Pigeon> {
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+		poseStack.pushPose();
 		pigeonModel.body.translateAndRotate(poseStack);
 		hat.copyFrom(pigeonModel.head);
 		super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
+		poseStack.popPose();
 	}
 
 	@Override

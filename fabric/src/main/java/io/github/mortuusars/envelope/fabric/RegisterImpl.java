@@ -15,8 +15,11 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -86,6 +89,10 @@ public class RegisterImpl {
         builder.alwaysUpdateVelocity(receiveVelocityUpdates);
         EntityType<T> type = Registry.register(BuiltInRegistries.ENTITY_TYPE, Envelope.resource(id), builder.build());
         return () -> type;
+    }
+
+    public static void entityDataSerializer(String id, EntityDataSerializer<?> serializer) {
+        EntityDataSerializers.registerSerializer(serializer);
     }
 
     public static <T extends SoundEvent> Supplier<T> soundEvent(String id, Supplier<T> supplier) {

@@ -27,6 +27,7 @@ public class EnvelopeNeoForge {
         RegisterImpl.BLOCK_ENTITY_TYPES.register(modEventBus);
         RegisterImpl.POI_TYPES.register(modEventBus);
         RegisterImpl.ENTITY_TYPES.register(modEventBus);
+        RegisterImpl.ENTITY_DATA_SERIALIZERS.register(modEventBus);
         RegisterImpl.ITEMS.register(modEventBus);
         RegisterImpl.MENU_TYPES.register(modEventBus);
         RegisterImpl.RECIPE_TYPES.register(modEventBus);

@@ -10,6 +10,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -80,6 +82,11 @@ public class Register {
     @ExpectPlatform
     public static <T extends Entity> Supplier<EntityType<T>> entityType(String id, EntityType.EntityFactory<T> factory, MobCategory category,
                                                                         boolean receiveVelocityUpdates, Consumer<EntityType.Builder<T>> typeBuilder) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static void entityDataSerializer(String id, EntityDataSerializer<?> serializer) {
         throw new AssertionError();
     }
 

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.client.renderer.entity.layers;
+package io.github.mortuusars.envelope.client.renderer.entity.layer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

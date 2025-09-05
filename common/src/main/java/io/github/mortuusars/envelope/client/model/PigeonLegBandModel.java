@@ -43,10 +43,12 @@ public class PigeonLegBandModel extends HierarchicalModel<Pigeon> {
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+		poseStack.pushPose();
 		pigeonModel.body.translateAndRotate(poseStack);
 		pigeonModel.torso.translateAndRotate(poseStack);
 		legBand.copyFrom(pigeonModel.rightLeg);
 		super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
+		poseStack.popPose();
 	}
 
 	@Override

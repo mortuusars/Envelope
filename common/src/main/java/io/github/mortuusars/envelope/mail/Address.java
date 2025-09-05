@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public interface Address {
     Address MAIL_SERVICE = new Npc("<Mail Service>", Component.translatable("address.envelope.mail_service"));
@@ -51,13 +52,34 @@ public interface Address {
         return this;
     }
 
-    default <R> R map(Function<Player, R> ifPlayer, Function<Npc, R> ifNpc, Function<Pigeonhole, R> ifPigeonhole) {
+    default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Npc, R> ifNpc) {
         return switch (this) {
+            case Pigeonhole pigeonhole -> ifPigeonhole.apply(pigeonhole);
             case Player player -> ifPlayer.apply(player);
             case Npc npc -> ifNpc.apply(npc);
-            case Pigeonhole pigeonhole -> ifPigeonhole.apply(pigeonhole);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
         };
+    }
+
+    record Pigeonhole(String id) implements Address {
+        public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
+        ).apply(instance, Pigeonhole::new));
+
+        public static final Codec<Pigeonhole> CODEC_STRING = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
+                ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();
+
+        @Override
+        public Type type() {
+            return Type.PIGEONHOLE;
+        }
+
+        @Override
+        public Component getDisplayName() {
+            return Component.literal(id);
+        }
     }
 
     record Player(String id, Optional<UUID> uuid) implements Address {
@@ -79,11 +101,6 @@ public interface Address {
         @Override
         public Type type() {
             return Type.PLAYER;
-        }
-
-        @Override
-        public String id() {
-            return id;
         }
 
         @Override
@@ -110,35 +127,7 @@ public interface Address {
 
         @Override
         public Type type() {
-            return Type.PLAYER;
-        }
-
-        @Override
-        public String id() {
-            return id;
-        }
-
-        @Override
-        public Component getDisplayName() {
-            return Component.literal(id);
-        }
-    }
-
-    record Pigeonhole(String id) implements Address {
-        public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
-        ).apply(instance, Pigeonhole::new));
-
-        public static final Codec<Pigeonhole> CODEC_STRING = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Pigeonhole::id,
-                Pigeonhole::new
-        );
-
-        @Override
-        public Type type() {
-            return Type.PIGEONHOLE;
+            return Type.NPC;
         }
 
         @Override
@@ -148,22 +137,33 @@ public interface Address {
     }
 
     enum Type implements StringRepresentable {
-        PLAYER("player", Player.CODEC, Player.STREAM_CODEC.cast()),
-        NPC("npc", Npc.CODEC, Npc.STREAM_CODEC),
-        PIGEONHOLE("pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC);
+        PIGEONHOLE(0, "pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC),
+        PLAYER(1, "player", Player.CODEC, Player.STREAM_CODEC.cast()),
+        NPC(2, "npc", Npc.CODEC, Npc.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
-        public static final StreamCodec<RegistryFriendlyByteBuf, Type> STREAM_CODEC =
-                ByteBufCodecs.idMapper(ByIdMap.continuous(Type::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), Type::ordinal).cast();
+        public static final IntFunction<Type> BY_ID = ByIdMap.continuous(Type::getId, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+        public static final StreamCodec<RegistryFriendlyByteBuf, Type> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Type::ordinal).cast();
 
+        private final int id;
         private final String name;
         private final MapCodec<? extends Address> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, ? extends Address> streamCodec;
 
-        Type(String name, MapCodec<? extends Address> codec, StreamCodec<RegistryFriendlyByteBuf, ? extends Address> streamCodec) {
+        Type(int id, String name, MapCodec<? extends Address> codec, StreamCodec<RegistryFriendlyByteBuf, ? extends Address> streamCodec) {
+            this.id = id;
             this.name = name;
             this.codec = codec;
             this.streamCodec = streamCodec;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public @NotNull String getSerializedName() {
+            return name;
         }
 
         public MapCodec<? extends Address> getCodec() {
@@ -172,11 +172,6 @@ public interface Address {
 
         public StreamCodec<RegistryFriendlyByteBuf, ? extends Address> getStreamCodec() {
             return streamCodec;
-        }
-
-        @Override
-        public @NotNull String getSerializedName() {
-            return name;
         }
     }
 }

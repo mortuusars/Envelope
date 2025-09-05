@@ -62,7 +62,9 @@
   "gui.envelope.mail.log.record.traveling": "§7Traveling to '%s§7'",
   "gui.envelope.mail.log.record.arrived": "§7Arrived to '%s§7'",
   "gui.envelope.mail.log.record.received": "§7Received at '%s§7'",
-  "gui.envelope.mail.log.record.by": "§7 by '%s§7'",
+  "gui.envelope.mail.log.record.message.by": "§7by '%s§7'",
+
+  "gui.envelope.mail.log.record.message.recipient_is_not_found": "§7Recipient is not found",
 
   "gui.envelope.time.years": "%sy",
   "gui.envelope.time.months": "%smo",

@@ -116,7 +116,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        if (!level.isClientSide && blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
+        if (blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
             if (!EnchantmentHelper.hasTag(tool, EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING)) {
                 pigeonholeBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
                 level.updateNeighbourForOutputSignal(pos, this);
@@ -171,6 +171,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 popResourceFromFace(level, pos, state.getValue(FACING), new ItemStack(Items.BONE_MEAL));
                 stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
+                level.setBlockAndUpdate(pos, state.setValue(WASTE_LEVEL, 0));
             }
 
             level.playSound(player, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
