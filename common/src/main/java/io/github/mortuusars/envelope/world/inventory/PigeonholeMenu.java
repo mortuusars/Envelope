@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
-import io.github.mortuusars.envelope.world.mail.MailId;
+import io.github.mortuusars.envelope.mail.MailId;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
