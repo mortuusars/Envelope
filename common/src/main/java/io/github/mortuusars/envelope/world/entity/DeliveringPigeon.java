@@ -21,7 +21,7 @@ public interface DeliveringPigeon {
     // --
 
     default NextPhaseBuilder nextDeliveryPhase() {
-        return new NextPhaseBuilder(this, getDelivery().getCurrentPhase());
+        return new NextPhaseBuilder(this, getDelivery().getCurrentPhase()).duration(400);
     }
 
     class NextPhaseBuilder {

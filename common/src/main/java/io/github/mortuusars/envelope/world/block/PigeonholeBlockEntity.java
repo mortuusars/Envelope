@@ -571,7 +571,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         }
 
         public static PigeonholeBlockEntity.Occupant of(Entity entity, int slot) {
-            return of(entity, slot, 600);
+            return of(entity, slot, 100);
         }
 
         public static PigeonholeBlockEntity.Occupant create(int slot, int ticksInHive) {

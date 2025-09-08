@@ -53,12 +53,12 @@ public class BackgroundPigeon implements DeliveringPigeon {
 
     public boolean tickDelivery(ServerLevel level) {
         if (getDelivery().tick()) {
-            return advancePhase(level);
+            return advanceDelivery(level);
         }
         return false;
     }
 
-    public boolean advancePhase(ServerLevel level) {
+    public boolean advanceDelivery(ServerLevel level) {
         switch (getDelivery().getCurrentPhase().type()) {
             case LEAVING_HOME -> {
                 nextDeliveryPhase()

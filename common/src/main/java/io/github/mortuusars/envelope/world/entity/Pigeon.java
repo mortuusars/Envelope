@@ -827,6 +827,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                 TravelingRecord.sentFrom(sender).atTime(level.getGameTime()),
                 TravelingRecord.travelingTo(recipient));
 
+        BlockPos targetPos = blockPosition();
+
         Optional<BlockPos> position = Addresses.getPosition(level, recipient);
         if (position.isPresent()) {
             if (Math.sqrt(position.get().distSqr(blockPosition())) < 48 && level.isLoaded(position.get())) {
@@ -834,14 +836,26 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                         Delivery.Phase.BEGINNING
                                 .ofType(Delivery.Phase.Type.APPROACHING_TARGET)
                                 .start(blockPosition())
-                                .end(position.get().above(16))));
+                                .end(position.get())));
+                return;
             }
+            targetPos = getPosInTheDirectionOf(blockPosition(), position.get(), 16);
         }
 
         setDelivery(new Delivery(mail, sender, recipient, travelDuration, Optional.ofNullable(homePos),
                 Delivery.Phase.BEGINNING
                         .start(blockPosition())
-                        .end(blockPosition().above(16)))); //TODO: pos in the direction of address
+                        .end(targetPos))); //TODO: pos in the direction of address
+    }
+
+    protected BlockPos getPosInTheDirectionOf(BlockPos current, BlockPos target, double distance) {
+        Vec3 entityVec = Vec3.atCenterOf(current);
+        Vec3 targetVec = Vec3.atCenterOf(target);
+
+        Vec3 direction = targetVec.subtract(entityVec).normalize();
+        Vec3 newPosVec = entityVec.add(direction.scale(distance));
+
+        return BlockPos.containing(newPosVec);
     }
 
     public void advancePhase(ServerLevel level) {
@@ -896,6 +910,24 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                         .startAt(blockPosition())
                         .endAt(getDelivery().getHomePos().orElse(BlockPos.ZERO))
                         .begin();
+
+//                if (getDelivery().getHomePos().isPresent()) {
+//                    BlockPos targetPos = blockPosition();
+//
+//                    Optional<BlockPos> position = getDelivery().getHomePos().get();
+//                    if (position.isPresent()) {
+//                        if (Math.sqrt(position.get().distSqr(blockPosition())) < 48 && level.isLoaded(position.get())) {
+//                            setDelivery(new Delivery(mail, sender, recipient, travelDuration, Optional.ofNullable(homePos),
+//                                    Delivery.Phase.BEGINNING
+//                                            .ofType(Delivery.Phase.Type.APPROACHING_TARGET)
+//                                            .start(blockPosition())
+//                                            .end(position.get())));
+//                            return;
+//                        }
+//                        targetPos = getPosInTheDirectionOf(blockPosition(), position.get(), 16);
+//                    }
+//                }
+
                 transitionToBackground(level, true);
             }
             case APPROACHING_HOME -> {
