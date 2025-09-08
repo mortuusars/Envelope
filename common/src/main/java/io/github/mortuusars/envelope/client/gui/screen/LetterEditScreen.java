@@ -69,7 +69,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         fillRecipientButton = new ImageButton(leftPos + 18, topPos + 18, 11, 9, FILL_RECIPIENT_SPRITES, this::fillRecipient);
         addRenderableWidget(fillRecipientButton);
 
-        @Nullable Address recipient = letter.get(Envelope.DataComponents.LETTER_RECIPIENT);
+        @Nullable Address recipient = letter.get(Envelope.DataComponents.MAIL_RECIPIENT);
         String recipientText = "";
         if (recipient != null) {
             recipientText = recipient.id();
@@ -207,8 +207,8 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         // Local
 
         recipient.ifPresentOrElse(
-                value -> letter.set(Envelope.DataComponents.LETTER_RECIPIENT, value),
-                () -> letter.remove(Envelope.DataComponents.LETTER_RECIPIENT));
+                value -> letter.set(Envelope.DataComponents.MAIL_RECIPIENT, value),
+                () -> letter.remove(Envelope.DataComponents.MAIL_RECIPIENT));
 
         String subject = subjectBox.getEditor().getString().toString();
         if (!subject.isBlank()) {

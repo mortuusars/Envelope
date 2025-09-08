@@ -40,7 +40,7 @@ public class PigeonholeNetwork extends SavedData {
     public void addOrUpdate(Address.Pigeonhole address, BlockPos pos) {
         getPigeonholeData(address).ifPresentOrElse(
                 existingData -> {
-                    if (!existingData.getPos().equals(pos)) {
+                    if (!existingData.getPosition().equals(pos)) {
                         existingData.setPos(pos);
                         setDirty();
                     }
@@ -105,6 +105,10 @@ public class PigeonholeNetwork extends SavedData {
         return Optional.ofNullable(pigeonholes.get(address));
     }
 
+    public Optional<BlockPos> getPositionOf(Address.Pigeonhole address) {
+        return getPigeonholeData(address).map(PigeonholeData::getPosition);
+    }
+
     // --
 
     public static PigeonholeNetwork get(ServerLevel level) {
@@ -139,7 +143,7 @@ public class PigeonholeNetwork extends SavedData {
 
     public static class PigeonholeData {
         public static final Codec<PigeonholeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPos),
+                BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPosition),
                 Codec.list(ItemStack.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
         ).apply(instance, PigeonholeData::new));
 
@@ -155,7 +159,7 @@ public class PigeonholeNetwork extends SavedData {
             this(pos, new ArrayList<>());
         }
 
-        public BlockPos getPos() {
+        public BlockPos getPosition() {
             return pos;
         }
 

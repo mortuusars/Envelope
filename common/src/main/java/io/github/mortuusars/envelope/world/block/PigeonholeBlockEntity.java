@@ -6,15 +6,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.world.PigeonholeNetwork;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.world.item.MailItem;
 import io.github.mortuusars.envelope.mail.MailId;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -212,12 +212,10 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
         return PigeonholeNetwork.get(((ServerLevel) level)).removeMailById(address, id)
                 .mapValue(extractedMail -> {
-                    MailTravelingLog.addRecords(extractedMail,
+                    MailDeliveryLog.addRecords(extractedMail,
                             TravelingRecord.receivedAt(address)
                                     .atTime(level.getGameTime())
                                     .withOperatorMessage(Optional.ofNullable(player).map(Player::getName)));
-                    extractedMail.remove(Envelope.DataComponents.MAIL_SENDER);
-                    extractedMail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
                     extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
                     return extractedMail;
                 })
@@ -232,6 +230,16 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
                 Containers.dropItemStack(serverLevel, pos.x, pos.y, pos.z, itemStack);
             }
         }
+    }
+
+    public void onMailDelivered(ServerLevel level, ItemStack mail) {
+        getAddress().ifPresent(address -> {
+            for (ServerPlayer player : level.players()) {
+                if (player.containerMenu instanceof PigeonholeMenu menu && menu.getAddress().equals(address)) {
+                    Packets.sendToClient(PigeonholeHasNewMailS2CP.INSTANCE, player);
+                }
+            }
+        });
     }
 
     // Container
@@ -252,6 +260,15 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
+    public void setItem(int slot, ItemStack stack) {
+        if (slot == SLOT_MAIL) {
+            stack.remove(Envelope.DataComponents.MAIL_SENDER);
+            stack.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
+        }
+        super.setItem(slot, stack);
+    }
+
+    @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (address == null) return false;
         if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
@@ -261,9 +278,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
     public boolean canSend(ItemStack stack) {
         return address != null
-                && stack.getItem() instanceof MailItem mailItem
-                && mailItem.canSend(stack)
-                && !address.equals(mailItem.getRecipient(stack));
+                && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address recipient
+                && !recipient.equals(address);
     }
 
     @Override
@@ -413,29 +429,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         }
 
         Entity entity = occupant.createEntity(level, pos);
-        if (entity == null) {
-            return Optional.empty();
-        }
-
-        if (entity instanceof Pigeon pigeon) {
-            float wasteChance = 0.2f;
-            if (releaseStatus != ReleaseReason.EMERGENCY
-                    && state.getBlock() instanceof PigeonholeBlock block
-                    && level.random.nextFloat() < wasteChance) {
-                block.addWaste(level, pos, state);
-            }
-
-            pigeon.releasedFromPigeonhole(pos, state, releaseStatus); // Calling before mail sending to set home pos etc
-
-            ItemStack mail = getItem(SLOT_MAIL);
-            if (canSend(mail)) {
-                ItemStack sentMail = mail.copy();
-                sentMail.set(Envelope.DataComponents.MAIL_SENDER, address);
-                if (pigeon.startDelivery(level, sentMail, getBlockPos())) {
-                    setItem(SLOT_MAIL, ItemStack.EMPTY);
-                }
-            }
-        }
+        if (entity == null) return Optional.empty();
 
         double offset = isFrontBlockedOff ? 0.0 : 0.55 + (double) (entity.getBbWidth() / 2.0F);
         double x = (double) pos.getX() + 0.5 + offset * (double) direction.getStepX();
@@ -446,7 +440,27 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         level.playSound(null, pos, getExitSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
         level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
 
+        if (entity instanceof Pigeon) {
+            float wasteChance = 0.2f;
+            if (releaseStatus != ReleaseReason.EMERGENCY
+                    && state.getBlock() instanceof PigeonholeBlock block
+                    && level.random.nextFloat() < wasteChance) {
+                block.addWaste(level, pos, state);
+            }
+        }
+
         if (level.addFreshEntity(entity)) {
+            if (entity instanceof Pigeon pigeon) {
+                pigeon.releasedFromPigeonhole(pos, state, releaseStatus); // Calling before mail sending to set home pos etc
+
+                ItemStack mail = getItem(SLOT_MAIL);
+                if (canSend(mail) && !pigeon.isDelivering()) {
+                    mail.set(Envelope.DataComponents.MAIL_SENDER, address);
+                    pigeon.startDelivery(level, mail, getBlockPos());
+                    setItem(SLOT_MAIL, ItemStack.EMPTY);
+                }
+            }
+
             return Optional.of(entity);
         }
 
@@ -552,7 +566,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         public static PigeonholeBlockEntity.Occupant of(Entity entity, int slot, int minTicksInPigeonhole) {
             CompoundTag tag = new CompoundTag();
             entity.save(tag);
-            Pigeon.IGNORED_PIGEON_TAGS.forEach(tag::remove);
+            Pigeon.IGNORED_TAGS.forEach(tag::remove);
             return new PigeonholeBlockEntity.Occupant(CustomData.of(tag), slot, 0, minTicksInPigeonhole);
         }
 
@@ -569,13 +583,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         @Nullable
         public Entity createEntity(Level level, BlockPos pos) {
             CompoundTag compoundTag = entityData.copyTag();
-            Pigeon.IGNORED_PIGEON_TAGS.forEach(compoundTag::remove);
+            Pigeon.IGNORED_TAGS.forEach(compoundTag::remove);
             Entity entity = EntityType.loadEntityRecursive(compoundTag, level, Function.identity());
             if (entity == null || !entity.getType().is(Envelope.Tags.EntityTypes.PIGEONHOLE_INHABITORS)) {
                 return null;
             }
 
-            // entity.setNoGravity(true); ??
+            entity.setNoGravity(true);
 
             if (entity instanceof Pigeon pigeon) {
                 pigeon.setPigeonholePos(pos);

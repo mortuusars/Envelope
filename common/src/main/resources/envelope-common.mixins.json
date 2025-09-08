@@ -8,8 +8,9 @@
   ],
   "mixins": [
     "jei.JeiKeyConflictContextMixin",
-    "pigeon_spawner.MinecraftServerMixin",
-    "pigeon_on_shoulder.PlayerMixin"
+    "mail_tooltip.ItemStackMixin",
+    "pigeon_on_shoulder.PlayerMixin",
+    "pigeon_spawner.MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

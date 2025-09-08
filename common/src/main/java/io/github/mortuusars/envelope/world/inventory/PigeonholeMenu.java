@@ -105,6 +105,10 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         return blockEntity;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
     public boolean isMain() {
         return isMain.get() == 1;
     }

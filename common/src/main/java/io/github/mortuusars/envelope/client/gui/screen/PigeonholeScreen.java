@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.log.MailTravelingLog;
+import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
@@ -376,7 +376,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                 tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.sender", senderName));
             }
 
-            MailTravelingLog.of(hoveredMail).getLastRecord().flatMap(TravelingRecord::timestamp).ifPresent(receivedAt -> {
+            MailDeliveryLog.of(hoveredMail).getLastRecord().flatMap(TravelingRecord::timestamp).ifPresent(receivedAt -> {
                 long ageTicks = Minecrft.level().getGameTime() - receivedAt;
                 tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
             });

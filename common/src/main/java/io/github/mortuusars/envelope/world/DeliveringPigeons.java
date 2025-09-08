@@ -41,6 +41,8 @@ public class DeliveringPigeons extends SavedData {
             return;
         }
 
+        Pigeon.IGNORED_TAGS.forEach(tag::remove);
+
         pigeons.add(new BackgroundPigeon(tag, pigeon.getDelivery()));
         setDirty();
     }
