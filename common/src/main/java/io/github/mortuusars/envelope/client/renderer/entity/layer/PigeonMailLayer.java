@@ -25,18 +25,18 @@ public class PigeonMailLayer extends RenderLayer<Pigeon, PigeonModel> {
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Pigeon pigeon,
                        float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (pigeon.getDelivery().getMail().isEmpty()) return;
-        ItemStack mail = pigeon.getDelivery().getMail();
+//        if (pigeon.getDelivery().getMail().isEmpty()) return;
+//        ItemStack mail = pigeon.getDelivery().getMail();
 //        mail = new ItemStack(Envelope.Items.LETTER.get());
 
-        poseStack.pushPose();
-        getParentModel().body.translateAndRotate(poseStack);
-        poseStack.scale(0.5f, 0.5f, 0.5f);
-        poseStack.mulPose(Axis.XP.rotationDegrees(180));
-        poseStack.mulPose(Axis.YN.rotationDegrees((Minecrft.level().getGameTime() + partialTick) % 360 * 8));
-        poseStack.translate(0, 3, 0);
-        itemRenderer.renderStatic(pigeon, mail, ItemDisplayContext.FIXED, false, poseStack,
-                bufferSource, pigeon.level(), packedLight, LivingEntityRenderer.getOverlayCoords(pigeon, 0.0F), pigeon.getId());
-        poseStack.popPose();
+//        poseStack.pushPose();
+//        getParentModel().body.translateAndRotate(poseStack);
+//        poseStack.scale(0.5f, 0.5f, 0.5f);
+//        poseStack.mulPose(Axis.XP.rotationDegrees(180));
+//        poseStack.mulPose(Axis.YN.rotationDegrees((Minecrft.level().getGameTime() + partialTick) % 360 * 8));
+//        poseStack.translate(0, 3, 0);
+//        itemRenderer.renderStatic(pigeon, mail, ItemDisplayContext.FIXED, false, poseStack,
+//                bufferSource, pigeon.level(), packedLight, LivingEntityRenderer.getOverlayCoords(pigeon, 0.0F), pigeon.getId());
+//        poseStack.popPose();
     }
 }

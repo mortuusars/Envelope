@@ -38,7 +38,7 @@ public class PigeonholeNetwork extends SavedData {
     }
 
     public void addOrUpdate(Address.Pigeonhole address, BlockPos pos) {
-        getPigeonholeData(address).ifPresentOrElse(
+        get(address).ifPresentOrElse(
                 existingData -> {
                     if (!existingData.getPosition().equals(pos)) {
                         existingData.setPos(pos);
@@ -64,11 +64,11 @@ public class PigeonholeNetwork extends SavedData {
     // --
 
     public List<ItemStack> getAllMail(Address.Pigeonhole address) {
-        return getPigeonholeData(address).map(PigeonholeData::getMail).orElse(Collections.emptyList());
+        return get(address).map(PigeonholeData::getMail).orElse(Collections.emptyList());
     }
 
     public boolean putMail(Address.Pigeonhole address, ItemStack mail) {
-        return getPigeonholeData(address)
+        return get(address)
                 .map(data -> {
                     mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());
                     data.getMail().add(mail);
@@ -79,7 +79,7 @@ public class PigeonholeNetwork extends SavedData {
     }
 
     public Result<ItemStack> removeMailById(Address.Pigeonhole address, MailId id) {
-        return getPigeonholeData(address)
+        return get(address)
                 .map(data -> {
                     @Nullable Result<ItemStack> result = null;
                     ListIterator<ItemStack> iterator = data.getMail().listIterator();
@@ -101,12 +101,12 @@ public class PigeonholeNetwork extends SavedData {
                 .orElseGet(() -> Result.failure(new Failure("No mailbox with address '" + address + "' exists.")));
     }
 
-    public Optional<PigeonholeData> getPigeonholeData(Address.Pigeonhole address) {
+    public Optional<PigeonholeData> get(Address.Pigeonhole address) {
         return Optional.ofNullable(pigeonholes.get(address));
     }
 
     public Optional<BlockPos> getPositionOf(Address.Pigeonhole address) {
-        return getPigeonholeData(address).map(PigeonholeData::getPosition);
+        return get(address).map(PigeonholeData::getPosition);
     }
 
     // --

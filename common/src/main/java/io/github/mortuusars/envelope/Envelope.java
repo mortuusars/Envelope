@@ -60,8 +60,6 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
-
-        Register.entityDataSerializer("pigeon_delivery", Delivery.ENTITY_DATA_SERIALIZER);
     }
 
     /**

@@ -3,13 +3,17 @@ package io.github.mortuusars.envelope.world.entity;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.world.Position;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
@@ -17,62 +21,78 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public class Delivery {
     public static final Codec<Delivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ItemStack.OPTIONAL_CODEC.fieldOf("mail").forGetter(Delivery::getMail),
             Address.CODEC.optionalFieldOf("sender", Address.UNKNOWN).forGetter(Delivery::getRecipient),
+            BlockPos.CODEC.optionalFieldOf("sender_pos").forGetter(Delivery::getSenderPos),
             Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
+            BlockPos.CODEC.optionalFieldOf("recipient_pos").forGetter(Delivery::getRecipientPos),
             Codec.INT.optionalFieldOf("travel_duration", -1).forGetter(Delivery::getTravelDuration),
-            BlockPos.CODEC.optionalFieldOf("home_pos").forGetter(Delivery::getHomePos),
-            Phase.CODEC.optionalFieldOf("phase", Phase.BEGINNING).forGetter(Delivery::getCurrentPhase)
+            Phase.CODEC.optionalFieldOf("phase", null).forGetter(Delivery::getPhase)
     ).apply(instance, Delivery::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, Delivery> STREAM_CODEC = StreamCodec.composite(
-            ItemStack.OPTIONAL_STREAM_CODEC, Delivery::getMail,
-            Address.STREAM_CODEC, Delivery::getSender,
-            Address.STREAM_CODEC, Delivery::getRecipient,
-            ByteBufCodecs.VAR_INT, Delivery::getTravelDuration,
-            ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Delivery::getHomePos,
-            Phase.STREAM_CODEC, Delivery::getCurrentPhase,
-            Delivery::new
-    );
+//    public static final StreamCodec<RegistryFriendlyByteBuf, Delivery> STREAM_CODEC = StreamCodec.composite(
+//            ItemStack.OPTIONAL_STREAM_CODEC, Delivery::getMail,
+//            Address.STREAM_CODEC, Delivery::getSender,
+//            Address.STREAM_CODEC, Delivery::getRecipient,
+//            ByteBufCodecs.VAR_INT, Delivery::getTravelDuration,
+//            ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Delivery::getHomePos,
+//            Phase.STREAM_CODEC, Delivery::getCurrentPhase,
+//            Delivery::new
+//    );
+//
+//    public static final EntityDataSerializer<Delivery> ENTITY_DATA_SERIALIZER = new EntityDataSerializer<>() {
+//        @Override
+//        public @NotNull StreamCodec<? super RegistryFriendlyByteBuf, Delivery> codec() {
+//            return STREAM_CODEC;
+//        }
+//
+//        public @NotNull Delivery copy(Delivery data) {
+//            return new Delivery(data.getMail().copy(), data.getSender(), data.getRecipient(), data.getTravelDuration(), data.getHomePos(), data.getCurrentPhase().copy());
+//        }
+//    };
 
-    public static final EntityDataSerializer<Delivery> ENTITY_DATA_SERIALIZER = new EntityDataSerializer<>() {
-        @Override
-        public @NotNull StreamCodec<? super RegistryFriendlyByteBuf, Delivery> codec() {
-            return STREAM_CODEC;
-        }
-
-        public @NotNull Delivery copy(Delivery data) {
-            return new Delivery(data.getMail().copy(), data.getSender(), data.getRecipient(), data.getTravelDuration(), data.getHomePos(), data.getCurrentPhase().copy());
-        }
-    };
-
-    public static final Delivery EMPTY = new Delivery(ItemStack.EMPTY, Address.UNKNOWN, Address.UNKNOWN, -1, Optional.empty(),
-            new Phase(Phase.Type.LEAVING_HOME, Optional.empty(), Optional.empty(), 1));
+//    public static final Delivery EMPTY = new Delivery(ItemStack.EMPTY, Address.UNKNOWN, Address.UNKNOWN, -1, Optional.empty(),
+//            new Phase(Phase.Type.LEAVING_HOME, Optional.empty(), Optional.empty(), 1));
 
     protected ItemStack mail;
     protected Address sender;
+    protected Optional<BlockPos> senderPos;
     protected Address recipient;
+    protected Optional<BlockPos> recipientPos;
     protected int travelDuration;
-    protected Optional<BlockPos> homePos;
     protected Phase phase;
-    protected int ticksAtCurrentPhase = 0;
 
-    public Delivery(ItemStack mail, Address sender, Address recipient, int travelDuration, Optional<BlockPos> homePos, Phase phase) {
+    public Delivery(ItemStack mail, Address sender, Optional<BlockPos> senderPos, Address recipient,
+                    Optional<BlockPos> recipientPos, int travelDuration, @Nullable Phase phase) {
         this.mail = mail;
         this.sender = sender;
+        this.senderPos = senderPos;
         this.recipient = recipient;
+        this.recipientPos = recipientPos;
         this.travelDuration = travelDuration;
-        this.homePos = homePos;
+        if (phase == null) {
+            phase = new Phase(Phase.Type.LEAVING_HOME, Optional.empty(), Optional.empty(), Phase.DEFAULT_DURATION, 0);
+        }
         this.phase = phase;
     }
 
-    public Delivery(ItemStack mail, Address sender, Address recipient, int travelDuration, Optional<BlockPos> homePos) {
-        this(mail, sender, recipient, travelDuration, homePos, Phase.BEGINNING);
+    public static Delivery start(ServerLevel level, ItemStack mail) {
+        @Nullable Address sender = mail.get(Envelope.DataComponents.MAIL_SENDER);
+        Preconditions.checkNotNull(sender, "Mail '" + mail + "' does not have 'envelope:mail_sender' defined.");
+        @Nullable Address recipient = mail.get(Envelope.DataComponents.MAIL_RECIPIENT);
+        Preconditions.checkNotNull(recipient, "Mail '" + mail + "' does not have 'envelope:mail_recipient' defined.");
+
+        return new Delivery(mail,
+                sender,
+                Position.ofAddress(level, sender),
+                mail.get(Envelope.DataComponents.MAIL_RECIPIENT),
+                Position.ofAddress(level, recipient),
+                mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, Config.Server.TRAVEL_DURATION.get()),
+                Phase.start());
     }
 
     // --
@@ -95,12 +115,30 @@ public class Delivery {
         return this;
     }
 
+    public Optional<BlockPos> getSenderPos() {
+        return senderPos;
+    }
+
+    public Delivery setSenderPos(Optional<BlockPos> senderPos) {
+        this.senderPos = senderPos;
+        return this;
+    }
+
     public Address getRecipient() {
         return recipient;
     }
 
     public Delivery setRecipient(Address recipient) {
         this.recipient = recipient;
+        return this;
+    }
+
+    public Optional<BlockPos> getRecipientPos() {
+        return recipientPos;
+    }
+
+    public Delivery setRecipientPos(Optional<BlockPos> recipientPos) {
+        this.recipientPos = recipientPos;
         return this;
     }
 
@@ -113,16 +151,7 @@ public class Delivery {
         return this;
     }
 
-    public Optional<BlockPos> getHomePos() {
-        return homePos;
-    }
-
-    public Delivery setHomePos(Optional<BlockPos> homePos) {
-        this.homePos = homePos;
-        return this;
-    }
-
-    public @NotNull Delivery.Phase getCurrentPhase() {
+    public Phase getPhase() {
         return phase;
     }
 
@@ -131,78 +160,132 @@ public class Delivery {
         return this;
     }
 
-    // --
-
-    public boolean isEmpty() {
-        return this.equals(EMPTY) || getRecipient().equals(Address.UNKNOWN);
+    public void advancePhase() {
+        getPhase().setType(phase.getType().next(this))
+                .setStart(phase.getEnd())
+                .setEnd(Optional.empty())
+                .setDuration(phase.getType().isTraveling() ? getTravelDuration() : Delivery.Phase.DEFAULT_DURATION)
+                .setTicks(0);
     }
 
-    public boolean tick() {
-        if (isEmpty()) return false;
-        ticksAtCurrentPhase++;
-        return ticksAtCurrentPhase >= getCurrentPhase().getDuration();
-    }
-
-    public Delivery updatePhase(Function<Phase, Phase> oldToNew) {
-        phase = oldToNew.apply(phase);
-        return this;
-    }
-
-    public Delivery resetTimer() {
-        ticksAtCurrentPhase = 0;
-        return this;
+    public boolean shouldSkipTravelingPhase() {
+        if (senderPos.isEmpty() || recipientPos.isEmpty()) return false;
+        return senderPos.get().distSqr(recipientPos.get()) < 1024; // 32 blocks
     }
 
     // --
 
-    public record Phase(Delivery.Phase.Type type, Optional<BlockPos> start, Optional<BlockPos> end, int durationTicks) {
-        public static final int DEFAULT_DURATION_TICKS = 100; // 5s
+    public static class Phase {
+        public static final int DEFAULT_DURATION = 5 * SharedConstants.TICKS_PER_SECOND;
 
         public static final Codec<Phase> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Type.CODEC.optionalFieldOf("phase", Type.LEAVING_HOME).forGetter(Phase::type),
-                BlockPos.CODEC.optionalFieldOf("start_pos").forGetter(Phase::start),
-                BlockPos.CODEC.optionalFieldOf("end_pos").forGetter(Phase::end),
-                Codec.INT.optionalFieldOf("duration", DEFAULT_DURATION_TICKS).forGetter(Phase::getDuration)
+                Type.CODEC.optionalFieldOf("type", Type.LEAVING_HOME).forGetter(Phase::getType),
+                BlockPos.CODEC.optionalFieldOf("start_pos").forGetter(Phase::getStart),
+                BlockPos.CODEC.optionalFieldOf("end_pos").forGetter(Phase::getEnd),
+                Codec.INT.optionalFieldOf("duration", DEFAULT_DURATION).forGetter(Phase::getDuration),
+                Codec.INT.optionalFieldOf("ticks", 0).forGetter(Phase::getTicks)
         ).apply(instance, Phase::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Phase> STREAM_CODEC = StreamCodec.composite(
-                Type.STREAM_CODEC, Phase::type,
-                ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Phase::start,
-                ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Phase::end,
+                Type.STREAM_CODEC, Phase::getType,
+                ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Phase::getStart,
+                ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Phase::getEnd,
                 ByteBufCodecs.VAR_INT, Phase::getDuration,
+                ByteBufCodecs.VAR_INT, Phase::getTicks,
                 Phase::new
         );
 
-        public static final Phase BEGINNING = new Phase(Type.LEAVING_HOME, Optional.empty(), Optional.empty(), DEFAULT_DURATION_TICKS);
+        protected Type type;
+        protected Optional<BlockPos> start;
+        protected Optional<BlockPos> end;
+        protected int duration;
+        protected int ticks;
+
+        public Phase(Type type, Optional<BlockPos> start, Optional<BlockPos> end, int duration, int ticks) {
+            this.type = type;
+            this.start = start;
+            this.end = end;
+            this.duration = duration;
+        }
+
+        public static Phase start() {
+            return new Phase(Type.LEAVING_HOME, Optional.empty(), Optional.empty(), DEFAULT_DURATION, 0);
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public Phase setType(Type type) {
+            this.type = type;
+            return this;
+        }
+
+        public Optional<BlockPos> getStart() {
+            return start;
+        }
+
+        public Phase setStart(Optional<BlockPos> start) {
+            this.start = start;
+            return this;
+        }
+
+        public Phase setStart(@NotNull BlockPos start) {
+            this.start = Optional.of(start);
+            return this;
+        }
+
+        public Optional<BlockPos> getEnd() {
+            return end;
+        }
+
+        public Phase setEnd(Optional<BlockPos> end) {
+            this.end = end;
+            return this;
+        }
+
+        public Phase setEnd(@NotNull BlockPos end) {
+            this.end = Optional.of(end);
+            return this;
+        }
 
         public int getDuration() {
-            return durationTicks;
+            return duration;
+        }
+
+        public Phase setDuration(int duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public int getTicks() {
+            return ticks;
+        }
+
+        public Phase setTicks(int ticks) {
+            this.ticks = ticks;
+            return this;
         }
 
         // --
 
-        public Phase next() {
-            return new Phase(type.next(), end, Optional.empty(), DEFAULT_DURATION_TICKS);
+        public void tick() {
+            ticks++;
         }
 
-        public Phase ofType(Type type) {
-            return new Phase(type, start, end, durationTicks);
+        public boolean isComplete() {
+            return ticks >= duration;
         }
 
-        public Phase start(@Nullable BlockPos start) {
-            return new Phase(type, Optional.ofNullable(start), end, durationTicks);
+        public float getProgress() {
+            return (float) getTicks() / getDuration();
         }
 
-        public Phase end(@Nullable BlockPos end) {
-            return new Phase(type, start, Optional.ofNullable(end), durationTicks);
-        }
-
-        public Phase duration(int durationTicks) {
-            return new Phase(type, start, end, durationTicks);
-        }
-
-        public Phase copy() {
-            return new Phase(type, start, end, durationTicks);
+        public Optional<BlockPos> estimateCurrentPos() {
+            if (getStart().isPresent() && getEnd().isPresent()) {
+                return Optional.of(BlockPos.containing(Position.lerp(getStart().get(), getEnd().get(), getProgress())));
+            }
+            return Optional.empty();
         }
 
         // --
@@ -230,23 +313,24 @@ public class Delivery {
                 return name;
             }
 
-            public static Optional<Type> byName(String name) {
-                for (Type value : values()) {
-                    if (value.getSerializedName().equals(name)) {
-                        return Optional.of(value);
-                    }
-                }
-                return Optional.empty();
-            }
-
-            public Type next() {
-                Preconditions.checkState(this != Type.APPROACHING_HOME,
-                        "Cannot advance past the last stage. Delivery is finished.");
-                return values()[ordinal() + 1];
-            }
-
             public boolean isTraveling() {
                 return this == TRAVELING_TO_TARGET || this == TRAVELING_TO_HOME;
+            }
+
+            public boolean hasNext() {
+                return this != APPROACHING_HOME;
+            }
+
+            public Type next(Delivery delivery) {
+                return switch (this) {
+                    case LEAVING_HOME -> delivery.shouldSkipTravelingPhase() ? APPROACHING_TARGET : TRAVELING_TO_TARGET;
+                    case TRAVELING_TO_TARGET -> APPROACHING_TARGET;
+                    case APPROACHING_TARGET -> LEAVING_TARGET;
+                    case LEAVING_TARGET -> delivery.shouldSkipTravelingPhase() ? APPROACHING_HOME : TRAVELING_TO_HOME;
+                    case TRAVELING_TO_HOME -> APPROACHING_HOME;
+                    case APPROACHING_HOME -> throw new IllegalStateException("Delivery is finished.");
+                    //TODO: find graceful delivery end instead of throwing an exception.
+                };
             }
         }
     }

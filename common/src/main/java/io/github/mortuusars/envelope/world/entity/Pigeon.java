@@ -8,8 +8,9 @@ import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.world.Addresses;
-import io.github.mortuusars.envelope.world.DeliveringPigeons;
+import io.github.mortuusars.envelope.world.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.PigeonholeNetwork;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -52,6 +53,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
@@ -91,14 +93,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             "SleepingZ",
             "Passengers",
             "UUID",
-            "leash",
-            "cannot_enter_pigeonhole_ticks",
-            "pigeonhole_pos"
+            "leash"
     );
+    private static final int COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE = 200;
+
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Delivery> DATA_DELIVERY = SynchedEntityData.defineId(Pigeon.class, Delivery.ENTITY_DATA_SERIALIZER);
-    private static final int COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE = 200;
+    private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+//    private static final EntityDataAccessor<Delivery> DATA_DELIVERY = SynchedEntityData.defineId(Pigeon.class, Delivery.ENTITY_DATA_SERIALIZER);
 
     public float flap;
     public float flapSpeed;
@@ -114,9 +116,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected int remainingCooldownBeforeLocatingNewPigeonhole;
     protected GoToPigeonholeGoal goToPigeonholeGoal;
 
+    protected @Nullable Delivery delivery = null;
+
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
-        moveControl = new PigeonFlyingMoveControl(this, 10, false);
+        moveControl = new FlyingMoveControl(this, 10, false);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
 
@@ -217,7 +221,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.defineSynchedData(builder);
         builder.define(DATA_VARIANT_ID, 0);
         builder.define(DATA_IS_SITTING, false);
-        builder.define(DATA_DELIVERY, Delivery.EMPTY);
+        builder.define(DATA_HAS_MAIL, false);
     }
 
     @Nullable
@@ -272,12 +276,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         entityData.set(DATA_IS_SITTING, sitting);
     }
 
-    public Delivery getDelivery() {
-        return entityData.get(DATA_DELIVERY);
+    public boolean hasMail() {
+        return entityData.get(DATA_HAS_MAIL);
     }
 
-    public void setDelivery(Delivery data) {
-        entityData.set(DATA_DELIVERY, data, true);
+    public void setHasMail(boolean hasMail) {
+        entityData.set(DATA_HAS_MAIL, hasMail);
     }
 
     public boolean hasFancyHat() {
@@ -451,7 +455,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         tag.putInt("Variant", getVariant().id);
         tag.putBoolean("Sitting", isSitting());
 
-        if (!getDelivery().isEmpty()) {
+        if (getDelivery() != null) {
             tag.put("Delivery", Delivery.CODEC.encodeStart(NbtOps.INSTANCE, getDelivery()).getOrThrow());
         }
     }
@@ -770,30 +774,30 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         @Override
         public void stop() {
-            setDelivery(Delivery.EMPTY);
+            setDelivery(null);
             Pigeon.this.navigation.stop();
             Pigeon.this.navigation.resetMaxVisitedNodesMultiplier();
         }
 
         @Override
         public void tick() {
-            if (!(level() instanceof ServerLevel level)) return;
-            if (getDelivery().isEmpty()) return;
+            if (!(level() instanceof ServerLevel level) || getDelivery() == null) return;
 
-            if (getDelivery().tick()) {
-                advancePhase(level);
-                return;
-            }
+            tickDelivery(level);
 
-            getDelivery().getCurrentPhase().end().ifPresent(pos -> {
+            if (getDelivery().getPhase().getEnd().isPresent()) {
+                BlockPos pos = getDelivery().getPhase().getEnd().get();
                 if (hasReachedTarget(pos)) {
-                    advancePhase(level);
+                    endDeliveryPhase(level);
+                    if (getDelivery().getPhase().getType().hasNext()) {
+                        advanceDeliveryPhase(level);
+                    }
                 } else if (!Pigeon.this.navigation.isInProgress()) {
                     if (!pathfindDirectlyTowards(pos)) {
                         pathfindRandomlyTowards(pos);
                     }
                 }
-            });
+            }
         }
 
         private boolean pathfindDirectlyTowards(BlockPos pos) {
@@ -801,172 +805,114 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             Pigeon.this.navigation.moveTo(pos.getX(), pos.getY(), pos.getZ(), 2, 2);
             return Pigeon.this.navigation.getPath() != null && Pigeon.this.navigation.getPath().canReach();
         }
+    }
 
-        private boolean hasReachedTarget(BlockPos pos) {
-            if (Pigeon.this.closerThan(pos, 2)) {
-                return true;
-            } else {
-                Path path = Pigeon.this.navigation.getPath();
-                return path != null && path.getTarget().equals(pos) && path.canReach() && path.isDone();
-            }
+    protected boolean hasReachedTarget(BlockPos pos) {
+        if (Pigeon.this.closerThan(pos, 2)) {
+            return true;
+        } else {
+            Path path = Pigeon.this.navigation.getPath();
+            return path != null && path.getTarget().equals(pos) && path.canReach() && path.isDone();
         }
     }
 
+    public @Nullable Delivery getDelivery() {
+        return delivery;
+    }
+
+    public void setDelivery(@Nullable Delivery delivery) {
+        this.delivery = delivery;
+    }
+
     public boolean isDelivering() {
-        return !getDelivery().isEmpty();
+        return getDelivery() != null;
     }
 
     public void startDelivery(ServerLevel level, ItemStack mail, @Nullable BlockPos homePos) {
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
 
-        Address sender = mail.get(Envelope.DataComponents.MAIL_SENDER);
-        Address recipient = mail.get(Envelope.DataComponents.MAIL_RECIPIENT);
-        int travelDuration = mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, Config.Server.TRAVEL_DURATION.get());
-
         MailDeliveryLog.addRecords(mail,
-                TravelingRecord.sentFrom(sender).atTime(level.getGameTime()),
-                TravelingRecord.travelingTo(recipient));
+                TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
+                TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
 
-        BlockPos targetPos = blockPosition();
+        setDelivery(Delivery.start(level, mail));
+    }
 
-        Optional<BlockPos> position = Addresses.getPosition(level, recipient);
-        if (position.isPresent()) {
-            if (Math.sqrt(position.get().distSqr(blockPosition())) < 48 && level.isLoaded(position.get())) {
-                setDelivery(new Delivery(mail, sender, recipient, travelDuration, Optional.ofNullable(homePos),
-                        Delivery.Phase.BEGINNING
-                                .ofType(Delivery.Phase.Type.APPROACHING_TARGET)
-                                .start(blockPosition())
-                                .end(position.get())));
-                return;
-            }
-            targetPos = getPosInTheDirectionOf(blockPosition(), position.get(), 16);
+    @Override
+    public Optional<BlockPos> getCurrentPos() {
+        return Optional.of(blockPosition());
+    }
+
+    @Override
+    public void startDeliveryPhase(ServerLevel level) {
+        Preconditions.checkNotNull(getDelivery());
+
+        if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
+                && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
+            // Return home when ascent position cannot be reached.
+
+            getDelivery().getPhase().setType(Delivery.Phase.Type.APPROACHING_HOME);
+
+            MailDeliveryLog.addRecords(getDelivery().getMail(),
+                    TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                    TravelingRecord.travelingTo(getDelivery().getSender()));
         }
 
-        setDelivery(new Delivery(mail, sender, recipient, travelDuration, Optional.ofNullable(homePos),
-                Delivery.Phase.BEGINNING
-                        .start(blockPosition())
-                        .end(targetPos))); //TODO: pos in the direction of address
-    }
+        getDelivery().getPhase().setStart(blockPosition());
 
-    protected BlockPos getPosInTheDirectionOf(BlockPos current, BlockPos target, double distance) {
-        Vec3 entityVec = Vec3.atCenterOf(current);
-        Vec3 targetVec = Vec3.atCenterOf(target);
-
-        Vec3 direction = targetVec.subtract(entityVec).normalize();
-        Vec3 newPosVec = entityVec.add(direction.scale(distance));
-
-        return BlockPos.containing(newPosVec);
-    }
-
-    public void advancePhase(ServerLevel level) {
-        Preconditions.checkState(!getDelivery().isEmpty(), "Cannot advance delivery phase: Pigeon is not delivering.");
-
-        switch (getDelivery().getCurrentPhase().type()) {
-            case LEAVING_HOME -> {
-                nextDeliveryPhase()
-                        .startAt(blockPosition())
-                        .endAt(Addresses.getPosition(level, getDelivery().getRecipient()).orElse(BlockPos.ZERO))
-                        .duration(getDelivery().getTravelDuration())
-                        .begin();
+        switch (getDelivery().getPhase().getType()) {
+            case LEAVING_HOME -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos(), 16));
+            case TRAVELING_TO_TARGET -> {
+                getDelivery().getRecipientPos().ifPresent(recipientPos -> {
+                    getDelivery().getPhase().setEnd(Position.ascent(level, recipientPos, Optional.of(blockPosition()), 16));
+                });
                 transitionToBackground(level, true);
             }
-            case APPROACHING_TARGET -> {
-                nextDeliveryPhase()
-                        .startAt(blockPosition())
-                        .endAt(blockPosition().above(16))
-                        .begin();
+            case APPROACHING_TARGET -> getDelivery().getPhase().setEnd(getDelivery().getRecipientPos().orElseThrow());
+            case LEAVING_TARGET -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getSenderPos(), 16));
+            case TRAVELING_TO_HOME -> {
+                getDelivery().getSenderPos().ifPresent(senderPos -> {
+                    getDelivery().getPhase().setEnd(Position.ascent(level, senderPos, Optional.of(blockPosition()), 16));
+                });
+                transitionToBackground(level, true);
+            }
+            case APPROACHING_HOME -> getDelivery().getPhase().setEnd(getDelivery().getSenderPos().orElseThrow());
+        }
+    }
 
-                ItemStack mail = getMail();
+    @Override
+    public void endDeliveryPhase(ServerLevel level) {
+        Preconditions.checkNotNull(getDelivery());
+
+        switch (getDelivery().getPhase().getType()) {
+            case APPROACHING_TARGET -> {
+                ItemStack mail = getDelivery().getMail();
                 if (mail.isEmpty()) return;
 
-                getDelivery().getRecipient()
-                        .ifPigeonhole(pigeonhole -> {
-                            PigeonholeNetwork pigeonholeNetwork = PigeonholeNetwork.get(level);
-                            if (pigeonholeNetwork.putMail(pigeonhole, mail)) {
-                                MailDeliveryLog.addRecords(mail, TravelingRecord.arrivedTo(pigeonhole));
-
-                                pigeonholeNetwork.getPositionOf(pigeonhole).ifPresent(pos -> {
-                                    if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                                        blockEntity.onMailDelivered(level, mail);
-                                    }
-                                });
-
-                                setMail(ItemStack.EMPTY);
-                            } else {
-                                MailDeliveryLog.addRecords(mail, TravelingRecord.returned(pigeonhole).atTime(level.getGameTime()));
-                                MailDeliveryLog.addRecords(mail, TravelingRecord.travelingTo(getDelivery().getSender()));
-                            }
-                        })
-                        .ifPlayer(player -> {
-                            throw new NotImplementedException("Player addresses are not implemented yet");
-                        })
-                        .ifNpc(npc -> {
-                            throw new NotImplementedException("NPC addresses are not implemented yet");
-                        });
-                setDelivery(getDelivery());
-            }
-            case LEAVING_TARGET -> {
-                nextDeliveryPhase()
-                        .startAt(blockPosition())
-                        .endAt(getDelivery().getHomePos().orElse(BlockPos.ZERO))
-                        .begin();
-
-//                if (getDelivery().getHomePos().isPresent()) {
-//                    BlockPos targetPos = blockPosition();
-//
-//                    Optional<BlockPos> position = getDelivery().getHomePos().get();
-//                    if (position.isPresent()) {
-//                        if (Math.sqrt(position.get().distSqr(blockPosition())) < 48 && level.isLoaded(position.get())) {
-//                            setDelivery(new Delivery(mail, sender, recipient, travelDuration, Optional.ofNullable(homePos),
-//                                    Delivery.Phase.BEGINNING
-//                                            .ofType(Delivery.Phase.Type.APPROACHING_TARGET)
-//                                            .start(blockPosition())
-//                                            .end(position.get())));
-//                            return;
-//                        }
-//                        targetPos = getPosInTheDirectionOf(blockPosition(), position.get(), 16);
-//                    }
-//                }
-
-                transitionToBackground(level, true);
+                if (tryDeliverMail(level, mail, getDelivery().getRecipient())) {
+                    getDelivery().setMail(ItemStack.EMPTY);
+                } else {
+                    MailDeliveryLog.addRecords(mail,
+                            TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                            TravelingRecord.travelingTo(getDelivery().getSender()));
+                }
             }
             case APPROACHING_HOME -> {
-                ItemStack mail = getMail();
-                if (!mail.isEmpty()) {
-                    getDelivery().getSender()
-                            .ifPigeonhole(pigeonhole -> {
-                                MailDeliveryLog.addRecords(mail, TravelingRecord.arrivedTo(getDelivery().getSender()));
-                                PigeonholeNetwork pigeonholeNetwork = PigeonholeNetwork.get(level);
+                ItemStack mail = getDelivery().getMail();
 
-                                if (pigeonholeNetwork.putMail(pigeonhole, mail)) {
-                                    pigeonholeNetwork.getPositionOf(pigeonhole).ifPresent(pos -> {
-                                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                                            blockEntity.onMailDelivered(level, mail);
-                                        }
-                                    });
-                                } else {
-                                    spawnAtLocation(mail);
-                                    Envelope.LOGGER.warn("Dropped returning mail on the ground as there's no Pigeonhole to put it in.");
-                                }
-                            })
-                            .ifPlayer(player -> {
-                                throw new IllegalStateException("Player senders should not be a thing.");
-                            })
-                            .ifNpc(npc -> {
-                                throw new IllegalStateException("NPC sender return to home should not be handled by alive Pigeons.");
-                            });
+                if (!mail.isEmpty() && !tryDeliverMail(level, mail, getDelivery().getSender())) {
+                    spawnAtLocation(mail);
+                    Envelope.LOGGER.info("Returning mail has been dropped on the ground because it cannot be delivered to Pigeonhole.");
                 }
-                setDelivery(Delivery.EMPTY);
+
+                throw new NotImplementedException("Waiting for spawn is not implemented yet.");
             }
-            case TRAVELING_TO_TARGET, TRAVELING_TO_HOME ->
-                    throw new IllegalStateException("Traveling phases are handled in background.");
-            default -> throw new IllegalStateException("Unexpected value: " + getDelivery().getCurrentPhase().type());
         }
     }
 
     protected void transitionToBackground(ServerLevel level, boolean effects) {
-        Preconditions.checkState(!getDelivery().isEmpty(), "Cannot transition to background: Pigeon is not delivering.");
-        DeliveringPigeons.get(level).add(this);
+        Preconditions.checkNotNull(getDelivery(), "Cannot transition to background: Pigeon is not delivering.");
+        BackgroundDelivery.get(level).add(this);
         if (effects) {
             level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
             level.playSound(null, position().x, position().y, position().z,

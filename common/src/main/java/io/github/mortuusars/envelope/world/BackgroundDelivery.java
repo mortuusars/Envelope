@@ -16,16 +16,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class DeliveringPigeons extends SavedData {
+public class BackgroundDelivery extends SavedData {
     protected static final String SAVED_DATA_NAME = "envelope_pigeons";
 
-    public static final Codec<DeliveringPigeons> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.list(BackgroundPigeon.CODEC).fieldOf("pigeons").forGetter(DeliveringPigeons::getPigeons)
-    ).apply(instance, DeliveringPigeons::new));
+    public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.list(BackgroundPigeon.CODEC).fieldOf("pigeons").forGetter(BackgroundDelivery::getPigeons)
+    ).apply(instance, BackgroundDelivery::new));
 
     protected List<BackgroundPigeon> pigeons;
 
-    public DeliveringPigeons(List<BackgroundPigeon> pigeons) {
+    public BackgroundDelivery(List<BackgroundPigeon> pigeons) {
         this.pigeons = new ArrayList<>(pigeons);
     }
 
@@ -49,14 +49,15 @@ public class DeliveringPigeons extends SavedData {
 
     public void tick(ServerLevel level) {
         pigeons.removeIf(pigeon -> {
+            pigeon.tickDelivery(level);
             setDirty();
-            return pigeon.tickDelivery(level);
+            return pigeon.shouldBeRemoved();
         });
     }
 
     // --
 
-    public static DeliveringPigeons get(ServerLevel level) {
+    public static BackgroundDelivery get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(factory(), SAVED_DATA_NAME);
     }
 
@@ -69,15 +70,15 @@ public class DeliveringPigeons extends SavedData {
                 .orElse(tag);
     }
 
-    private static Factory<DeliveringPigeons> factory() {
-        return new Factory<>(DeliveringPigeons::createEmpty, DeliveringPigeons::loadFromTag, null);
+    private static Factory<BackgroundDelivery> factory() {
+        return new Factory<>(BackgroundDelivery::createEmpty, BackgroundDelivery::loadFromTag, null);
     }
 
-    private static DeliveringPigeons createEmpty() {
-        return new DeliveringPigeons(new ArrayList<>());
+    private static BackgroundDelivery createEmpty() {
+        return new BackgroundDelivery(new ArrayList<>());
     }
 
-    private static DeliveringPigeons loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
+    private static BackgroundDelivery loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
         return CODEC.decode(NbtOps.INSTANCE, tag)
                 .ifError(e -> Envelope.LOGGER.error("Cannot load DeliveringPigeons: {}", e.message()))
                 .result().map(Pair::getFirst).orElse(createEmpty());

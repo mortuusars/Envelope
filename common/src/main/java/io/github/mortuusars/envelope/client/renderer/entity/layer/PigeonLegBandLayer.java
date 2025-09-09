@@ -26,9 +26,9 @@ public class PigeonLegBandLayer extends RenderLayer<Pigeon, PigeonModel> {
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Pigeon pigeon, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-//        if (!pigeon.getDelivery().isEmpty()) {
+        if (pigeon.isDelivering()) {
             VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(PigeonRenderer.LEG_BAND));
             legBandModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
-//        }
+        }
     }
 }

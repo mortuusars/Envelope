@@ -9,7 +9,7 @@ import java.util.Optional;
 public class Addresses {
     public static Optional<BlockPos> getPosition(ServerLevel level, Address address) {
         if (address instanceof Address.Pigeonhole pigeonhole) {
-            return PigeonholeNetwork.get(level).getPigeonholeData(pigeonhole).map(PigeonholeNetwork.PigeonholeData::getPosition);
+            return PigeonholeNetwork.get(level).get(pigeonhole).map(PigeonholeNetwork.PigeonholeData::getPosition);
         }
         return Optional.empty();
     }
