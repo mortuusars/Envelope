@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
@@ -44,6 +45,10 @@ public interface DeliveringPigeon {
             } else {
                 setDelivery(null);
             }
+        }
+
+        if (PlatformHelper.isInDevEnv()) {
+            setDelivery(getDelivery()); // Update to send bugger info to client
         }
     }
 

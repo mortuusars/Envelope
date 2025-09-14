@@ -1,13 +1,12 @@
 package io.github.mortuusars.envelope.world.entity;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
-import io.github.mortuusars.envelope.world.PigeonholeNetwork;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.Position;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -19,7 +18,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,14 +27,14 @@ import java.util.function.Function;
 public class BackgroundPigeon implements DeliveringPigeon {
     public static final Codec<BackgroundPigeon> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             CompoundTag.CODEC.fieldOf("tag").forGetter(BackgroundPigeon::getEntityTag),
-            Delivery.CODEC.fieldOf("delivery_data").forGetter(BackgroundPigeon::getDelivery)
+            Delivery.CODEC.optionalFieldOf("delivery", null).forGetter(BackgroundPigeon::getDelivery)
     ).apply(instance, BackgroundPigeon::new));
 
     protected final CompoundTag entityTag;
-    protected Delivery delivery;
+    protected @Nullable Delivery delivery;
     protected boolean remove = false;
 
-    public BackgroundPigeon(CompoundTag entityTag, Delivery delivery) {
+    public BackgroundPigeon(CompoundTag entityTag, @NotNull Delivery delivery) {
         this.entityTag = entityTag;
         this.delivery = delivery;
     }
@@ -45,7 +43,7 @@ public class BackgroundPigeon implements DeliveringPigeon {
         return entityTag;
     }
 
-    public @NotNull Delivery getDelivery() {
+    public @Nullable Delivery getDelivery() {
         return delivery;
     }
 
@@ -60,52 +58,48 @@ public class BackgroundPigeon implements DeliveringPigeon {
 
     @Override
     public Optional<BlockPos> getCurrentPos() {
+        Preconditions.checkNotNull(getDelivery());
         return getDelivery().getPhase().estimateCurrentPos();
     }
 
     // --
 
+
+    @Override
+    public void tickDelivery(ServerLevel level) {
+        if (getDelivery() == null) {
+            remove = true;
+            return;
+        }
+        DeliveringPigeon.super.tickDelivery(level);
+    }
+
     @Override
     public void startDeliveryPhase(ServerLevel level) {
+        Preconditions.checkNotNull(getDelivery());
         Envelope.LOGGER.info("BackgroundPigeon has started phase '{}'", getDelivery().getPhase().getType().getSerializedName());
 
         switch (getDelivery().getPhase().getType()) {
-            case LEAVING_HOME -> {
-//                getCurrentPos().ifPresent(currentPos -> {
-//                    getDelivery().getPhase().setStart(Optional.of(currentPos));
-//
-//
-//                });
-//
-//                BlockPos endPos = getDelivery().getRecipientPos()
-//                        .map(pos -> {
-//                            Position.inTheDirectionOf()
-//                        })
-//                        .orElseGet(() -> {
-//                            BlockPos pos = getCurrentPos().orElse(BlockPos.ZERO);
-//                            return pos.relative(Direction.Plane.HORIZONTAL.getRandomDirection(level.getRandom()), 12);
-//                        });
-//
-//                getDelivery().getPhase().setEnd(Position.inTheDirectionOf());
-            }
-            case TRAVELING_TO_TARGET -> {
-            }
             case APPROACHING_TARGET -> {
-//                getDelivery().getRecipientPos().ifPresent(pos -> {
-//
-//                });
-            }
-            case LEAVING_TARGET -> {
-            }
-            case TRAVELING_TO_HOME -> {
+                getDelivery().getRecipientPos().ifPresent(pos -> {
+                    if (trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getSenderPos()), true).isPresent()) {
+                        remove = true;
+                    }
+                });
             }
             case APPROACHING_HOME -> {
+                getDelivery().getSenderPos().ifPresent(pos -> {
+                    if (trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getRecipientPos()), true).isPresent()) {
+                        remove = true;
+                    }
+                });
             }
         }
     }
 
     @Override
     public void endDeliveryPhase(ServerLevel level) {
+        Preconditions.checkNotNull(getDelivery());
         switch (getDelivery().getPhase().getType()) {
             case APPROACHING_TARGET -> {
                 ItemStack mail = getDelivery().getMail();
@@ -126,7 +120,7 @@ public class BackgroundPigeon implements DeliveringPigeon {
                     remove = true;
                 }
 
-                throw new NotImplementedException("Waiting for spawn is not implemented yet.");
+                Envelope.LOGGER.error("Waiting for spawn is not implemented yet.");
             }
         }
     }

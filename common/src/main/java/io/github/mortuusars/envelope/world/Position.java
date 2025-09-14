@@ -59,4 +59,8 @@ public class Position {
 
         return pos;
     }
+
+    public static BlockPos ascent(Level level, BlockPos origin, Optional<BlockPos> target) {
+        return ascent(level, origin, target, 16);
+    }
 }

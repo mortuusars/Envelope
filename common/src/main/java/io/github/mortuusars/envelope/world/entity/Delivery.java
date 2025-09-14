@@ -26,7 +26,7 @@ import java.util.function.IntFunction;
 public class Delivery {
     public static final Codec<Delivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ItemStack.OPTIONAL_CODEC.fieldOf("mail").forGetter(Delivery::getMail),
-            Address.CODEC.optionalFieldOf("sender", Address.UNKNOWN).forGetter(Delivery::getRecipient),
+            Address.CODEC.optionalFieldOf("sender", Address.UNKNOWN).forGetter(Delivery::getSender),
             BlockPos.CODEC.optionalFieldOf("sender_pos").forGetter(Delivery::getSenderPos),
             Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
             BlockPos.CODEC.optionalFieldOf("recipient_pos").forGetter(Delivery::getRecipientPos),
@@ -34,29 +34,30 @@ public class Delivery {
             Phase.CODEC.optionalFieldOf("phase", null).forGetter(Delivery::getPhase)
     ).apply(instance, Delivery::new));
 
-//    public static final StreamCodec<RegistryFriendlyByteBuf, Delivery> STREAM_CODEC = StreamCodec.composite(
-//            ItemStack.OPTIONAL_STREAM_CODEC, Delivery::getMail,
-//            Address.STREAM_CODEC, Delivery::getSender,
-//            Address.STREAM_CODEC, Delivery::getRecipient,
-//            ByteBufCodecs.VAR_INT, Delivery::getTravelDuration,
-//            ByteBufCodecs.optional(BlockPos.STREAM_CODEC), Delivery::getHomePos,
-//            Phase.STREAM_CODEC, Delivery::getCurrentPhase,
-//            Delivery::new
-//    );
-//
-//    public static final EntityDataSerializer<Delivery> ENTITY_DATA_SERIALIZER = new EntityDataSerializer<>() {
-//        @Override
-//        public @NotNull StreamCodec<? super RegistryFriendlyByteBuf, Delivery> codec() {
-//            return STREAM_CODEC;
-//        }
-//
-//        public @NotNull Delivery copy(Delivery data) {
-//            return new Delivery(data.getMail().copy(), data.getSender(), data.getRecipient(), data.getTravelDuration(), data.getHomePos(), data.getCurrentPhase().copy());
-//        }
-//    };
+    public static final StreamCodec<RegistryFriendlyByteBuf, Delivery> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public @NotNull Delivery decode(RegistryFriendlyByteBuf buffer) {
+            return new Delivery(
+                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer),
+                    Address.STREAM_CODEC.decode(buffer),
+                    ByteBufCodecs.optional(BlockPos.STREAM_CODEC).decode(buffer),
+                    Address.STREAM_CODEC.decode(buffer),
+                    ByteBufCodecs.optional(BlockPos.STREAM_CODEC).decode(buffer),
+                    ByteBufCodecs.VAR_INT.decode(buffer),
+                    Phase.STREAM_CODEC.decode(buffer));
+        }
 
-//    public static final Delivery EMPTY = new Delivery(ItemStack.EMPTY, Address.UNKNOWN, Address.UNKNOWN, -1, Optional.empty(),
-//            new Phase(Phase.Type.LEAVING_HOME, Optional.empty(), Optional.empty(), 1));
+        @Override
+        public void encode(RegistryFriendlyByteBuf buffer, Delivery delivery) {
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, delivery.getMail());
+            Address.STREAM_CODEC.encode(buffer, delivery.getSender());
+            ByteBufCodecs.optional(BlockPos.STREAM_CODEC).encode(buffer, delivery.getSenderPos());
+            Address.STREAM_CODEC.encode(buffer, delivery.getRecipient());
+            ByteBufCodecs.optional(BlockPos.STREAM_CODEC).encode(buffer, delivery.getRecipientPos());
+            ByteBufCodecs.VAR_INT.encode(buffer, delivery.getTravelDuration());
+            Phase.STREAM_CODEC.encode(buffer, delivery.getPhase());
+        }
+    };
 
     protected ItemStack mail;
     protected Address sender;

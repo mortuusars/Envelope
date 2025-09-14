@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.Addresses;
 import io.github.mortuusars.envelope.world.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.PigeonholeNetwork;
@@ -204,6 +205,22 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         Envelope.LOGGER.info("Transitioning a delivering Pigeon to background...");
         transitionToBackground(level, false);
+    }
+
+    @Override
+    public void die(DamageSource damageSource) {
+        super.die(damageSource);
+        if (!isRemoved() && !dead && isDelivering()) {
+            Envelope.LOGGER.info("Delivering pigeon has died!");
+            //TODO: send pigeon death notice to sender
+        }
+    }
+    @Override
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
+        if (getDelivery() != null && !getDelivery().getMail().isEmpty()) {
+            spawnAtLocation(getDelivery().getMail());
+            getDelivery().setMail(ItemStack.EMPTY);
+        }
     }
 
     // -- Properties
@@ -785,7 +802,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
             tickDelivery(level);
 
-            if (getDelivery().getPhase().getEnd().isPresent()) {
+            if (getDelivery() != null && getDelivery().getPhase().getEnd().isPresent()) {
                 BlockPos pos = getDelivery().getPhase().getEnd().get();
                 if (hasReachedTarget(pos)) {
                     endDeliveryPhase(level);
@@ -822,6 +839,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public void setDelivery(@Nullable Delivery delivery) {
         this.delivery = delivery;
+        BuggerPackets.sendPigeonDelivery(this);
     }
 
     public boolean isDelivering() {
@@ -836,6 +854,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                 TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
 
         setDelivery(Delivery.start(level, mail));
+        startDeliveryPhase(level);
     }
 
     @Override
@@ -847,32 +866,21 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void startDeliveryPhase(ServerLevel level) {
         Preconditions.checkNotNull(getDelivery());
 
-        if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
-                && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
-            // Return home when ascent position cannot be reached.
-
-            getDelivery().getPhase().setType(Delivery.Phase.Type.APPROACHING_HOME);
-
-            MailDeliveryLog.addRecords(getDelivery().getMail(),
-                    TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                    TravelingRecord.travelingTo(getDelivery().getSender()));
-        }
-
         getDelivery().getPhase().setStart(blockPosition());
 
         switch (getDelivery().getPhase().getType()) {
-            case LEAVING_HOME -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos(), 16));
+            case LEAVING_HOME -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos()));
             case TRAVELING_TO_TARGET -> {
                 getDelivery().getRecipientPos().ifPresent(recipientPos -> {
-                    getDelivery().getPhase().setEnd(Position.ascent(level, recipientPos, Optional.of(blockPosition()), 16));
+                    getDelivery().getPhase().setEnd(Position.ascent(level, recipientPos, Optional.of(blockPosition())));
                 });
                 transitionToBackground(level, true);
             }
             case APPROACHING_TARGET -> getDelivery().getPhase().setEnd(getDelivery().getRecipientPos().orElseThrow());
-            case LEAVING_TARGET -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getSenderPos(), 16));
+            case LEAVING_TARGET -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getSenderPos()));
             case TRAVELING_TO_HOME -> {
                 getDelivery().getSenderPos().ifPresent(senderPos -> {
-                    getDelivery().getPhase().setEnd(Position.ascent(level, senderPos, Optional.of(blockPosition()), 16));
+                    getDelivery().getPhase().setEnd(Position.ascent(level, senderPos, Optional.of(blockPosition())));
                 });
                 transitionToBackground(level, true);
             }
@@ -883,6 +891,18 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void endDeliveryPhase(ServerLevel level) {
         Preconditions.checkNotNull(getDelivery());
+
+        if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
+                && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
+            // Return home when ascent position cannot be reached.
+
+            getDelivery().getPhase().setType(Delivery.Phase.Type.APPROACHING_HOME);
+
+            MailDeliveryLog.addRecords(getDelivery().getMail(),
+                    TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                    TravelingRecord.travelingTo(getDelivery().getSender()));
+            return;
+        }
 
         switch (getDelivery().getPhase().getType()) {
             case APPROACHING_TARGET -> {
@@ -904,8 +924,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                     spawnAtLocation(mail);
                     Envelope.LOGGER.info("Returning mail has been dropped on the ground because it cannot be delivered to Pigeonhole.");
                 }
-
-                throw new NotImplementedException("Waiting for spawn is not implemented yet.");
             }
         }
     }

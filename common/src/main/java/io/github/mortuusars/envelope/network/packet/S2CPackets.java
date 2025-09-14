@@ -1,9 +1,6 @@
 package io.github.mortuusars.envelope.network.packet;
 
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditScreenS2CP;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
@@ -15,7 +12,9 @@ public class S2CPackets {
                 new CustomPacketPayload.TypeAndCodec<>(PigeonholeSyncBlockDataS2CP.TYPE, PigeonholeSyncBlockDataS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(PigeonholeHasNewMailS2CP.TYPE, PigeonholeHasNewMailS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(PigeonholeMenuMailS2CP.TYPE, PigeonholeMenuMailS2CP.STREAM_CODEC),
-                new CustomPacketPayload.TypeAndCodec<>(OpenLetterEditScreenS2CP.TYPE, OpenLetterEditScreenS2CP.STREAM_CODEC)
+                new CustomPacketPayload.TypeAndCodec<>(OpenLetterEditScreenS2CP.TYPE, OpenLetterEditScreenS2CP.STREAM_CODEC),
+
+                new CustomPacketPayload.TypeAndCodec<>(BuggerPigeonDeliveryS2CP.TYPE, BuggerPigeonDeliveryS2CP.STREAM_CODEC)
         );
     }
 }

@@ -4,6 +4,10 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
+    "bugger.EntityRendererMixin",
+    "bugger.KeyboardHandlerMixin",
+    "bugger.ScreenOverlayMixin",
+    "bugger.ScreenRenderLinesInvoker",
     "pigeon_on_shoulder.PlayerRendererMixin"
   ],
   "mixins": [
