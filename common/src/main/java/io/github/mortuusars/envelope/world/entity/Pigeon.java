@@ -805,10 +805,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             if (getDelivery() != null && getDelivery().getPhase().getEnd().isPresent()) {
                 BlockPos pos = getDelivery().getPhase().getEnd().get();
                 if (hasReachedTarget(pos)) {
-                    endDeliveryPhase(level);
-                    if (getDelivery().getPhase().getType().hasNext()) {
-                        advanceDeliveryPhase(level);
-                    }
+                    getDelivery().getPhase().setTicks(getDelivery().getPhase().getDuration());
                 } else if (!Pigeon.this.navigation.isInProgress()) {
                     if (!pathfindDirectlyTowards(pos)) {
                         pathfindRandomlyTowards(pos);
@@ -825,7 +822,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     protected boolean hasReachedTarget(BlockPos pos) {
-        if (Pigeon.this.closerThan(pos, 2)) {
+        return hasReachedTarget(pos, 2);
+    }
+
+    protected boolean hasReachedTarget(BlockPos pos, int distance) {
+        if (Pigeon.this.closerThan(pos, distance)) {
             return true;
         } else {
             Path path = Pigeon.this.navigation.getPath();
@@ -863,10 +864,32 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     @Override
+    public void advanceDeliveryPhase(ServerLevel level) {
+        Preconditions.checkNotNull(getDelivery());
+
+        if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
+                && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
+            // Return home when ascent position cannot be reached.
+            getDelivery().getPhase()
+                    .setType(Delivery.Phase.Type.APPROACHING_HOME)
+                    .setTicks(0);
+
+            MailDeliveryLog.addRecords(getDelivery().getMail(),
+                    TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                    TravelingRecord.travelingTo(getDelivery().getSender()));
+            return;
+        }
+
+        DeliveringPigeon.super.advanceDeliveryPhase(level);
+    }
+
+    @Override
     public void startDeliveryPhase(ServerLevel level) {
         Preconditions.checkNotNull(getDelivery());
 
         getDelivery().getPhase().setStart(blockPosition());
+
+        Envelope.LOGGER.info("Starting phase '{}'", getDelivery().getPhase().getType().getSerializedName());
 
         switch (getDelivery().getPhase().getType()) {
             case LEAVING_HOME -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos()));
@@ -891,18 +914,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void endDeliveryPhase(ServerLevel level) {
         Preconditions.checkNotNull(getDelivery());
-
-        if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
-                && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
-            // Return home when ascent position cannot be reached.
-
-            getDelivery().getPhase().setType(Delivery.Phase.Type.APPROACHING_HOME);
-
-            MailDeliveryLog.addRecords(getDelivery().getMail(),
-                    TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                    TravelingRecord.travelingTo(getDelivery().getSender()));
-            return;
-        }
 
         switch (getDelivery().getPhase().getType()) {
             case APPROACHING_TARGET -> {

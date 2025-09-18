@@ -61,6 +61,6 @@ public class Position {
     }
 
     public static BlockPos ascent(Level level, BlockPos origin, Optional<BlockPos> target) {
-        return ascent(level, origin, target, 16);
+        return ascent(level, origin, target, 8);
     }
 }

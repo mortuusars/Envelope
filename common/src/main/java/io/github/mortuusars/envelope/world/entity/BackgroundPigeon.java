@@ -81,18 +81,20 @@ public class BackgroundPigeon implements DeliveringPigeon {
 
         switch (getDelivery().getPhase().getType()) {
             case APPROACHING_TARGET -> {
-                getDelivery().getRecipientPos().ifPresent(pos -> {
-                    if (trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getSenderPos()), true).isPresent()) {
-                        remove = true;
-                    }
-                });
+                getDelivery().getRecipientPos()
+                        .flatMap(pos -> trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getSenderPos()), true))
+                        .ifPresent(pigeon -> {
+                            pigeon.startDeliveryPhase(level);
+                            remove = true;
+                        });
             }
             case APPROACHING_HOME -> {
-                getDelivery().getSenderPos().ifPresent(pos -> {
-                    if (trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getRecipientPos()), true).isPresent()) {
-                        remove = true;
-                    }
-                });
+                getDelivery().getSenderPos()
+                        .flatMap(pos -> trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getRecipientPos()), true))
+                        .ifPresent(pigeon -> {
+                            pigeon.startDeliveryPhase(level);
+                            remove = true;
+                        });
             }
         }
     }
@@ -148,6 +150,7 @@ public class BackgroundPigeon implements DeliveringPigeon {
             }
 
             pigeon.setDelivery(delivery);
+
             return Optional.of(pigeon);
         }
 

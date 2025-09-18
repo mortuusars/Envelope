@@ -252,7 +252,10 @@ public class Bugger {
     private static List<Component> getOverheadEntityInfoLines(Entity entity) {
         if (entity instanceof Pigeon pigeon && pigeon.getDelivery() != null) {
             return List.of(
-                    Component.literal(pigeon.getDelivery().getSender() + " → " + pigeon.getDelivery().getRecipient()),
+                    Component.empty()
+                            .append(pigeon.getDelivery().getSender().getDisplayName())
+                            .append(" → ")
+                            .append(pigeon.getDelivery().getRecipient().getDisplayName()),
                     Component.literal(WordUtils.capitalize(pigeon.getDelivery().getPhase().getType().getSerializedName().replace('_', ' '))));
         }
         return Collections.emptyList();

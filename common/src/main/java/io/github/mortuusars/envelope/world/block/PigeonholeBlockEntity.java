@@ -171,7 +171,9 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
     protected void onOccupantsChanged() {
         for (Player player : getLevelOrThrow().players()) {
-            if (player instanceof ServerPlayer serverPlayer && player.containerMenu instanceof PigeonholeMenu) {
+            if (player instanceof ServerPlayer serverPlayer
+                    && player.containerMenu instanceof PigeonholeMenu menu
+                    && menu.getAddress().equals(address)) {
                 Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), serverPlayer);
             }
         }

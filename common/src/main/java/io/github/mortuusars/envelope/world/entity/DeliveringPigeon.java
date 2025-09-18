@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
@@ -28,6 +29,7 @@ public interface DeliveringPigeon {
     default void advanceDeliveryPhase(ServerLevel level) {
         Preconditions.checkNotNull(getDelivery());
         getDelivery().advancePhase();
+        Envelope.LOGGER.info("Delivery phase advanced to '{}'", getDelivery().getPhase().getType().getSerializedName());
     }
 
     default void tickDelivery(ServerLevel level) {
