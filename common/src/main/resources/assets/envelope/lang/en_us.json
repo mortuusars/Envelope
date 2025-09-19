@@ -38,9 +38,9 @@
   "gui.envelope.pigeonhole.mail.tooltip.status": "§7Status: %s",
 
   "gui.envelope.pigeonhole.address": "Set as Default Address",
-  "gui.envelope.pigeonhole.address.tooltip": "§8Mail sent directly to you will be delivered to this Pigeonhole",
+  "gui.envelope.pigeonhole.address.tooltip": "§8Mail sent to your name will be delivered to this Pigeonhole",
   "gui.envelope.pigeonhole.address.default": "Default Address",
-  "gui.envelope.pigeonhole.address.default.tooltip": "§8Mail sent directly to you is delivered to this Pigeonhole",
+  "gui.envelope.pigeonhole.address.default.tooltip": "§8Mail sent to your name is delivered to this Pigeonhole",
 
   "gui.envelope.pigeonhole.mail.tooltip.new_mail": "New Mail Arrived",
   "gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
