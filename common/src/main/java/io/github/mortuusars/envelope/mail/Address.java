@@ -67,7 +67,7 @@ public interface Address {
                 Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
         ).apply(instance, Pigeonhole::new));
 
-        public static final Codec<Pigeonhole> CODEC_STRING = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
+        public static final Codec<Pigeonhole> STRING_CODEC = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
                 ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();

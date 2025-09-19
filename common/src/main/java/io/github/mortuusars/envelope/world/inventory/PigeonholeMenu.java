@@ -30,26 +30,28 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     public static final int ADDRESS_BUTTON_ID = 0;
     public static final int REFRESH_MAIL_BUTTON_ID = 1;
 
-    protected final DataSlot isMain = DataSlot.standalone();
+    protected final DataSlot isDefault = DataSlot.standalone();
 
     protected final Inventory playerInventory;
+    protected final Player player;
     protected final BlockPos pigeonholePos;
-    protected final Address address;
+    protected final Address.Pigeonhole address;
     protected final PigeonholeBlockEntity blockEntity;
 
     protected List<ItemStack> mail;
     protected boolean hasNewMail;
 
-    protected PigeonholeMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory, BlockPos pigeonholePos, List<ItemStack> mail, Address address) {
+    protected PigeonholeMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
+                             BlockPos pigeonholePos, List<ItemStack> mail, Address.Pigeonhole address) {
         super(menuType, id);
         this.playerInventory = playerInventory;
+        this.player = playerInventory.player;
         this.pigeonholePos = pigeonholePos;
         this.address = address;
         if (!(playerInventory.player.level().getBlockEntity(pigeonholePos) instanceof PigeonholeBlockEntity be)) {
             throw new IllegalStateException("PigeonholeBlockEntity is not available at " + pigeonholePos);
         }
         this.blockEntity = be;
-
         this.mail = new ArrayList<>(mail.reversed());
 
         addSlot(new Slot(be, 0, 227, 62) {
@@ -65,14 +67,11 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             }
         });
         addPlayerSlots(playerInventory, 140, 121);
-        addDataSlot(isMain);
-
-        if (playerInventory.player instanceof ServerPlayer serverPlayer) {
-//            isMain.set(); // TODO: main address
-        }
+        addDataSlot(isDefault);
+        updateIsDefault();
     }
 
-    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<ItemStack> mail, Address address) {
+    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<ItemStack> mail, Address.Pigeonhole address) {
         this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pigeonholePos, mail, address);
     }
 
@@ -83,7 +82,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         for (int i = 0; i < mailCount; i++) {
             mail.add(ItemStack.STREAM_CODEC.decode(buffer));
         }
-        Address address = Address.STREAM_CODEC.decode(buffer);
+        Address.Pigeonhole address = Address.Pigeonhole.STREAM_CODEC.decode(buffer);
         return new PigeonholeMenu(id, inventory, mailboxPos, mail, address);
     }
 
@@ -109,8 +108,20 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         return address;
     }
 
-    public boolean isMain() {
-        return isMain.get() == 1;
+    public boolean isDefaultAddress() {
+        if (player instanceof ServerPlayer serverPlayer) {
+            return serverPlayer.serverLevel().getEnvelopePigeonholeManager()
+                    .getDefaultAddressOf(player.getUUID())
+                    .map(address::equals)
+                    .orElse(false);
+        }
+        return isDefault.get() == 1;
+    }
+
+    protected void updateIsDefault() {
+        if (player instanceof ServerPlayer) {
+            isDefault.set(isDefaultAddress() ? 1 : 0);
+        }
     }
 
     public List<ItemStack> getMail() {
@@ -175,7 +186,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         return returnedStack;
     }
 
-    public boolean doMailAction(Player player, int index, Action action) {
+    public boolean doMailAction(Player player, int index, MailAction action) {
         if (index < 0 || index >= getMail().size()) return false;
 
         return switch (action) {
@@ -244,7 +255,8 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == ADDRESS_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            isMain.set(1);
+            serverPlayer.serverLevel().getEnvelopePigeonholeManager().setDefaultAddressOf(serverPlayer.getUUID(), address);
+            updateIsDefault();
             return true;
         }
 
@@ -260,13 +272,13 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
     // --
 
-    public enum Action {
+    public enum MailAction {
         PICK_UP,
         MOVE_TO_INVENTORY,
         MOVE_ALL_TO_INVENTORY,
         REJECT;
 
-        public static final StreamCodec<ByteBuf, Action> STREAM_CODEC = ByteBufCodecs.idMapper(
-                ByIdMap.continuous(Action::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), Action::ordinal);
+        public static final StreamCodec<ByteBuf, MailAction> STREAM_CODEC = ByteBufCodecs.idMapper(
+                ByIdMap.continuous(MailAction::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), MailAction::ordinal);
     }
 }

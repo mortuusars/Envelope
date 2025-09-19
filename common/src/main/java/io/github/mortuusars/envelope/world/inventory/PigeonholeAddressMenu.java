@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.world.PigeonholeNetwork;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -83,7 +83,7 @@ public class PigeonholeAddressMenu extends AbstractContainerMenu {
     }
 
     public void setAddressAndUpdateConfirmState(ServerLevel level, String address) {
-        if (setAddress(address) && !PigeonholeNetwork.get(level).exists(new Address.Pigeonhole(address))) {
+        if (setAddress(address) && !level.getEnvelopePigeonholeManager().exists(new Address.Pigeonhole(address))) {
             canConfirm.set(1);
         } else {
             canConfirm.set(0);

@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -22,7 +23,7 @@ public class Position {
 
     public static Optional<BlockPos> ofAddress(ServerLevel level, Address address) {
         return address.map(
-                pigeonhole -> PigeonholeNetwork.get(level).getPositionOf(pigeonhole),
+                pigeonhole -> level.getEnvelopePigeonholeManager().getPositionOf(pigeonhole),
                 player -> {
                     throw new NotImplementedException("Player address is not implemented yet.");
                 }, npc -> {

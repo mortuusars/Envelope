@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PigeonholeData {
     public static final Codec<PigeonholeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Address.Pigeonhole.CODEC_STRING.fieldOf("address").forGetter(PigeonholeData::getAddress),
+            Address.Pigeonhole.STRING_CODEC.fieldOf("address").forGetter(PigeonholeData::getAddress),
             BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPos),
             Codec.list(ItemStack.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
     ).apply(instance, PigeonholeData::new));

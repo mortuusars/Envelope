@@ -14,7 +14,8 @@
     "jei.JeiKeyConflictContextMixin",
     "mail_tooltip.ItemStackMixin",
     "pigeon_on_shoulder.PlayerMixin",
-    "pigeon_spawner.MinecraftServerMixin"
+    "pigeon_spawner.MinecraftServerMixin",
+    "injected.ServerLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

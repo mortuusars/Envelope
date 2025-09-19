@@ -43,7 +43,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/pigeonhole.png");
 
     public static final WidgetSprites ADDRESS_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/address_button"));
-    public static final WidgetSprites ADDRESS_MAIN_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/address_main_button"));
+    public static final WidgetSprites ADDRESS_DEFAULT_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/address_default_button"));
 
     public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/mail_button"));
     public static final WidgetSprites ICON_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_player"));
@@ -75,7 +75,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     protected ItemStack hoveredMail;
 
     protected ImageButton addressButton;
-    protected ImageButton addressMainButton;
+    protected ImageButton addressDefaultButton;
     protected ImageButton newMailButton;
 
     protected Rect2i mailArea = new Rect2i(0, 0, 0, 0);
@@ -142,12 +142,12 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
         addRenderableWidget(addressButton);
 
-        addressMainButton = new ImageButton(leftPos + titleLabelX - 13, topPos + 4, 11, 10, ADDRESS_MAIN_BUTTON_SPRITES, btn -> {});
-        addressMainButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address.main")
+        addressDefaultButton = new ImageButton(leftPos + titleLabelX - 13, topPos + 4, 11, 10, ADDRESS_DEFAULT_BUTTON_SPRITES, btn -> {});
+        addressDefaultButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address.default")
                 .append("\n")
-                .append(Component.translatable("gui.envelope.pigeonhole.address.main.tooltip"))));
-        addressMainButton.active = false;
-        addRenderableWidget(addressMainButton);
+                .append(Component.translatable("gui.envelope.pigeonhole.address.default.tooltip"))));
+        addressDefaultButton.active = false;
+        addRenderableWidget(addressDefaultButton);
 
         newMailButton = new ImageButton(leftPos + 7, topPos + 21, 8, 8, NEW_MAIL_INDICATOR_SPRITES, btn -> {
             Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.REFRESH_MAIL_BUTTON_ID);
@@ -176,8 +176,8 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     }
 
     protected void updateButtons() {
-        addressButton.visible = !getMenu().isMain();
-        addressMainButton.visible = getMenu().isMain();
+        addressButton.visible = !getMenu().isDefaultAddress();
+        addressDefaultButton.visible = getMenu().isDefaultAddress();
         newMailButton.visible = getMenu().hasNewMail();
     }
 
@@ -469,12 +469,12 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             int index = getMenu().getMail().indexOf(hoveredMail);
             if (index == -1) return false;
 
-            PigeonholeMenu.Action action = PigeonholeMenu.Action.PICK_UP;
+            PigeonholeMenu.MailAction action = PigeonholeMenu.MailAction.PICK_UP;
             if (Screen.hasShiftDown()) {
                 if (Screen.hasControlDown()) {
-                    action = PigeonholeMenu.Action.MOVE_ALL_TO_INVENTORY;
+                    action = PigeonholeMenu.MailAction.MOVE_ALL_TO_INVENTORY;
                 } else {
-                    action = PigeonholeMenu.Action.MOVE_TO_INVENTORY;
+                    action = PigeonholeMenu.MailAction.MOVE_TO_INVENTORY;
                 }
             }
 

@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
-import io.github.mortuusars.envelope.world.PigeonholeNetwork;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -81,11 +81,11 @@ public interface Courier {
 
     default boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {
         return address.map(pigeonhole -> {
-                    PigeonholeNetwork pigeonholeNetwork = PigeonholeNetwork.get(level);
-                    if (pigeonholeNetwork.putMail(pigeonhole, mail)) {
+                    PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
+                    if (pigeonholeManager.putMail(pigeonhole, mail)) {
                         MailDeliveryLog.addRecords(mail, TravelingRecord.arrivedTo(pigeonhole));
 
-                        pigeonholeNetwork.getPositionOf(pigeonhole).ifPresent(pos -> {
+                        pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
                             if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
                                 blockEntity.onMailDelivered(level, mail);
                             }

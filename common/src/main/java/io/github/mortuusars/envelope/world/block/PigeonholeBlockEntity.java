@@ -11,7 +11,7 @@ import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
-import io.github.mortuusars.envelope.world.PigeonholeNetwork;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
@@ -83,27 +83,39 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return Optional.ofNullable(address);
     }
 
-    public PigeonholeBlockEntity setAddress(@NotNull Address.Pigeonhole address) {
-        this.address = address;
-        if (level instanceof ServerLevel serverLevel) {
-            PigeonholeNetwork network = PigeonholeNetwork.get(serverLevel);
+    public void setAddress(@Nullable Address.Pigeonhole address) {
+        if (getLevel() instanceof ServerLevel serverLevel) {
+            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
 
-            if (this.address != null) {
+            if (this.address != null && !this.address.equals(address)) {
                 dropOrReturnAllMail();
-                network.remove(address);
+                pigeonholeManager.remove(address);
             }
 
-            network.addOrUpdate(address, getBlockPos());
-            setChanged();
+            pigeonholeManager.registerOrUpdate(address, getBlockPos());
         }
-        return this;
+
+        this.address = address;
+        setChanged();
+    }
+
+    public void removeAddress() {
+        if (address == null) return;
+
+        if (getLevel() instanceof ServerLevel serverLevel) {
+            dropOrReturnAllMail();
+            serverLevel.getEnvelopePigeonholeManager().remove(address);
+        }
+
+        this.address = null;
+        setChanged();
     }
 
     // -- Events
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, PigeonholeBlockEntity be) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, PigeonholeBlockEntity blockEntity) {
         if (level instanceof ServerLevel serverLevel) {
-            be.serverTick(serverLevel, pos, state);
+            blockEntity.serverTick(serverLevel, pos, state);
         }
     }
 
@@ -146,13 +158,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         }
     }
 
-    public void onBlockRemoved() {
-        if (address != null && level instanceof ServerLevel serverLevel) {
-            dropOrReturnAllMail();
-            PigeonholeNetwork.get(serverLevel).remove(address);
-        }
-    }
-
     @Override
     public void setChanged() {
         if (isFireNearby()) {
@@ -184,7 +189,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
     public List<ItemStack> getAllMail() {
         Preconditions.checkState(level instanceof ServerLevel, "Can only be called server-side.");
         Preconditions.checkState(address != null, "Can only be called when Pigeonhole has an address.");
-        return PigeonholeNetwork.get(((ServerLevel) level)).getAllMail(address);
+        return ((ServerLevel) level).getEnvelopePigeonholeManager().getAllMail(address);
     }
 
 //    public boolean sendMail(ItemStack mail, @Nullable Player player) {
@@ -212,7 +217,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         Preconditions.checkState(level instanceof ServerLevel, "Can only be called server-side.");
         Preconditions.checkState(address != null, "Can only be called when Pigeonhole has an address.");
 
-        return PigeonholeNetwork.get(((ServerLevel) level)).removeMailById(address, id)
+        return ((ServerLevel) level).getEnvelopePigeonholeManager().removeMailById(address, id)
                 .mapValue(extractedMail -> {
                     MailDeliveryLog.addRecords(extractedMail,
                             TravelingRecord.receivedAt(address)
@@ -329,8 +334,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
             return false;
         }
 
-        PigeonholeNetwork network = PigeonholeNetwork.get(player.serverLevel());
-        network.addOrUpdate(address, getBlockPos());
+        player.serverLevel().getEnvelopePigeonholeManager().registerOrUpdate(address, getBlockPos());
 
         PlatformHelper.openMenu(player, this, buffer -> {
             List<ItemStack> mail = getAllMail();
@@ -339,7 +343,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
             for (ItemStack item : mail) {
                 ItemStack.STREAM_CODEC.encode(buffer, item);
             }
-            Address.STREAM_CODEC.encode(buffer, address);
+            Address.Pigeonhole.STREAM_CODEC.encode(buffer, address);
         });
 
         Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), player);
