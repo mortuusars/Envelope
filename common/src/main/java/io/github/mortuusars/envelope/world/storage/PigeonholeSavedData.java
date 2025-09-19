@@ -1,12 +1,12 @@
-package io.github.mortuusars.envelope.world.pigeonhole;
+package io.github.mortuusars.envelope.world.storage;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeData;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
@@ -15,34 +15,25 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class PigeonholeSavedData extends SavedData {
     public static final Codec<PigeonholeSavedData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.unboundedMap(Address.Pigeonhole.STRING_CODEC, PigeonholeData.CODEC)
-                    .optionalFieldOf("pigeonholes", new HashMap<>()).forGetter(PigeonholeSavedData::getPigeonholes),
-            Codec.unboundedMap(UUIDUtil.STRING_CODEC, Address.Pigeonhole.STRING_CODEC)
-                    .optionalFieldOf("player_addresses", new HashMap<>()).forGetter(PigeonholeSavedData::getPlayerAddresses)
+                    .optionalFieldOf("pigeonholes", new HashMap<>()).forGetter(PigeonholeSavedData::getPigeonholes)
     ).apply(instance, PigeonholeSavedData::new));
 
     private final Map<Address.Pigeonhole, PigeonholeData> pigeonholes;
-    private final Map<UUID, Address.Pigeonhole> playerAddresses;
 
-    protected PigeonholeSavedData(Map<Address.Pigeonhole, PigeonholeData> pigeonholes, Map<UUID, Address.Pigeonhole> playerAddresses) {
+    protected PigeonholeSavedData(Map<Address.Pigeonhole, PigeonholeData> pigeonholes) {
         this.pigeonholes = new HashMap<>(pigeonholes);
-        this.playerAddresses = new HashMap<>(playerAddresses);
     }
 
     protected PigeonholeSavedData() {
-        this(new HashMap<>(), new HashMap<>());
+        this(new HashMap<>());
     }
 
     public Map<Address.Pigeonhole, PigeonholeData> getPigeonholes() {
         return pigeonholes;
-    }
-
-    public Map<UUID, Address.Pigeonhole> getPlayerAddresses() {
-        return playerAddresses;
     }
 
     // --

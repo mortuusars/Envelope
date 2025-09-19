@@ -110,8 +110,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
     public boolean isDefaultAddress() {
         if (player instanceof ServerPlayer serverPlayer) {
-            return serverPlayer.serverLevel().getEnvelopePigeonholeManager()
-                    .getDefaultAddressOf(player.getUUID())
+            return serverPlayer.serverLevel().getEnvelopePlayerInformation().defaultAddress().of(player)
                     .map(address::equals)
                     .orElse(false);
         }
@@ -255,7 +254,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == ADDRESS_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.serverLevel().getEnvelopePigeonholeManager().setDefaultAddressOf(serverPlayer.getUUID(), address);
+            serverPlayer.serverLevel().getEnvelopePlayerInformation().defaultAddress().set(serverPlayer, address);
             updateIsDefault();
             return true;
         }

@@ -1,7 +1,6 @@
-package io.github.mortuusars.envelope.world;
+package io.github.mortuusars.envelope.mail;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import net.minecraft.client.gui.screens.Screen;

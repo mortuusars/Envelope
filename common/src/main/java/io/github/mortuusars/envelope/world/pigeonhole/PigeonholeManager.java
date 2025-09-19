@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.util.result.Failure;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.mail.MailId;
+import io.github.mortuusars.envelope.world.storage.PigeonholeSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -30,15 +31,17 @@ public class PigeonholeManager {
                     }
                 },
                 () -> {
-                    data().getPigeonholes().put(address, new PigeonholeData(address, pos));
-                    data().setDirty();
+                    PigeonholeSavedData data = data();
+                    data.getPigeonholes().put(address, new PigeonholeData(address, pos));
+                    data.setDirty();
                 });
     }
 
     public void remove(Address.Pigeonhole address) {
-        if (data().getPigeonholes().remove(address) != null) {
-            data().getPlayerAddresses().entrySet().removeIf(entry -> entry.getValue().equals(address));
-            data().setDirty();
+        PigeonholeSavedData data = data();
+        if (data.getPigeonholes().remove(address) != null) {
+            level.getEnvelopePlayerInformation().defaultAddress().remove(address);
+            data.setDirty();
         }
     }
 
@@ -100,17 +103,6 @@ public class PigeonholeManager {
                     return result;
                 })
                 .orElseGet(() -> Result.failure(new Failure("No mailbox with address '" + address + "' exists.")));
-    }
-
-    // -- Default Address
-
-    public Optional<Address.Pigeonhole> getDefaultAddressOf(UUID uuid) {
-        return Optional.ofNullable(data().getPlayerAddresses().get(uuid));
-    }
-
-    public void setDefaultAddressOf(UUID uuid, Address.Pigeonhole address) {
-        data().getPlayerAddresses().put(uuid, address);
-        data().setDirty();
     }
 
     // --

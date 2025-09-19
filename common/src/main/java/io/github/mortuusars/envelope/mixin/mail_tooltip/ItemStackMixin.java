@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.mixin.mail_tooltip;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.mortuusars.envelope.world.Mail;
+import io.github.mortuusars.envelope.mail.Mail;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
