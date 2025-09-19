@@ -55,6 +55,7 @@
 
   "gui.envelope.mail.sender": "§7Sender: %s",
   "gui.envelope.mail.recipient": "§7Recipient: %s",
+  "gui.envelope.mail.sender_and_recipient": "%s§7➡ %s",
 
   "gui.envelope.mail.log": "Mail Route:",
   "gui.envelope.mail.log.show_tooltip": "§8Hold [§7Shift§8] to see mail delivery log",

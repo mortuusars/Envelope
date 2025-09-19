@@ -8,6 +8,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
@@ -29,7 +30,7 @@ public interface Address {
 
     Type type();
     String id();
-    Component getDisplayName();
+    MutableComponent getDisplayName();
 
     default Address ifPlayer(Consumer<Player> consumer) {
         if (this instanceof Player player) {
@@ -77,7 +78,7 @@ public interface Address {
         }
 
         @Override
-        public Component getDisplayName() {
+        public MutableComponent getDisplayName() {
             return Component.literal(id);
         }
     }
@@ -104,7 +105,7 @@ public interface Address {
         }
 
         @Override
-        public Component getDisplayName() {
+        public MutableComponent getDisplayName() {
             return Component.literal(id);
         }
     }
@@ -131,7 +132,7 @@ public interface Address {
         }
 
         @Override
-        public Component getDisplayName() {
+        public MutableComponent getDisplayName() {
             return Component.literal(id);
         }
     }

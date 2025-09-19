@@ -11,6 +11,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
@@ -174,10 +175,14 @@ public class Delivery {
         return senderPos.get().distSqr(recipientPos.get()) < 1024; // 32 blocks
     }
 
+    public MutableComponent createSenderToRecipientComponent(String middle) {
+        return getSender().getDisplayName().append(middle).append(getRecipient().getDisplayName());
+    }
+
     // --
 
     public static class Phase {
-        public static final int DEFAULT_DURATION = 5 * SharedConstants.TICKS_PER_SECOND;
+        public static final int DEFAULT_DURATION = 15 * SharedConstants.TICKS_PER_SECOND;
 
         public static final Codec<Phase> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Type.CODEC.optionalFieldOf("type", Type.LEAVING_HOME).forGetter(Phase::getType),

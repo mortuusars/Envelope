@@ -49,7 +49,7 @@ public class Position {
         BlockPos pos = target
                 .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
                 .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
-                .above(16);
+                .above(distance);
 
         int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ()) + 5;
 

@@ -8,20 +8,20 @@ import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
-import io.github.mortuusars.envelope.world.Addresses;
 import io.github.mortuusars.envelope.world.BackgroundDelivery;
-import io.github.mortuusars.envelope.world.PigeonholeNetwork;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
+import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -40,12 +40,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
 import net.minecraft.world.entity.ai.util.AirRandomPos;
-import net.minecraft.world.entity.ai.util.HoverRandomPos;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
@@ -54,20 +49,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, DeliveringPigeon {
+public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, Courier {
     public static final List<String> IGNORED_TAGS = Arrays.asList(
             "Air",
             "ArmorDropChances",
@@ -94,14 +85,18 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             "SleepingZ",
             "Passengers",
             "UUID",
-            "leash"
+            "leash",
+            "PigeonholePos",
+            "LastPigeonholePos",
+            "LeftPigeonholeAt",
+            "WouldWantToEnterPigeonholeAfter",
+            "Sitting",
+            "Delivery"
     );
-    private static final int COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE = 200;
 
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
-//    private static final EntityDataAccessor<Delivery> DATA_DELIVERY = SynchedEntityData.defineId(Pigeon.class, Delivery.ENTITY_DATA_SERIALIZER);
 
     public float flap;
     public float flapSpeed;
@@ -110,18 +105,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected float flapping = 1.0F;
     protected float nextFlap = 1.0F;
 
-    protected @Nullable BlockPos pigeonholePos;
-    protected @Nullable BlockPos lastPigeonholePos;
-    protected long leftPigeonholeAt;
-    protected int wouldWantToEnterPigeonholeAfter = random.nextInt(200, 600);
-    protected int remainingCooldownBeforeLocatingNewPigeonhole;
-    protected GoToPigeonholeGoal goToPigeonholeGoal;
+    protected PigeonholeHandler pigeonholeHandler;
 
     protected @Nullable Delivery delivery = null;
 
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
-        moveControl = new FlyingMoveControl(this, 10, false);
+        this.moveControl = new FlyingMoveControl(this, 10, false);
+        this.pigeonholeHandler = new PigeonholeHandler(level);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
 
@@ -147,21 +138,20 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(0, new DeliverMailGoal());
-        goalSelector.addGoal(1, new EnterPigeonholeGoal());
+        goalSelector.addGoal(0, new PigeonDeliverMailGoal(this));
+        goalSelector.addGoal(1, new PigeonEnterPigeonholeGoal(this));
         goalSelector.addGoal(2, new BreedGoal(this, 1.0));
         goalSelector.addGoal(3, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
         goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(5, new FollowParentGoal(this, 1.25));
-        goalSelector.addGoal(5, new LocatePigeonholeGoal());
-        goToPigeonholeGoal = new GoToPigeonholeGoal();
-        goalSelector.addGoal(5, goToPigeonholeGoal);
-        goalSelector.addGoal(6, new PigeonWanderGoal());
+        goalSelector.addGoal(5, new PigeonLocatePigeonholeGoal(this));
+        goalSelector.addGoal(5, new PigeonGoToPigeonholeGoal(this));
+        goalSelector.addGoal(6, new PigeonWanderGoal(this));
         goalSelector.addGoal(7, new FloatGoal(this));
     }
 
     @Override
-    protected @NotNull PathNavigation createNavigation(Level level) {
+    protected @NotNull FlyingPathNavigation createNavigation(Level level) {
         FlyingPathNavigation navigation = new FlyingPathNavigation(this, level);
         navigation.setCanOpenDoors(false);
         navigation.setCanFloat(true);
@@ -174,11 +164,25 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.aiStep();
         this.calculateFlapping();
 
-        if (!this.level().isClientSide) {
-            if (this.tickCount % 20 == 0 && !this.isPigeonholeValid()) {
-                this.setPigeonholePos(null);
+        if (level() instanceof ServerLevel level) {
+            if (this.tickCount % 20 == 0 && !getPigeonholeHandler().isPigeonholeValid(blockPosition())) {
+                getPigeonholeHandler().setPigeonholePos(null);
+            }
+
+            if (isDelivering() && !isInSafeSimulationDistance(level)) {
+                transitionToBackground(level, true);
             }
         }
+    }
+
+    protected boolean isInSafeSimulationDistance(ServerLevel level) {
+        int simDistance = level.getServer().getPlayerList().getSimulationDistance();
+        int range = simDistance - 1; // Reduce by 1 chunk to be safe.
+        return level.players().stream().anyMatch(player -> {
+            double dx = Math.abs(getX() - player.getX()) / 16.0;
+            double dz = Math.abs(getZ() - player.getZ()) / 16.0;
+            return Math.max(dx, dz) <= range;
+        });
     }
 
     protected void calculateFlapping() {
@@ -193,7 +197,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         this.flapping *= 0.9F;
         Vec3 vec3 = this.getDeltaMovement();
         if (!this.onGround() && vec3.y < 0.0) {
-            this.setDeltaMovement(vec3.multiply(1.0, 0.8, 1.0));
+
+            this.setDeltaMovement(vec3.multiply(1.0, 0.85, 1.0));
         }
 
         this.flap = this.flap + this.flapping * 2.0F;
@@ -215,6 +220,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             //TODO: send pigeon death notice to sender
         }
     }
+
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
         if (getDelivery() != null && !getDelivery().getMail().isEmpty()) {
@@ -277,14 +283,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         return new Vec3(0.0, 0.5F * getEyeHeight(), getBbWidth() * 0.4F);
     }
 
-    public long getLeftPigeonholeAt() {
-        return leftPigeonholeAt;
-    }
-
-    public long getTicksSinceLeftPigeonhole() {
-        return level().getGameTime() - leftPigeonholeAt;
-    }
-
     public boolean isSitting() {
         return entityData.get(DATA_IS_SITTING);
     }
@@ -304,64 +302,22 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public boolean hasFancyHat() {
         //TODO: supporters
         // return getOwnerUUID()
-        return true;
+        return hasMail();
     }
 
     // -- Pigeonhole
 
-    public @Nullable BlockPos getPigeonholePos() {
-        return pigeonholePos;
+    public @NotNull PigeonholeHandler getPigeonholeHandler() {
+        return pigeonholeHandler;
     }
 
-    public void setPigeonholePos(@Nullable BlockPos pigeonholePos) {
-        this.pigeonholePos = pigeonholePos;
+    public boolean pathfindDirectlyTowards(BlockPos pos) {
+        getNavigation().setMaxVisitedNodesMultiplier(10.0F);
+        getNavigation().moveTo(pos.getX(), pos.getY(), pos.getZ(), 2, 1);
+        return getNavigation().getPath() != null && getNavigation().getPath().canReach();
     }
 
-    public @Nullable BlockPos getLastPigeonholePos() {
-        return lastPigeonholePos;
-    }
-
-    public Optional<PigeonholeBlockEntity> getPigeonhole() {
-        BlockPos pos = getPigeonholePos();
-        if (pos != null && level().isLoaded(pos) && level().getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
-            return Optional.of(be);
-        }
-        return Optional.empty();
-    }
-
-    protected boolean wantsToEnterPigeonhole() {
-        if (getTicksSinceLeftPigeonhole() < 200) return false; // Cooldown
-
-        boolean wantsToEnter = (level().isNight() || level().isThundering())
-                || (level().getGameTime() >= leftPigeonholeAt + wouldWantToEnterPigeonholeAfter);
-
-        return wantsToEnter && !isPigeonholeNearFire();
-
-        // Probably better to send a signal to pickup mail from Pigeonhole itself.
-        // Because doing it here will cause all nearby pigeons to go into pigeonhole.
-        // return getPigeonhole().filter(PigeonholeBlockEntity::hasMailToDeliver).orElse(false);
-    }
-
-    protected boolean isPigeonholeNearFire() {
-        return getPigeonhole().map(PigeonholeBlockEntity::isFireNearby).orElse(false);
-    }
-
-    protected boolean closerThan(BlockPos pos, int distance) {
-        return pos.closerThan(blockPosition(), distance);
-    }
-
-    protected boolean isTooFarAway(BlockPos pos) {
-        return !this.closerThan(pos, 32);
-    }
-
-    protected boolean isPigeonholeValid() {
-        BlockPos pos = getPigeonholePos();
-        if (pos == null) return false;
-        if (isTooFarAway(pos)) return false;
-        return level().getBlockEntity(pos) instanceof PigeonholeBlockEntity;
-    }
-
-    protected void pathfindRandomlyTowards(BlockPos pos) {
+    public void pathfindRandomlyTowards(BlockPos pos) {
         Vec3 vec3 = Vec3.atBottomCenterOf(pos);
         int i = 0;
         BlockPos blockPos = this.blockPosition();
@@ -382,15 +338,15 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         Vec3 vec32 = AirRandomPos.getPosTowards(this, k, l, i, vec3, (float) (Math.PI / 10));
         if (vec32 != null) {
-            this.navigation.setMaxVisitedNodesMultiplier(0.5F);
-            this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1.0);
+            this.navigation.setMaxVisitedNodesMultiplier(1.0F);
+            this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1);
         }
     }
 
     public void releasedFromPigeonhole(BlockPos pos, BlockState state, PigeonholeBlockEntity.ReleaseReason releaseReason) {
-        lastPigeonholePos = pos;
-        leftPigeonholeAt = level().getGameTime();
-        wouldWantToEnterPigeonholeAfter = getRandom().nextInt(400, 800);
+        getPigeonholeHandler().setLastPigeonholePos(pos);
+        getPigeonholeHandler().setLeftPigeonholeAt(level().getGameTime());
+        getPigeonholeHandler().setWouldWantToEnterPigeonholeAfter(getRandom().nextInt(400, 800));
     }
 
     // -- Sound
@@ -461,14 +417,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        if (getPigeonholePos() != null) {
-            tag.put("PigeonholePos", NbtUtils.writeBlockPos(getPigeonholePos()));
-        }
-        if (lastPigeonholePos != null) {
-            tag.put("LastPigeonholePos", NbtUtils.writeBlockPos(lastPigeonholePos));
-        }
-        tag.putLong("LeftPigeonholeAt", leftPigeonholeAt);
-        tag.putInt("WouldWantToEnterPigeonholeAfter", wouldWantToEnterPigeonholeAfter);
+        getPigeonholeHandler().save(tag);
+
         tag.putInt("Variant", getVariant().id);
         tag.putBoolean("Sitting", isSitting());
 
@@ -480,10 +430,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        setPigeonholePos(NbtUtils.readBlockPos(tag, "PigeonholePos").orElse(null));
-        lastPigeonholePos = NbtUtils.readBlockPos(tag, "LastPigeonholePos").orElse(null);
-        leftPigeonholeAt = tag.getLong("LeftPigeonholeAt");
-        wouldWantToEnterPigeonholeAfter = tag.getInt("WouldWantToEnterPigeonholeAfter");
+        getPigeonholeHandler().load(tag);
         setVariant(Variant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
         if (tag.contains("Delivery")) {
@@ -543,290 +490,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
     }
 
-    // --
-
-    class LocatePigeonholeGoal extends Goal {
-        @Override
-        public boolean canUse() {
-            Pigeon pigeon = Pigeon.this;
-            return pigeon.remainingCooldownBeforeLocatingNewPigeonhole == 0
-                    && pigeon.getPigeonholePos() == null
-                    && pigeon.wantsToEnterPigeonhole();
-        }
-
-        @Override
-        public boolean canContinueToUse() {
-            return false;
-        }
-
-        @Override
-        public void start() {
-            Pigeon pigeon = Pigeon.this;
-
-            pigeon.remainingCooldownBeforeLocatingNewPigeonhole = COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE;
-            List<BlockPos> pigeonholes = findNearbyPigeonholesWithSpace();
-            if (!pigeonholes.isEmpty()) {
-                for (BlockPos pos : pigeonholes) {
-                    if (!pigeon.goToPigeonholeGoal.isTargetBlacklisted(pos)) {
-                        pigeon.setPigeonholePos(pos);
-                        return;
-                    }
-                }
-
-                pigeon.goToPigeonholeGoal.clearBlacklist();
-                pigeon.setPigeonholePos(pigeonholes.getFirst());
-            }
-        }
-
-        private List<BlockPos> findNearbyPigeonholesWithSpace() {
-            Pigeon pigeon = Pigeon.this;
-            BlockPos pos = pigeon.blockPosition();
-            PoiManager poiManager = ((ServerLevel) pigeon.level()).getPoiManager();
-            Stream<PoiRecord> stream = poiManager.getInRange(holder -> holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 20, PoiManager.Occupancy.ANY);
-            return stream.map(PoiRecord::getPos)
-                    .filter(p -> level().getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole && pigeonhole.hasSpace())
-                    .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    public class GoToPigeonholeGoal extends Goal {
-        public static final int MAX_TRAVELLING_TICKS = 600;
-        int travellingTicks = Pigeon.this.level().random.nextInt(10);
-        private static final int MAX_BLACKLISTED_TARGETS = 3;
-        final List<BlockPos> blacklistedTargets = new ArrayList<>();
-        @Nullable
-        private Path lastPath;
-        private static final int TICKS_BEFORE_PIGEONHOLE_DROP = 60;
-        private int ticksStuck;
-
-        GoToPigeonholeGoal() {
-            setFlags(EnumSet.of(Flag.MOVE));
-        }
-
-        @Override
-        public boolean canUse() {
-            Pigeon pigeon = Pigeon.this;
-            return pigeon.getPigeonholePos() != null
-                    && !pigeon.hasRestriction()
-                    && pigeon.wantsToEnterPigeonhole()
-                    && !this.hasReachedTarget(pigeon.getPigeonholePos())
-                    && pigeon.level().getBlockState(pigeon.getPigeonholePos()).is(Envelope.Tags.Blocks.PIGEONHOLES);
-        }
-
-        @Override
-        public void start() {
-            travellingTicks = 0;
-            ticksStuck = 0;
-            super.start();
-        }
-
-        @Override
-        public void stop() {
-            this.travellingTicks = 0;
-            this.ticksStuck = 0;
-            Pigeon.this.navigation.stop();
-            Pigeon.this.navigation.resetMaxVisitedNodesMultiplier();
-        }
-
-        @Override
-        public void tick() {
-            Pigeon pigeon = Pigeon.this;
-            if (pigeon.getPigeonholePos() == null) return;
-
-            travellingTicks++;
-            if (travellingTicks > adjustedTickDelay(MAX_TRAVELLING_TICKS)) {
-                dropAndBlacklistPigeonhole();
-            } else if (!pigeon.navigation.isInProgress()) {
-                if (!pigeon.closerThan(getPigeonholePos(), 16)) {
-                    if (pigeon.isTooFarAway(getPigeonholePos())) {
-                        dropPigeonhole();
-                    } else {
-                        pigeon.pathfindRandomlyTowards(getPigeonholePos());
-                    }
-                } else {
-                    boolean bl = pathfindDirectlyTowards(getPigeonholePos());
-                    if (!bl) {
-                        dropAndBlacklistPigeonhole();
-                    } else if (lastPath != null && lastPath.sameAs(pigeon.navigation.getPath())) {
-                        ticksStuck++;
-                        if (ticksStuck > TICKS_BEFORE_PIGEONHOLE_DROP) {
-                            dropPigeonhole();
-                            ticksStuck = 0;
-                        }
-                    } else {
-                        lastPath = pigeon.navigation.getPath();
-                    }
-                }
-            }
-        }
-
-        private boolean pathfindDirectlyTowards(BlockPos pos) {
-            Pigeon.this.navigation.setMaxVisitedNodesMultiplier(10.0F);
-            Pigeon.this.navigation.moveTo(pos.getX(), pos.getY(), pos.getZ(), 2, 1.0);
-            return Pigeon.this.navigation.getPath() != null && Pigeon.this.navigation.getPath().canReach();
-        }
-
-        boolean isTargetBlacklisted(BlockPos pos) {
-            return this.blacklistedTargets.contains(pos);
-        }
-
-        private void blacklistTarget(BlockPos pos) {
-            this.blacklistedTargets.add(pos);
-
-            while (this.blacklistedTargets.size() > MAX_BLACKLISTED_TARGETS) {
-                this.blacklistedTargets.removeFirst();
-            }
-        }
-
-        void clearBlacklist() {
-            this.blacklistedTargets.clear();
-        }
-
-        private void dropAndBlacklistPigeonhole() {
-            if (Pigeon.this.getPigeonholePos() != null) {
-                blacklistTarget(Pigeon.this.getPigeonholePos());
-            }
-
-            dropPigeonhole();
-        }
-
-        private void dropPigeonhole() {
-            Pigeon.this.setPigeonholePos(null);
-            Pigeon.this.remainingCooldownBeforeLocatingNewPigeonhole = COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE;
-        }
-
-        private boolean hasReachedTarget(BlockPos pos) {
-            if (Pigeon.this.closerThan(pos, 2)) {
-                return true;
-            } else {
-                Path path = Pigeon.this.navigation.getPath();
-                return path != null && path.getTarget().equals(pos) && path.canReach() && path.isDone();
-            }
-        }
-    }
-
-    class EnterPigeonholeGoal extends Goal {
-        @Override
-        public boolean canUse() {
-            Pigeon pigeon = Pigeon.this;
-            BlockPos pos = pigeon.getPigeonholePos();
-
-            if (pos != null
-                    && pigeon.wantsToEnterPigeonhole()
-                    && pos.closerToCenterThan(pigeon.position(), 2.0)
-                    && level().getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
-                if (!be.isFull()) {
-                    return true;
-                }
-
-                pigeon.setPigeonholePos(null);
-            }
-
-            return false;
-        }
-
-        @Override
-        public boolean canContinueToUse() {
-            return false;
-        }
-
-        @Override
-        public void start() {
-            getPigeonhole().ifPresent(pigeonhole -> pigeonhole.addOccupant(Pigeon.this));
-        }
-    }
-
-    class PigeonWanderGoal extends Goal {
-        private static final int WANDER_THRESHOLD = 22;
-
-        PigeonWanderGoal() {
-            setFlags(EnumSet.of(Flag.MOVE));
-        }
-
-        @Override
-        public boolean canUse() {
-            return Pigeon.this.navigation.isDone() && Pigeon.this.random.nextInt(10) == 0;
-        }
-
-        @Override
-        public boolean canContinueToUse() {
-            return Pigeon.this.navigation.isInProgress();
-        }
-
-        @Override
-        public void start() {
-            Vec3 pos = this.findPos();
-            if (pos != null) {
-                Pigeon.this.navigation.moveTo(Pigeon.this.navigation.createPath(BlockPos.containing(pos), 1), 1.0);
-            }
-        }
-
-        @Nullable
-        private Vec3 findPos() {
-            Vec3 pos;
-            BlockPos pigeonholePos = Pigeon.this.getPigeonholePos();
-            if (Pigeon.this.isPigeonholeValid() && pigeonholePos != null && !Pigeon.this.closerThan(pigeonholePos, WANDER_THRESHOLD)) {
-                Vec3 pigeonholeCenter = Vec3.atCenterOf(pigeonholePos);
-                pos = pigeonholeCenter.subtract(Pigeon.this.position()).normalize();
-            } else {
-                pos = Pigeon.this.getViewVector(0.0F);
-            }
-
-            int radius = 8;
-            Vec3 vec33 = HoverRandomPos.getPos(Pigeon.this, radius, 12, pos.x, pos.z, (float) (Math.PI / 2), 3, 1);
-            return vec33 != null ? vec33 : AirAndWaterRandomPos.getPos(Pigeon.this, radius, 4, -2, pos.x, pos.z, (float) (Math.PI / 2));
-        }
-    }
-
-    class DeliverMailGoal extends Goal {
-        DeliverMailGoal() {
-            setFlags(EnumSet.of(Flag.MOVE));
-        }
-
-        @Override
-        public boolean canUse() {
-            return isDelivering();
-        }
-
-        @Override
-        public void stop() {
-            setDelivery(null);
-            Pigeon.this.navigation.stop();
-            Pigeon.this.navigation.resetMaxVisitedNodesMultiplier();
-        }
-
-        @Override
-        public void tick() {
-            if (!(level() instanceof ServerLevel level) || getDelivery() == null) return;
-
-            tickDelivery(level);
-
-            if (getDelivery() != null && getDelivery().getPhase().getEnd().isPresent()) {
-                BlockPos pos = getDelivery().getPhase().getEnd().get();
-                if (hasReachedTarget(pos)) {
-                    getDelivery().getPhase().setTicks(getDelivery().getPhase().getDuration());
-                } else if (!Pigeon.this.navigation.isInProgress()) {
-                    if (!pathfindDirectlyTowards(pos)) {
-                        pathfindRandomlyTowards(pos);
-                    }
-                }
-            }
-        }
-
-        private boolean pathfindDirectlyTowards(BlockPos pos) {
-            Pigeon.this.navigation.setMaxVisitedNodesMultiplier(10.0F);
-            Pigeon.this.navigation.moveTo(pos.getX(), pos.getY(), pos.getZ(), 2, 2);
-            return Pigeon.this.navigation.getPath() != null && Pigeon.this.navigation.getPath().canReach();
-        }
-    }
-
-    protected boolean hasReachedTarget(BlockPos pos) {
+    public boolean hasReachedTarget(BlockPos pos) {
         return hasReachedTarget(pos, 2);
     }
 
     protected boolean hasReachedTarget(BlockPos pos, int distance) {
-        if (Pigeon.this.closerThan(pos, distance)) {
+        if (closerThan(pos, distance)) {
             return true;
         } else {
             Path path = Pigeon.this.navigation.getPath();
@@ -834,28 +503,24 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
     }
 
+    public boolean closerThan(BlockPos pos, int distance) {
+        return pos.closerThan(blockPosition(), distance);
+    }
+
+    // -- Delivery
+
     public @Nullable Delivery getDelivery() {
         return delivery;
     }
 
     public void setDelivery(@Nullable Delivery delivery) {
         this.delivery = delivery;
+    }
+
+    @Override
+    public void onDeliveryChanged(ServerLevel level) {
+        setHasMail(getDelivery() != null && !getDelivery().getMail().isEmpty());
         BuggerPackets.sendPigeonDelivery(this);
-    }
-
-    public boolean isDelivering() {
-        return getDelivery() != null;
-    }
-
-    public void startDelivery(ServerLevel level, ItemStack mail, @Nullable BlockPos homePos) {
-        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
-
-        MailDeliveryLog.addRecords(mail,
-                TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
-                TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
-
-        setDelivery(Delivery.start(level, mail));
-        startDeliveryPhase(level);
     }
 
     @Override
@@ -869,7 +534,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
                 && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
-            // Return home when ascent position cannot be reached.
+            // Return home if ascent position cannot be reached.
             getDelivery().getPhase()
                     .setType(Delivery.Phase.Type.APPROACHING_HOME)
                     .setTicks(0);
@@ -880,7 +545,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             return;
         }
 
-        DeliveringPigeon.super.advanceDeliveryPhase(level);
+        Courier.super.advanceDeliveryPhase(level);
     }
 
     @Override
@@ -892,7 +557,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         Envelope.LOGGER.info("Starting phase '{}'", getDelivery().getPhase().getType().getSerializedName());
 
         switch (getDelivery().getPhase().getType()) {
-            case LEAVING_HOME -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos()));
+            case LEAVING_HOME ->
+                    getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos()));
             case TRAVELING_TO_TARGET -> {
                 getDelivery().getRecipientPos().ifPresent(recipientPos -> {
                     getDelivery().getPhase().setEnd(Position.ascent(level, recipientPos, Optional.of(blockPosition())));
@@ -900,7 +566,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                 transitionToBackground(level, true);
             }
             case APPROACHING_TARGET -> getDelivery().getPhase().setEnd(getDelivery().getRecipientPos().orElseThrow());
-            case LEAVING_TARGET -> getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getSenderPos()));
+            case LEAVING_TARGET ->
+                    getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getSenderPos()));
             case TRAVELING_TO_HOME -> {
                 getDelivery().getSenderPos().ifPresent(senderPos -> {
                     getDelivery().getPhase().setEnd(Position.ascent(level, senderPos, Optional.of(blockPosition())));
@@ -939,14 +606,39 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
     }
 
+    @Override
+    public boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {
+        if (Courier.super.tryDeliverMail(level, mail, address)) {
+            level().playSound(null, this, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
+            return true;
+        }
+        return false;
+    }
+
     protected void transitionToBackground(ServerLevel level, boolean effects) {
-        Preconditions.checkNotNull(getDelivery(), "Cannot transition to background: Pigeon is not delivering.");
-        BackgroundDelivery.get(level).add(this);
+        BackgroundDelivery.get(level).add(toBackgroundCourier());
         if (effects) {
             level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
             level.playSound(null, position().x, position().y, position().z,
                     SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
         }
         discard();
+    }
+
+    public BackgroundCourier toBackgroundCourier() {
+        return new BackgroundCourier(saveToRecreatableTag().orElse(new CompoundTag()), getDeliveryOrThrow());
+    }
+
+    protected Optional<CompoundTag> saveToRecreatableTag() {
+        CompoundTag tag = new CompoundTag();
+
+        if (!save(tag)) {
+            Envelope.LOGGER.error("Failed to save Pigeon to a tag. " +
+                    "Entity is passenger, about to be removed or entity type is not serializable.");
+            return Optional.empty();
+        }
+
+        Pigeon.IGNORED_TAGS.forEach(tag::remove);
+        return Optional.of(tag);
     }
 }

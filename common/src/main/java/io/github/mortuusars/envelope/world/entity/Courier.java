@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.entity;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
@@ -13,11 +12,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public interface DeliveringPigeon {
+public interface Courier {
     @Nullable Delivery getDelivery();
     void setDelivery(@Nullable Delivery delivery);
 
@@ -26,10 +26,32 @@ public interface DeliveringPigeon {
     void startDeliveryPhase(ServerLevel level);
     void endDeliveryPhase(ServerLevel level);
 
+    default @NotNull Delivery getDeliveryOrThrow() {
+        Preconditions.checkNotNull(getDelivery(), "Courier is not delivering.");
+        return getDelivery();
+    }
+
+    default boolean isDelivering() {
+        return getDelivery() != null;
+    }
+
+    default void startDelivery(ServerLevel level, ItemStack mail, @Nullable BlockPos homePos) {
+        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
+
+        MailDeliveryLog.addRecords(mail,
+                TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
+                TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
+
+        setDelivery(Delivery.start(level, mail).setSenderPos(Optional.ofNullable(homePos)));
+        startDeliveryPhase(level);
+        onDeliveryChanged(level);
+
+        Envelope.LOGGER.debug("Starting delivery '{}'", getDeliveryOrThrow().createSenderToRecipientComponent("➡"));
+    }
+
     default void advanceDeliveryPhase(ServerLevel level) {
         Preconditions.checkNotNull(getDelivery());
         getDelivery().advancePhase();
-        Envelope.LOGGER.info("Delivery phase advanced to '{}'", getDelivery().getPhase().getType().getSerializedName());
     }
 
     default void tickDelivery(ServerLevel level) {
@@ -45,13 +67,16 @@ public interface DeliveringPigeon {
                 updateAddressPositions(level, getDelivery());
                 startDeliveryPhase(level);
             } else {
+                Envelope.LOGGER.debug("Delivery '{}' is finished.", getDeliveryOrThrow().createSenderToRecipientComponent("➡"));
                 setDelivery(null);
             }
-        }
 
-        if (PlatformHelper.isInDevEnv()) {
-            setDelivery(getDelivery()); // Update to send bugger info to client
+            onDeliveryChanged(level);
         }
+    }
+
+    default void onDeliveryChanged(ServerLevel level) {
+
     }
 
     default boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {

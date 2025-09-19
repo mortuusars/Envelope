@@ -1,27 +1,16 @@
 package io.github.mortuusars.envelope.world.entity.npc;
 
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-public class DeliveringPigeonSpawner implements CustomSpawner {
+public class DeliveringCourierSpawner implements CustomSpawner {
     protected static final int SPAWN_ATTEMPT_DELAY = 5;
     protected int nextAttemptDelay;
 
@@ -66,24 +55,6 @@ public class DeliveringPigeonSpawner implements CustomSpawner {
 //        }
 
         return 0;
-    }
-
-    protected int spawnInVillage(ServerLevel serverLevel, BlockPos pos) {
-        int area = 48;
-        if (serverLevel.getPoiManager().getCountInRange(holder -> holder.is(PoiTypes.HOME), pos, area, PoiManager.Occupancy.IS_OCCUPIED) > 4L) {
-            List<Pigeon> pigeonsInArea = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area, 8.0, area));
-            if (pigeonsInArea.size() < 5) {
-                return spawn(serverLevel, pos);
-            }
-        }
-
-        return 0;
-    }
-
-    protected int spawnInStructure(ServerLevel serverLevel, BlockPos pos) {
-        int area = 16;
-        List<Pigeon> list = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area, 8.0, area));
-        return list.isEmpty() ? this.spawn(serverLevel, pos) : 0;
     }
 
     protected int spawn(ServerLevel level, BlockPos pos) {

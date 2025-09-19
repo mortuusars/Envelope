@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.util.result.Failure;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.mail.MailId;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -40,13 +41,13 @@ public class PigeonholeNetwork extends SavedData {
     public void addOrUpdate(Address.Pigeonhole address, BlockPos pos) {
         get(address).ifPresentOrElse(
                 existingData -> {
-                    if (!existingData.getPosition().equals(pos)) {
+                    if (!existingData.getPos().equals(pos)) {
                         existingData.setPos(pos);
                         setDirty();
                     }
                 },
                 () -> {
-                    pigeonholes.put(address, new PigeonholeData(pos));
+                    pigeonholes.put(address, new PigeonholeData(address, pos));
                     setDirty();
                 });
     }
@@ -106,7 +107,7 @@ public class PigeonholeNetwork extends SavedData {
     }
 
     public Optional<BlockPos> getPositionOf(Address.Pigeonhole address) {
-        return get(address).map(PigeonholeData::getPosition);
+        return get(address).map(PigeonholeData::getPos);
     }
 
     // --
@@ -141,38 +142,4 @@ public class PigeonholeNetwork extends SavedData {
 
     // --
 
-    public static class PigeonholeData {
-        public static final Codec<PigeonholeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPosition),
-                Codec.list(ItemStack.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
-        ).apply(instance, PigeonholeData::new));
-
-        protected BlockPos pos;
-        protected List<ItemStack> mail;
-
-        protected PigeonholeData(BlockPos pos, List<ItemStack> mail) {
-            this.pos = pos;
-            this.mail = new ArrayList<>(mail);
-        }
-
-        public PigeonholeData(BlockPos pos) {
-            this(pos, new ArrayList<>());
-        }
-
-        public BlockPos getPosition() {
-            return pos;
-        }
-
-        public void setPos(BlockPos pos) {
-            this.pos = pos;
-        }
-
-        public List<ItemStack> getMail() {
-            return mail;
-        }
-
-        public void setMail(List<ItemStack> mail) {
-            this.mail = mail;
-        }
-    }
 }

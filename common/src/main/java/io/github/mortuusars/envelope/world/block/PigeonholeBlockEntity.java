@@ -120,7 +120,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
         if (occupants.isEmpty() && !getItem(SLOT_MAIL).isEmpty()) {
             for (Pigeon nearbyPigeon : level.getEntitiesOfClass(Pigeon.class, new AABB(getBlockPos()).inflate(16))) {
-                nearbyPigeon.setPigeonholePos(getBlockPos());
+                nearbyPigeon.getPigeonholeHandler().setPigeonholePos(getBlockPos());
                 break;
             }
         }
@@ -594,7 +594,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
             entity.setNoGravity(true);
 
             if (entity instanceof Pigeon pigeon) {
-                pigeon.setPigeonholePos(pos);
+                pigeon.getPigeonholeHandler().setPigeonholePos(pos);
                 setPigeonReleaseData(ticksInPigeonhole, pigeon);
             }
 

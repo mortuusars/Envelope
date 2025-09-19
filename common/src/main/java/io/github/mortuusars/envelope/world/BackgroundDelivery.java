@@ -5,8 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.entity.BackgroundPigeon;
-import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.BackgroundCourier;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -17,45 +16,37 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class BackgroundDelivery extends SavedData {
-    protected static final String SAVED_DATA_NAME = "envelope_pigeons";
+    protected static final String SAVED_DATA_NAME = "envelope_background_delivery";
 
     public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.list(BackgroundPigeon.CODEC).fieldOf("pigeons").forGetter(BackgroundDelivery::getPigeons)
+            Codec.list(BackgroundCourier.CODEC).fieldOf("couriers").forGetter(BackgroundDelivery::getCouriers)
     ).apply(instance, BackgroundDelivery::new));
 
-    protected List<BackgroundPigeon> pigeons;
+    protected List<BackgroundCourier> couriers;
 
-    public BackgroundDelivery(List<BackgroundPigeon> pigeons) {
-        this.pigeons = new ArrayList<>(pigeons);
+    public BackgroundDelivery(List<BackgroundCourier> couriers) {
+        this.couriers = new ArrayList<>(couriers);
     }
 
-    public List<BackgroundPigeon> getPigeons() {
-        return pigeons;
+    public List<BackgroundCourier> getCouriers() {
+        return couriers;
     }
 
-    public void add(Pigeon pigeon) {
-        Preconditions.checkNotNull(pigeon.getDelivery(), "Pigeon must be delivering mail.");
-        CompoundTag tag = new CompoundTag();
-        if (!pigeon.saveAsPassenger(tag)) { // Weird ass name for this method. It just saves an entity with its id, WITH PASSENGERS.
-            Envelope.LOGGER.error("Failed to save delivering Pigeon to a tag.");
-            return;
-        }
-
-        Pigeon.IGNORED_TAGS.forEach(tag::remove);
-
-        pigeons.add(new BackgroundPigeon(tag, pigeon.getDelivery()));
+    public void add(BackgroundCourier courier) {
+        Preconditions.checkNotNull(courier.getDelivery(), "Courier must be delivering mail.");
+        couriers.add(courier);
         setDirty();
     }
 
     public void tick(ServerLevel level) {
-        pigeons.removeIf(pigeon -> {
+        couriers.removeIf(pigeon -> {
             pigeon.tickDelivery(level);
             setDirty();
             return pigeon.shouldBeRemoved();
         });
     }
 
-    // --
+    // -- Save / Load
 
     public static BackgroundDelivery get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(factory(), SAVED_DATA_NAME);
@@ -63,7 +54,7 @@ public class BackgroundDelivery extends SavedData {
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         return CODEC.encodeStart(NbtOps.INSTANCE, this)
-                .ifError(e -> Envelope.LOGGER.error("Cannot save DeliveringPigeons: {}", e.message()))
+                .ifError(e -> Envelope.LOGGER.error("Cannot save BackgroundDelivery: {}", e.message()))
                 .result()
                 .filter(t -> t instanceof CompoundTag)
                 .map(t -> ((CompoundTag) t))
@@ -80,7 +71,7 @@ public class BackgroundDelivery extends SavedData {
 
     private static BackgroundDelivery loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
         return CODEC.decode(NbtOps.INSTANCE, tag)
-                .ifError(e -> Envelope.LOGGER.error("Cannot load DeliveringPigeons: {}", e.message()))
+                .ifError(e -> Envelope.LOGGER.error("Cannot load BackgroundDelivery: {}", e.message()))
                 .result().map(Pair::getFirst).orElse(createEmpty());
     }
 }

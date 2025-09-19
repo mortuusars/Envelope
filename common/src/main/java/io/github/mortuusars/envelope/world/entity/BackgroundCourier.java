@@ -21,20 +21,21 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class BackgroundPigeon implements DeliveringPigeon {
-    public static final Codec<BackgroundPigeon> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            CompoundTag.CODEC.fieldOf("tag").forGetter(BackgroundPigeon::getEntityTag),
-            Delivery.CODEC.optionalFieldOf("delivery", null).forGetter(BackgroundPigeon::getDelivery)
-    ).apply(instance, BackgroundPigeon::new));
+public class BackgroundCourier implements Courier {
+    public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            CompoundTag.CODEC.fieldOf("entity_tag").forGetter(BackgroundCourier::getEntityTag),
+            Delivery.CODEC.optionalFieldOf("delivery", null).forGetter(BackgroundCourier::getDelivery)
+    ).apply(instance, BackgroundCourier::new));
 
     protected final CompoundTag entityTag;
     protected @Nullable Delivery delivery;
     protected boolean remove = false;
 
-    public BackgroundPigeon(CompoundTag entityTag, @NotNull Delivery delivery) {
+    public BackgroundCourier(CompoundTag entityTag, @NotNull Delivery delivery) {
         this.entityTag = entityTag;
         this.delivery = delivery;
     }
@@ -64,14 +65,13 @@ public class BackgroundPigeon implements DeliveringPigeon {
 
     // --
 
-
     @Override
     public void tickDelivery(ServerLevel level) {
         if (getDelivery() == null) {
             remove = true;
             return;
         }
-        DeliveringPigeon.super.tickDelivery(level);
+        Courier.super.tickDelivery(level);
     }
 
     @Override
@@ -85,6 +85,7 @@ public class BackgroundPigeon implements DeliveringPigeon {
                         .flatMap(pos -> trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getSenderPos()), true))
                         .ifPresent(pigeon -> {
                             pigeon.startDeliveryPhase(level);
+                            pigeon.onDeliveryChanged(level);
                             remove = true;
                         });
             }
@@ -93,6 +94,7 @@ public class BackgroundPigeon implements DeliveringPigeon {
                         .flatMap(pos -> trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getRecipientPos()), true))
                         .ifPresent(pigeon -> {
                             pigeon.startDeliveryPhase(level);
+                            pigeon.onDeliveryChanged(level);
                             remove = true;
                         });
             }
@@ -158,8 +160,12 @@ public class BackgroundPigeon implements DeliveringPigeon {
     }
 
     public @Nullable Entity createEntity(ServerLevel level) {
-        Pigeon.IGNORED_TAGS.forEach(entityTag::remove);
-        @Nullable Entity entity = EntityType.loadEntityRecursive(entityTag, level, Function.identity());
-        return entity;
+        if (entityTag.isEmpty()) {
+            Pigeon pigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level));
+            pigeon.setVariant(Pigeon.Variant.getRandom(level.getRandom()));
+            return pigeon;
+        }
+
+        return EntityType.loadEntityRecursive(entityTag, level, Function.identity());
     }
 }
