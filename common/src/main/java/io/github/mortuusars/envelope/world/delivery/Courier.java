@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.entity;
+package io.github.mortuusars.envelope.world.delivery;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;

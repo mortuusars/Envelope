@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.world.entity.Delivery;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

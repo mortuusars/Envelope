@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.entity;
+package io.github.mortuusars.envelope.world.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.mail.log.TravelingRecord;
 import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;

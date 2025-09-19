@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.entity.Delivery;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
