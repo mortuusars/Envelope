@@ -26,7 +26,7 @@ public class Mail {
             }
 
             consumer.accept(Component.translatable("gui.envelope.mail.sender_and_recipient",
-                    sender.getDisplayName().append(CommonComponents.SPACE), recipient.getDisplayName()));
+                    sender.getDisplayName(), recipient.getDisplayName()));
         } else if (recipient != null) {
             consumer.accept(Component.translatable("gui.envelope.mail.sender_and_recipient",
                     CommonComponents.EMPTY, recipient.getDisplayName()));

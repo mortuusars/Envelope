@@ -207,10 +207,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     public void unloaded(ServerLevel level) {
+        if (level().isClientSide()) return;
         if (getRemovalReason() != null) return;
         if (!isDelivering()) return;
 
-        Envelope.LOGGER.info("Transitioning a delivering Pigeon to background...");
         transitionToBackground(level, false);
     }
 
@@ -618,6 +618,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     protected void transitionToBackground(ServerLevel level, boolean effects) {
+        Envelope.LOGGER.debug("Transitioning a delivering Pigeon to background...");
         BackgroundDelivery.get(level).add(toBackgroundCourier());
         if (effects) {
             level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
@@ -627,7 +628,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         discard();
     }
 
-    public BackgroundCourier toBackgroundCourier() {
+    protected BackgroundCourier toBackgroundCourier() {
         return new BackgroundCourier(saveToRecreatableTag().orElse(new CompoundTag()), getDeliveryOrThrow());
     }
 

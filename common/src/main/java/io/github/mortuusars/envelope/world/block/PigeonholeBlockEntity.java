@@ -446,15 +446,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         level.playSound(null, pos, getExitSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
         level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
 
-        if (entity instanceof Pigeon) {
-            float wasteChance = 0.2f;
-            if (releaseStatus != ReleaseReason.EMERGENCY
-                    && state.getBlock() instanceof PigeonholeBlock block
-                    && level.random.nextFloat() < wasteChance) {
-                block.addWaste(level, pos, state);
-            }
-        }
-
         if (level.addFreshEntity(entity)) {
             if (entity instanceof Pigeon pigeon) {
                 pigeon.releasedFromPigeonhole(pos, state, releaseStatus); // Calling before mail sending to set home pos etc
@@ -464,6 +455,19 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
                     mail.set(Envelope.DataComponents.MAIL_SENDER, address);
                     pigeon.startDelivery(level, mail, getBlockPos());
                     setItem(SLOT_MAIL, ItemStack.EMPTY);
+                }
+
+                float wasteChance = 0.2f;
+
+                if (pigeon.isDelivering()) {
+                    wasteChance = 1f;
+                }
+
+                if (releaseStatus != ReleaseReason.EMERGENCY
+                        && state.getBlock() instanceof PigeonholeBlock block
+                        && level.random.nextFloat() < wasteChance) {
+                    block.addWaste(level, pos, state);
+                    setChanged();
                 }
             }
 
