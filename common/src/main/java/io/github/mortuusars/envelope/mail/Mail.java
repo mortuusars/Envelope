@@ -17,6 +17,10 @@ import java.util.function.Consumer;
 public class Mail {
     public static void addTooltip(ItemStack stack, Item.TooltipContext tooltipContext,
                                   TooltipFlag tooltipFlag, Player player, Consumer<Component> consumer) {
+        if (!stack.is(Envelope.Tags.Items.MAILABLE)) {
+            return;
+        }
+
         @Nullable Address sender = stack.get(Envelope.DataComponents.MAIL_SENDER);
         @Nullable Address recipient = stack.get(Envelope.DataComponents.MAIL_RECIPIENT);
 

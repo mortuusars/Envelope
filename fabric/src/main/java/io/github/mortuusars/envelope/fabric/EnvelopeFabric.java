@@ -40,6 +40,7 @@ public class EnvelopeFabric implements ModInitializer {
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(content -> {
             content.accept(Envelope.Items.LETTER.get());
+            content.accept(Envelope.Items.RECIPIENT_TAG.get());
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(content -> {

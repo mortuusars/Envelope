@@ -81,6 +81,7 @@ public class NeoForgeCommonEvents {
             }
             if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
                 event.accept(Envelope.Items.LETTER.get());
+                event.accept(Envelope.Items.RECIPIENT_TAG.get());
             }
             if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
                 event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());

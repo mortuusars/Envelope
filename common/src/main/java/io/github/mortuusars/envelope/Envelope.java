@@ -14,6 +14,7 @@ import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.mail.MailId;
+import io.github.mortuusars.envelope.world.item.RecipientTagItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -130,8 +131,13 @@ public class Envelope {
 
         public static final Supplier<CardboardBoxItem> CARDBOARD_BOX = Register.item("cardboard_box",
                 () -> new CardboardBoxItem(new Item.Properties()));
+
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
                 () -> new PackageItem(new Item.Properties().stacksTo(1)));
+
+        public static final Supplier<RecipientTagItem> RECIPIENT_TAG = Register.item("recipient_tag",
+                () -> new RecipientTagItem(new Item.Properties()));
+
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
                 () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
 
@@ -262,6 +268,8 @@ public class Envelope {
                     TagKey.create(Registries.ITEM, resource("pigeon_food"));
             public static final TagKey<Item> WASTE_SCOOPABLE =
                     TagKey.create(Registries.ITEM, resource("waste_scoopable"));
+            public static final TagKey<Item> MAILABLE =
+                    TagKey.create(Registries.ITEM, resource("mailable"));
         }
 
         public static class EntityTypes {

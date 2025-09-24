@@ -13,6 +13,7 @@
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
   "item.envelope.package": "Package",
+  "item.envelope.recipient_tag": "Recipient Tag",
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
   "container.envelope.pigeonhole": "Pigeonhole",
