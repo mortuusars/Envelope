@@ -40,13 +40,17 @@ public class PigeonholeManager {
     public void remove(Address.Pigeonhole address) {
         PigeonholeSavedData data = data();
         if (data.getPigeonholes().remove(address) != null) {
-            level.getEnvelopePlayerInformation().defaultAddress().remove(address);
+            level.getEnvelopePlayerInformation().getDefaultAddress().remove(address);
             data.setDirty();
         }
     }
 
     public boolean exists(Address.Pigeonhole pigeonhole) {
         return data().getPigeonholes().containsKey(pigeonhole);
+    }
+
+    public Set<Address.Pigeonhole> getAllAddresses() {
+        return data().getPigeonholes().keySet();
     }
 
     public Optional<PigeonholeData> findByAddress(Address.Pigeonhole address) {

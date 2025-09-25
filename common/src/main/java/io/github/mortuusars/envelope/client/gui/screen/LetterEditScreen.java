@@ -114,10 +114,10 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         MutableComponent tooltip = Component.translatable("gui.envelope.fill_recipient.tooltip.title");
         boolean canFillWithLastRecipient = !fillRecipientState.recipient.isBlank()
                 && recipientBox != null
-                && !fillRecipientState.recipient.equalsIgnoreCase(recipientBox.getEditor().getString().toString());
+                && !fillRecipientState.recipient.equalsIgnoreCase(recipientBox.getEditor().getText().toString());
         boolean canFillWithLastSender = !fillRecipientState.sender.isBlank()
                 && recipientBox != null
-                && !fillRecipientState.sender.equalsIgnoreCase(recipientBox.getEditor().getString().toString());
+                && !fillRecipientState.sender.equalsIgnoreCase(recipientBox.getEditor().getText().toString());
 
         if (canFillWithLastRecipient) {
             tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.lclick_last_recipient"));
@@ -195,7 +195,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
     // --
 
     protected void saveChanges() {
-        Optional<Address> recipient = getOrCreateRecipient(recipientBox.getEditor().getString().toStringWithoutFormatting());
+        Optional<Address> recipient = getOrCreateRecipient(recipientBox.getEditor().getText().toStringWithoutFormatting());
 
         recipient.ifPresent(value -> {
             if (!fillRecipientState.recipient.equals(value.id())) {
@@ -210,14 +210,14 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 value -> letter.set(Envelope.DataComponents.MAIL_RECIPIENT, value),
                 () -> letter.remove(Envelope.DataComponents.MAIL_RECIPIENT));
 
-        String subject = subjectBox.getEditor().getString().toString();
+        String subject = subjectBox.getEditor().getText().toString();
         if (!subject.isBlank()) {
             letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);
         } else {
             letter.remove(Envelope.DataComponents.LETTER_SUBJECT);
         }
 
-        String message = messageBox.getEditor().getString().toString();
+        String message = messageBox.getEditor().getText().toString();
         if (!message.isBlank()) {
             letter.set(Envelope.DataComponents.LETTER_MESSAGE, message);
         } else {

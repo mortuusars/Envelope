@@ -19,9 +19,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -179,7 +177,14 @@ public class TextBox extends AbstractWidget {
     }
 
     public TextBox setText(FormattedString text) {
-        getEditor().setString(text);
+        getEditor().setText(text);
+        return this;
+    }
+
+    public TextBox setTextAndUpdate(FormattedString text) {
+        setText(text);
+        onTextChanged().accept(getEditor().getText());
+        getDisplayCache().scheduleUpdate();
         return this;
     }
 
@@ -207,7 +212,7 @@ public class TextBox extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         FormattedStringDisplayCache displayCache = getDisplayCache();
 
-        if (getHint() != null && !isFocused() && getEditor().getString().toString().isBlank()) {
+        if (getHint() != null && !isFocused() && getEditor().getText().toString().isBlank()) {
             int x = getX() + getHorizontalAlignment().align(getWidth(), font.width(getHint()));
             guiGraphics.drawString(font, getHint(), x, getY(), getHintColor(), false);
         }
@@ -291,7 +296,7 @@ public class TextBox extends AbstractWidget {
 
         if (handleKeyPressed(keyCode, scanCode, modifiers)) {
             lastActionTime = System.currentTimeMillis();
-            onTextChanged().accept(getEditor().getString());
+            onTextChanged().accept(getEditor().getText());
             refreshDisplayCache();
             return true;
         }
@@ -322,7 +327,7 @@ public class TextBox extends AbstractWidget {
     public boolean charTyped(char codePoint, int modifiers) {
         if (isFocused() && getEditor().charTyped(codePoint)) {
             lastActionTime = System.currentTimeMillis();
-            onTextChanged().accept(getEditor().getString());
+            onTextChanged().accept(getEditor().getText());
             refreshDisplayCache();
             return true;
         }
@@ -373,7 +378,7 @@ public class TextBox extends AbstractWidget {
     public boolean formattingToolbarMouseClicked(double mouseX, double mouseY, int button) {
         if (isFormattingEnabled() && getFormattingToolbar().mouseClicked(mouseX, mouseY, button)) {
             refreshDisplayCache();
-            onTextChanged().accept(getEditor().getString());
+            onTextChanged().accept(getEditor().getText());
             canDrag = false;
             return true;
         }
@@ -429,7 +434,7 @@ public class TextBox extends AbstractWidget {
 
     @Override
     public @NotNull Component getMessage() {
-        return Component.literal(getEditor().getString().toStringWithoutFormatting());
+        return Component.literal(getEditor().getText().toStringWithoutFormatting());
     }
 
     @Override

@@ -14,7 +14,7 @@ import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.mail.MailId;
-import io.github.mortuusars.envelope.world.item.RecipientTagItem;
+import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -135,8 +135,8 @@ public class Envelope {
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
                 () -> new PackageItem(new Item.Properties().stacksTo(1)));
 
-        public static final Supplier<RecipientTagItem> RECIPIENT_TAG = Register.item("recipient_tag",
-                () -> new RecipientTagItem(new Item.Properties()));
+        public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
+                () -> new AddressTagItem(new Item.Properties()));
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
                 () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
@@ -152,33 +152,21 @@ public class Envelope {
     }
 
     public static class DataComponents {
+        public static final DataComponentType<Address> ADDRESS = Register.dataComponentType("address",
+                arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
+
         /**
          * Used in Pigeonhole inbox to differentiate between mail items.
          */
         public static final DataComponentType<MailId> MAIL_ID = Register.dataComponentType("mail_id",
                 arg -> arg.persistent(MailId.CODEC).networkSynchronized(MailId.STREAM_CODEC));
-        /**
-         * 'From' address of the mail. Used to know return place if mail cannot be delivered to recipient, amongst other purposes.
-         * This component is temporary and should not be depended on.
-         */
+
         public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender",
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        /**
-         * 'To' address of the mail. Can change in the process of traveling (if the mail is returned or rejected, for example).
-         * This component is temporary and should not be depended on.
-         * If the item needs to have persistent recipient, it should use another 'recipient' component,
-         * like Letters do with 'envelope:letter_recipient'.
-         */
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient",
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        /**
-         * Duration of the trip from sender to recipient. Returning (or rejecting, etc.) a mail will use this for travel back duration as well.
-         */
         public static final DataComponentType<Integer> MAIL_TRAVEL_DURATION = Register.dataComponentType("mail_travel_duration",
                 arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-        /**
-         * Log of all steps that mail has been through. Used to show details to the player.
-         */
         public static final DataComponentType<MailDeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log",
                 arg -> arg.persistent(MailDeliveryLog.CODEC).networkSynchronized(MailDeliveryLog.STREAM_CODEC));
 

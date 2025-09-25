@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "envelope:item/recipient_tag"
+    "layer0": "envelope:item/address_tag"
   }
 }

@@ -13,13 +13,15 @@
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
   "item.envelope.package": "Package",
-  "item.envelope.recipient_tag": "Recipient Tag",
+  "item.envelope.address_tag": "Address Tag",
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
   "container.envelope.pigeonhole": "Pigeonhole",
 
   "gui.envelope.pigeonhole_address.rename_warning.inbox": "• Mail in inbox will be dropped on the ground.",
   "gui.envelope.pigeonhole_address.rename_warning.traveling": "• Mail traveling to previous address will be returned.",
+
+  "gui.envelope.address_tag.title": "Address",
 
   "gui.envelope.pigeonhole": "Pigeonhole",
   "gui.envelope.pigeonhole.inbox": "Inbox",

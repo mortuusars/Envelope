@@ -32,11 +32,11 @@ public class FormattedStringEditor {
         this.validator = str -> stringValidator.get().test(str);
     }
 
-    public FormattedString getString() {
+    public FormattedString getText() {
         return string;
     }
 
-    public void setString(FormattedString string) {
+    public void setText(FormattedString string) {
         this.string = string;
     }
 
@@ -68,11 +68,11 @@ public class FormattedStringEditor {
     // -- String
 
     public int length() {
-        return getString().size();
+        return getText().size();
     }
 
     public List<Char> getSpan(int start, int end) {
-        return getString().subList(start, end);
+        return getText().subList(start, end);
     }
 
     public List<Char> getSelectedSpan() {
@@ -117,7 +117,7 @@ public class FormattedStringEditor {
         if (!keepSelection && isSelecting()) {
             setCursorPos(direction < 0 ? getSelectionStart() : getSelectionEnd(), false);
         } else {
-            setCursorPos(Util.offsetByCodepoints(getString().toStringWithoutFormatting(), getCursorPos(), direction), keepSelection);
+            setCursorPos(Util.offsetByCodepoints(getText().toStringWithoutFormatting(), getCursorPos(), direction), keepSelection);
         }
     }
 
@@ -125,14 +125,14 @@ public class FormattedStringEditor {
         if (!keepSelection && isSelecting()) {
             setCursorPos(direction < 0 ? getSelectionStart() : getSelectionEnd(), false);
         } else {
-            setCursorPos(StringSplitter.getWordPosition(getString().toStringWithoutFormatting(), direction, getCursorPos(), true), keepSelection);
+            setCursorPos(StringSplitter.getWordPosition(getText().toStringWithoutFormatting(), direction, getCursorPos(), true), keepSelection);
         }
     }
 
     public Formatting getFormattingAtCursor() {
         int charBeforeCursor = getCursorPos() - 1;
         if (charBeforeCursor >= 0 && charBeforeCursor < length()) {
-            return getString().get(charBeforeCursor).formatting();
+            return getText().get(charBeforeCursor).formatting();
         }
         return Formatting.EMPTY;
     }
@@ -166,13 +166,13 @@ public class FormattedStringEditor {
 
     public void selectWord(int index) {
         setSelectionRange(
-                StringSplitter.getWordPosition(getString().toStringWithoutFormatting(), -1, index, false),
-                StringSplitter.getWordPosition(getString().toStringWithoutFormatting(), 1, index, false));
+                StringSplitter.getWordPosition(getText().toStringWithoutFormatting(), -1, index, false),
+                StringSplitter.getWordPosition(getText().toStringWithoutFormatting(), 1, index, false));
     }
 
     public String getSelectedString(boolean withFormatting) {
         if (!isSelecting()) return "";
-        FormattedString selectedString = getString().subString(getSelectionStart(), getSelectionEnd());
+        FormattedString selectedString = getText().subString(getSelectionStart(), getSelectionEnd());
         return withFormatting ? selectedString.toString() : selectedString.toStringWithoutFormatting();
     }
 
@@ -289,7 +289,7 @@ public class FormattedStringEditor {
     public void applyFormatting(Formatting formatting) {
         // Prevents applying bold formatting if the text would overflow available space due to extra width:
         if (formatting.format().contains(Formatting.Format.BOLD)) {
-            FormattedString string = new FormattedString(getString().stream().map(c -> new Char(c.character(), c.formatting().copy())).toList());
+            FormattedString string = new FormattedString(getText().stream().map(c -> new Char(c.character(), c.formatting().copy())).toList());
             List<Char> chars = string.subList(getSelectionStart(), getSelectionEnd());
             chars.replaceAll(c -> c.flipFormatting(formatting));
 
@@ -301,7 +301,7 @@ public class FormattedStringEditor {
         if (isSelecting()) {
             getSelectedSpan().replaceAll(c -> c.flipFormatting(formatting));
         } else if (formatting == Formatting.EMPTY) {
-            getString().replaceAll(c -> c.withFormatting(Formatting.EMPTY));
+            getText().replaceAll(c -> c.withFormatting(Formatting.EMPTY));
         }
     }
 
@@ -352,7 +352,7 @@ public class FormattedStringEditor {
             return c;
         });
 
-        FormattedString newString = new FormattedString(getString());
+        FormattedString newString = new FormattedString(getText());
         newString.addAll(getCursorPos(), insertedString);
 
         String string = newString.toStringWithoutFormatting();
@@ -378,12 +378,12 @@ public class FormattedStringEditor {
     }
 
     public void removeWordsFromCursor(int direction) {
-        int charsCount = StringSplitter.getWordPosition(getString().toStringWithoutFormatting(), direction, this.cursorPos, true);
+        int charsCount = StringSplitter.getWordPosition(getText().toStringWithoutFormatting(), direction, this.cursorPos, true);
         this.removeCharsFromCursor(charsCount - this.cursorPos);
     }
 
     public void removeCharsFromCursor(int direction) {
-        String string = getString().toStringWithoutFormatting();
+        String string = getText().toStringWithoutFormatting();
         if (!string.isEmpty()) {
             if (isSelecting()) {
                 removeSelectedText();

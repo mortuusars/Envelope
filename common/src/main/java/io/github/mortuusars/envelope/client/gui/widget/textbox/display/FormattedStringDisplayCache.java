@@ -53,7 +53,7 @@ public class FormattedStringDisplayCache {
 
     protected void updateLines() {
         lines.clear();
-        lines.addAll(splitLines(editor.getString(), font, width, alignment));
+        lines.addAll(splitLines(editor.getText(), font, width, alignment));
     }
 
     protected void updateCursor() {

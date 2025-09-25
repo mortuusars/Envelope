@@ -5,13 +5,10 @@ import io.github.mortuusars.envelope.world.storage.PlayerInfoSavedData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerInformation {
-    protected final KnownNames knownNames = new KnownNames();
+    protected final KnownPlayers knownPlayers = new KnownPlayers();
     protected final DefaultAddress defaultAddress = new DefaultAddress();
     protected final ServerLevel level;
 
@@ -19,11 +16,11 @@ public class PlayerInformation {
         this.level = level;
     }
 
-    public KnownNames knownNames() {
-        return knownNames;
+    public KnownPlayers getKnownPlayers() {
+        return knownPlayers;
     }
 
-    public class KnownNames {
+    public class KnownPlayers {
         public void add(Player player) {
             PlayerInfoSavedData data = data();
             data.getNames().put(player.getScoreboardName().toLowerCase(), player.getUUID());
@@ -47,6 +44,12 @@ public class PlayerInformation {
             return Collections.unmodifiableMap(data().getNames());
         }
 
+        public List<Address.Player> getAllAddresses() {
+            return data().getNames().entrySet().stream()
+                    .map(entry -> new Address.Player(entry.getKey(), Optional.of(entry.getValue())))
+                    .toList();
+        }
+
         public Optional<UUID> getUuid(String name) {
             return Optional.ofNullable(data().getNames().get(name.toLowerCase()));
         }
@@ -54,7 +57,7 @@ public class PlayerInformation {
 
     // --
 
-    public DefaultAddress defaultAddress() {
+    public DefaultAddress getDefaultAddress() {
         return defaultAddress;
     }
 
