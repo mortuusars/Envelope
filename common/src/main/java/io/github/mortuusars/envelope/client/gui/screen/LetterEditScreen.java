@@ -9,7 +9,7 @@ import io.github.mortuusars.envelope.client.state.ClientStateManager;
 import io.github.mortuusars.envelope.client.state.FillRecipientState;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.EditLetterC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.LetterEditC2SP;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -227,7 +227,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         // Send to server
 
         int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new EditLetterC2SP(slot, recipient, subject, message));
+        Packets.sendToServer(new LetterEditC2SP(slot, recipient, subject, message));
     }
 
     protected Optional<Address> getOrCreateRecipient(String name) {

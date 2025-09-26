@@ -66,6 +66,7 @@ public class AddressTagItem extends Item {
             List<Address> knownAddresses = new ArrayList<>(Stream.concat(players.stream(), pigeonholes.stream()).toList());
 
             Packets.sendToClient(new OpenAddressTagScreenS2CP(usedHand, knownAddresses), serverPlayer);
+            player.getCooldowns().addCooldown(this, 6);
         }
 
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);

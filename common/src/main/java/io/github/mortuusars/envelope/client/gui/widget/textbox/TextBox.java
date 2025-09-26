@@ -178,6 +178,7 @@ public class TextBox extends AbstractWidget {
 
     public TextBox setText(FormattedString text) {
         getEditor().setText(text);
+        getEditor().setCursorPos(getEditor().length(), false);
         return this;
     }
 

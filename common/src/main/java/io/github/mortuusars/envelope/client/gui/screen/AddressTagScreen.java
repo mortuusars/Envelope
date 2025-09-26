@@ -5,20 +5,28 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
+import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AddressTagScreen extends Screen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
@@ -39,8 +47,9 @@ public class AddressTagScreen extends Screen {
 
     protected ImageButton addressButton;
     protected TextBox addressBox;
+    protected ImageButton confirmButton;
 
-    protected Address matchedAddress = Address.UNKNOWN;
+    protected Address matchedKnownAddress = Address.UNKNOWN;
 
     public AddressTagScreen(ItemStack tag, InteractionHand hand, List<Address> knownAddresses) {
         super(Component.translatable("gui.envelope.address_tag.title"));
@@ -51,24 +60,14 @@ public class AddressTagScreen extends Screen {
 
     @Override
     protected void init() {
-        imageWidth = 175;
-        imageHeight = 33;
+        imageWidth = 221;
+        imageHeight = 32;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
-        titleLabelX = 19;
-        titleLabelY = 6;
+        titleLabelX = leftPos + 42;
+        titleLabelY = topPos + 5;
 
-//        name = new EditBox(this.font, leftPos + 11, topPos + 21, 142, 12, Component.translatable("gui.exposure.pigeonhole.address_box.title"));
-//        name.setTextColor(-1);
-//        name.setTextColorUneditable(-1);
-//        name.setBordered(false);
-//        name.setMaxLength(PigeonholeAddressMenu.MAX_NAME_LENGTH);
-//        name.setResponder(this::onAddressChanged);
-//        name.setValue(getMenu().getAddress());
-//        addWidget(name);
-//        setInitialFocus(name);
-
-        addressButton = new ImageButton(leftPos + 6, topPos + 4, 10, 10, ADDRESS_SPRITES, b -> fillLastAddress());
+        addressButton = new ImageButton(leftPos + 29, topPos + 4, 10, 10, ADDRESS_SPRITES, b -> fillLastAddress());
         addRenderableWidget(addressButton);
 
         @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
@@ -76,8 +75,8 @@ public class AddressTagScreen extends Screen {
         if (address != null) {
             addressText = address.id();
         }
-        addressBox = new TextBox(font, leftPos + 18, topPos + 17, 155, 9)
-                .setTextValidator(text -> text.length() <= 25)
+        addressBox = new TextBox(font, leftPos + 42, topPos + 17, 155, 9)
+                .setTextValidator(text -> text.length() <= 25 && !text.contains("\n"))
                 .setFormattingEnabled(false)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
@@ -86,28 +85,16 @@ public class AddressTagScreen extends Screen {
                 .setHintColor(0xFFC2A57F)
                 .setOnTextChanged(this::onAddressTextChanged);
         addressBox.setTextAndUpdate(FormattedString.parse(addressText));
+        addressBox.getEditor().setCursorToEnd(false);
         addRenderableWidget(addressBox);
 
-//        confirmButton = new ImageButton(leftPos + 112, topPos + 42, 19, 19,
-//                Sprites.CONFIRM_BUTTON_SPRITES,
-//                button -> confirm(), Component.translatable("gui.envelope.confirm"));
-//        MutableComponent confirmTooltip = Component.translatable("gui.envelope.confirm");
-//        if (getMenu().isRenaming()) {
-//            confirmTooltip.append("\n")
-//                    .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.inbox")
-//                            .withStyle(Style.EMPTY.withColor(0xFFE76A6A)))
-//                    .append("\n")
-//                    .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.traveling")
-//                            .withStyle(Style.EMPTY.withColor(0xFFE76A6A)));
-//        }
-//        confirmButton.setTooltip(Tooltip.create(confirmTooltip));
-//        addRenderableWidget(confirmButton);
-//
-//        ImageButton cancelButton = new ImageButton(leftPos + 133, topPos + 42, 19, 19,
-//                Sprites.CANCEL_BUTTON_SPRITES,
-//                button -> cancel(), Component.translatable("gui.envelope.cancel"));
-//        cancelButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.cancel")));
-//        addRenderableWidget(cancelButton);
+        confirmButton = new ImageButton(leftPos + 202, topPos + 13, 19, 19,
+                Sprites.CONFIRM_BUTTON_SPRITES,
+                button -> confirm(), Component.translatable("gui.envelope.confirm"));
+        confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
+        addRenderableWidget(confirmButton);
+
+        setInitialFocus(addressBox);
     }
 
     @Override
@@ -125,17 +112,40 @@ public class AddressTagScreen extends Screen {
         // it should be deferred somehow, as it's set to the button after handling click
     }
 
+    protected void confirm() {
+        Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
+        int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
+        Packets.sendToServer(new AddressTagApplyC2SP(slot, getAddress()));
+        onClose();
+    }
+
+    protected Optional<Address> getAddress() {
+        String addressText = addressBox.getEditor().getText().toString();
+        if (addressText.isBlank()) {
+            return Optional.empty();
+        }
+
+        Address address = matchedKnownAddress != Address.UNKNOWN
+                ? matchedKnownAddress
+                : new Address.Pigeonhole(addressText);
+        return Optional.ofNullable(address);
+    }
+
     // -- Events
 
     protected void onAddressTextChanged(FormattedString text) {
-        String string = addressBox.getEditor().getText().toString();
+        String string = text.toString();
+        matchedKnownAddress = Address.UNKNOWN;
         for (Address address : knownAddresses) {
             if (address.id().equalsIgnoreCase(string)) {
-                matchedAddress = address;
-                return;
+                matchedKnownAddress = address;
+                break;
             }
         }
-        matchedAddress = Address.UNKNOWN;
+
+        getAddress().ifPresentOrElse(
+                value -> tag.set(Envelope.DataComponents.ADDRESS, value),
+                () -> tag.remove(Envelope.DataComponents.ADDRESS));
     }
 
     // -- Render
@@ -143,23 +153,31 @@ public class AddressTagScreen extends Screen {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFFB89B76, false);
         renderAddressType(guiGraphics, mouseX, mouseY, partialTick);
+
+        guiGraphics.renderItem(tag, leftPos + 1, topPos + 7);
+
+        if (mouseX >= leftPos + 1 && mouseX < leftPos + 19
+                && mouseY >= topPos + 7 && mouseY < topPos + 25) {
+            guiGraphics.renderTooltip(font, tag, mouseX, mouseY);
+        }
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        renderTransparentBackground(guiGraphics);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
     protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         WidgetSprites sprites = UNKNOWN_PIGEONHOLE_SPRITES;
 
-        if (matchedAddress != Address.UNKNOWN) {
-            sprites = matchedAddress.map(p -> PIGEONHOLE_SPRITES, pl -> PLAYER_SPRITES, npc -> NPC_SPRITES);
+        if (matchedKnownAddress != Address.UNKNOWN) {
+            sprites = matchedKnownAddress.map(p -> PIGEONHOLE_SPRITES, pl -> PLAYER_SPRITES, npc -> NPC_SPRITES);
         }
 
-        guiGraphics.blitSprite(sprites.enabled(), leftPos + 6, topPos + 16, 10, 10);
+        guiGraphics.blitSprite(sprites.enabled(), leftPos + 29, topPos + 16, 10, 10);
     }
 
     // -- Input
@@ -170,17 +188,10 @@ public class AddressTagScreen extends Screen {
             onClose();
         }
 
-//        if (keyCode == InputConstants.KEY_RETURN) {
-//            if (canConfirm()) {
-//                confirm();
-//                Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1f));
-//            }
-//            return true;
-//        }
-
-//        if (keyCode != InputConstants.KEY_TAB && (name.keyPressed(keyCode, scanCode, modifiers) || name.canConsumeInput())) {
-//            return true;
-//        }
+        if (keyCode == InputConstants.KEY_RETURN) {
+            confirm();
+            return true;
+        }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
