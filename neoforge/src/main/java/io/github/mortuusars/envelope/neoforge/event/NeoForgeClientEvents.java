@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.neoforge.event;
 
+import com.mojang.datafixers.util.Either;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressScreen;
@@ -9,12 +10,17 @@ import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
+import io.github.mortuusars.envelope.mail.Address;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+
+import java.util.Optional;
 
 public class NeoForgeClientEvents {
     @EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

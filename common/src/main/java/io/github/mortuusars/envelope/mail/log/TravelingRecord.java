@@ -3,11 +3,14 @@ package io.github.mortuusars.envelope.mail.log;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.AddressDisplay;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
@@ -78,7 +81,9 @@ public record TravelingRecord(Status status, Address address, Optional<Long> tim
     // --
 
     public MutableComponent translate() {
-        MutableComponent component = Component.translatable("gui.envelope.mail.log.record." + status.name, address.getDisplayName());
+        MutableComponent component = Component.translatable(
+                "gui.envelope.mail.log.record." + status.name, AddressDisplay.create(
+                        address, AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.applyFormat(ChatFormatting.WHITE)));
         message.ifPresent(sibling -> {
             component.append(" ");
             component.append(sibling);
@@ -108,10 +113,6 @@ public record TravelingRecord(Status status, Address address, Optional<Long> tim
         @Override
         public @NotNull String getSerializedName() {
             return name;
-        }
-
-        public MutableComponent translate() {
-            return Component.translatable("gui.envelope.mail.status." + name);
         }
     }
 }

@@ -11,11 +11,11 @@
     "pigeon_on_shoulder.PlayerRendererMixin"
   ],
   "mixins": [
+    "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
     "mail_tooltip.ItemStackMixin",
     "pigeon_on_shoulder.PlayerMixin",
-    "pigeon_spawner.MinecraftServerMixin",
-    "injected.ServerLevelMixin"
+    "pigeon_spawner.MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

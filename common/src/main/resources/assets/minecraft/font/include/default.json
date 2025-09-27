@@ -1,0 +1,20 @@
+{
+  "providers": [
+    {
+      "type": "space",
+      "advances": {
+        "\uEEFF": 2
+      }
+    },
+    {
+      "type": "bitmap",
+      "file": "envelope:font/icons.png",
+      "height": 9,
+      "ascent": 8,
+      "chars": [
+        "\uEE00\uEE01\uEE02\uEE03\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+        "\uEE10\uEE11\uEE12\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      ]
+    }
+  ]
+}

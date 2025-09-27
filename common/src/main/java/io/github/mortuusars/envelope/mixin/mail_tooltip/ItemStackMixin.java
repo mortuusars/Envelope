@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.mixin.mail_tooltip;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.mortuusars.envelope.mail.Mail;
+import io.github.mortuusars.envelope.client.gui.tooltip.Tooltip;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -18,9 +18,11 @@ import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements DataComponentHolder {
-    @Inject(method = "getTooltipLines", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/item/Item;appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/Item$TooltipContext;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V"))
+    @Inject(method = "getTooltipLines",
+            at = @At(value = "INVOKE", shift = At.Shift.AFTER,
+                    target = "Lnet/minecraft/world/item/Item;appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/Item$TooltipContext;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V"))
     private void appendHoverText(Item.TooltipContext tooltipContext, Player player,
                                  TooltipFlag tooltipFlag, CallbackInfoReturnable<List<Component>> cir, @Local Consumer<Component> consumer) {
-        Mail.addTooltip(((ItemStack)(Object) this), tooltipContext, tooltipFlag, player, consumer);
+        Tooltip.Mail.mailable(((ItemStack) (Object) this), consumer);
     }
 }

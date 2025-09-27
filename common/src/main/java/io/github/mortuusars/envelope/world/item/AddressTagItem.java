@@ -2,9 +2,9 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.AddressDisplay;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,8 +35,7 @@ public class AddressTagItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
         if (address != null) {
-            tooltipComponents.add(Component.literal("✉ ").withStyle(ChatFormatting.GRAY)
-                    .append(address.getDisplayName().withStyle(ChatFormatting.WHITE)));
+            tooltipComponents.add(AddressDisplay.createGeneric(address));
         }
     }
 
