@@ -3,9 +3,14 @@ package io.github.mortuusars.envelope.world.block;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -179,11 +184,24 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        if (stack.is(Items.NAME_TAG)) { //TODO: config to require nametag
+        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
+        if (address != null) {
+            String string = address.getDisplayName().getString();
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                if (!blockEntity.openAddressMenu(serverPlayer, hand)) {
+                boolean matchesPlayer = serverPlayer.serverLevel().getEnvelopePlayerInformation()
+                        .getKnownPlayers().getAllAddresses().stream().anyMatch(a -> a.id().equalsIgnoreCase(string));
+                boolean matchesPigeonhole = serverPlayer.serverLevel().getEnvelopePigeonholeManager()
+                        .getAllAddresses().stream().anyMatch(a -> a.id().equalsIgnoreCase(string));
+
+                if (matchesPlayer || matchesPigeonhole) {
+                    player.displayClientMessage(Component.literal("Address is already taken [Not Translated]")
+                            .withStyle(ChatFormatting.RED), true);
+                    level.playSound(null, player, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 1);
                     return ItemInteractionResult.FAIL;
                 }
+
+                applyAddress(player, state, pos, hand, string);
+                level.playSound(null, player, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 1, 1);
             }
             return ItemInteractionResult.SUCCESS;
         }

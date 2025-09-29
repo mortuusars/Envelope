@@ -20,9 +20,8 @@ public class ClientPacketsHandler {
     }
 
     public static void openAddressTagScreen(OpenAddressTagScreenS2CP packet) {
-        ItemStack itemInHand = Minecrft.player().getItemInHand(packet.hand());
-        if (itemInHand.getItem() instanceof AddressTagItem) {
-            Minecrft.get().setScreen(new AddressTagScreen(itemInHand, packet.hand(), packet.knownAddresses()));
+        if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
+            Minecrft.get().setScreen(new AddressTagScreen(packet.hand(), packet.knownAddresses()));
         }
     }
 

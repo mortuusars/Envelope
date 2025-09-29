@@ -45,9 +45,9 @@ public class AddressTagScreen extends Screen {
 
     protected Address matchedKnownAddress = Address.UNKNOWN;
 
-    public AddressTagScreen(ItemStack tag, InteractionHand hand, List<Address> knownAddresses) {
+    public AddressTagScreen(InteractionHand hand, List<Address> knownAddresses) {
         super(Component.translatable("gui.envelope.address_tag.title"));
-        this.tag = tag;
+        this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.hand = hand;
         this.knownAddresses = knownAddresses;
     }
