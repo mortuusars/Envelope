@@ -7,13 +7,13 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.mail.AddressDisplay;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -31,12 +31,6 @@ import java.util.Optional;
 public class AddressTagScreen extends Screen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
 
-    public static final WidgetSprites ADDRESS_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("address_tag/address"));
-    public static final WidgetSprites UNKNOWN_PIGEONHOLE_SPRITES = Sprites.normalOnly(Envelope.resource("address_tag/unknown_pigeonhole"));
-    public static final WidgetSprites PIGEONHOLE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("address_tag/pigeonhole"));
-    public static final WidgetSprites PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("address_tag/player"));
-    public static final WidgetSprites NPC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("address_tag/npc"));
-
     protected final ItemStack tag;
     protected final InteractionHand hand;
     protected final List<Address> knownAddresses;
@@ -45,7 +39,7 @@ public class AddressTagScreen extends Screen {
     protected int leftPos, topPos;
     protected int titleLabelX, titleLabelY;
 
-    protected ImageButton addressButton;
+//    protected ImageButton addressButton;
     protected TextBox addressBox;
     protected ImageButton confirmButton;
 
@@ -67,8 +61,8 @@ public class AddressTagScreen extends Screen {
         titleLabelX = leftPos + 42;
         titleLabelY = topPos + 5;
 
-        addressButton = new ImageButton(leftPos + 29, topPos + 4, 10, 10, ADDRESS_SPRITES, b -> fillLastAddress());
-        addRenderableWidget(addressButton);
+//        addressButton = new ImageButton(leftPos + 29, topPos + 4, 10, 10, ADDRESS_SPRITES, b -> fillLastAddress());
+//        addRenderableWidget(addressButton);
 
         @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
         String addressText = "";
@@ -106,7 +100,7 @@ public class AddressTagScreen extends Screen {
 
     protected void fillLastAddress() {
         //TODO: fill last address
-        String lastAddress = ChatFormatting.stripFormatting("Placeholder");
+        String lastAddress = ChatFormatting.stripFormatting("Last address goes here");
         addressBox.setTextAndUpdate(FormattedString.parse(lastAddress));
         //TODO: move focus to addressBox, but it's not that simple,
         // it should be deferred somehow, as it's set to the button after handling click
@@ -171,13 +165,9 @@ public class AddressTagScreen extends Screen {
     }
 
     protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        WidgetSprites sprites = UNKNOWN_PIGEONHOLE_SPRITES;
-
-        if (matchedKnownAddress != Address.UNKNOWN) {
-            sprites = matchedKnownAddress.map(p -> PIGEONHOLE_SPRITES, pl -> PLAYER_SPRITES, npc -> NPC_SPRITES);
-        }
-
-        guiGraphics.blitSprite(sprites.enabled(), leftPos + 29, topPos + 16, 10, 10);
+        int color = matchedKnownAddress == Address.UNKNOWN ? 0xFFB89B76 : 0xFF7B593D;
+        guiGraphics.drawString(font, AddressDisplay.getIcon(matchedKnownAddress),
+                leftPos + 31, topPos + 17, color, false);
     }
 
     // -- Input

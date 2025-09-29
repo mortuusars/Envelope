@@ -32,6 +32,13 @@ public interface Address {
     String id();
     MutableComponent getDisplayName();
 
+    default Address ifPigeonhole(Consumer<Pigeonhole> consumer) {
+        if (this instanceof Pigeonhole pigeonhole) {
+            consumer.accept(pigeonhole);
+        }
+        return this;
+    }
+
     default Address ifPlayer(Consumer<Player> consumer) {
         if (this instanceof Player player) {
             consumer.accept(player);
@@ -42,13 +49,6 @@ public interface Address {
     default Address ifNpc(Consumer<Npc> consumer) {
         if (this instanceof Npc npc) {
             consumer.accept(npc);
-        }
-        return this;
-    }
-
-    default Address ifPigeonhole(Consumer<Pigeonhole> consumer) {
-        if (this instanceof Pigeonhole pigeonhole) {
-            consumer.accept(pigeonhole);
         }
         return this;
     }
