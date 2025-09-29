@@ -200,8 +200,14 @@ public class PigeonholeBlock extends BaseEntityBlock {
                     return ItemInteractionResult.FAIL;
                 }
 
+                if (!player.isCreative() && player.experienceLevel < 5) {
+                    player.displayClientMessage(Component.literal("Not enough XP (5 required) [Not Translated]")
+                            .withStyle(ChatFormatting.RED), true);
+                    level.playSound(null, player, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 1);
+                    return ItemInteractionResult.FAIL;
+                }
+
                 applyAddress(player, state, pos, hand, string);
-                level.playSound(null, player, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 1, 1);
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -227,11 +233,13 @@ public class PigeonholeBlock extends BaseEntityBlock {
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
             if (!player.isCreative()) {
                 player.getItemInHand(hand).shrink(1);
+                player.giveExperienceLevels(-5);
+                level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1, 1);
             }
             player.swing(hand);
         }
 
-        level.playSound(player, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
+        level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
     }
 
     @Nullable
