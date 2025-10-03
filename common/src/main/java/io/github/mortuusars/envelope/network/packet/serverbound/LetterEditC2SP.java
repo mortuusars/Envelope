@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.network.packet.serverbound;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -13,15 +12,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
-public record LetterEditC2SP(int slot, Optional<Address> recipient, String subject, String message) implements Packet {
+public record LetterEditC2SP(int slot, String subject, String message) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("letter_edit");
     public static final Type<LetterEditC2SP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, LetterEditC2SP> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, LetterEditC2SP::slot,
-            ByteBufCodecs.optional(Address.STREAM_CODEC), LetterEditC2SP::recipient,
             ByteBufCodecs.stringUtf8(512), LetterEditC2SP::subject,
             ByteBufCodecs.stringUtf8(4096), LetterEditC2SP::message,
             LetterEditC2SP::new
@@ -41,10 +37,6 @@ public record LetterEditC2SP(int slot, Optional<Address> recipient, String subje
         }
 
         ItemStack letter = player.getInventory().getItem(slot);
-
-        recipient.ifPresentOrElse(
-                value -> letter.set(Envelope.DataComponents.MAIL_RECIPIENT, value),
-                () -> letter.remove(Envelope.DataComponents.MAIL_RECIPIENT));
 
         if (!subject.isBlank()) {
             letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);

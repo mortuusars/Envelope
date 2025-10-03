@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.network.handler.ClientPacketsHandler;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -14,15 +13,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public record OpenLetterEditScreenS2CP(InteractionHand hand, List<Address> knownRecipients) implements Packet {
+public record OpenLetterEditScreenS2CP(InteractionHand hand) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("open_letter_edit_screen");
     public static final Type<OpenLetterEditScreenS2CP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenLetterEditScreenS2CP> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), OpenLetterEditScreenS2CP::hand,
-            Address.STREAM_CODEC.apply(ByteBufCodecs.list()), OpenLetterEditScreenS2CP::knownRecipients,
             OpenLetterEditScreenS2CP::new
     );
 

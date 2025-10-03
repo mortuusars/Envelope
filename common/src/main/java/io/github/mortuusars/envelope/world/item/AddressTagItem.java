@@ -5,14 +5,11 @@ import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.AddressDisplay;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -20,7 +17,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +48,11 @@ public class AddressTagItem extends Item {
         if (address.equals(slot.getItem().get(Envelope.DataComponents.MAIL_RECIPIENT))) return true; // Do not swap stacks, just do nothing
 
         slot.getItem().set(Envelope.DataComponents.MAIL_RECIPIENT, address);
+
+        // Having old info with new recipient address would make no sense (and may confuse someone)
+        slot.getItem().remove(Envelope.DataComponents.MAIL_SENDER);
+        slot.getItem().remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
+
         stack.shrink(1);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
         return true;

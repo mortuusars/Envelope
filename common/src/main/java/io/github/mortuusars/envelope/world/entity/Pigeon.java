@@ -121,7 +121,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     // -- Spawn
 
     public static boolean checkPigeonSpawnRules(EntityType<Pigeon> pigeon, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-        return Config.Server.PIGEON_SPAWNS_NATURALLY.get() && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON) && isBrightEnoughToSpawn(level, pos);
+        return Config.Server.Pigeon.SPAWNS_NATURALLY.get() && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON) && isBrightEnoughToSpawn(level, pos);
     }
 
     @Nullable

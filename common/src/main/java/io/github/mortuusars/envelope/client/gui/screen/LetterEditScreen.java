@@ -1,6 +1,8 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.client.gui.widget.textbox.display.HorizontalAlignment;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
@@ -32,69 +34,42 @@ import java.util.Optional;
 public class LetterEditScreen extends Screen implements JeiKeyConflictResolverScreen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/letter.png");
 
-    public static final WidgetSprites FILL_RECIPIENT_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("widgets/fill_recipient"));
-
     protected final ItemStack letter;
     protected final InteractionHand hand;
-    protected final List<Address> knownRecipients;
-    protected final FillRecipientState fillRecipientState;
 
     protected int imageWidth, imageHeight, leftPos, topPos;
-    protected TextBox recipientBox;
     protected TextBox subjectBox;
     protected TextBox messageBox;
-    protected ImageButton fillRecipientButton;
 
-    public LetterEditScreen(ItemStack letter, InteractionHand hand, List<Address> knownRecipients) {
+    public LetterEditScreen(ItemStack letter, InteractionHand hand) {
         super(Component.empty());
         this.letter = letter;
         this.hand = hand;
-        this.knownRecipients = knownRecipients;
-        this.fillRecipientState = ClientStateManager.getFillRecipientState();
     }
 
     @Override
     public boolean isPauseScreen() {
-        //TODO: config option
-        return false;
+        return Config.Server.Letter.PAUSE.get();
     }
 
     @Override
     protected void init() {
-        imageWidth = 200;
+        imageWidth = 196;
         imageHeight = 244;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
-        fillRecipientButton = new ImageButton(leftPos + 18, topPos + 18, 11, 9, FILL_RECIPIENT_SPRITES, this::fillRecipient);
-        addRenderableWidget(fillRecipientButton);
-
-        @Nullable Address recipient = letter.get(Envelope.DataComponents.MAIL_RECIPIENT);
-        String recipientText = "";
-        if (recipient != null) {
-            recipientText = recipient.id();
-        }
-        recipientBox = new TextBox(font, leftPos + 30, topPos + 18, 140, 9)
-                .setFormattingEnabled(false)
+        subjectBox = new TextBox(font, leftPos + 18, topPos + 23, 160, 19)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
                 .setHintColor(0xFFC2A57F)
-                .setText(FormattedString.parse(recipientText))
-                .setOnTextChanged(this::recipientTextChanged);
-        addRenderableWidget(recipientBox);
-
-        subjectBox = new TextBox(font, leftPos + 20, topPos + 39, 160, 19)
-                .setFontColor(0xFF7B593D)
-                .setFontUnfocusedColor(0xFF7B593D)
-                .setSelectionColor(0xFF664488)
-                .setSelectionUnfocusedColor(0xFF696170)
-                .setHintColor(0xFFC2A57F)
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
         addRenderableWidget(subjectBox);
 
-        messageBox = new TextBox(font, leftPos + 20, topPos + 69, 160, 137)
+        messageBox = new TextBox(font, leftPos + 18, topPos + 53, 160, 137)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
@@ -102,41 +77,6 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 .setHintColor(0xFFC2A57F)
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_MESSAGE, "")));
         addRenderableWidget(messageBox);
-
-        updateFillRecipientButton();
-    }
-
-    protected void recipientTextChanged(FormattedString chars) {
-        updateFillRecipientButton();
-    }
-
-    private void updateFillRecipientButton() {
-        MutableComponent tooltip = Component.translatable("gui.envelope.fill_recipient.tooltip.title");
-        boolean canFillWithLastRecipient = !fillRecipientState.recipient.isBlank()
-                && recipientBox != null
-                && !fillRecipientState.recipient.equalsIgnoreCase(recipientBox.getEditor().getText().toString());
-        boolean canFillWithLastSender = !fillRecipientState.sender.isBlank()
-                && recipientBox != null
-                && !fillRecipientState.sender.equalsIgnoreCase(recipientBox.getEditor().getText().toString());
-
-        if (canFillWithLastRecipient) {
-            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.lclick_last_recipient"));
-        }
-        if (canFillWithLastSender) {
-            tooltip.append("\n").append(Component.translatable("gui.envelope.fill_recipient.tooltip.rclick_last_sender"));
-        }
-
-        fillRecipientButton.setTooltip(Tooltip.create(tooltip));
-
-        fillRecipientButton.active = canFillWithLastRecipient || canFillWithLastSender;
-    }
-
-    protected void fillRecipient(Button button) {
-        recipientBox.setText(Screen.hasShiftDown()
-                ? FormattedString.parse(fillRecipientState.sender)
-                : FormattedString.parse(fillRecipientState.recipient));
-        recipientBox.getDisplayCache().scheduleUpdate();
-        updateFillRecipientButton();
     }
 
     @Override
@@ -195,20 +135,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
     // --
 
     protected void saveChanges() {
-        Optional<Address> recipient = getOrCreateRecipient(recipientBox.getEditor().getText().toStringWithoutFormatting());
-
-        recipient.ifPresent(value -> {
-            if (!fillRecipientState.recipient.equals(value.id())) {
-                fillRecipientState.recipient = value.id();
-                ClientStateManager.save();
-            }
-        });
-
         // Local
-
-        recipient.ifPresentOrElse(
-                value -> letter.set(Envelope.DataComponents.MAIL_RECIPIENT, value),
-                () -> letter.remove(Envelope.DataComponents.MAIL_RECIPIENT));
 
         String subject = subjectBox.getEditor().getText().toString();
         if (!subject.isBlank()) {
@@ -227,22 +154,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         // Send to server
 
         int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new LetterEditC2SP(slot, recipient, subject, message));
-    }
-
-    protected Optional<Address> getOrCreateRecipient(String name) {
-        if (name.isBlank()) {
-            return Optional.empty();
-        }
-
-        name = name.trim();
-        for (Address recipient : knownRecipients) {
-            if (recipient.id().equalsIgnoreCase(name)) {
-                return Optional.of(recipient);
-            }
-        }
-
-        return Optional.of(new Address.Pigeonhole(name));
+        Packets.sendToServer(new LetterEditC2SP(slot, subject, message));
     }
 
     // --

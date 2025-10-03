@@ -5,40 +5,61 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 /**
  * Using ForgeConfigApiPort on fabric allows using forge config in both environments and without extra dependencies on forge.
  */
-public class Config {
-    public static class Server {
+public abstract class Config {
+    public static abstract class Server {
+        private static ModConfigSpec.Builder BUILDER;
+
         public static final ModConfigSpec SPEC;
 
-        public static final ModConfigSpec.IntValue TRAVEL_DURATION;
+        public static final ModConfigSpec.IntValue MAIL_TRAVEL_DURATION;
 
-        // Pigeon
-        public static final ModConfigSpec.BooleanValue PIGEON_SPAWNS_NATURALLY;
-        public static final ModConfigSpec.BooleanValue PIGEON_SPAWNS_IN_VILLAGE;
+        public static class Pigeon {
+            public static final ModConfigSpec.BooleanValue SPAWNS_NATURALLY;
+            public static final ModConfigSpec.BooleanValue SPAWNS_IN_VILLAGE;
+
+            static {
+                BUILDER.push("pigeon");
+                SPAWNS_NATURALLY = BUILDER
+                        .comment("Pigeon can spawn naturally in '#envelope:allows_pigeon_spawns' biomes. Default: true")
+                        .define("spawns_naturally", true);
+                SPAWNS_IN_VILLAGE = BUILDER
+                        .comment("Pigeon can spawn in the village (similar to Cats). Default: true")
+                        .define("spawns_in_village", true);
+                BUILDER.pop();
+            }
+
+            public static void init() { }
+        }
+
+        public static class Letter {
+            public static final ModConfigSpec.BooleanValue PAUSE;
+
+            static {
+                BUILDER.push("letter");
+                PAUSE = BUILDER.comment("Letter screen pauses singleplayer game. Default: false")
+                        .define("letter_pause", false);
+                BUILDER.pop();
+            }
+
+            public static void init() { }
+        }
 
         static {
-            ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+            BUILDER = new ModConfigSpec.Builder();
 
             {
-                builder.push("mail");
-                TRAVEL_DURATION = builder
+                BUILDER.push("mail");
+                MAIL_TRAVEL_DURATION = BUILDER
                         //TODO: change default travel duration
                         .comment("Default travel duration in ticks. Default: 50")
                         .defineInRange("travel_duration", 50, 1, Integer.MAX_VALUE);
-                builder.pop();
+                BUILDER.pop();
             }
 
-            {
-                builder.push("pigeon");
-                PIGEON_SPAWNS_NATURALLY = builder
-                        .comment("Pigeon can spawn naturally in '#envelope:allows_pigeon_spawns' biomes. Default: true")
-                        .define("spawns_naturally", true);
-                PIGEON_SPAWNS_IN_VILLAGE = builder
-                        .comment("Pigeon can spawn in the village (similar to how Cats do). Default: true")
-                        .define("spawns_in_village", true);
-                builder.pop();
-            }
+            Letter.init();
 
-            SPEC = builder.build();
+            SPEC = BUILDER.build();
+            BUILDER = null;
         }
     }
 

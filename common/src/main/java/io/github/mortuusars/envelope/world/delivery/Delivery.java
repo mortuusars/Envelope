@@ -93,7 +93,7 @@ public class Delivery {
                 Position.ofAddress(level, sender),
                 mail.get(Envelope.DataComponents.MAIL_RECIPIENT),
                 Position.ofAddress(level, recipient),
-                mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, Config.Server.TRAVEL_DURATION.get()),
+                mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, Config.Server.MAIL_TRAVEL_DURATION.get()),
                 Phase.start());
     }
 

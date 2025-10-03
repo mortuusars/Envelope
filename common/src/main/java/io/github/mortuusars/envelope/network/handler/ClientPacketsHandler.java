@@ -15,7 +15,7 @@ public class ClientPacketsHandler {
     public static void openLetterEditScreen(OpenLetterEditScreenS2CP packet) {
         ItemStack itemInHand = Minecrft.player().getItemInHand(packet.hand());
         if (itemInHand.getItem() instanceof LetterItem) {
-            Minecrft.get().setScreen(new LetterEditScreen(itemInHand, packet.hand(), packet.knownRecipients()));
+            Minecrft.get().setScreen(new LetterEditScreen(itemInHand, packet.hand()));
         }
     }
 
