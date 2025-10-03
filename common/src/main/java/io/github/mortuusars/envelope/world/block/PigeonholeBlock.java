@@ -3,14 +3,11 @@ package io.github.mortuusars.envelope.world.block;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -194,14 +191,14 @@ public class PigeonholeBlock extends BaseEntityBlock {
                         .getAllAddresses().stream().anyMatch(a -> a.id().equalsIgnoreCase(string));
 
                 if (matchesPlayer || matchesPigeonhole) {
-                    player.displayClientMessage(Component.literal("Address is already taken [Not Translated]")
+                    player.displayClientMessage(Component.literal("Ḻ Address is already taken")
                             .withStyle(ChatFormatting.RED), true);
                     level.playSound(null, player, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 1);
                     return ItemInteractionResult.FAIL;
                 }
 
                 if (!player.isCreative() && player.experienceLevel < 5) {
-                    player.displayClientMessage(Component.literal("Not enough XP (5 required) [Not Translated]")
+                    player.displayClientMessage(Component.literal("Ḻ Not enough XP (5 required)")
                             .withStyle(ChatFormatting.RED), true);
                     level.playSound(null, player, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 1);
                     return ItemInteractionResult.FAIL;

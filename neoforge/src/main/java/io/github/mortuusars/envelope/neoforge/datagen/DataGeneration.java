@@ -1,7 +1,11 @@
 package io.github.mortuusars.envelope.neoforge.datagen;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.neoforge.datagen.client.BlockStatesDatagen;
+import io.github.mortuusars.envelope.neoforge.datagen.client.ModelsDatagen;
+import io.github.mortuusars.envelope.neoforge.datagen.server.BlockTagsDatagen;
+import io.github.mortuusars.envelope.neoforge.datagen.server.LootTablesDatagen;
+import io.github.mortuusars.envelope.neoforge.datagen.server.RecipesDatagen;
+import io.github.mortuusars.envelope.neoforge.datagen.server.ItemTagsDatagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -19,8 +23,14 @@ public class DataGeneration {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+        CompletableFuture<HolderLookup.Provider> registries = event.getLookupProvider();
 
-        generator.addProvider(event.includeClient(), new BlockStatesDatagen(output, existingFileHelper));
+        generator.addProvider(event.includeClient(), new ModelsDatagen(output, existingFileHelper));
+
+        generator.addProvider(event.includeServer(), new RecipesDatagen(output, registries));
+        BlockTagsDatagen blockTags = new BlockTagsDatagen(output, registries, existingFileHelper);
+        generator.addProvider(event.includeServer(), blockTags);
+        generator.addProvider(event.includeServer(), new ItemTagsDatagen(output, registries, blockTags.contentsGetter(), existingFileHelper));
+        generator.addProvider(event.includeServer(), LootTablesDatagen.create(output, registries));
     }
 }

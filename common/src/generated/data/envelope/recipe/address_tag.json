@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "S": {
+      "tag": "minecraft:signs"
+    }
+  },
+  "pattern": [
+    "   ",
+    "PSP",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:address_tag"
+  }
+}

@@ -1,0 +1,5 @@
+// 1.21.1	2025-10-04T01:11:28.0225513	Tags for minecraft:item mod id envelope
+9ac0586fe35e278ba0a157b03d8c1edfa39239a0 data/envelope/tags/item/mailable.json
+95bc4468845de7f38c07a3cd00bdc7760c81e800 data/envelope/tags/item/pigeonholes.json
+788e6e34a201c014ae3783bc128afbd75443273b data/envelope/tags/item/pigeon_food.json
+5e7c760621586934c47d721d06be94fdb2693f4e data/envelope/tags/item/waste_scoopable.json

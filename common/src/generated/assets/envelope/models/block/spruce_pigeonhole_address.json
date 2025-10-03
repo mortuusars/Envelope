@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "bottom": "envelope:block/spruce_pigeonhole_end",
+    "front": "envelope:block/spruce_pigeonhole_front_address",
+    "side": "envelope:block/spruce_pigeonhole_side",
+    "top": "envelope:block/spruce_pigeonhole_end"
+  }
+}

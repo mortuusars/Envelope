@@ -127,10 +127,10 @@ public class Envelope {
         public static final Supplier<BlockItem> BIRCH_PIGEONHOLE = pigeonhole("birch", Blocks.BIRCH_PIGEONHOLE);
 
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
-                () -> new LetterItem(new Item.Properties()));
+                () -> new LetterItem(new Item.Properties().stacksTo(1)));
 
         public static final Supplier<CardboardBoxItem> CARDBOARD_BOX = Register.item("cardboard_box",
-                () -> new CardboardBoxItem(new Item.Properties()));
+                () -> new CardboardBoxItem(new Item.Properties().stacksTo(16)));
 
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
                 () -> new PackageItem(new Item.Properties().stacksTo(1)));
@@ -252,6 +252,8 @@ public class Envelope {
         }
 
         public static class Items {
+            public static final TagKey<Item> PIGEONHOLES =
+                    TagKey.create(Registries.ITEM, resource("pigeonholes"));
             public static final TagKey<Item> PIGEON_FOOD =
                     TagKey.create(Registries.ITEM, resource("pigeon_food"));
             public static final TagKey<Item> WASTE_SCOOPABLE =

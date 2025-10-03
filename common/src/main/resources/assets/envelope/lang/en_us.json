@@ -51,7 +51,7 @@
   "gui.envelope.mail.sender": "§7Sender: %s",
   "gui.envelope.mail.recipient": "§7Recipient: %s",
 
-  "gui.envelope.mail.log": "Mail Delivery Log:",
+  "gui.envelope.mail.log": "§7Mail Delivery Log §8[Shift]",
   "gui.envelope.mail.log.show_tooltip": "§8Mail Delivery Log [§7Shift§8]",
   "gui.envelope.mail.log.record.sent": " §7Sent from %s§7",
   "gui.envelope.mail.log.record.returned": " §7Returned",

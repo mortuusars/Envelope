@@ -34,3 +34,11 @@ tasks {
         useJUnitPlatform()
     }
 }
+
+// Makes datagenerated resources usable:
+sourceSets {
+    main {
+        resources.srcDir file("src/generated")
+        // We are using NeoForge to datagen, and it outputs to the 'common/src/generated' folder
+    }
+}
