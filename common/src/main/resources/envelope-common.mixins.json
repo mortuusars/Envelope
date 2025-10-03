@@ -7,14 +7,12 @@
     "bugger.EntityRendererMixin",
     "bugger.KeyboardHandlerMixin",
     "bugger.ScreenOverlayMixin",
-    "bugger.ScreenRenderLinesInvoker",
-    "pigeon_on_shoulder.PlayerRendererMixin"
+    "bugger.ScreenRenderLinesInvoker"
   ],
   "mixins": [
     "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
     "mail_tooltip.ItemStackMixin",
-    "pigeon_on_shoulder.PlayerMixin",
     "pigeon_spawner.MinecraftServerMixin"
   ],
   "injectors": {
