@@ -68,6 +68,10 @@ public class PlatformHelperImpl {
         serverPlayer.openMenu(extendedScreenHandlerFactory);
     }
 
+    public static Path getGameDirectory() {
+        return FabricLoader.getInstance().getGameDir();
+    }
+
     public static Path getConfigDirectory() {
         return FabricLoader.getInstance().getConfigDir();
     }

@@ -49,6 +49,11 @@ public class PlatformHelper {
     }
 
     @ExpectPlatform
+    public static Path getGameDirectory() {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
     public static Path getConfigDirectory() {
         throw new AssertionError();
     }

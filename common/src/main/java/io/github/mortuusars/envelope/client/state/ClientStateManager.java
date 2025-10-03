@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ClientStateManager {
+    //TODO: Rework for individual states. Use gameDir instead of configDir.
+
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE_PATH = PlatformHelper.getConfigDirectory().resolve(Envelope.ID + "/fill_recipient.json");
     private static FillRecipientState data;

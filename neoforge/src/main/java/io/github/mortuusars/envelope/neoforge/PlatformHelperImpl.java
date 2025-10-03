@@ -35,6 +35,10 @@ public class PlatformHelperImpl {
         serverPlayer.openMenu(menuProvider, extraDataWriter);
     }
 
+    public static Path getGameDirectory() {
+        return FMLPaths.GAMEDIR.get();
+    }
+
     public static Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get();
     }
