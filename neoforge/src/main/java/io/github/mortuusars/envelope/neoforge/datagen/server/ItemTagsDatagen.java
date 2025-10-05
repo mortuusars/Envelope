@@ -31,5 +31,8 @@ public class ItemTagsDatagen extends ItemTagsProvider {
 
         tag(Envelope.Tags.Items.WASTE_SCOOPABLE)
                 .addTag(ItemTags.SHOVELS);
+
+        tag(Envelope.Tags.Items.CANNOT_BE_PACKAGED)
+                .add(Envelope.Items.PACKAGE.get());
     }
 }

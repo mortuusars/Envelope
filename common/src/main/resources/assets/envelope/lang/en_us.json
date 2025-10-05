@@ -21,6 +21,8 @@
   "gui.envelope.pigeonhole_address.rename_warning.inbox": "• Mail in inbox will be dropped on the ground.",
   "gui.envelope.pigeonhole_address.rename_warning.traveling": "• Mail traveling to previous address will be returned.",
 
+  "gui.envelope.package.pack": "Pack",
+
   "gui.envelope.address_tag.title": "Address",
 
   "gui.envelope.pigeonhole": "Pigeonhole",

@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
@@ -15,6 +16,7 @@ import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.mail.MailId;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -175,6 +177,9 @@ public class Envelope {
         public static final DataComponentType<String> LETTER_MESSAGE = Register.dataComponentType("letter_message",
                 arg -> arg.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.stringUtf8(4096)));
 
+        public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = Register.dataComponentType("package_contents",
+                arg -> arg.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));
+
         static void init() {
         }
     }
@@ -196,6 +201,9 @@ public class Envelope {
                 Register.menuType("pigeonhole_address", PigeonholeAddressMenu::fromNetwork);
         public static final Supplier<MenuType<PigeonholeMenu>> PIGEONHOLE =
                 Register.menuType("pigeonhole", PigeonholeMenu::fromNetwork);
+
+        public static final Supplier<MenuType<PackageMenu>> PACKAGE =
+                Register.menuType("package", PackageMenu::fromNetwork);
 
         static void init() {
         }
@@ -260,6 +268,8 @@ public class Envelope {
                     TagKey.create(Registries.ITEM, resource("waste_scoopable"));
             public static final TagKey<Item> MAILABLE =
                     TagKey.create(Registries.ITEM, resource("mailable"));
+            public static final TagKey<Item> CANNOT_BE_PACKAGED =
+                    TagKey.create(Registries.ITEM, resource("cannot_be_packaged"));
         }
 
         public static class EntityTypes {
