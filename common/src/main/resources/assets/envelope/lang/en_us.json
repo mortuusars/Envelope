@@ -22,6 +22,7 @@
   "gui.envelope.pigeonhole_address.rename_warning.traveling": "• Mail traveling to previous address will be returned.",
 
   "gui.envelope.package.pack": "Pack",
+  "gui.envelope.package.tooltip.empty": "§7Empty",
 
   "gui.envelope.address_tag.title": "Address",
 

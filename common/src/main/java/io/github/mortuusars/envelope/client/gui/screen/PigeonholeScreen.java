@@ -365,8 +365,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         }
 
         if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail),
-                    Optional.empty(), x, y);
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail), hoveredMail.getTooltipImage(), x, y);
         } else {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(hoveredMail.getHoverName());

@@ -53,16 +53,16 @@ public final class PackageContents implements TooltipComponent {
         return items;
     }
 
+    public ItemStack getItemForReading(int index) {
+        return items.get(index);
+    }
+
     public List<ItemStack> copyItems() {
         return Lists.transform(this.items, ItemStack::copy);
     }
 
 //    public ItemStack[] copyItemsToArray() {
 //        return copyItems().toArray(ItemStack[]::new);
-//    }
-
-//    public ItemStack getItemForReading(int index) {
-//        return items.get(index);
 //    }
 
     // --
