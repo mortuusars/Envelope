@@ -70,14 +70,6 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
     }
 
     @Override
-    protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
-        super.renderTooltip(guiGraphics, x, y);
-        if (hoveredSlot == null && isHovering(45, 17, 86, 64, x, y) && getMenu().isPackageDestroyedOnClose()) {
-            guiGraphics.renderTooltip(font, Component.translatable("gui.envelope.package.destroyed_on_close"), x, y);
-        }
-    }
-
-    @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         packButton.visible = getMenu().canPack() && getMenu().needsPacking();
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
