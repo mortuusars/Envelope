@@ -17,6 +17,7 @@ import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.mail.MailId;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -179,6 +180,8 @@ public class Envelope {
 
         public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = Register.dataComponentType("package_contents",
                 arg -> arg.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));
+        public static final DataComponentType<StoredItemStack> PACKAGE_LETTER = Register.dataComponentType("package_letter",
+                arg -> arg.persistent(StoredItemStack.CODEC).networkSynchronized(StoredItemStack.STREAM_CODEC));
 
         static void init() {
         }
@@ -270,6 +273,10 @@ public class Envelope {
                     TagKey.create(Registries.ITEM, resource("mailable"));
             public static final TagKey<Item> CANNOT_BE_PACKAGED =
                     TagKey.create(Registries.ITEM, resource("cannot_be_packaged"));
+            public static final TagKey<Item> LETTERS =
+                    TagKey.create(Registries.ITEM, resource("letters"));
+            public static final TagKey<Item> PACKAGES =
+                    TagKey.create(Registries.ITEM, resource("packages"));
         }
 
         public static class EntityTypes {

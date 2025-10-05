@@ -34,5 +34,10 @@ public class ItemTagsDatagen extends ItemTagsProvider {
 
         tag(Envelope.Tags.Items.CANNOT_BE_PACKAGED)
                 .add(Envelope.Items.PACKAGE.get());
+
+        tag(Envelope.Tags.Items.LETTERS)
+                .add(Envelope.Items.LETTER.get());
+        tag(Envelope.Tags.Items.PACKAGES)
+                .add(Envelope.Items.PACKAGE.get());
     }
 }

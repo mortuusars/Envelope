@@ -45,6 +45,7 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderTooltip(guiGraphics, mouseX, mouseY);
         Pos2i packageSlotPos = getMenu().getPackageSlotPos();
         guiGraphics.renderItem(getMenu().getPackageStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
         guiGraphics.pose().pushPose();

@@ -47,6 +47,7 @@ public abstract class AddressDisplay {
         }
 
         return Component.empty()
+                .append(SENDER_TO_RECIPIENT_ARROW)
                 .append(create(recipient, RECIPIENT_ICON_STYLE, textStyle));
     }
 

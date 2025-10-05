@@ -13,6 +13,7 @@
   "item.envelope.letter": "Letter",
   "item.envelope.cardboard_box": "Cardboard Box",
   "item.envelope.package": "Package",
+  "item.envelope.package.empty": "Empty Package",
   "item.envelope.address_tag": "Address Tag",
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
@@ -23,6 +24,8 @@
 
   "gui.envelope.package.pack": "Pack",
   "gui.envelope.package.tooltip.empty": "§7Empty",
+  "gui.envelope.package.tooltip.has_letter": "\uEE10\uEEFFHas Letter",
+  "gui.envelope.package.tooltip.has_letter.shift": "\uEE10\uEEFFHas Letter §8- [§7Right Click§8] to remove",
 
   "gui.envelope.address_tag.title": "Address",
 
