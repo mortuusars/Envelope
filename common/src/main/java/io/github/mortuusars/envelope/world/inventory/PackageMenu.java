@@ -203,7 +203,11 @@ public class PackageMenu extends AbstractContainerMenu {
 
             if (getPackageContentsFromItem().isEmpty()
                     && getPackage().map(PackageItem::shouldBeDestroyedWhenEmpty)) {
-                getPackage().getItem().destroy(serverPlayer, getPackage().getItemStack());
+                PackageItem packageItem = getPackage().getItem();
+                ItemStack stack = getPackage().getItemStack();
+                packageItem.unpack(stack).forEach(itemStack -> serverPlayer.drop(itemStack, false));
+                stack.setCount(0);
+                serverPlayer.serverLevel().playSound(null, serverPlayer, SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
             }
         }
 

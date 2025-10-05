@@ -21,9 +21,6 @@
     "client": [
       "io.github.mortuusars.envelope.fabric.EnvelopeFabricClient"
     ],
-    "fabric-datagen": [
-      "io.github.mortuusars.envelope.fabric.datagen.EnvelopeDataGenerator"
-    ],
     "jei_mod_plugin": [
       "io.github.mortuusars.envelope.compat.jei.EnvelopeJeiPlugin"
     ]

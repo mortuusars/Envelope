@@ -23,6 +23,8 @@ public class ModelsDatagen extends BlockStateProvider {
             itemModels().simpleBlockItem(block.get());
         });
 
+        horizontalBlock(Envelope.Blocks.PACKAGE.get(), models().getExistingFile(modLoc("block/package")));
+
         itemModels().basicItem(Envelope.Items.LETTER.get());
         itemModels().basicItem(Envelope.Items.CARDBOARD_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());

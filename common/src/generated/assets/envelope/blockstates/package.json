@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "envelope:block/package",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "envelope:block/package"
+    },
+    "facing=south": {
+      "model": "envelope:block/package",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "envelope:block/package",
+      "y": 270
+    }
+  }
+}

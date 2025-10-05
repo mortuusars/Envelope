@@ -7,6 +7,8 @@
   "client": [
   ],
   "mixins": [
+    "flammable.PackageBlockMixin",
+    "flammable.PigeonholeBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

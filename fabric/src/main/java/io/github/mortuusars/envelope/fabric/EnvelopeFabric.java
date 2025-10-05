@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.SpawnPlacements;
@@ -71,6 +72,11 @@ public class EnvelopeFabric implements ModInitializer {
 
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING, Pigeon::checkPigeonSpawnRules);
+
+        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 15, 50);
+        Envelope.Blocks.PIGEONHOLES.values().forEach(b -> {
+            FlammableBlockRegistry.getDefaultInstance().add(b.get(), 5, 20);
+        });
 
         FabricC2SPackets.register();
         FabricS2CPackets.register();

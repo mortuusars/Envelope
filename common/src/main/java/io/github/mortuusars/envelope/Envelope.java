@@ -5,6 +5,8 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.mail.Address;
 import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.block.PackageBlock;
+import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -38,6 +40,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -79,6 +83,14 @@ public class Envelope {
         public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = pigeonhole("spruce");
         public static final Supplier<PigeonholeBlock> BIRCH_PIGEONHOLE = pigeonhole("birch");
 
+        public static final Supplier<PackageBlock> PACKAGE = Register.block("package",
+                () -> new PackageBlock(BlockBehaviour.Properties.of()
+                        .pushReaction(PushReaction.DESTROY)
+                        .ignitedByLava()
+                        .strength(0.5f)
+                        .mapColor(MapColor.SAND)
+                        .noOcclusion()));
+
         private static Supplier<PigeonholeBlock> pigeonhole(String type) {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
@@ -96,6 +108,10 @@ public class Envelope {
         public static final Supplier<BlockEntityType<PigeonholeBlockEntity>> PIGEONHOLE =
                 Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(
                         PigeonholeBlockEntity::new, getPigeonholeBlocks()));
+
+        public static final Supplier<BlockEntityType<PackageBlockEntity>> PACKAGE =
+                Register.blockEntityType("package", () -> Register.newBlockEntityType(
+                        PackageBlockEntity::new, Blocks.PACKAGE.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
             return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
@@ -136,7 +152,7 @@ public class Envelope {
                 () -> new CardboardBoxItem(new Item.Properties().stacksTo(16)));
 
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
-                () -> new PackageItem(new Item.Properties().stacksTo(1)));
+                () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
 
         public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
                 () -> new AddressTagItem(new Item.Properties()));
