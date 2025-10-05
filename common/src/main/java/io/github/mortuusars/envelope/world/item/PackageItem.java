@@ -68,9 +68,9 @@ public class PackageItem extends Item {
 
         StoredItemStack storedLetter = stack.getOrDefault(Envelope.DataComponents.PACKAGE_LETTER, StoredItemStack.EMPTY);
 
-        if (storedLetter.isEmpty() && other.is(Envelope.Tags.Items.LETTERS)) {
+        if (other.is(Envelope.Tags.Items.LETTERS)) {
             stack.set(Envelope.DataComponents.PACKAGE_LETTER, new StoredItemStack(other));
-            access.set(ItemStack.EMPTY);
+            access.set(storedLetter.getCopy());
             player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1.1f);
             return true;
         } else if (!storedLetter.isEmpty() && other.isEmpty()) {
@@ -118,13 +118,13 @@ public class PackageItem extends Item {
     public void destroy(ServerPlayer player, ItemStack stack) {
         @Nullable StoredItemStack storedLetter = stack.get(Envelope.DataComponents.PACKAGE_LETTER);
         if (storedLetter != null) {
-            player.drop(storedLetter.getCopy(), true, false);
+            player.drop(storedLetter.getCopy(), false);
             stack.remove(Envelope.DataComponents.PACKAGE_LETTER);
         }
 
         PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
         if (!contents.isEmpty()) {
-            contents.copyItems().forEach(itemStack -> player.drop(itemStack, true, false));
+            contents.copyItems().forEach(itemStack -> player.drop(itemStack, false));
             stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
         }
 
