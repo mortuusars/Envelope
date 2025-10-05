@@ -4,6 +4,7 @@ import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.MailCommand;
+import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
@@ -32,6 +33,8 @@ public class EnvelopeFabric implements ModInitializer {
         NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.SERVER, Config.Server.SPEC);
 //        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.COMMON, Config.Common.SPEC);
 //        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.CLIENT, Config.Client.SPEC);
+
+        CommonEvents.commonSetup();
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
             Envelope.Items.PIGEONHOLES.forEach(item -> content.accept(item.get()));

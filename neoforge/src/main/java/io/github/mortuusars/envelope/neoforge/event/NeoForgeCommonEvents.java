@@ -44,6 +44,7 @@ public class NeoForgeCommonEvents {
         @SubscribeEvent
         public static void commonSetup(FMLCommonSetupEvent event) {
             event.enqueueWork(() -> {
+                CommonEvents.commonSetup();
                 for (Map.Entry<ResourceLocation, StatFormatter> entry : RegisterImpl.STATS.entrySet()) {
                     Stats.CUSTOM.get(entry.getKey(), entry.getValue());
                 }

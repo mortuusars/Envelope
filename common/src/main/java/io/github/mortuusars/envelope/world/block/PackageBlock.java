@@ -30,8 +30,8 @@ import org.jetbrains.annotations.Nullable;
 public class PackageBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public static final VoxelShape SHAPE_X = Block.box(3, 0, 4, 13, 6, 12);
-    public static final VoxelShape SHAPE_Y = Block.box(4, 0, 3, 12, 6, 13);
+    public static final VoxelShape SHAPE_X = Block.box(4, 0, 3, 12, 6, 13);
+    public static final VoxelShape SHAPE_Y = Block.box(3, 0, 4, 13, 6, 12);
 
     public PackageBlock(Properties properties) {
         super(properties);
