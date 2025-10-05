@@ -23,6 +23,8 @@
   "gui.envelope.pigeonhole_address.rename_warning.traveling": "• Mail traveling to previous address will be returned.",
 
   "gui.envelope.package.pack": "Pack",
+  "gui.envelope.package.pack.tooltip.packs_remaining": "§7Remaining: %s",
+  "gui.envelope.package.destroyed_on_close": "§4Package will be destroyed",
   "gui.envelope.package.tooltip.empty": "§7Empty",
   "gui.envelope.package.tooltip.has_letter": "\uEE10\uEEFFHas Letter",
   "gui.envelope.package.tooltip.has_letter.shift": "\uEE10\uEEFFHas Letter §8- [§7Right Click§8] to remove",

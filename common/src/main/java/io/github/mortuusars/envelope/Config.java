@@ -37,7 +37,21 @@ public abstract class Config {
             static {
                 BUILDER.push("letter");
                 PAUSE = BUILDER.comment("Letter screen pauses singleplayer game. Default: false")
-                        .define("letter_pause", false);
+                        .define("pause", false);
+                BUILDER.pop();
+            }
+
+            public static void init() { }
+        }
+
+        public static class Package {
+            public static final ModConfigSpec.IntValue PACK_LIMIT;
+
+            static {
+                BUILDER.push("package");
+                PACK_LIMIT = BUILDER.comment("Number of packs that a single package can handle.",
+                                "(When reached, the item will be destroyed after all items are removed from it).", "Default: 3")
+                        .defineInRange("pack_limit", 3, 1, Integer.MAX_VALUE);
                 BUILDER.pop();
             }
 
@@ -56,7 +70,9 @@ public abstract class Config {
                 BUILDER.pop();
             }
 
+            Pigeon.init();
             Letter.init();
+            Package.init();
 
             SPEC = BUILDER.build();
             BUILDER = null;

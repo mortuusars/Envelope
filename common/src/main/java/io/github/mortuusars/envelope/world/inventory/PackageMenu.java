@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Pos2i;
+import io.github.mortuusars.envelope.util.ItemAndStack;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,10 +28,10 @@ public class PackageMenu extends AbstractContainerMenu {
     protected final Player player;
     protected final InteractionHand hand;
     protected final int packageSlot;
-    protected final ItemStack packageStack;
+    protected final ItemAndStack<PackageItem> packageStack;
+    protected final boolean canPack;
 
     protected final SimpleContainer packageContainer;
-    protected final DataSlot needsPacking = DataSlot.standalone();
 
     protected Pos2i packageSlotPos = new Pos2i(-999, -999);
 
@@ -41,21 +42,18 @@ public class PackageMenu extends AbstractContainerMenu {
         this.player = playerInventory.player;
         this.hand = hand;
         this.packageSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : playerInventory.selected;
-        this.packageStack = playerInventory.getItem(packageSlot);
+        this.packageStack = new ItemAndStack<>(playerInventory.getItem(packageSlot));
+        this.canPack = packageStack.map(PackageItem::canPack);
 
-        List<ItemStack> items = new ArrayList<>(PackageContents.of(packageStack).copyItems());
+        List<ItemStack> items = new ArrayList<>(PackageContents.of(packageStack.getItemStack()).copyItems());
         while (items.size() < PackageContents.SLOTS) {
             items.add(ItemStack.EMPTY);
         }
 
         packageContainer = new SimpleContainer(items.toArray(ItemStack[]::new));
-        packageContainer.addListener(container -> {
-            needsPacking.set(needsPacking() ? 1 : 0);
-        });
 
         addPackageSlots();
         addPlayerSlots(playerInventory, 8, 96, packageSlot);
-        addDataSlot(needsPacking);
     }
 
     public PackageMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -120,27 +118,40 @@ public class PackageMenu extends AbstractContainerMenu {
 
     // --
 
-
-    public ItemStack getPackageStack() {
+    public ItemAndStack<PackageItem> getPackage() {
         return packageStack;
+    }
+
+    protected @NotNull PackageContents getPackageContentsFromItem() {
+        return PackageContents.of(getPackage().getItemStack());
     }
 
     public Pos2i getPackageSlotPos() {
         return packageSlotPos;
     }
 
-    public boolean needsPacking() {
-        if (player.level().isClientSide) {
-            return needsPacking.get() == 1;
-        }
+    public boolean canPack() {
+        return canPack;
+    }
 
+    public boolean needsPacking() {
         if (packed) {
             return false;
         }
 
         PackageContents contents = PackageContents.of(packageContainer);
-        return !contents.isEmpty() && !contents.equals(PackageContents.of(packageStack));
+        return !contents.isEmpty() && !contents.equals(getPackageContentsFromItem());
     }
+
+    public boolean isContainerEmpty() {
+        return packageContainer.isEmpty();
+    }
+
+    public boolean isPackageDestroyedOnClose() {
+        return !canPack() && (needsPacking() || isContainerEmpty());
+    }
+
+    // --
 
     @Override
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
@@ -165,8 +176,10 @@ public class PackageMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(@NotNull Player player, int buttonId) {
         if (!(player instanceof ServerPlayer serverPlayer)) return true;
 
-        if (buttonId == PACK_BUTTON_ID) {
-            packageStack.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.of(packageContainer));
+        if (buttonId == PACK_BUTTON_ID && getPackage().map(PackageItem::canPack)) {
+            getPackage().set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.of(packageContainer));
+            getPackage().set(Envelope.DataComponents.PACKAGE_TIMES_PACKED,
+                    getPackage().getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0) + 1);
             packed = true;
 
             player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
@@ -181,11 +194,16 @@ public class PackageMenu extends AbstractContainerMenu {
     @Override
     public void removed(@NotNull Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            if (!PackageContents.of(packageContainer).equals(PackageContents.of(packageStack))) {
+            if (!PackageContents.of(packageContainer).equals(getPackageContentsFromItem())) {
                 for (ItemStack stack : PackageContents.of(packageContainer).copyItems()) {
                     serverPlayer.drop(stack, true);
                 }
-                packageStack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+                getPackage().remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+            }
+
+            if (getPackageContentsFromItem().isEmpty()
+                    && getPackage().map(PackageItem::shouldBeDestroyedWhenEmpty)) {
+                getPackage().getItem().destroy(serverPlayer, getPackage().getItemStack());
             }
         }
 

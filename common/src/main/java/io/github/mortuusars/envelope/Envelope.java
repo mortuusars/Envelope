@@ -182,6 +182,8 @@ public class Envelope {
                 arg -> arg.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));
         public static final DataComponentType<StoredItemStack> PACKAGE_LETTER = Register.dataComponentType("package_letter",
                 arg -> arg.persistent(StoredItemStack.CODEC).networkSynchronized(StoredItemStack.STREAM_CODEC));
+        public static final DataComponentType<Integer> PACKAGE_TIMES_PACKED = Register.dataComponentType("package_times_packed",
+                arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
         static void init() {
         }

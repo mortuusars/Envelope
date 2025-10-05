@@ -1,14 +1,17 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
@@ -22,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -87,11 +91,44 @@ public class PackageItem extends Item {
             PlatformHelper.openMenu(serverPlayer,
                     new SimpleMenuProvider((id, inventory, pl) ->
                             new PackageMenu(id, inventory, usedHand), player.getItemInHand(usedHand).getHoverName()),
-                    buffer -> {
-                        buffer.writeEnum(usedHand);
-                    });
+                    buffer -> buffer.writeEnum(usedHand));
         }
 
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+    }
+
+    // --
+
+    public int getTimesPacked(ItemStack stack) {
+        return stack.getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0);
+    }
+
+    public int getRemainingPacks(ItemStack stack) {
+        return Config.Server.Package.PACK_LIMIT.get() - getTimesPacked(stack);
+    }
+
+    public boolean canPack(ItemStack stack) {
+        return getTimesPacked(stack) < Config.Server.Package.PACK_LIMIT.get();
+    }
+
+    public boolean shouldBeDestroyedWhenEmpty(ItemStack stack) {
+        return !canPack(stack);
+    }
+
+    public void destroy(ServerPlayer player, ItemStack stack) {
+        @Nullable StoredItemStack storedLetter = stack.get(Envelope.DataComponents.PACKAGE_LETTER);
+        if (storedLetter != null) {
+            player.drop(storedLetter.getCopy(), true, false);
+            stack.remove(Envelope.DataComponents.PACKAGE_LETTER);
+        }
+
+        PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
+        if (!contents.isEmpty()) {
+            contents.copyItems().forEach(itemStack -> player.drop(itemStack, true, false));
+            stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+        }
+
+        stack.setCount(0);
+        player.serverLevel().playSound(null, player, SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
     }
 }
