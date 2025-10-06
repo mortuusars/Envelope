@@ -47,7 +47,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
-        subjectBox = new TextBox(font, leftPos + 18, topPos + 23, 160, 19)
+        subjectBox = new TextBox(font, leftPos + 18, topPos + 22, 160, 19)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
@@ -57,7 +57,7 @@ public class LetterEditScreen extends Screen implements JeiKeyConflictResolverSc
                 .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
         addRenderableWidget(subjectBox);
 
-        messageBox = new TextBox(font, leftPos + 18, topPos + 53, 160, 144)
+        messageBox = new TextBox(font, leftPos + 18, topPos + 52, 160, 144)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
