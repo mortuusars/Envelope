@@ -43,7 +43,7 @@ public class RecipesDatagen extends RecipeProvider {
                 .unlockedBy("has_cardboard_box", has(Envelope.Items.CARDBOARD_BOX.get()))
                 .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Envelope.Items.ADDRESS_TAG.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Envelope.Items.ADDRESS_TAG.get(), 2)
                 .define('P', Items.PAPER)
                 .define('S', ItemTags.SIGNS)
                 .pattern("   ")

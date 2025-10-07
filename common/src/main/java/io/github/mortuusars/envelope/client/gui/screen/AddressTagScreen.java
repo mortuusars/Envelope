@@ -14,6 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -31,6 +32,9 @@ import java.util.Optional;
 public class AddressTagScreen extends Screen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
 
+    public static final WidgetSprites CONFIRM_BUTTON_SPRITES =
+            Sprites.threeStates(Envelope.resource("address_tag/confirm_button"));
+
     protected final ItemStack tag;
     protected final InteractionHand hand;
     protected final List<Address> knownAddresses;
@@ -39,7 +43,6 @@ public class AddressTagScreen extends Screen {
     protected int leftPos, topPos;
     protected int titleLabelX, titleLabelY;
 
-//    protected ImageButton addressButton;
     protected TextBox addressBox;
     protected ImageButton confirmButton;
 
@@ -54,23 +57,20 @@ public class AddressTagScreen extends Screen {
 
     @Override
     protected void init() {
-        imageWidth = 221;
-        imageHeight = 32;
+        imageWidth = 183;
+        imageHeight = 33;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
-        titleLabelX = leftPos + 42;
-        titleLabelY = topPos + 5;
-
-//        addressButton = new ImageButton(leftPos + 29, topPos + 4, 10, 10, ADDRESS_SPRITES, b -> fillLastAddress());
-//        addRenderableWidget(addressButton);
+        titleLabelX = leftPos + 12;
+        titleLabelY = topPos + 7;
 
         @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
         String addressText = "";
         if (address != null) {
             addressText = address.id();
         }
-        addressBox = new TextBox(font, leftPos + 42, topPos + 17, 155, 9)
-                .setTextValidator(text -> text.length() <= 25 && !text.contains("\n"))
+        addressBox = new TextBox(font, leftPos + 20, topPos + 18, 140, 9)
+                .setTextValidator(text -> text.length() <= 22 && !text.contains("\n"))
                 .setFormattingEnabled(false)
                 .setFontColor(0xFF7B593D)
                 .setFontUnfocusedColor(0xFF7B593D)
@@ -82,8 +82,7 @@ public class AddressTagScreen extends Screen {
         addressBox.getEditor().setCursorToEnd(false);
         addRenderableWidget(addressBox);
 
-        confirmButton = new ImageButton(leftPos + 202, topPos + 13, 19, 19,
-                Sprites.CONFIRM_BUTTON_SPRITES,
+        confirmButton = new ImageButton(leftPos + 162, topPos + 16, 11, 11, CONFIRM_BUTTON_SPRITES,
                 button -> confirm(), Component.translatable("gui.envelope.confirm"));
         confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
         addRenderableWidget(confirmButton);
@@ -114,7 +113,7 @@ public class AddressTagScreen extends Screen {
     }
 
     protected Optional<Address> getAddress() {
-        String addressText = addressBox.getEditor().getText().toString();
+        String addressText = addressBox.getEditor().getText().toString().trim();
         if (addressText.isBlank()) {
             return Optional.empty();
         }
@@ -149,13 +148,7 @@ public class AddressTagScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFFB89B76, false);
         renderAddressType(guiGraphics, mouseX, mouseY, partialTick);
-
-        guiGraphics.renderItem(tag, leftPos + 1, topPos + 7);
-
-        if (mouseX >= leftPos + 1 && mouseX < leftPos + 19
-                && mouseY >= topPos + 7 && mouseY < topPos + 25) {
-            guiGraphics.renderTooltip(font, tag, mouseX, mouseY);
-        }
+        renderTargetPreview(guiGraphics, mouseX, mouseY);
     }
 
     @Override
@@ -167,7 +160,18 @@ public class AddressTagScreen extends Screen {
     protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int color = matchedKnownAddress == Address.UNKNOWN ? 0xFFB89B76 : 0xFF7B593D;
         guiGraphics.drawString(font, AddressDisplay.getIcon(matchedKnownAddress),
-                leftPos + 31, topPos + 17, color, false);
+                leftPos + 12, topPos + 18, color, false);
+        if (matchedKnownAddress != Address.UNKNOWN && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
+            guiGraphics.renderTooltip(font, Component.translatable("address.envelope.type."
+                    + matchedKnownAddress.type().getSerializedName()), mouseX, mouseY);
+        }
+    }
+
+    protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.renderItem(tag, leftPos - 20, topPos + 8);
+        if (isHovering(-20, 8, 18, 18, mouseX, mouseY)) {
+            guiGraphics.renderTooltip(font, tag, mouseX, mouseY);
+        }
     }
 
     // -- Input
@@ -194,5 +198,12 @@ public class AddressTagScreen extends Screen {
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    // --
+
+    protected boolean isHovering(int x, int y, int width, int height, int mouseX, int mouseY) {
+        return mouseX >= leftPos + x && mouseX < leftPos + x + width
+                && mouseY >= topPos + y && mouseY < topPos + y + height;
     }
 }

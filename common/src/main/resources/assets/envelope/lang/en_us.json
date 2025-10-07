@@ -112,6 +112,10 @@
   "address.envelope.mail_service": "‹Mail Service›",
   "address.envelope.unknown": "‹Unknown›",
 
+  "address.envelope.type.pigeonhole": "Pigeonhole",
+  "address.envelope.type.player": "Personal",
+  "address.envelope.type.npc": "Entity",
+
   "subtitles.envelope.entity.pigeon.ambient": "Pigeon coos",
   "subtitles.envelope.entity.pigeon.death": "Pigeon dies",
   "subtitles.envelope.entity.pigeon.eats": "Pigeon eats",
