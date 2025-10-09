@@ -3,20 +3,20 @@ package io.github.mortuusars.envelope;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
-import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
+import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.block.PackageBlock;
 import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressTagMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
-import io.github.mortuusars.envelope.mail.MailId;
+import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
@@ -218,8 +218,8 @@ public class Envelope {
     }
 
     public static class MenuTypes {
-        public static final Supplier<MenuType<PigeonholeAddressMenu>> PIGEONHOLE_ADDRESS =
-                Register.menuType("pigeonhole_address", PigeonholeAddressMenu::fromNetwork);
+        public static final Supplier<MenuType<PigeonholeAddressTagMenu>> PIGEONHOLE_ADDRESS =
+                Register.menuType("pigeonhole_address", PigeonholeAddressTagMenu::fromNetwork);
         public static final Supplier<MenuType<PigeonholeMenu>> PIGEONHOLE =
                 Register.menuType("pigeonhole", PigeonholeMenu::fromNetwork);
 

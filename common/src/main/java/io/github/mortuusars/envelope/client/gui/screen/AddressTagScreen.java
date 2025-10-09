@@ -6,10 +6,12 @@ import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.AddressDisplay;
+import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.core.address.AddressDisplay;
+import io.github.mortuusars.envelope.core.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
+import io.github.mortuusars.envelope.util.EasingFunction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -26,7 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
 
 public class AddressTagScreen extends Screen {
@@ -37,7 +38,7 @@ public class AddressTagScreen extends Screen {
 
     protected final ItemStack tag;
     protected final InteractionHand hand;
-    protected final List<Address> knownAddresses;
+    protected final AllAddresses knownAddresses;
 
     protected int imageWidth, imageHeight;
     protected int leftPos, topPos;
@@ -48,7 +49,7 @@ public class AddressTagScreen extends Screen {
 
     protected Address matchedKnownAddress = Address.UNKNOWN;
 
-    public AddressTagScreen(InteractionHand hand, List<Address> knownAddresses) {
+    public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses) {
         super(Component.translatable("gui.envelope.address_tag.title"));
         this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.hand = hand;
@@ -128,13 +129,7 @@ public class AddressTagScreen extends Screen {
 
     protected void onAddressTextChanged(FormattedString text) {
         String string = text.toString();
-        matchedKnownAddress = Address.UNKNOWN;
-        for (Address address : knownAddresses) {
-            if (address.id().equalsIgnoreCase(string)) {
-                matchedKnownAddress = address;
-                break;
-            }
-        }
+        matchedKnownAddress = knownAddresses.byName(string).orElse(Address.UNKNOWN);
 
         getAddress().ifPresentOrElse(
                 value -> tag.set(Envelope.DataComponents.ADDRESS, value),
@@ -168,7 +163,19 @@ public class AddressTagScreen extends Screen {
     }
 
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.renderItem(tag, leftPos - 20, topPos + 8);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(leftPos - 24 + 8, topPos + 8 + 8, 0);
+        float anim =  (System.currentTimeMillis() % 1000 / 1000f);
+        anim = (float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim);
+        if (anim > 0.5f) {
+            anim = 1f - anim;
+        }
+        float scale = 1.5f + anim * 0.35f;
+        guiGraphics.pose().scale(scale, scale, scale);
+        guiGraphics.pose().translate(-(leftPos - 24 + 8), -(topPos + 8 + 8), 0);
+        guiGraphics.renderItem(tag, leftPos - 24, topPos + 8);
+        guiGraphics.pose().popPose();
+
         if (isHovering(-20, 8, 18, 18, mouseX, mouseY)) {
             guiGraphics.renderTooltip(font, tag, mouseX, mouseY);
         }
@@ -180,6 +187,7 @@ public class AddressTagScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == InputConstants.KEY_ESCAPE) {
             onClose();
+            return true;
         }
 
         if (keyCode == InputConstants.KEY_RETURN) {

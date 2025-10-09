@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeData;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;

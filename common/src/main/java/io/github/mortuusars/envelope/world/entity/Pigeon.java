@@ -4,9 +4,8 @@ import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
-import io.github.mortuusars.envelope.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.Position;
@@ -542,8 +541,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                     .setTicks(0);
 
             MailDeliveryLog.addRecords(getDelivery().getMail(),
-                    TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                    TravelingRecord.travelingTo(getDelivery().getSender()));
+                    MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                    MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));
             return;
         }
 
@@ -593,8 +592,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                     getDelivery().setMail(ItemStack.EMPTY);
                 } else {
                     MailDeliveryLog.addRecords(mail,
-                            TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                            TravelingRecord.travelingTo(getDelivery().getSender()));
+                            MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                            MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));
                 }
             }
             case APPROACHING_HOME -> {

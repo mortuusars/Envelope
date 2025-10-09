@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.mail;
+package io.github.mortuusars.envelope.core.address;
 
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import net.minecraft.ChatFormatting;

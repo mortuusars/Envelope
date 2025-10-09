@@ -2,9 +2,8 @@ package io.github.mortuusars.envelope.world.delivery;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
-import io.github.mortuusars.envelope.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
@@ -39,8 +38,8 @@ public interface Courier {
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
 
         MailDeliveryLog.addRecords(mail,
-                TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
-                TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
+                MailDeliveryLog.TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
+                MailDeliveryLog.TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
 
         setDelivery(Delivery.start(level, mail).setSenderPos(Optional.ofNullable(homePos)));
         startDeliveryPhase(level);
@@ -83,7 +82,7 @@ public interface Courier {
         return address.map(pigeonhole -> {
                     PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
                     if (pigeonholeManager.putMail(pigeonhole, mail)) {
-                        MailDeliveryLog.addRecords(mail, TravelingRecord.arrivedTo(pigeonhole));
+                        MailDeliveryLog.addRecords(mail, MailDeliveryLog.TravelingRecord.arrivedTo(pigeonhole));
 
                         pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
                             if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {

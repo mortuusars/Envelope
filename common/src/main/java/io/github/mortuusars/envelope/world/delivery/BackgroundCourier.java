@@ -4,8 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
-import io.github.mortuusars.envelope.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
@@ -114,8 +113,8 @@ public class BackgroundCourier implements Courier {
                     getDelivery().setMail(ItemStack.EMPTY);
                 } else {
                     MailDeliveryLog.addRecords(mail,
-                            TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                            TravelingRecord.travelingTo(getDelivery().getSender()));
+                            MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
+                            MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));
                 }
             }
             case APPROACHING_HOME -> {

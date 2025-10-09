@@ -37,7 +37,11 @@
   "gui.envelope.pigeonhole.empty": "Empty",
 
   "gui.envelope.pigeonhole_address": "Pigeonhole Address",
-  "gui.envelope.pigeonhole_address.enter_address": "Enter Address",
+  "gui.envelope.pigeonhole_address.validation.err_empty": "§4Address cannot be empty",
+  "gui.envelope.pigeonhole_address.validation.err_too_long": "§4Address is too long",
+  "gui.envelope.pigeonhole_address.validation.err_contains_invalid_chars": "§4Address contains invalid characters",
+  "gui.envelope.pigeonhole_address.validation.err_taken": "§4Address is already taken",
+  "gui.envelope.pigeonhole_address.validation.err_not_enough_xp": "§4Not enough experience",
 
   "entity.envelope.pigeon": "Pigeon",
 

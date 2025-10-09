@@ -1,9 +1,8 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.AddressDisplay;
-import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
-import io.github.mortuusars.envelope.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.core.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -30,7 +29,7 @@ public class Tooltip {
             if (log != null && !log.isEmpty()) {
                 if (Screen.hasShiftDown()) {
                     consumer.accept(Component.translatable("gui.envelope.mail.log"));
-                    for (TravelingRecord record : log.records()) {
+                    for (MailDeliveryLog.TravelingRecord record : log.records()) {
                         consumer.accept(record.translate());
                     }
                 } else {

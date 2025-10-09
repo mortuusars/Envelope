@@ -13,6 +13,20 @@ public abstract class Config {
 
         public static final ModConfigSpec.IntValue MAIL_TRAVEL_DURATION;
 
+        public static class Pigeonhole {
+            public static final ModConfigSpec.IntValue ADDRESS_EXPERIENCE_LEVELS_COST;
+
+            static {
+                BUILDER.push("pigeonhole");
+                ADDRESS_EXPERIENCE_LEVELS_COST = BUILDER
+                        .comment("Levels of experience needed to set or change an address. Default: 5")
+                        .defineInRange("address_experience_levels_cost", 5, 0, 128);
+                BUILDER.pop();
+            }
+
+            public static void init() { }
+        }
+
         public static class Pigeon {
             public static final ModConfigSpec.BooleanValue SPAWNS_NATURALLY;
             public static final ModConfigSpec.BooleanValue SPAWNS_IN_VILLAGE;
@@ -70,6 +84,7 @@ public abstract class Config {
                 BUILDER.pop();
             }
 
+            Pigeonhole.init();
             Pigeon.init();
             Letter.init();
             Package.init();

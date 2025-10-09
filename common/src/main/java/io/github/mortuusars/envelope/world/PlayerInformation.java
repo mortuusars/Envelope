@@ -1,11 +1,14 @@
 package io.github.mortuusars.envelope.world;
 
-import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.world.storage.PlayerInfoSavedData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlayerInformation {
     protected final KnownPlayers knownPlayers = new KnownPlayers();
@@ -21,16 +24,21 @@ public class PlayerInformation {
     }
 
     public class KnownPlayers {
+        @Nullable
+        protected Set<Address.Player> addresses;
+
         public void add(Player player) {
             PlayerInfoSavedData data = data();
-            data.getNames().put(player.getScoreboardName().toLowerCase(), player.getUUID());
+            data.getNames().put(player.getScoreboardName(), player.getUUID());
             data.setDirty();
+            addresses = null;
         }
 
         public void remove(String name) {
             PlayerInfoSavedData data = data();
-            if (data.getNames().remove(name.toLowerCase()) != null) {
+            if (data.getNames().remove(name) != null) {
                 data.setDirty();
+                addresses = null;
             }
         }
 
@@ -38,20 +46,24 @@ public class PlayerInformation {
             PlayerInfoSavedData data = data();
             data.getNames().clear();
             data.setDirty();
+            addresses = null;
         }
 
         public Map<String, UUID> getAll() {
             return Collections.unmodifiableMap(data().getNames());
         }
 
-        public List<Address.Player> getAllAddresses() {
-            return data().getNames().entrySet().stream()
-                    .map(entry -> new Address.Player(entry.getKey(), Optional.of(entry.getValue())))
-                    .toList();
+        public Optional<UUID> getUuid(String name) {
+            return Optional.ofNullable(data().getNames().get(name));
         }
 
-        public Optional<UUID> getUuid(String name) {
-            return Optional.ofNullable(data().getNames().get(name.toLowerCase()));
+        public @NotNull Set<Address.Player> getAllAddresses() {
+            if (addresses == null) {
+                addresses = data().getNames().keySet().stream()
+                        .map(Address.Player::new)
+                        .collect(Collectors.toSet());
+            }
+            return addresses;
         }
     }
 

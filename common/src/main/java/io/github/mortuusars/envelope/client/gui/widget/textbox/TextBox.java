@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class TextBox extends AbstractWidget {
-
     protected FormattedStringEditor editor = new FormattedStringEditor(() ->
             FormattedStringEditor.Validator.fitInDimensions(getFont(), getWidth(), getHeight()));
     protected FormattedStringDisplayCache displayCache = new FormattedStringDisplayCache(editor);
@@ -189,6 +188,11 @@ public class TextBox extends AbstractWidget {
         return this;
     }
 
+    public TextBox clearText() {
+        setTextAndUpdate(FormattedString.parse(""));
+        return this;
+    }
+
     public @Nullable Component getHint() {
         return hint;
     }
@@ -290,6 +294,10 @@ public class TextBox extends AbstractWidget {
     }
 
     // -- Input
+
+    public boolean canConsumeInput() {
+        return isActive() && isFocused();
+    }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.pigeonhole;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.core.address.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 

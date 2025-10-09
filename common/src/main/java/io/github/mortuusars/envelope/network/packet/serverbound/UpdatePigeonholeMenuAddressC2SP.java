@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.network.packet.serverbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressTagMenu;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,8 +29,8 @@ public record UpdatePigeonholeMenuAddressC2SP(String address) implements Packet 
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        if (player instanceof ServerPlayer serverPlayer && player.containerMenu instanceof PigeonholeAddressMenu pigeonholeAddressMenu) {
-            pigeonholeAddressMenu.setAddressAndUpdateConfirmState(serverPlayer.serverLevel(), address);
+        if (player instanceof ServerPlayer serverPlayer && player.containerMenu instanceof PigeonholeAddressTagMenu pigeonholeAddressTagMenu) {
+            pigeonholeAddressTagMenu.setAddressAndUpdateValidationState(serverPlayer.serverLevel(), address);
         }
         return true;
     }

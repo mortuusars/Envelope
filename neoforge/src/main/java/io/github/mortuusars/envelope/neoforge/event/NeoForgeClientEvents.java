@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.neoforge.event;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.PackageScreen;
-import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
@@ -28,7 +28,7 @@ public class NeoForgeClientEvents {
         @SubscribeEvent
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
             event.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
-            event.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressScreen::new);
+            event.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressTagScreen::new);
             event.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
         }
 

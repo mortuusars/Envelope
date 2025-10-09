@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.mail;
+package io.github.mortuusars.envelope.world.item.component;
 
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Envelope;

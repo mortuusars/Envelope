@@ -1,10 +1,8 @@
-package io.github.mortuusars.envelope.mail;
+package io.github.mortuusars.envelope.core.address;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -15,8 +13,9 @@ import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -31,6 +30,10 @@ public interface Address {
     Type type();
     String id();
     MutableComponent getDisplayName();
+
+    default boolean matchesName(String name) {
+        return getDisplayName().getString().equalsIgnoreCase(name);
+    }
 
     default Address ifPigeonhole(Consumer<Pigeonhole> consumer) {
         if (this instanceof Pigeonhole pigeonhole) {
@@ -81,22 +84,31 @@ public interface Address {
         public MutableComponent getDisplayName() {
             return Component.literal(id);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pigeonhole that = (Pigeonhole) o;
+            return this.id.equalsIgnoreCase(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode("p" + id.toLowerCase(Locale.ROOT));
+        }
     }
 
-    record Player(String id, Optional<UUID> uuid) implements Address {
+    record Player(String id) implements Address {
         public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Player::id),
-                UUIDUtil.CODEC.optionalFieldOf("uuid").forGetter(Player::uuid)
+                Codec.STRING.fieldOf("id").forGetter(Player::id)
         ).apply(instance, Player::new));
 
-        public static final StreamCodec<ByteBuf, Player> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Player::id,
-                ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC), Player::uuid,
-                Player::new
-        );
+        public static final StreamCodec<RegistryFriendlyByteBuf, Player> STREAM_CODEC =
+                ByteBufCodecs.STRING_UTF8.map(Player::new, Player::id).cast();
 
         public Player(net.minecraft.world.entity.player.Player player) {
-            this(player.getScoreboardName(), Optional.of(player.getUUID()));
+            this(player.getScoreboardName());
         }
 
         @Override
@@ -107,6 +119,19 @@ public interface Address {
         @Override
         public MutableComponent getDisplayName() {
             return Component.literal(id);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Player that = (Player) o;
+            return this.id.equalsIgnoreCase(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode("pl" + id.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -126,6 +151,10 @@ public interface Address {
             this(id, Optional.ofNullable(displayName));
         }
 
+        public Npc(String id) {
+            this(id, Optional.empty());
+        }
+
         @Override
         public Type type() {
             return Type.NPC;
@@ -136,11 +165,24 @@ public interface Address {
             return displayName.map(component -> Component.empty().append(component))
                     .orElseGet(() -> Component.literal(id));
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Npc that = (Npc) o;
+            return this.id.equalsIgnoreCase(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode("npc" + id.toLowerCase(Locale.ROOT));
+        }
     }
 
     enum Type implements StringRepresentable {
         PIGEONHOLE(0, "pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC),
-        PLAYER(1, "player", Player.CODEC, Player.STREAM_CODEC.cast()),
+        PLAYER(1, "player", Player.CODEC, Player.STREAM_CODEC),
         NPC(2, "npc", Npc.CODEC, Npc.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);

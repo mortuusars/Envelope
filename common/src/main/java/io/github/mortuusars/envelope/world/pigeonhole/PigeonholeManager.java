@@ -1,10 +1,10 @@
 package io.github.mortuusars.envelope.world.pigeonhole;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.mail.Address;
+import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.util.result.Failure;
 import io.github.mortuusars.envelope.util.result.Result;
-import io.github.mortuusars.envelope.mail.MailId;
+import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.github.mortuusars.envelope.world.storage.PigeonholeSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

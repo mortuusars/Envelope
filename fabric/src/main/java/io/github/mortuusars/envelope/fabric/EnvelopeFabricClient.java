@@ -4,7 +4,7 @@ import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactory
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.PackageScreen;
-import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
@@ -31,7 +31,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
 
         MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressTagScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
 
         FabricS2CPacketHandler.register();

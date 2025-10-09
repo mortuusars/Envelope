@@ -5,17 +5,17 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
-import io.github.mortuusars.envelope.mail.Address;
-import io.github.mortuusars.envelope.mail.log.MailDeliveryLog;
-import io.github.mortuusars.envelope.mail.log.TravelingRecord;
+import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressMenu;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressTagMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.mail.MailId;
+import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -83,32 +83,32 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return Optional.ofNullable(address);
     }
 
-    public void setAddress(@Nullable Address.Pigeonhole address) {
+    public void setAddress(@Nullable Address.Pigeonhole newAddress) {
+        Address.Pigeonhole currentAddress = address;
+
+        if (newAddress == null && currentAddress == null) {
+            return;
+        }
+
         if (getLevel() instanceof ServerLevel serverLevel) {
             PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
 
-            if (this.address != null && !this.address.equals(address)) {
+            if (currentAddress != null && (newAddress == null || !newAddress.equals(currentAddress))) {
                 dropOrReturnAllMail();
-                pigeonholeManager.remove(address);
+                pigeonholeManager.remove(currentAddress);
             }
 
-            pigeonholeManager.registerOrUpdate(address, getBlockPos());
+            if (newAddress != null) {
+                pigeonholeManager.registerOrUpdate(newAddress, getBlockPos());
+            }
         }
 
-        this.address = address;
+        address = newAddress;
         setChanged();
     }
 
     public void removeAddress() {
-        if (address == null) return;
-
-        if (getLevel() instanceof ServerLevel serverLevel) {
-            dropOrReturnAllMail();
-            serverLevel.getEnvelopePigeonholeManager().remove(address);
-        }
-
-        this.address = null;
-        setChanged();
+        setAddress(null);
     }
 
     // -- Events
@@ -220,7 +220,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return ((ServerLevel) level).getEnvelopePigeonholeManager().removeMailById(address, id)
                 .mapValue(extractedMail -> {
                     MailDeliveryLog.addRecords(extractedMail,
-                            TravelingRecord.receivedAt(address)
+                            MailDeliveryLog.TravelingRecord.receivedAt(address)
                                     .atTime(level.getGameTime())
                                     .withOperatorMessage(Optional.ofNullable(player).map(Player::getName)));
                     extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
@@ -302,32 +302,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return new PigeonholeMenu(id, inventory, getBlockPos(), getAllMail(), getAddress().orElseThrow());
     }
 
-    public boolean openAddressMenu(ServerPlayer serverPlayer, InteractionHand hand) {
-        String suggestedAddress = getAddress().map(Address::id).orElse("");
-        boolean isRenaming = address != null;
-
-        MenuProvider menuProvider = new MenuProvider() {
-            @Override
-            public @NotNull Component getDisplayName() {
-                return Component.translatable("gui.envelope.pigeonhole_address.enter_address");
-            }
-
-            @Override
-            public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                return new PigeonholeAddressMenu(id, inventory, hand, getBlockPos(), suggestedAddress, isRenaming);
-            }
-        };
-
-        PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> {
-            buffer.writeEnum(hand);
-            buffer.writeBlockPos(getBlockPos());
-            buffer.writeUtf(suggestedAddress);
-            buffer.writeBoolean(isRenaming);
-        });
-
-        return true;
-    }
-
     public boolean openMenu(ServerPlayer player, InteractionHand hand) {
         if (address == null) {
             Envelope.LOGGER.error("Cannot open Pigeonhole: it doesn't have an address.");
@@ -349,6 +323,30 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), player);
 
         return true;
+    }
+
+    public void openAddressMenu(ServerPlayer serverPlayer, InteractionHand hand) {
+        AllAddresses allAddresses = AllAddresses.of(serverPlayer.serverLevel());
+
+        MenuProvider menuProvider = new MenuProvider() {
+            @Override
+            public @NotNull Component getDisplayName() {
+                return Component.translatable("gui.envelope.pigeonhole_address");
+            }
+
+            @Override
+            public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+                return new PigeonholeAddressTagMenu(id, inventory, hand, getBlockPos(),
+                        allAddresses, getAddress().orElse(null));
+            }
+        };
+
+        PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> {
+            buffer.writeEnum(hand);
+            buffer.writeBlockPos(getBlockPos());
+            AllAddresses.STREAM_CODEC.encode(buffer, allAddresses);
+            Address.Pigeonhole.STREAM_CODEC.apply(ByteBufCodecs::optional).encode(buffer, getAddress());
+        });
     }
 
     // --

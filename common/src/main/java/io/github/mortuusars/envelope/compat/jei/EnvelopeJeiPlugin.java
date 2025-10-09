@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.compat.jei;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressTagScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
@@ -25,9 +25,9 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         // Hides JEI side panels
-        registration.addGenericGuiContainerHandler(PigeonholeAddressScreen.class, new IGuiContainerHandler<PigeonholeAddressScreen>() {
+        registration.addGenericGuiContainerHandler(PigeonholeAddressTagScreen.class, new IGuiContainerHandler<PigeonholeAddressTagScreen>() {
             @Override
-            public @NotNull List<Rect2i> getGuiExtraAreas(@NotNull PigeonholeAddressScreen containerScreen) {
+            public @NotNull List<Rect2i> getGuiExtraAreas(@NotNull PigeonholeAddressTagScreen containerScreen) {
                 return List.of(new Rect2i(0, 0,
                         Minecraft.getInstance().getWindow().getGuiScaledWidth(),
                         Minecraft.getInstance().getWindow().getGuiScaledHeight()));
