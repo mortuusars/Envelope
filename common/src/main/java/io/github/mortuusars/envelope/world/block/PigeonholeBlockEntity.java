@@ -6,14 +6,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.core.address.AllAddresses;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressTagMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.netty.buffer.ByteBuf;
@@ -164,10 +162,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
             releaseAllOccupants(getLevelOrThrow().getBlockState(getBlockPos()), ReleaseReason.EMERGENCY);
         }
 
-        if (level instanceof ServerLevel serverLevel && getBlockState().hasProperty(PigeonholeBlock.HAS_MAIL)) {
-            boolean hasMail = !getItem(SLOT_MAIL).isEmpty();
-            if (getBlockState().getValue(PigeonholeBlock.HAS_MAIL) != hasMail) {
-                serverLevel.setBlock(getBlockPos(), getBlockState().setValue(PigeonholeBlock.HAS_MAIL, hasMail), Block.UPDATE_ALL);
+        if (level instanceof ServerLevel serverLevel) {
+            if (getBlockState().hasProperty(PigeonholeBlock.HAS_MAIL)) {
+                boolean hasMail = !getItem(SLOT_MAIL).isEmpty();
+                if (getBlockState().getValue(PigeonholeBlock.HAS_MAIL) != hasMail) {
+                    serverLevel.setBlock(getBlockPos(), getBlockState().setValue(PigeonholeBlock.HAS_MAIL, hasMail), Block.UPDATE_ALL);
+                }
             }
         }
 
@@ -323,30 +323,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), player);
 
         return true;
-    }
-
-    public void openAddressMenu(ServerPlayer serverPlayer, InteractionHand hand) {
-        AllAddresses allAddresses = AllAddresses.of(serverPlayer.serverLevel());
-
-        MenuProvider menuProvider = new MenuProvider() {
-            @Override
-            public @NotNull Component getDisplayName() {
-                return Component.translatable("gui.envelope.pigeonhole_address");
-            }
-
-            @Override
-            public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                return new PigeonholeAddressTagMenu(id, inventory, hand, getBlockPos(),
-                        allAddresses, getAddress().orElse(null));
-            }
-        };
-
-        PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> {
-            buffer.writeEnum(hand);
-            buffer.writeBlockPos(getBlockPos());
-            AllAddresses.STREAM_CODEC.encode(buffer, allAddresses);
-            Address.Pigeonhole.STREAM_CODEC.apply(ByteBufCodecs::optional).encode(buffer, getAddress());
-        });
     }
 
     // --

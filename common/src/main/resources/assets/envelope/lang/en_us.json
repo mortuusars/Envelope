@@ -19,8 +19,8 @@
 
   "container.envelope.pigeonhole": "Pigeonhole",
 
-  "gui.envelope.pigeonhole_address.rename_warning.inbox": "• Mail in inbox will be dropped on the ground.",
-  "gui.envelope.pigeonhole_address.rename_warning.traveling": "• Mail traveling to previous address will be returned.",
+  "gui.envelope.pigeonhole_address.rename_warning.inbox": "§6• Mail in inbox will be dropped on the ground.",
+  "gui.envelope.pigeonhole_address.rename_warning.traveling": "§6• Mail traveling to previous address will be returned.",
 
   "gui.envelope.package.pack": "Pack",
   "gui.envelope.package.pack.tooltip.packs_remaining": "§7Remaining: %s",
@@ -37,11 +37,11 @@
   "gui.envelope.pigeonhole.empty": "Empty",
 
   "gui.envelope.pigeonhole_address": "Pigeonhole Address",
-  "gui.envelope.pigeonhole_address.validation.err_empty": "§4Address cannot be empty",
-  "gui.envelope.pigeonhole_address.validation.err_too_long": "§4Address is too long",
-  "gui.envelope.pigeonhole_address.validation.err_contains_invalid_chars": "§4Address contains invalid characters",
-  "gui.envelope.pigeonhole_address.validation.err_taken": "§4Address is already taken",
-  "gui.envelope.pigeonhole_address.validation.err_not_enough_xp": "§4Not enough experience",
+  "gui.envelope.validation.issue.address.empty": "§4Address cannot be empty",
+  "gui.envelope.validation.issue.address.too_long": "§4Address is too long",
+  "gui.envelope.validation.issue.address.contains_invalid_chars": "§4Address contains invalid characters",
+  "gui.envelope.validation.issue.address.taken": "§4Address is already taken",
+  "gui.envelope.validation.issue.address.not_enough_xp_levels": "§4Not enough experience",
 
   "entity.envelope.pigeon": "Pigeon",
 

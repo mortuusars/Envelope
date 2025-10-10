@@ -1,9 +1,9 @@
-package io.github.mortuusars.envelope.client.gui.screen;
+package io.github.mortuusars.envelope.compat.jei;
 
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import net.minecraft.client.gui.screens.Screen;
 
-public interface JeiKeyConflictResolverScreen {
+public interface JeiCompatibleScreen {
     default boolean shouldBlockJeiInput() {
         return this instanceof Screen screen && screen.getFocused() instanceof TextBox textBox && textBox.getEditor().isSelecting();
     }

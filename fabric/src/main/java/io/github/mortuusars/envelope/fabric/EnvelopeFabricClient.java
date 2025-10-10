@@ -31,7 +31,6 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
 
         MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressTagScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
 
         FabricS2CPacketHandler.register();

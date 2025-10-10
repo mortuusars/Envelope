@@ -4,10 +4,17 @@ import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.core.address.validation.PigeonholeAddressValidator;
+import io.github.mortuusars.envelope.core.address.validation.Validator;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -19,6 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.entity.vehicle.MinecartTNT;
@@ -43,6 +51,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -184,7 +193,8 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                blockEntity.openAddressMenu(serverPlayer, hand);
+                AllAddresses knownAddresses = AllAddresses.of(serverPlayer.serverLevel());
+                Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -202,23 +212,31 @@ public class PigeonholeBlock extends BaseEntityBlock {
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
-    public void applyAddress(Player player, BlockState state, BlockPos pos, InteractionHand hand, String address) {
+    public void applyAddress(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
         Level level = player.level();
 
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             Optional<Address.Pigeonhole> currentAddress = blockEntity.getAddress();
 
-            blockEntity.setAddress(new Address.Pigeonhole(address));
+            PigeonholeAddressValidator validator = new PigeonholeAddressValidator(player, currentAddress.map(Address.class::cast));
+            ArrayList<Validator.Issue> issues = validator.validate(addressId);
+            if (!issues.isEmpty()) {
+                player.displayClientMessage(issues.getFirst().translate(), true);
+                level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                return;
+            }
+
+            blockEntity.setAddress(new Address.Pigeonhole(addressId));
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
 
-            boolean hasChanged = currentAddress.isEmpty() || !currentAddress.get().matchesName(address);
+            boolean hasChanged = currentAddress.isEmpty() || !currentAddress.get().matches(addressId);
             if (hasChanged) {
                 if (!player.isCreative()) {
-                    player.getItemInHand(hand).shrink(1);
+                    player.getInventory().getItem(slot).shrink(1);
                     player.giveExperienceLevels(-Config.Server.Pigeonhole.ADDRESS_EXPERIENCE_LEVELS_COST.get());
                     level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1, 1);
                 }
-                player.swing(hand);
+                player.swing(slot == Inventory.SLOT_OFFHAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
                 level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
             }
         }

@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.display.Horizonta
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.compat.jei.JeiCompatibleScreen;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.LetterEditC2SP;
 import net.minecraft.client.Minecraft;
@@ -19,7 +20,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class LetterEditScreen extends Screen implements JeiKeyConflictResolverScreen {
+public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/letter.png");
 
     protected final ItemStack letter;

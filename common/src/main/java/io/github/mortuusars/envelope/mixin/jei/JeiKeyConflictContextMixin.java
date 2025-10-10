@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.mixin.jei;
 
-import io.github.mortuusars.envelope.client.gui.screen.JeiKeyConflictResolverScreen;
+import io.github.mortuusars.envelope.compat.jei.JeiCompatibleScreen;
 import mezz.jei.common.input.IInternalKeyMappings;
 import mezz.jei.gui.input.IUserInputHandler;
 import mezz.jei.gui.input.UserInput;
@@ -20,7 +20,7 @@ public class JeiKeyConflictContextMixin {
      */
     @Inject(method = "handleUserInput", at = @At("HEAD"), cancellable = true)
     private void onHandleUserInput(Screen screen, UserInput input, IInternalKeyMappings keyBindings, CallbackInfoReturnable<Optional<IUserInputHandler>> cir) {
-        if (screen instanceof JeiKeyConflictResolverScreen resolverScreen && resolverScreen.shouldBlockJeiInput()) {
+        if (screen instanceof JeiCompatibleScreen resolverScreen && resolverScreen.shouldBlockJeiInput()) {
             cir.setReturnValue(Optional.empty());
         }
     }

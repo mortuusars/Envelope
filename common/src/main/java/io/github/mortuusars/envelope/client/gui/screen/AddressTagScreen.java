@@ -36,9 +36,10 @@ public class AddressTagScreen extends Screen {
     public static final WidgetSprites CONFIRM_BUTTON_SPRITES =
             Sprites.threeStates(Envelope.resource("address_tag/confirm_button"));
 
-    protected final ItemStack tag;
     protected final InteractionHand hand;
+    protected final ItemStack tag;
     protected final AllAddresses knownAddresses;
+    protected Optional<Address> existingAddress;
 
     protected int imageWidth, imageHeight;
     protected int leftPos, topPos;
@@ -47,13 +48,14 @@ public class AddressTagScreen extends Screen {
     protected TextBox addressBox;
     protected ImageButton confirmButton;
 
-    protected Address matchedKnownAddress = Address.UNKNOWN;
+    protected Optional<Address> matchedKnownAddress = Optional.empty();
 
     public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses) {
         super(Component.translatable("gui.envelope.address_tag.title"));
-        this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.hand = hand;
+        this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.knownAddresses = knownAddresses;
+        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS));
     }
 
     @Override
@@ -65,11 +67,6 @@ public class AddressTagScreen extends Screen {
         titleLabelX = leftPos + 12;
         titleLabelY = topPos + 7;
 
-        @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
-        String addressText = "";
-        if (address != null) {
-            addressText = address.id();
-        }
         addressBox = new TextBox(font, leftPos + 20, topPos + 18, 140, 9)
                 .setTextValidator(text -> text.length() <= 22 && !text.contains("\n"))
                 .setFormattingEnabled(false)
@@ -78,8 +75,8 @@ public class AddressTagScreen extends Screen {
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
                 .setHintColor(0xFFC2A57F)
-                .setOnTextChanged(this::onAddressTextChanged);
-        addressBox.setTextAndUpdate(FormattedString.parse(addressText));
+                .setOnTextChanged(this::addressTextChanged);
+        addressBox.setTextAndUpdate(FormattedString.parse(getInitialAddressValue()));
         addressBox.getEditor().setCursorToEnd(false);
         addRenderableWidget(addressBox);
 
@@ -91,12 +88,47 @@ public class AddressTagScreen extends Screen {
         setInitialFocus(addressBox);
     }
 
-    @Override
-    public boolean isPauseScreen() {
-        return false;
+    // -- Address
+
+    protected String getCurrentAddressId() {
+        return addressBox.getEditor().getText().toStringWithoutFormatting();
     }
 
-    // --
+    protected String getInitialAddressValue() {
+        @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
+        if (address != null) {
+            return address.id();
+        }
+        return "";
+    }
+
+    protected Optional<Address> getMatchedKnownAddress() {
+        return matchedKnownAddress;
+    }
+
+    protected Optional<Address> getOrCreateAddressFromCurrentValue() {
+        String addressId = getCurrentAddressId().trim();
+        if (addressId.isBlank()) {
+            return Optional.empty();
+        }
+
+        return getMatchedKnownAddress().or(() -> Optional.of(new Address.Pigeonhole(addressId)));
+    }
+
+    protected boolean isRenaming() {
+        return existingAddress.isPresent();
+    }
+
+    protected boolean isCurrentIdSameAsExistingAddress() {
+        String currentAddressId = getCurrentAddressId().trim();
+        return existingAddress.map(address -> address.matches(currentAddressId)).orElse(false);
+    }
+
+    protected void updateAddressTagAddress() {
+        getOrCreateAddressFromCurrentValue().ifPresentOrElse(
+                value -> tag.set(Envelope.DataComponents.ADDRESS, value),
+                () -> tag.remove(Envelope.DataComponents.ADDRESS));
+    }
 
     protected void fillLastAddress() {
         //TODO: fill last address
@@ -106,34 +138,23 @@ public class AddressTagScreen extends Screen {
         // it should be deferred somehow, as it's set to the button after handling click
     }
 
+    // -- Events
+
+    protected void addressTextChanged(FormattedString text) {
+        String addressId = text.toString().trim();
+        matchedKnownAddress = knownAddresses.byName(addressId);
+        updateAddressTagAddress();
+    }
+
     protected void confirm() {
         Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
         int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new AddressTagApplyC2SP(slot, getAddress()));
+        Packets.sendToServer(new AddressTagApplyC2SP(slot, getOrCreateAddressFromCurrentValue()));
+        close();
+    }
+
+    protected void close() {
         onClose();
-    }
-
-    protected Optional<Address> getAddress() {
-        String addressText = addressBox.getEditor().getText().toString().trim();
-        if (addressText.isBlank()) {
-            return Optional.empty();
-        }
-
-        Address address = matchedKnownAddress != Address.UNKNOWN
-                ? matchedKnownAddress
-                : new Address.Pigeonhole(addressText);
-        return Optional.ofNullable(address);
-    }
-
-    // -- Events
-
-    protected void onAddressTextChanged(FormattedString text) {
-        String string = text.toString();
-        matchedKnownAddress = knownAddresses.byName(string).orElse(Address.UNKNOWN);
-
-        getAddress().ifPresentOrElse(
-                value -> tag.set(Envelope.DataComponents.ADDRESS, value),
-                () -> tag.remove(Envelope.DataComponents.ADDRESS));
     }
 
     // -- Render
@@ -153,12 +174,14 @@ public class AddressTagScreen extends Screen {
     }
 
     protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        int color = matchedKnownAddress == Address.UNKNOWN ? 0xFFB89B76 : 0xFF7B593D;
-        guiGraphics.drawString(font, AddressDisplay.getIcon(matchedKnownAddress),
+        Address address = getMatchedKnownAddress().orElse(Address.UNKNOWN);
+
+        int color = address == Address.UNKNOWN ? 0xFFB89B76 : 0xFF7B593D;
+        guiGraphics.drawString(font, AddressDisplay.getIcon(address),
                 leftPos + 12, topPos + 18, color, false);
-        if (matchedKnownAddress != Address.UNKNOWN && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
+        if (address != Address.UNKNOWN && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
             guiGraphics.renderTooltip(font, Component.translatable("address.envelope.type."
-                    + matchedKnownAddress.type().getSerializedName()), mouseX, mouseY);
+                    + address.type().getSerializedName()), mouseX, mouseY);
         }
     }
 
@@ -186,7 +209,7 @@ public class AddressTagScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == InputConstants.KEY_ESCAPE) {
-            onClose();
+            close();
             return true;
         }
 
@@ -209,6 +232,11 @@ public class AddressTagScreen extends Screen {
     }
 
     // --
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
 
     protected boolean isHovering(int x, int y, int width, int height, int mouseX, int mouseY) {
         return mouseX >= leftPos + x && mouseX < leftPos + x + width

@@ -28,7 +28,6 @@ public class NeoForgeClientEvents {
         @SubscribeEvent
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
             event.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
-            event.register(Envelope.MenuTypes.PIGEONHOLE_ADDRESS.get(), PigeonholeAddressTagScreen::new);
             event.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
         }
 

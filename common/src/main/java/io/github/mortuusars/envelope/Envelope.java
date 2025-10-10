@@ -11,7 +11,6 @@ import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressTagMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
@@ -126,7 +125,7 @@ public class Envelope {
                 ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, resource("pigeonhole"));
 
         static void init() {
-            Register.poiType(PIGEONHOLE, 0, 1, () -> getPigeonholePoiBlockStates());
+            Register.poiType(PIGEONHOLE, 0, 1, PoiTypes::getPigeonholePoiBlockStates);
         }
 
         private static Set<BlockState> getPigeonholePoiBlockStates() {
@@ -218,8 +217,6 @@ public class Envelope {
     }
 
     public static class MenuTypes {
-        public static final Supplier<MenuType<PigeonholeAddressTagMenu>> PIGEONHOLE_ADDRESS =
-                Register.menuType("pigeonhole_address", PigeonholeAddressTagMenu::fromNetwork);
         public static final Supplier<MenuType<PigeonholeMenu>> PIGEONHOLE =
                 Register.menuType("pigeonhole", PigeonholeMenu::fromNetwork);
 

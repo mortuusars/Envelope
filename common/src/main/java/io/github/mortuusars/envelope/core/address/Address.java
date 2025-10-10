@@ -31,8 +31,8 @@ public interface Address {
     String id();
     MutableComponent getDisplayName();
 
-    default boolean matchesName(String name) {
-        return getDisplayName().getString().equalsIgnoreCase(name);
+    default boolean matches(String name) {
+        return id().equalsIgnoreCase(name);
     }
 
     default Address ifPigeonhole(Consumer<Pigeonhole> consumer) {
@@ -158,6 +158,11 @@ public interface Address {
         @Override
         public Type type() {
             return Type.NPC;
+        }
+
+        @Override
+        public boolean matches(String name) {
+            return Address.super.matches(name) || getDisplayName().getString().equalsIgnoreCase(name);
         }
 
         @Override

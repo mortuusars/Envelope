@@ -28,7 +28,7 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
     }
 
     public Optional<Address> byName(String name) {
-        return stream().filter(a -> a.matchesName(name)).findFirst();
+        return stream().filter(a -> a.matches(name)).findFirst();
     }
 
     public boolean isKnown(String name) {

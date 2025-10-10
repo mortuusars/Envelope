@@ -1,77 +1,87 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.core.address.validation.PigeonholeAddressValidator;
+import io.github.mortuusars.envelope.core.address.validation.Validator;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.UpdatePigeonholeMenuAddressC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.PigeonholeAddressTagApplyC2SP;
 import io.github.mortuusars.envelope.util.EasingFunction;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeAddressTagMenu;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
+import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class PigeonholeAddressTagScreen extends AbstractContainerScreen<PigeonholeAddressTagMenu> {
-    protected TextBox addressBox;
-    protected ImageButton confirmButton;
+import java.util.Optional;
 
-    public PigeonholeAddressTagScreen(PigeonholeAddressTagMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
+public class PigeonholeAddressTagScreen extends AddressTagScreen {
+    protected final LocalPlayer player;
+    protected final BlockPos pos;
+    protected final BlockState state;
+    protected final Validator.CachedValidator<String> addressValidator;
+
+    public PigeonholeAddressTagScreen(InteractionHand hand, AllAddresses knownAddresses,
+                                      BlockPos pos, Optional<Address.Pigeonhole> existingAddress) {
+        super(hand, knownAddresses);
+        this.player = Minecrft.player();
+        this.pos = pos;
+        this.state = Minecrft.level().getBlockState(pos);
+        this.existingAddress = existingAddress.map(Address.class::cast);
+        this.addressValidator = new Validator.CachedValidator<>(
+                new PigeonholeAddressValidator(player, existingAddress.map(Address.class::cast))
+                        .setKnownAddresses(knownAddresses));
     }
+
+    // -- Address
 
     @Override
-    protected void init() {
-        imageWidth = 183;
-        imageHeight = 33;
-        inventoryLabelX = -999;
-        inventoryLabelY = -999;
-        titleLabelX = 12;
-        titleLabelY = 7;
-        super.init();
-
-        addressBox = new TextBox(font, leftPos + 20, topPos + 18, 140, 9)
-                .setTextValidator(text -> text.length() <= 22 && !text.contains("\n"))
-                .setFormattingEnabled(false)
-                .setFontColor(0xFF7B593D)
-                .setFontUnfocusedColor(0xFF7B593D)
-                .setSelectionColor(0xFF664488)
-                .setSelectionUnfocusedColor(0xFF696170)
-                .setHintColor(0xFFC2A57F)
-                .setOnTextChanged(this::onAddressTextChanged);
-        addressBox.setTextAndUpdate(FormattedString.parse(getMenu().getAddress()));
-        addressBox.getEditor().setCursorToEnd(false);
-        addRenderableWidget(addressBox);
-
-        confirmButton = new ImageButton(leftPos + 162, topPos + 16, 11, 11, AddressTagScreen.CONFIRM_BUTTON_SPRITES,
-                button -> confirm(), Component.translatable("gui.envelope.confirm"));
-        addRenderableWidget(confirmButton);
-
-        setInitialFocus(addressBox);
+    protected String getInitialAddressValue() {
+        return existingAddress
+                .map(Address::id)
+                .orElseGet(() ->
+                        Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
+                                .map(Address::getDisplayName)
+                                .map(Component::getString)
+                                .orElse(""));
     }
 
-    protected void updateConfirmButtonTooltip() {
-        if (confirmButton == null) return; // If not initialized yet
-        if (!getMenu().canConfirm()) {
-            confirmButton.setTooltip(Tooltip.create(getMenu().getValidationState().translate()));
+    // --
+
+    protected void updateConfirmButton() {
+        if (confirmButton == null) return; // Not initialized yet
+
+        confirmButton.active = canConfirm();
+
+        MutableComponent confirmTooltip = Component.translatable("gui.envelope.confirm");
+
+        if (!canConfirm()) {
+            getAddressValidator().getCurrentIssues().forEach(issue -> {
+                confirmTooltip.append("\n").append(issue.translate());
+            });
+            confirmButton.setTooltip(Tooltip.create(confirmTooltip));
             return;
         }
-        MutableComponent confirmTooltip = Component.translatable("gui.envelope.confirm");
-        if (getMenu().isRenaming() && !getMenu().isSameAsCurrentAddress(getMenu().getAddress())) {
+
+        if (isRenaming() && !isCurrentIdSameAsExistingAddress()) {
             confirmTooltip.append("\n")
                     .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.inbox")
                             .withStyle(Style.EMPTY.withColor(0xFFE76A6A)))
@@ -82,68 +92,59 @@ public class PigeonholeAddressTagScreen extends AbstractContainerScreen<Pigeonho
         confirmButton.setTooltip(Tooltip.create(confirmTooltip));
     }
 
-    protected void onAddressTextChanged(FormattedString text) {
-        String string = text.toString();
-        getMenu().setAddress(string);
-        Packets.sendToServer(new UpdatePigeonholeMenuAddressC2SP(string));
+    // -- Events
+
+
+    @Override
+    protected void addressTextChanged(FormattedString text) {
+        super.addressTextChanged(text);
+        getAddressValidator().setValue(getCurrentAddressId());
     }
 
-    protected boolean canConfirm() {
-        return getMenu().canConfirm();
-    }
-
+    @Override
     protected void confirm() {
         if (!canConfirm()) {
             return;
         }
 
-        getMenu().clickMenuButton(getMenu().getPlayer(), PigeonholeAddressTagMenu.APPLY_BUTTON_ID);
-        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeAddressTagMenu.APPLY_BUTTON_ID);
-        onClose();
-    }
-
-    protected void cancel() {
-        onClose();
+        Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
+        int slot = this.hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
+        Packets.sendToServer(new PigeonholeAddressTagApplyC2SP(slot, getCurrentAddressId().trim(), pos));
+        close();
     }
 
     // -- Render
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        updateConfirmButtonTooltip();
-        confirmButton.active = canConfirm();
+        if (!stillValid()) {
+            close();
+        }
+
+        updateConfirmButton();
+
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderAddressType(guiGraphics, mouseX, mouseY, partialTick);
-        renderTargetPreview(guiGraphics, mouseX, mouseY);
         renderExperienceCost(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.blit(AddressTagScreen.TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+    protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+//        boolean isValid = getMenu().getValidationState() != PigeonholeAddressTagMenu.AddressValidation.ERR_TAKEN;
+        int color = /*isValid ?*/ 0xFF7B593D/* : 0xFFFA5951*/;
+        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE,
+                leftPos + 12, topPos + 18, color, false);
+//        if (!isValid && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
+//            guiGraphics.renderTooltip(font, getMenu().getValidationState().translate(), mouseX, mouseY);
+//        }
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFFB89B76, false);
-    }
-
-    protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        boolean isValid = getMenu().getValidationState() != PigeonholeAddressTagMenu.AddressValidation.ERR_TAKEN;
-        int color = isValid ? 0xFF7B593D : 0xFFFA5951;
-        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE,
-                leftPos + 12, topPos + 18, color, false);
-        if (!isValid && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, getMenu().getValidationState().translate(), mouseX, mouseY);
-        }
-    }
-
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        BlockState state = getMenu().getPlayer().level().getBlockState(getMenu().getPos());
+        //TODO: generalize
         ItemStack stack = new ItemStack(state.getBlock().asItem());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos - 28 + 8, topPos + 8 + 8, 0);
-        float anim =  (System.currentTimeMillis() % 1000 / 1000f);
+        float anim =  (System.currentTimeMillis() % 600 / 600f);
         anim = (float)EasingFunction.EASE_IN_OUT_QUAD.ease(anim);
         if (anim > 0.5f) {
             anim = 1f - anim;
@@ -159,12 +160,12 @@ public class PigeonholeAddressTagScreen extends AbstractContainerScreen<Pigeonho
     }
 
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (getMenu().isSameAsCurrentAddress(getMenu().getAddress())) return;
+        if (isCurrentIdSameAsExistingAddress()) return;
 
         int cost = Config.Server.Pigeonhole.ADDRESS_EXPERIENCE_LEVELS_COST.get();
         if (cost <= 0) return;
 
-        boolean hasEnough = getMenu().getPlayer().experienceLevel >= cost;
+        boolean hasEnough = player.experienceLevel >= cost;
         ResourceLocation sprite = Envelope.resource("address_tag/experience" + (hasEnough ? "" : "_disabled"));
 
         int x = 150;
@@ -193,33 +194,21 @@ public class PigeonholeAddressTagScreen extends AbstractContainerScreen<Pigeonho
         guiGraphics.drawString(font, text, leftPos + x, topPos + y, centerColor, false);
     }
 
-    // -- Input
+    // --
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == InputConstants.KEY_ESCAPE) {
-            cancel();
-            return true;
-        }
-
-        if (keyCode == InputConstants.KEY_RETURN) {
-            if (canConfirm()) {
-                confirm();
-                Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1f));
-            }
-            return true;
-        }
-
-        return this.addressBox.keyPressed(keyCode, scanCode, modifiers) || this.addressBox.canConsumeInput() || super.keyPressed(keyCode, scanCode, modifiers);
+    protected boolean stillValid() {
+        return player.getItemInHand(hand).getItem() instanceof AddressTagItem
+                && player.level().getBlockState(pos).getBlock() instanceof PigeonholeBlock
+                && player.distanceToSqr(Vec3.atCenterOf(pos)) <= 64.0D;
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == InputConstants.MOUSE_BUTTON_RIGHT && addressBox.isMouseOver(mouseX, mouseY)) {
-            addressBox.clearText();
-            return true;
-        }
+    // -- Validation
 
-        return super.mouseClicked(mouseX, mouseY, button);
+    public Validator.CachedValidator<String> getAddressValidator() {
+        return addressValidator;
+    }
+
+    protected boolean canConfirm() {
+        return getAddressValidator().getCurrentIssues().isEmpty();
     }
 }
