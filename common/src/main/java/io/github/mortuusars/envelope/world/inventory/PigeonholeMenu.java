@@ -30,6 +30,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     public static final int ADDRESS_BUTTON_ID = 0;
     public static final int REFRESH_MAIL_BUTTON_ID = 1;
 
+    protected final DataSlot hasDefault = DataSlot.standalone();
     protected final DataSlot isDefault = DataSlot.standalone();
 
     protected final Inventory playerInventory;
@@ -67,7 +68,9 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             }
         });
         addPlayerSlots(playerInventory, 140, 121);
+        addDataSlot(hasDefault);
         addDataSlot(isDefault);
+        updateHasDefault();
         updateIsDefault();
     }
 
@@ -106,6 +109,19 @@ public class PigeonholeMenu extends AbstractContainerMenu {
 
     public Address getAddress() {
         return address;
+    }
+
+    public boolean hasDefaultAddress() {
+        if (player instanceof ServerPlayer serverPlayer) {
+            return serverPlayer.serverLevel().getEnvelopePlayerInformation().getDefaultAddress().of(player).isPresent();
+        }
+        return hasDefault.get() == 1;
+    }
+
+    protected void updateHasDefault() {
+        if (player instanceof ServerPlayer) {
+            hasDefault.set(hasDefaultAddress() ? 1 : 0);
+        }
     }
 
     public boolean isDefaultAddress() {
@@ -255,6 +271,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(Player player, int id) {
         if (id == ADDRESS_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
             serverPlayer.serverLevel().getEnvelopePlayerInformation().getDefaultAddress().set(serverPlayer, address);
+            updateHasDefault();
             updateIsDefault();
             return true;
         }
