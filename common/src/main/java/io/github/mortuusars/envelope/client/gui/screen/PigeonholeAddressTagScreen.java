@@ -10,7 +10,6 @@ import io.github.mortuusars.envelope.core.address.validation.PigeonholeAddressVa
 import io.github.mortuusars.envelope.core.address.validation.Validator;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.PigeonholeAddressTagApplyC2SP;
-import io.github.mortuusars.envelope.util.EasingFunction;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
@@ -66,6 +65,11 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
 
     // --
 
+    @Override
+    protected ItemStack getTarget() {
+        return new ItemStack(state.getBlock().asItem());
+    }
+
     protected void updateConfirmButton() {
         if (confirmButton == null) return; // Not initialized yet
 
@@ -93,7 +97,6 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     }
 
     // -- Events
-
 
     @Override
     protected void addressTextChanged(FormattedString text) {
@@ -136,27 +139,6 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
 //        if (!isValid && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
 //            guiGraphics.renderTooltip(font, getMenu().getValidationState().translate(), mouseX, mouseY);
 //        }
-    }
-
-    @Override
-    protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        //TODO: generalize
-        ItemStack stack = new ItemStack(state.getBlock().asItem());
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos - 28 + 8, topPos + 8 + 8, 0);
-        float anim =  (System.currentTimeMillis() % 600 / 600f);
-        anim = (float)EasingFunction.EASE_IN_OUT_QUAD.ease(anim);
-        if (anim > 0.5f) {
-            anim = 1f - anim;
-        }
-        float scale = 2f + anim * 0.35f;
-        guiGraphics.pose().scale(scale, scale, scale);
-        guiGraphics.pose().translate(-(leftPos - 28 + 8), -(topPos + 8 + 8), 0);
-        guiGraphics.renderItem(stack, leftPos - 28, topPos + 8);
-        guiGraphics.pose().popPose();
-        if (isHovering(-36, 0, 32, 34, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, state.getBlock().getName(), mouseX, mouseY);
-        }
     }
 
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {

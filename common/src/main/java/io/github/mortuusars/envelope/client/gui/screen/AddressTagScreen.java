@@ -11,7 +11,6 @@ import io.github.mortuusars.envelope.core.address.AddressDisplay;
 import io.github.mortuusars.envelope.core.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
-import io.github.mortuusars.envelope.util.EasingFunction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -138,6 +137,12 @@ public class AddressTagScreen extends Screen {
         // it should be deferred somehow, as it's set to the button after handling click
     }
 
+    // --
+
+    protected ItemStack getTarget() {
+        return tag;
+    }
+
     // -- Events
 
     protected void addressTextChanged(FormattedString text) {
@@ -186,21 +191,26 @@ public class AddressTagScreen extends Screen {
     }
 
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos - 24 + 8, topPos + 8 + 8, 0);
-        float anim =  (System.currentTimeMillis() % 1000 / 1000f);
-        anim = (float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim);
-        if (anim > 0.5f) {
-            anim = 1f - anim;
+        ItemStack target = getTarget();
+        if (target.isEmpty()) {
+            return;
         }
-        float scale = 1.5f + anim * 0.35f;
+
+        float scale = 2f;
+        int size = (int)(16 * scale);
+
+        int x = leftPos - size - 4;
+        int y = topPos + (imageHeight - size) / 2;
+
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2, 0);
         guiGraphics.pose().scale(scale, scale, scale);
-        guiGraphics.pose().translate(-(leftPos - 24 + 8), -(topPos + 8 + 8), 0);
-        guiGraphics.renderItem(tag, leftPos - 24, topPos + 8);
+        guiGraphics.pose().translate(-8, -8, 0);
+        guiGraphics.renderItem(target, 0, 0);
         guiGraphics.pose().popPose();
 
-        if (isHovering(-20, 8, 18, 18, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, tag, mouseX, mouseY);
+        if (isHovering(x - leftPos, y - topPos, size, size, mouseX, mouseY)) {
+            guiGraphics.renderTooltip(font, target, mouseX, mouseY);
         }
     }
 
