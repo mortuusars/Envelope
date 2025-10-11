@@ -21,8 +21,8 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public interface Address {
-    Address MAIL_SERVICE = new Npc("‹Mail Service›", Component.translatable("address.envelope.mail_service"));
-    Address UNKNOWN = new Npc("‹Unknown›", Component.translatable("address.envelope.unknown"));
+    Address MAIL_SERVICE = new Npc("Mail Service", Component.translatable("address.envelope.mail_service"));
+    Address UNKNOWN = new Npc("Unknown", Component.translatable("address.envelope.unknown"));
 
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::type, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);

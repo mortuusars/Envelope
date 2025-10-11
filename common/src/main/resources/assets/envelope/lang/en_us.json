@@ -37,11 +37,11 @@
   "gui.envelope.pigeonhole.empty": "Empty",
 
   "gui.envelope.pigeonhole_address": "Pigeonhole Address",
-  "gui.envelope.validation.issue.address.empty": "§4Address cannot be empty",
-  "gui.envelope.validation.issue.address.too_long": "§4Address is too long",
-  "gui.envelope.validation.issue.address.contains_invalid_chars": "§4Address contains invalid characters",
-  "gui.envelope.validation.issue.address.taken": "§4Address is already taken",
-  "gui.envelope.validation.issue.address.not_enough_xp_levels": "§4Not enough experience",
+  "gui.envelope.validation.issue.address.empty": "§4• Address cannot be empty",
+  "gui.envelope.validation.issue.address.too_long": "§4• Address is too long",
+  "gui.envelope.validation.issue.address.contains_invalid_chars": "§4• Address contains invalid characters",
+  "gui.envelope.validation.issue.address.taken": "§4• Address is already taken",
+  "gui.envelope.validation.issue.address.not_enough_xp_levels": "§4• Not enough experience",
 
   "entity.envelope.pigeon": "Pigeon",
 
@@ -113,8 +113,8 @@
   "gui.envelope.formatting.white": "White",
   "gui.envelope.formatting.yellow": "Yellow",
 
-  "address.envelope.mail_service": "‹Mail Service›",
-  "address.envelope.unknown": "‹Unknown›",
+  "address.envelope.mail_service": "Mail Service",
+  "address.envelope.unknown": "Unknown",
 
   "address.envelope.type.pigeonhole": "Pigeonhole",
   "address.envelope.type.player": "Personal",
