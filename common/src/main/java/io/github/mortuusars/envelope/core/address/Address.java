@@ -9,6 +9,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +64,15 @@ public interface Address {
             case Npc npc -> ifNpc.apply(npc);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
         };
+    }
+
+    default Address mapPlayerToPigeonholeIfApplicable(ServerLevel level) {
+        if (this instanceof Player player) {
+            return level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
+                .map(Address.class::cast)
+                .orElse(this);
+        }
+        return this;
     }
 
     record Pigeonhole(String id) implements Address {

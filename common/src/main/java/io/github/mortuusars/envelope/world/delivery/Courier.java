@@ -40,15 +40,18 @@ public interface Courier {
     default void startDelivery(ServerLevel level, ItemStack mail, @Nullable BlockPos homePos) {
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
 
+        Address finalRecipientAddress = mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)
+            .mapPlayerToPigeonholeIfApplicable(level);
+
         MailDeliveryLog.addRecords(mail,
             MailDeliveryLog.TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
-            MailDeliveryLog.TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
+            MailDeliveryLog.TravelingRecord.travelingTo(finalRecipientAddress));
 
         setDelivery(Delivery.start(level, mail).setSenderPos(Optional.ofNullable(homePos)));
         startDeliveryPhase(level);
         onDeliveryChanged(level);
 
-        Envelope.LOGGER.debug("Starting delivery '{}'", getDeliveryOrThrow().createSenderToRecipientComponent("➡"));
+        Envelope.LOGGER.debug("Starting delivery '{}'", getDeliveryOrThrow().createSenderToRecipientComponent("➡").getString());
     }
 
     default void advanceDeliveryPhase(ServerLevel level) {
@@ -69,7 +72,7 @@ public interface Courier {
                 updateAddressPositions(level, getDelivery());
                 startDeliveryPhase(level);
             } else {
-                Envelope.LOGGER.debug("Delivery '{}' is finished.", getDeliveryOrThrow().createSenderToRecipientComponent("➡"));
+                Envelope.LOGGER.debug("Delivery '{}' is finished.", getDeliveryOrThrow().createSenderToRecipientComponent("➡").getString());
                 setDelivery(null);
             }
 
