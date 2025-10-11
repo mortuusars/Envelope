@@ -108,18 +108,18 @@ public class NeoForgeCommonEvents {
         }
 
         @SubscribeEvent
-        public static void tick(LevelTickEvent.Post event) {
-            CommonEvents.levelTick(event.getLevel());
-        }
-
-        @SubscribeEvent
-        public static void tick(ServerStartedEvent event) {
+        public static void serverStarted(ServerStartedEvent event) {
             ServerEvents.serverStarted(event.getServer());
         }
 
         @SubscribeEvent
-        public static void tick(ServerTickEvent.Post tick) {
+        public static void serverTick(ServerTickEvent.Post tick) {
             ServerEvents.serverTick(tick.getServer());
+        }
+
+        @SubscribeEvent
+        public static void levelTick(LevelTickEvent.Post event) {
+            CommonEvents.levelTick(event.getLevel());
         }
 
         @SubscribeEvent

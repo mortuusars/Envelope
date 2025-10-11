@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.pigeonhole;
 
+import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.util.result.Failure;
@@ -10,10 +11,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.*;
 
 public class PigeonholeManager {
+    protected static final Logger LOGGER = LogUtils.getLogger();
+
     private final ServerLevel level;
 
     public PigeonholeManager(ServerLevel level) {
@@ -22,26 +26,42 @@ public class PigeonholeManager {
 
     // -- Pigeonhole
 
-    public void registerOrUpdate(Address.Pigeonhole address, BlockPos pos) {
-        findByAddress(address).ifPresentOrElse(
-                pigeonhole -> {
-                    if (!pigeonhole.getPos().equals(pos)) {
-                        pigeonhole.setPos(pos);
-                        data().setDirty();
-                    }
-                },
-                () -> {
-                    PigeonholeSavedData data = data();
-                    data.getPigeonholes().put(address, new PigeonholeData(address, pos));
-                    data.setDirty();
+    public void register(Address.Pigeonhole address, BlockPos pos) {
+        PigeonholeSavedData data = data();
+        HashMap<Address.Pigeonhole, PigeonholeData> pigeonholes = data.getPigeonholes();
+
+        @Nullable PigeonholeData existing = pigeonholes.get(address);
+        if (existing != null) {
+            if (existing.getPos().equals(pos)) {
+                LOGGER.warn("Trying to register same Pigeonhole '{}'@[{}] twice.", address.id(), pos.toShortString());
+            } else {
+                LOGGER.error("Cannot register new Pigeonhole '{}'@[{}]: it is already registered @[{}]",
+                        address.id(), pos.toShortString(), existing.getPos().toShortString());
+            }
+            return;
+        }
+
+        pigeonholes.values().stream()
+                .filter(pigeonhole -> pigeonhole.getPos().equals(pos))
+                .toList()
+                .forEach(pigeonhole -> {
+                    LOGGER.warn("Removing Pigeonhole '{}'@[{}] because new Pigeonhole '{}' is being registered at the same blockpos.",
+                            pigeonhole.getAddress().id(), pigeonhole.getPos().toShortString(), address.id());
+                    pigeonholes.remove(pigeonhole.getAddress());
                 });
+
+        pigeonholes.put(address, new PigeonholeData(address, pos));
+        LOGGER.debug("Registered new Pigeonhole '{}'@[{}]", address.id(), pos.toShortString());
+        data.setDirty();
     }
 
     public void remove(Address.Pigeonhole address) {
         PigeonholeSavedData data = data();
-        if (data.getPigeonholes().remove(address) != null) {
+        @Nullable PigeonholeData removed = data.getPigeonholes().remove(address);
+        if (removed != null) {
             level.getEnvelopePlayerInformation().getDefaultAddress().remove(address);
             data.setDirty();
+            LOGGER.debug("Removed Pigeonhole '{}'@[{}]", removed.getAddress().id(), removed.getPos().toShortString());
         }
     }
 

@@ -81,32 +81,24 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return Optional.ofNullable(address);
     }
 
-    public void setAddress(@Nullable Address.Pigeonhole newAddress) {
-        Address.Pigeonhole currentAddress = address;
-
-        if (newAddress == null && currentAddress == null) {
+    public void setAddress(@NotNull Address.Pigeonhole address) {
+        if (Objects.equals(this.address, address)) {
             return;
         }
 
         if (getLevel() instanceof ServerLevel serverLevel) {
             PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
 
-            if (currentAddress != null && (newAddress == null || !newAddress.equals(currentAddress))) {
+            if (this.address != null) {
                 dropOrReturnAllMail();
-                pigeonholeManager.remove(currentAddress);
+                pigeonholeManager.remove(this.address);
             }
 
-            if (newAddress != null) {
-                pigeonholeManager.registerOrUpdate(newAddress, getBlockPos());
-            }
+            pigeonholeManager.register(address, getBlockPos());
         }
 
-        address = newAddress;
+        this.address = address;
         setChanged();
-    }
-
-    public void removeAddress() {
-        setAddress(null);
     }
 
     // -- Events
@@ -156,6 +148,30 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         }
     }
 
+    public void onBlockRemoved() {
+        if (this.address == null) {
+            return;
+        }
+
+        if (getLevel() instanceof ServerLevel serverLevel) {
+            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
+            dropOrReturnAllMail();
+            pigeonholeManager.remove(this.address);
+        }
+
+        this.address = null;
+    }
+
+    protected void onOccupantsChanged() {
+        for (Player player : getLevelOrThrow().players()) {
+            if (player instanceof ServerPlayer serverPlayer
+                    && player.containerMenu instanceof PigeonholeMenu menu
+                    && menu.getAddress().equals(address)) {
+                Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), serverPlayer);
+            }
+        }
+    }
+
     @Override
     public void setChanged() {
         if (isFireNearby()) {
@@ -174,22 +190,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         super.setChanged();
     }
 
-    protected void onOccupantsChanged() {
-        for (Player player : getLevelOrThrow().players()) {
-            if (player instanceof ServerPlayer serverPlayer
-                    && player.containerMenu instanceof PigeonholeMenu menu
-                    && menu.getAddress().equals(address)) {
-                Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), serverPlayer);
-            }
-        }
-    }
-
     // -- Mail
 
     public List<ItemStack> getAllMail() {
-        Preconditions.checkState(level instanceof ServerLevel, "Can only be called server-side.");
-        Preconditions.checkState(address != null, "Can only be called when Pigeonhole has an address.");
-        return ((ServerLevel) level).getEnvelopePigeonholeManager().getAllMail(address);
+        if (address != null && level instanceof ServerLevel serverLevel) {
+            return serverLevel.getEnvelopePigeonholeManager().getAllMail(address);
+        }
+        return Collections.emptyList();
     }
 
 //    public boolean sendMail(ItemStack mail, @Nullable Player player) {
@@ -308,7 +315,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
             return false;
         }
 
-        player.serverLevel().getEnvelopePigeonholeManager().registerOrUpdate(address, getBlockPos());
+        player.serverLevel().getEnvelopePigeonholeManager().register(address, getBlockPos());
 
         PlatformHelper.openMenu(player, this, buffer -> {
             List<ItemStack> mail = getAllMail();

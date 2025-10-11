@@ -12,9 +12,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAd
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -119,8 +117,8 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.getBlock().equals(newState.getBlock())
-                && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
-            pigeonholeBlockEntity.removeAddress();
+                && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+            blockEntity.onBlockRemoved();
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

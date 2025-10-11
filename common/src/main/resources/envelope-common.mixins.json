@@ -11,6 +11,7 @@
     "package_tooltip.ClientTooltipComponentMixin"
   ],
   "mixins": [
+    "event.ServerLevelMixin",
     "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
     "mail_tooltip.ItemStackMixin",

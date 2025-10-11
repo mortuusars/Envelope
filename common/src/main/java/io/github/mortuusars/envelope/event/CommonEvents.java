@@ -20,6 +20,12 @@ public class CommonEvents {
         }
     }
 
+    /**
+     * Fired before level data storage is saved.
+     */
+    public static void saveLevelData(ServerLevel level) {
+    }
+
     public static void entityLeaveLevel(Level level, Entity entity) {
         if (level instanceof ServerLevel serverLevel && entity instanceof Pigeon pigeon) {
             pigeon.unloaded(serverLevel);

@@ -290,9 +290,10 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
         FormattedCharSequence inbox = Component.empty()
                 .append(inboxLabel)
-                .append(" - " + (getMenu().getMail().isEmpty()
+                .append(" (" + (getMenu().getMail().isEmpty()
                         ? Component.translatable("gui.envelope.pigeonhole.empty").getString()
                         : getMenu().getMail().size()))
+                .append(")")
                 .getVisualOrderText();
         int inboxLabelX = 71 - font.width(inbox) / 2;
         guiGraphics.drawString(font, inbox, inboxLabelX, 21, 0x404040, false);

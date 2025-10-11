@@ -22,7 +22,7 @@ public class PigeonholeSavedData extends SavedData {
                     .optionalFieldOf("pigeonholes", new HashMap<>()).forGetter(PigeonholeSavedData::getPigeonholes)
     ).apply(instance, PigeonholeSavedData::new));
 
-    private final Map<Address.Pigeonhole, PigeonholeData> pigeonholes;
+    private final HashMap<Address.Pigeonhole, PigeonholeData> pigeonholes;
 
     protected PigeonholeSavedData(Map<Address.Pigeonhole, PigeonholeData> pigeonholes) {
         this.pigeonholes = new HashMap<>(pigeonholes);
@@ -32,7 +32,7 @@ public class PigeonholeSavedData extends SavedData {
         this(new HashMap<>());
     }
 
-    public Map<Address.Pigeonhole, PigeonholeData> getPigeonholes() {
+    public HashMap<Address.Pigeonhole, PigeonholeData> getPigeonholes() {
         return pigeonholes;
     }
 
