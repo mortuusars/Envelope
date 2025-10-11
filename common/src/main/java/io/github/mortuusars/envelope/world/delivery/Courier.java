@@ -17,12 +17,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public interface Courier {
-    @Nullable Delivery getDelivery();
+    @Nullable
+    Delivery getDelivery();
+
     void setDelivery(@Nullable Delivery delivery);
 
     Optional<BlockPos> getCurrentPos();
 
     void startDeliveryPhase(ServerLevel level);
+
     void endDeliveryPhase(ServerLevel level);
 
     default @NotNull Delivery getDeliveryOrThrow() {
@@ -38,8 +41,8 @@ public interface Courier {
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
 
         MailDeliveryLog.addRecords(mail,
-                MailDeliveryLog.TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
-                MailDeliveryLog.TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
+            MailDeliveryLog.TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
+            MailDeliveryLog.TravelingRecord.travelingTo(mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)));
 
         setDelivery(Delivery.start(level, mail).setSenderPos(Optional.ofNullable(homePos)));
         startDeliveryPhase(level);
@@ -80,26 +83,26 @@ public interface Courier {
 
     default boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {
         return address.map(pigeonhole -> {
-                    PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
-                    if (pigeonholeManager.putMail(pigeonhole, mail)) {
-                        MailDeliveryLog.addRecords(mail, MailDeliveryLog.TravelingRecord.arrivedTo(pigeonhole));
+                PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
+                if (pigeonholeManager.putMail(pigeonhole, mail)) {
+                    MailDeliveryLog.addRecords(mail, MailDeliveryLog.TravelingRecord.arrivedTo(pigeonhole));
 
-                        pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
-                            if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                                blockEntity.onMailDelivered(level, mail);
-                            }
-                        });
+                    pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
+                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+                            blockEntity.onMailDelivered(level, mail);
+                        }
+                    });
 
-                        return true;
-                    }
-                    return false;
-                },
-                player -> {
-                    throw new NotImplementedException("Player addresses are not implemented yet");
-                },
-                npc -> {
-                    throw new NotImplementedException("NPC addresses are not implemented yet");
-                });
+                    return true;
+                }
+                return false;
+            },
+            player -> level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
+                .map(pigeonholeAddress -> tryDeliverMail(level, mail, pigeonholeAddress))
+                .orElse(false),
+            npc -> {
+                throw new NotImplementedException("NPC addresses are not implemented yet");
+            });
     }
 
     // --

@@ -101,6 +101,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         setChanged();
     }
 
+    protected void ensureAddressCorrectness() {
+        if (address == null || !(level instanceof ServerLevel serverLevel)) return;
+        address = serverLevel.getEnvelopePigeonholeManager().resolve(address, getBlockPos());
+    }
+
     // -- Events
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, PigeonholeBlockEntity blockEntity) {
@@ -176,15 +181,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
     public void setChanged() {
         if (isFireNearby()) {
             releaseAllOccupants(getLevelOrThrow().getBlockState(getBlockPos()), ReleaseReason.EMERGENCY);
-        }
-
-        if (level instanceof ServerLevel serverLevel) {
-            if (getBlockState().hasProperty(PigeonholeBlock.HAS_MAIL)) {
-                boolean hasMail = !getItem(SLOT_MAIL).isEmpty();
-                if (getBlockState().getValue(PigeonholeBlock.HAS_MAIL) != hasMail) {
-                    serverLevel.setBlock(getBlockPos(), getBlockState().setValue(PigeonholeBlock.HAS_MAIL, hasMail), Block.UPDATE_ALL);
-                }
-            }
         }
 
         super.setChanged();
@@ -315,7 +311,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
             return false;
         }
 
-        player.serverLevel().getEnvelopePigeonholeManager().register(address, getBlockPos());
+        ensureAddressCorrectness();
 
         PlatformHelper.openMenu(player, this, buffer -> {
             List<ItemStack> mail = getAllMail();
@@ -491,6 +487,14 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
                     .parse(NbtOps.INSTANCE, tag.get("pigeons"))
                     .resultOrPartial(string -> Envelope.LOGGER.error("Failed to parse pigeons: '{}'", string))
                     .ifPresent(list -> list.forEach(this::storeOccupant));
+        }
+
+        ensureAddressCorrectness();
+
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.setBlockAndUpdate(getBlockPos(), getBlockState()
+                .setValue(PigeonholeBlock.HAS_ADDRESS, getAddress().isPresent())
+                .setValue(PigeonholeBlock.HAS_MAIL, !getItem(PigeonholeBlockEntity.SLOT_MAIL).isEmpty()));
         }
     }
 

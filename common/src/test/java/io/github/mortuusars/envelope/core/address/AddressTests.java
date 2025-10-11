@@ -1,6 +1,5 @@
-package io.github.mortuusars.envelope.core.mail;
+package io.github.mortuusars.envelope.core.address;
 
-import io.github.mortuusars.envelope.core.address.Address;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

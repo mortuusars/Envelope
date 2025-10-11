@@ -22,12 +22,12 @@ public class Position {
 
     public static Optional<BlockPos> ofAddress(ServerLevel level, Address address) {
         return address.map(
-                pigeonhole -> level.getEnvelopePigeonholeManager().getPositionOf(pigeonhole),
-                player -> {
-                    throw new NotImplementedException("Player address is not implemented yet.");
-                }, npc -> {
-                    throw new NotImplementedException("NPC address is not implemented yet.");
-                });
+            pigeonhole -> level.getEnvelopePigeonholeManager().getPositionOf(pigeonhole),
+            player -> level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
+                .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
+            npc -> {
+                throw new NotImplementedException("NPC address is not implemented yet.");
+            });
     }
 
     public static BlockPos towardsDirection(BlockPos origin, BlockPos target, double distance) {
@@ -47,9 +47,9 @@ public class Position {
 
     public static BlockPos ascent(Level level, BlockPos origin, Optional<BlockPos> target, int distance) {
         BlockPos pos = target
-                .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
-                .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
-                .above(distance);
+            .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
+            .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
+            .above(distance);
 
         int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ()) + 5;
 

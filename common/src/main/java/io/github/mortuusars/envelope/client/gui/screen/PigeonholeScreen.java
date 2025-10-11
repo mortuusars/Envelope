@@ -126,7 +126,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     protected void init() {
         imageWidth = 308;
         imageHeight = 203;
-        titleLabelX = Math.max(17, (imageWidth / 2) - (font.width(title) / 2) + 6);
+        titleLabelX = Math.max(17, (imageWidth / 2) - (font.width(title) / 2) + 5);
         titleLabelY = 5;
         inventoryLabelX = 140;
         inventoryLabelY = imageHeight - 94;
