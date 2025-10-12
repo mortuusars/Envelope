@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.core.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -85,6 +86,16 @@ public class AddressTagScreen extends Screen {
         addRenderableWidget(confirmButton);
 
         setInitialFocus(addressBox);
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        // Prevent contents reset when window is resized
+        FormattedString address = addressBox.getEditor().getText();
+        int cursorPos = addressBox.getEditor().getCursorPos();
+        super.resize(minecraft, width, height);
+        addressBox.getEditor().setText(address);
+        addressBox.getEditor().setCursorPos(cursorPos, false);
     }
 
     // -- Address

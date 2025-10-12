@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.network.packet.serverbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
+import io.github.mortuusars.envelope.world.item.LetterItem;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -37,6 +38,10 @@ public record LetterEditC2SP(int slot, String subject, String message) implement
         }
 
         ItemStack letter = player.getInventory().getItem(slot);
+        if (!(letter.getItem() instanceof LetterItem)) {
+            Envelope.LOGGER.error("Cannot handle {} packet: item in slot {} is not a LetterItem.", ID, slot);
+            return false;
+        }
 
         if (!subject.isBlank()) {
             letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);

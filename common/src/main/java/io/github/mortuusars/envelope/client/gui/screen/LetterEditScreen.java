@@ -49,24 +49,42 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
         topPos = (height - imageHeight) / 2;
 
         subjectBox = new TextBox(font, leftPos + 18, topPos + 22, 160, 19)
-                .setFontColor(0xFF7B593D)
-                .setFontUnfocusedColor(0xFF7B593D)
-                .setSelectionColor(0xFF664488)
-                .setSelectionUnfocusedColor(0xFF696170)
-                .setHintColor(0xFFC2A57F)
-                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
+            .setFontColor(0xFF7B593D)
+            .setFontUnfocusedColor(0xFF7B593D)
+            .setSelectionColor(0xFF664488)
+            .setSelectionUnfocusedColor(0xFF696170)
+            .setHintColor(0xFFC2A57F)
+            .setHorizontalAlignment(HorizontalAlignment.CENTER)
+            .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
         addRenderableWidget(subjectBox);
 
         messageBox = new TextBox(font, leftPos + 18, topPos + 52, 160, 144)
-                .setFontColor(0xFF7B593D)
-                .setFontUnfocusedColor(0xFF7B593D)
-                .setSelectionColor(0xFF664488)
-                .setSelectionUnfocusedColor(0xFF696170)
-                .setHintColor(0xFFC2A57F)
-                .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_MESSAGE, "")));
+            .setFontColor(0xFF7B593D)
+            .setFontUnfocusedColor(0xFF7B593D)
+            .setSelectionColor(0xFF664488)
+            .setSelectionUnfocusedColor(0xFF696170)
+            .setHintColor(0xFFC2A57F)
+            .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_MESSAGE, "")));
         addRenderableWidget(messageBox);
+
+        setInitialFocus(subjectBox);
     }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        // Prevent contents reset when window is resized
+        FormattedString subject = subjectBox.getEditor().getText();
+        int subjectCursorPos = subjectBox.getEditor().getCursorPos();
+        FormattedString message = messageBox.getEditor().getText();
+        int messageCursorPos = messageBox.getEditor().getCursorPos();
+        super.resize(minecraft, width, height);
+        subjectBox.getEditor().setText(subject);
+        subjectBox.getEditor().setCursorPos(subjectCursorPos, false);
+        messageBox.getEditor().setText(message);
+        messageBox.getEditor().setCursorPos(messageCursorPos, false);
+    }
+
+    // -- Render
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -78,12 +96,6 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-        saveChanges();
     }
 
     // -- Input
@@ -123,9 +135,13 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
 
     // --
 
-    protected void saveChanges() {
-        // Local
+    @Override
+    public void onClose() {
+        super.onClose();
+        saveChanges();
+    }
 
+    protected void saveChanges() {
         String subject = subjectBox.getEditor().getText().toString();
         if (!subject.isBlank()) {
             letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);
@@ -139,8 +155,6 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
         } else {
             letter.remove(Envelope.DataComponents.LETTER_MESSAGE);
         }
-
-        // Send to server
 
         int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
         Packets.sendToServer(new LetterEditC2SP(slot, subject, message));
