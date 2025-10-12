@@ -88,7 +88,7 @@ public interface Courier {
         return address.map(pigeonhole -> {
                 PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
                 if (pigeonholeManager.putMail(pigeonhole, mail)) {
-                    MailDeliveryLog.addRecords(mail, MailDeliveryLog.TravelingRecord.arrivedTo(pigeonhole));
+                    MailDeliveryLog.addRecords(mail, MailDeliveryLog.TravelingRecord.arrivedTo(pigeonhole).atTime(level.getGameTime()));
 
                     pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
                         if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {

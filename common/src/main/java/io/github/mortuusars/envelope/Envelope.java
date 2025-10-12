@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.block.PackageBlock;
 import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
@@ -15,10 +15,7 @@ import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.CardboardBoxItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
-import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -183,6 +180,8 @@ public class Envelope {
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient",
                 arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
+        public static final DataComponentType<MailStatus> MAIL_STATUS = Register.dataComponentType("mail_status",
+            arg -> arg.persistent(MailStatus.CODEC).networkSynchronized(MailStatus.STREAM_CODEC));
         public static final DataComponentType<Integer> MAIL_TRAVEL_DURATION = Register.dataComponentType("mail_travel_duration",
                 arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
         public static final DataComponentType<MailDeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log",

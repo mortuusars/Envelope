@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -112,6 +113,7 @@ public class BackgroundCourier implements Courier {
                 if (tryDeliverMail(level, mail, getDelivery().getRecipient())) {
                     getDelivery().setMail(ItemStack.EMPTY);
                 } else {
+                    mail.set(Envelope.DataComponents.MAIL_STATUS, MailStatus.RETURNED);
                     MailDeliveryLog.addRecords(mail,
                             MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
                             MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));

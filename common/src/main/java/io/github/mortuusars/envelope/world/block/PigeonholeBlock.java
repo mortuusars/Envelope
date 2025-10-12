@@ -179,6 +179,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.is(Envelope.Tags.Items.WASTE_SCOOPABLE) && state.getValue(WASTE_LEVEL) >= MAX_WASTE_LEVEL) {
             if (!level.isClientSide()) {
+                //TODO: Waste loot table
                 popResourceFromFace(level, pos, state.getValue(FACING), new ItemStack(Items.BONE_MEAL));
                 stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));

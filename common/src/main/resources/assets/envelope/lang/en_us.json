@@ -52,6 +52,10 @@
   "gui.envelope.pigeonhole.mail.tooltip.age": "§7Received: §c%s §fago",
   "gui.envelope.pigeonhole.mail.tooltip.status": "§7Status: %s",
 
+  "gui.envelope.mail.status.returned": "Returned",
+  "gui.envelope.mail.status.rejected": "Rejected",
+  "gui.envelope.mail.status.unclaimed": "Unclaimed",
+
   "gui.envelope.pigeonhole.address": "Set as Default Address",
   "gui.envelope.pigeonhole.address.tooltip": "§8Mail sent to your name will be delivered to this Pigeonhole",
   "gui.envelope.pigeonhole.address.default": "Default Address",
@@ -73,6 +77,8 @@
   "gui.envelope.mail.log.record.arrived": " §7Arrived to %s§7",
   "gui.envelope.mail.log.record.received": " §7Received at %s§7",
   "gui.envelope.mail.log.record.message.by": "§7by %s§7",
+
+  "gui.envelope.letter.subject": "§7Subject: %s",
 
   "gui.envelope.mail.log.record.message.recipient_is_not_found": "§7Recipient is not found",
 
