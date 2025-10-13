@@ -31,8 +31,8 @@ public class LetterItem extends Item {
                 subject = subject.substring(0, 44) + "...";
             }
 
-            components.add(Component.translatable("gui.envelope.letter.subject").withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal(subject).withStyle(ChatFormatting.WHITE)));
+            components.add(Component.translatable("gui.envelope.letter.subject",
+                Component.literal(subject).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
         }
     }
 

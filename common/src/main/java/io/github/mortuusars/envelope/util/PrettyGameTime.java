@@ -19,7 +19,7 @@ public class PrettyGameTime {
     public static final long WEEK = 12096000;
     public static final long MONTH = 362880000;
 
-    public static Component gameDuration(long ticks) {
+    public static MutableComponent gameDuration(long ticks) {
         MutableComponent component = Component.empty();
         boolean needsSpace = false;
 
@@ -70,7 +70,7 @@ public class PrettyGameTime {
         return component;
     }
 
-    public static Component duration(long ticks) {
+    public static MutableComponent duration(long ticks) {
         long secondsTotal = ticks / 20;
 
         long years = secondsTotal / 31104000;
@@ -104,7 +104,7 @@ public class PrettyGameTime {
         return result;
     }
 
-    public static Component durationLargest(long ticks) {
+    public static MutableComponent durationLargest(long ticks) {
         long secondsTotal = ticks / 20;
 
         long years = secondsTotal / 31104000;

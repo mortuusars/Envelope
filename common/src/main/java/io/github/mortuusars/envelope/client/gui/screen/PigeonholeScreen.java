@@ -16,6 +16,7 @@ import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -35,6 +36,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -208,19 +210,34 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         updateButtons();
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        if (hoveredSlot != null && hoveredSlot.index == 1) {
-            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x - 1, topPos + hoveredSlot.y - 1,
-                leftPos + hoveredSlot.x + 17, topPos + hoveredSlot.y, -2130706433, -2130706433, 0);
-            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x - 1, topPos + hoveredSlot.y,
-                leftPos + hoveredSlot.x, topPos + hoveredSlot.y + 16, -2130706433, -2130706433, 0);
-            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x + 16, topPos + hoveredSlot.y,
-                leftPos + hoveredSlot.x + 17, topPos + hoveredSlot.y + 16, -2130706433, -2130706433, 0);
-            guiGraphics.fillGradient(RenderType.guiOverlay(), leftPos + hoveredSlot.x - 1, topPos + hoveredSlot.y + 16,
-                leftPos + hoveredSlot.x + 17, topPos + hoveredSlot.y + 17, -2130706433, -2130706433, 0);
-        }
-
         renderOccupants(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+        super.renderSlot(guiGraphics, slot);
+
+        // Extend slot highlight for mail slot to cover whole rectangle (mail slot is slightly bigger):
+
+        int mouseX = (int) (Minecrft.get().mouseHandler.xpos()
+            * (double) Minecrft.get().getWindow().getGuiScaledWidth()
+            / (double) Minecrft.get().getWindow().getScreenWidth());
+        int mouseY = (int) (Minecrft.get().mouseHandler.ypos()
+            * (double) Minecrft.get().getWindow().getGuiScaledHeight()
+            / (double) Minecrft.get().getWindow().getScreenHeight());
+
+        if (slot.isActive() && slot.getContainerSlot() == PigeonholeBlockEntity.SLOT_MAIL
+            && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
+            guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y - 1,
+                slot.x + 17, slot.y, 0x80FFFFFF, 0x80FFFFFF, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y,
+                slot.x, slot.y + 16, 0x80FFFFFF, 0x80FFFFFF, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x + 16, slot.y,
+                slot.x + 17, slot.y + 16, 0x80FFFFFF, 0x80FFFFFF, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y + 16,
+                slot.x + 17, slot.y + 17, 0x80FFFFFF, 0x80FFFFFF, 0);
+        }
     }
 
     @Override
@@ -324,7 +341,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
 
-        String sender = mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN).getDisplayName().getString();
+        String sender = getDisplayedSender(mail).getDisplayName().getString();
         if (font.width(sender) > 76) {
             sender = font.plainSubstrByWidth(sender, 72) + "...";
         }
@@ -376,30 +393,54 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
         super.renderTooltip(guiGraphics, x, y);
 
-        if (hoveredMail == null) {
+        if (hoveredMail != null) {
+            renderMailTooltip(guiGraphics, x, y, hoveredMail);
+        }
+    }
+
+    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, ItemStack hoveredMail) {
+        if (x >= leftPos + 8 && x < leftPos + 28) {
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail), hoveredMail.getTooltipImage(), x, y);
             return;
         }
 
-        if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail), hoveredMail.getTooltipImage(), x, y);
-        } else {
-            List<Component> tooltip = new ArrayList<>();
-            tooltip.add(hoveredMail.getHoverName());
+        List<Component> tooltip = new ArrayList<>();
 
-            Component senderName = hoveredMail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN).getDisplayName();
-            if (font.split(senderName, 110).size() > 1) {
-                tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.sender", senderName));
-            }
+        Address sender = getDisplayedSender(hoveredMail);
+        if (font.width(sender.getDisplayName().getString()) > 76) {
+            MutableComponent address = AddressDisplay.create(sender,
+                AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.withColor(ChatFormatting.WHITE));
+            tooltip.add(address);
+        }
 
-            MailDeliveryLog.of(hoveredMail).getLastRecord().flatMap(MailDeliveryLog.TravelingRecord::timestamp).ifPresent(receivedAt -> {
-                long ageTicks = Minecrft.level().getGameTime() - receivedAt;
-                tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.age", PrettyGameTime.durationLargest(ageTicks)));
-            });
+        MailDeliveryLog deliveryLog = MailDeliveryLog.of(hoveredMail);
 
+        if (!Screen.hasShiftDown() || deliveryLog.isEmpty()) {
             MailStatus.of(hoveredMail).ifPresent(status -> {
-                tooltip.add(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.status", status.translate()));
+                int color = switch (status) {
+                    case RETURNED -> 0xFFD47F46;
+                    case REJECTED -> 0xFFD7503E;
+                    case UNCLAIMED -> 0xFFDDC649;
+                };
+                tooltip.add(status.translate().withStyle(Style.EMPTY.withColor(color)));
             });
 
+            deliveryLog.getLastRecordOfType(MailDeliveryLog.Record.Type.ARRIVED)
+                .flatMap(MailDeliveryLog.Record::timestamp)
+                .ifPresent(arrivedAt -> {
+                    long ageTicks = Minecrft.level().getGameTime() - arrivedAt;
+                    tooltip.add(Component.translatable("gui.envelope.time.elapsed", PrettyGameTime.durationLargest(ageTicks)));
+                });
+        } else {
+            if (!deliveryLog.isEmpty()) {
+                tooltip.add(Component.translatable("gui.envelope.mail.log"));
+                for (MailDeliveryLog.Record record : deliveryLog.records()) {
+                    tooltip.add(record.translate(Minecrft.level().getGameTime()));
+                }
+            }
+        }
+
+        if (!tooltip.isEmpty()) {
             guiGraphics.renderTooltip(font, tooltip, Optional.empty(), x, y);
         }
     }
@@ -553,6 +594,16 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     }
 
     // --
+
+    protected Address getDisplayedSender(ItemStack mail) {
+        return MailStatus.of(mail)
+            .map(status -> switch (status) {
+                case RETURNED -> Address.MAIL_SERVICE;
+                case REJECTED, UNCLAIMED -> mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT,
+                    mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
+            })
+            .orElse(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
+    }
 
     protected WidgetSprites getMailIconSprites(ItemStack mail) {
         return MailStatus.of(mail)

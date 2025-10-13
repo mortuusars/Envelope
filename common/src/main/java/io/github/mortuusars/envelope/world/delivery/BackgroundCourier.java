@@ -11,6 +11,7 @@ import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -115,8 +116,7 @@ public class BackgroundCourier implements Courier {
                 } else {
                     mail.set(Envelope.DataComponents.MAIL_STATUS, MailStatus.RETURNED);
                     MailDeliveryLog.addRecords(mail,
-                            MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                            MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));
+                        MailDeliveryLog.Record.returned(getDelivery().getRecipient()));
                 }
             }
             case APPROACHING_HOME -> {

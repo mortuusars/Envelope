@@ -41,7 +41,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -222,10 +221,9 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
         return ((ServerLevel) level).getEnvelopePigeonholeManager().removeMailById(address, id)
                 .mapValue(extractedMail -> {
-                    MailDeliveryLog.addRecords(extractedMail,
-                            MailDeliveryLog.TravelingRecord.receivedAt(address)
-                                    .atTime(level.getGameTime())
-                                    .withOperatorMessage(Optional.ofNullable(player).map(Player::getName)));
+                    extractedMail.remove(Envelope.DataComponents.MAIL_ID);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_STATUS);
+                    extractedMail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
                     extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
                     return extractedMail;
                 })
@@ -236,7 +234,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         if (address != null && level instanceof ServerLevel serverLevel) {
             Vec3 pos = Vec3.atCenterOf(getBlockPos());
             for (ItemStack itemStack : getAllMail()) {
-                //TODO: Return mail
+                //TODO: Return C.O.D mail
                 Containers.dropItemStack(serverLevel, pos.x, pos.y, pos.z, itemStack);
             }
         }
@@ -288,6 +286,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
     public boolean canSend(ItemStack stack) {
         return address != null
+                && !stack.has(Envelope.DataComponents.MAIL_SENDER)
                 && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address recipient
                 && !recipient.equals(address);
     }

@@ -2,8 +2,6 @@ package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.AddressDisplay;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
@@ -23,18 +21,6 @@ public class Tooltip {
                     stack.get(Envelope.DataComponents.MAIL_RECIPIENT));
             if (senderToRecipient != null) {
                 consumer.accept(senderToRecipient);
-            }
-
-            @Nullable MailDeliveryLog log = stack.get(Envelope.DataComponents.MAIL_DELIVERY_LOG);
-            if (log != null && !log.isEmpty()) {
-                if (Screen.hasShiftDown()) {
-                    consumer.accept(Component.translatable("gui.envelope.mail.log"));
-                    for (MailDeliveryLog.TravelingRecord record : log.records()) {
-                        consumer.accept(record.translate());
-                    }
-                } else {
-                    consumer.accept(Component.translatable("gui.envelope.mail.log.show_tooltip"));
-                }
             }
         }
     }

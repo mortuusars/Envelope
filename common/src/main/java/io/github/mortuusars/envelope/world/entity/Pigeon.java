@@ -15,6 +15,7 @@ import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
+import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -541,8 +542,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                     .setTicks(0);
 
             MailDeliveryLog.addRecords(getDelivery().getMail(),
-                    MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                    MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));
+                    MailDeliveryLog.Record.returned(getDelivery().getRecipient()).atTime(level.getGameTime()));
             return;
         }
 
@@ -591,9 +591,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                 if (tryDeliverMail(level, mail, getDelivery().getRecipient())) {
                     getDelivery().setMail(ItemStack.EMPTY);
                 } else {
+                    mail.set(Envelope.DataComponents.MAIL_STATUS, MailStatus.RETURNED);
                     MailDeliveryLog.addRecords(mail,
-                            MailDeliveryLog.TravelingRecord.returned(getDelivery().getRecipient()).atTime(level.getGameTime()),
-                            MailDeliveryLog.TravelingRecord.travelingTo(getDelivery().getSender()));
+                            MailDeliveryLog.Record.returned(getDelivery().getRecipient()).atTime(level.getGameTime()));
                 }
             }
             case APPROACHING_HOME -> {

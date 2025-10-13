@@ -48,18 +48,20 @@
   "gui.envelope.confirm": "Confirm",
   "gui.envelope.cancel": "Cancel",
 
-  "gui.envelope.pigeonhole.mail.tooltip.sender": "§7Sender: %s",
+  "gui.envelope.pigeonhole.mail.tooltip.sender": "§7From: %s",
   "gui.envelope.pigeonhole.mail.tooltip.age": "§7Received: §c%s §fago",
   "gui.envelope.pigeonhole.mail.tooltip.status": "§7Status: %s",
+
+  "gui.envelope.time.elapsed": "%s ago",
 
   "gui.envelope.mail.status.returned": "Returned",
   "gui.envelope.mail.status.rejected": "Rejected",
   "gui.envelope.mail.status.unclaimed": "Unclaimed",
 
   "gui.envelope.pigeonhole.address": "Set as Default Address",
-  "gui.envelope.pigeonhole.address.tooltip": "§8Mail sent to your name will be delivered to this Pigeonhole",
+  "gui.envelope.pigeonhole.address.tooltip": "§7Mail sent to your name will be delivered to this Pigeonhole",
   "gui.envelope.pigeonhole.address.default": "Default Address",
-  "gui.envelope.pigeonhole.address.default.tooltip": "§8Mail sent to your name is delivered to this Pigeonhole",
+  "gui.envelope.pigeonhole.address.default.tooltip": "§7Mail sent to your name is delivered to this Pigeonhole",
 
   "gui.envelope.pigeonhole.mail.tooltip.new_mail": "New Mail Arrived",
   "gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
@@ -67,8 +69,8 @@
   "gui.envelope.mail.sender": "§7Sender: %s",
   "gui.envelope.mail.recipient": "§7Recipient: %s",
 
-  "gui.envelope.mail.log": "§7Mail Delivery Log §8[Shift]",
-  "gui.envelope.mail.log.show_tooltip": "§8Mail Delivery Log [§7Shift§8]",
+  "gui.envelope.mail.log": "§7Delivery Log §8[Shift]",
+  "gui.envelope.mail.log.show_tooltip": "§8Delivery Log [§7Shift§8]",
   "gui.envelope.mail.log.record.sent": " §7Sent from %s§7",
   "gui.envelope.mail.log.record.returned": " §7Returned",
   "gui.envelope.mail.log.record.rejected": " §7Rejected at %s§7",

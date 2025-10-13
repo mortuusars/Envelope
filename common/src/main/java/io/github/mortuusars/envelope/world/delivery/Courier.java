@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
@@ -39,13 +40,10 @@ public interface Courier {
 
     default void startDelivery(ServerLevel level, ItemStack mail, @Nullable BlockPos homePos) {
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
-
-        Address finalRecipientAddress = mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN)
-            .mapPlayerToPigeonholeIfApplicable(level);
+        mail.remove(Envelope.DataComponents.MAIL_STATUS); // Remove previous log before new send
 
         MailDeliveryLog.addRecords(mail,
-            MailDeliveryLog.TravelingRecord.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()),
-            MailDeliveryLog.TravelingRecord.travelingTo(finalRecipientAddress));
+            MailDeliveryLog.Record.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()));
 
         setDelivery(Delivery.start(level, mail).setSenderPos(Optional.ofNullable(homePos)));
         startDeliveryPhase(level);
@@ -88,7 +86,8 @@ public interface Courier {
         return address.map(pigeonhole -> {
                 PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
                 if (pigeonholeManager.putMail(pigeonhole, mail)) {
-                    MailDeliveryLog.addRecords(mail, MailDeliveryLog.TravelingRecord.arrivedTo(pigeonhole).atTime(level.getGameTime()));
+                    MailDeliveryLog.addRecords(mail,
+                        MailDeliveryLog.Record.arrivedTo(pigeonhole).atTime(level.getGameTime()));
 
                     pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
                         if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
@@ -98,6 +97,7 @@ public interface Courier {
 
                     return true;
                 }
+
                 return false;
             },
             player -> level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
