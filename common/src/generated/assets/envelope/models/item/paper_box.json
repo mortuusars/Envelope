@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "envelope:item/cardboard_box"
+    "layer0": "envelope:item/paper_box"
   }
 }

@@ -1,15 +1,15 @@
-// 1.21.1	2025-10-04T00:46:59.2924493	Recipes
+// 1.21.1	2025-10-13T14:53:41.5241605	Recipes
 21da201e64747b6823be1f252196958f68fbd1a7 data/envelope/advancement/recipes/decorations/birch_pigeonhole.json
 09f34bae49ae0d92bd3ac358c5445f38d650a200 data/envelope/advancement/recipes/decorations/oak_pigeonhole.json
 58d0b03ce4aa1c3bc1af9141d513cc7023a0fa84 data/envelope/advancement/recipes/decorations/spruce_pigeonhole.json
 38f49c86b18e5e81f2934cc05697a8c644c91fc8 data/envelope/advancement/recipes/tools/address_tag.json
-1ecb7bae7ea09fb12e761adb08497652077788d4 data/envelope/advancement/recipes/tools/cardboard_box.json
 65306727608abcc087ca4da7472b6549d2295ec9 data/envelope/advancement/recipes/tools/letter.json
-4f1633b0d3e9992f2c18d80adb1e0bcd5c84a216 data/envelope/advancement/recipes/tools/package.json
-b304d29350d217acb9146879f551bd0ab7fec677 data/envelope/recipe/address_tag.json
+ec8d5a4dd42ab51175dcfa0c81e65280112bd3ab data/envelope/advancement/recipes/tools/package.json
+75149155f9a0199f7ece7470c4c3187f9de4955d data/envelope/advancement/recipes/tools/paper_box.json
+4065d28f0c10c66ab32af98ded70eda05b5a9021 data/envelope/recipe/address_tag.json
 a73564ab30f1fcf19ccb8aa7a7985d2df0547c1b data/envelope/recipe/birch_pigeonhole.json
-e8fc21b1b697a909358228b73ac1df34a5ff3629 data/envelope/recipe/cardboard_box.json
 1f6c214b155f45e2cd13e20d0798450c0abd06a9 data/envelope/recipe/letter.json
 4c1a5f02aec66aeba67c3f0d9a4d7537a453d936 data/envelope/recipe/oak_pigeonhole.json
-2b57ac876819ab8fd16b437b22b0067e8dc86ac9 data/envelope/recipe/package.json
+82262a2e59a9225634c62a5cf756250cecbc3fbc data/envelope/recipe/package.json
+b17601a206a1507d070e896921de55c78b4fb914 data/envelope/recipe/paper_box.json
 a2b8076b5eb8fda35c259da8857137d1e47a6199 data/envelope/recipe/spruce_pigeonhole.json

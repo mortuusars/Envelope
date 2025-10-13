@@ -76,7 +76,7 @@ public class NeoForgeCommonEvents {
         public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
             if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
                 Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
-                event.accept(Envelope.Items.CARDBOARD_BOX.get());
+                event.accept(Envelope.Items.PAPER_BOX.get());
                 event.accept(Envelope.Items.PACKAGE.get());
             }
             if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {

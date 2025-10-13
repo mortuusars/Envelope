@@ -1,7 +1,8 @@
-// 1.21.1	2025-10-05T21:26:04.5719434	Block States: envelope
+// 1.21.1	2025-10-13T15:03:17.8494993	Block States: envelope
 010590ef83b2bc965f7008f57e3339f7ac6d6212 assets/envelope/blockstates/birch_pigeonhole.json
 4395cbbf53e39bf0f1813433f98d33fbe4e72b29 assets/envelope/blockstates/oak_pigeonhole.json
 b23843de3b5faa9851524890cf48a8e74e2c9872 assets/envelope/blockstates/package.json
+2edeec08f84e99e329a540acc27758c11b070a94 assets/envelope/blockstates/paper_box.json
 37dc4bb8554a4331f689adc275fbf19701ac29f8 assets/envelope/blockstates/spruce_pigeonhole.json
 9cee035c6f57f17e8b8777011f2667648e535d38 assets/envelope/models/block/birch_pigeonhole.json
 f573adee57545e09a8aa154d9da4fa2c245faddc assets/envelope/models/block/birch_pigeonhole_address.json
@@ -23,9 +24,9 @@ abc6b0c208b30f17916938d63fe3ea64f887c63c assets/envelope/models/block/oak_pigeon
 a7a5c0a3cfc2e87fdac2221b8321bd5286c85504 assets/envelope/models/block/spruce_pigeonhole_waste_address_mail.json
 9c58b5e6693d69b6521b2f702c4744e12ddcf82d assets/envelope/models/item/address_tag.json
 df87a208b167f2f16ab6f73ca40fb99d30bf5f2f assets/envelope/models/item/birch_pigeonhole.json
-7d3ea9c3c0ee13862fb2510a9f846b86cdcc3c90 assets/envelope/models/item/cardboard_box.json
 3ad6d14b9fdf76944e08a867cbaf16ade7c78659 assets/envelope/models/item/letter.json
 ad2a0e20629d12e639432cedebb873df7f485b58 assets/envelope/models/item/oak_pigeonhole.json
 131ae31e873cf751e0f298a8cadb0345faae2790 assets/envelope/models/item/package.json
+84bf88cc02bd62a10f3f742af3b02500a8f7c8eb assets/envelope/models/item/paper_box.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/envelope/models/item/pigeon_spawn_egg.json
 a8d2c42f4335af4468cfa454c323ed50d8386974 assets/envelope/models/item/spruce_pigeonhole.json

@@ -1,7 +1,10 @@
 package io.github.mortuusars.envelope.neoforge.datagen.client;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.block.PaperBoxBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -25,8 +28,18 @@ public class ModelsDatagen extends BlockStateProvider {
 
         horizontalBlock(Envelope.Blocks.PACKAGE.get(), models().getExistingFile(modLoc("block/package")));
 
+        getVariantBuilder(Envelope.Blocks.PAPER_BOX.get()).forAllStates(state -> {
+            String[] boxes = {"one", "two", "three", "four"};
+            ModelFile.ExistingModelFile model = models().getExistingFile(
+                modLoc("block/paper_box_" + boxes[state.getValue(PaperBoxBlock.BOXES) - 1]));
+            return ConfiguredModel.builder()
+                .modelFile(model)
+                .rotationY(state.getValue(PaperBoxBlock.AXIS) == Direction.Axis.X ? 0 : 90)
+                .build();
+        });
+
         itemModels().basicItem(Envelope.Items.LETTER.get());
-        itemModels().basicItem(Envelope.Items.CARDBOARD_BOX.get());
+        itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());
         itemModels().basicItem(Envelope.Items.ADDRESS_TAG.get());
 
@@ -43,19 +56,19 @@ public class ModelsDatagen extends BlockStateProvider {
             boolean hasMail = state.getValue(PigeonholeBlock.HAS_MAIL);
 
             String suffix = (waste >= PigeonholeBlock.MAX_WASTE_LEVEL ? "_waste" : "")
-                    + (hasAddress ? "_address" : "")
-                    + (hasMail && hasAddress ? "_mail" : "");
+                + (hasAddress ? "_address" : "")
+                + (hasMail && hasAddress ? "_mail" : "");
 
             ModelFile model = models().orientableWithBottom(baseName + suffix,
-                    Envelope.resource("block/" + baseName + "_side"),
-                    Envelope.resource("block/" + baseName + "_front" + suffix),
-                    Envelope.resource("block/" + baseName + "_end"),
-                    Envelope.resource("block/" + baseName + "_end"));
+                Envelope.resource("block/" + baseName + "_side"),
+                Envelope.resource("block/" + baseName + "_front" + suffix),
+                Envelope.resource("block/" + baseName + "_end"),
+                Envelope.resource("block/" + baseName + "_end"));
 
             return ConfiguredModel.builder()
-                    .modelFile(model)
-                    .rotationY(((int) facing.toYRot() + 180) % 360)
-                    .build();
+                .modelFile(model)
+                .rotationY(((int) facing.toYRot() + 180) % 360)
+                .build();
         });
     }
 }

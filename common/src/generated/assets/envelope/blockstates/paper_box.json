@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "axis=x,boxes=1": {
+      "model": "envelope:block/paper_box_one"
+    },
+    "axis=x,boxes=2": {
+      "model": "envelope:block/paper_box_two"
+    },
+    "axis=x,boxes=3": {
+      "model": "envelope:block/paper_box_three"
+    },
+    "axis=x,boxes=4": {
+      "model": "envelope:block/paper_box_four"
+    },
+    "axis=z,boxes=1": {
+      "model": "envelope:block/paper_box_one",
+      "y": 90
+    },
+    "axis=z,boxes=2": {
+      "model": "envelope:block/paper_box_two",
+      "y": 90
+    },
+    "axis=z,boxes=3": {
+      "model": "envelope:block/paper_box_three",
+      "y": 90
+    },
+    "axis=z,boxes=4": {
+      "model": "envelope:block/paper_box_four",
+      "y": 90
+    }
+  }
+}

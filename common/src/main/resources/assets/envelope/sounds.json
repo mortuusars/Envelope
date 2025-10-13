@@ -1,4 +1,103 @@
 {
+  "block.paper.break": {
+    "sounds": [
+      {
+        "name": "block/scaffold/place1",
+        "pitch": 0.6,
+        "volume": 0.6
+      },
+      {
+        "name": "block/scaffold/place2",
+        "pitch": 0.6,
+        "volume": 0.6
+      },
+      {
+        "name": "block/scaffold/place3",
+        "pitch": 0.6,
+        "volume": 0.6
+      },
+      {
+        "name": "block/scaffold/place4",
+        "pitch": 0.6,
+        "volume": 0.6
+      }
+    ],
+    "subtitle": "subtitles.block.generic.break"
+  },
+  "block.paper.fall": {
+    "sounds": [
+      {
+        "name": "step/scaffold1",
+        "pitch": 0.65,
+        "volume": 0.65
+      },
+      {
+        "name": "step/scaffold2",
+        "pitch": 0.65,
+        "volume": 0.65
+      },
+      {
+        "name": "step/scaffold3",
+        "pitch": 0.65,
+        "volume": 0.65
+      },
+      {
+        "name": "step/scaffold4",
+        "pitch": 0.65,
+        "volume": 0.65
+      },
+      {
+        "name": "step/scaffold5",
+        "pitch": 0.65,
+        "volume": 0.65
+      },
+      {
+        "name": "step/scaffold6",
+        "pitch": 0.65,
+        "volume": 0.65
+      },
+      {
+        "name": "step/scaffold7",
+        "pitch": 0.65,
+        "volume": 0.65
+      }
+    ]
+  },
+  "block.paper.hit": {
+    "sounds": [
+      "envelope:block/paper/hit1",
+      "envelope:block/paper/hit2",
+      "envelope:block/paper/hit3",
+      "envelope:block/paper/hit4"
+    ],
+    "subtitle": "subtitles.block.generic.hit"
+  },
+  "block.paper.place": {
+    "sounds": [
+      "envelope:block/paper/hit1",
+      "envelope:block/paper/hit2",
+      "envelope:block/paper/hit3",
+      "envelope:block/paper/hit4"
+    ],
+    "subtitle": "subtitles.block.generic.place"
+  },
+  "block.paper.step": {
+    "sounds": [
+      "envelope:block/paper/hit1",
+      "envelope:block/paper/hit2",
+      "envelope:block/paper/hit3",
+      "envelope:block/paper/hit4"
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
+  },
+  "block.paper.use": {
+    "sounds": [
+      "envelope:block/paper/hit1",
+      "envelope:block/paper/hit2",
+      "envelope:block/paper/hit3",
+      "envelope:block/paper/hit4"
+    ]
+  },
   "entity.pigeon.ambient": {
     "sounds": [
       {

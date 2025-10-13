@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     {
-      "item": "envelope:cardboard_box"
+      "item": "envelope:paper_box"
     },
     {
       "item": "minecraft:honeycomb"

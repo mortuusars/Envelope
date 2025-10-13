@@ -1,0 +1,21 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "envelope:block/paper_box",
+		"texture": "envelope:block/paper_box"
+	},
+	"elements": [
+		{
+			"from": [4, 0, 4],
+			"to": [10, 6, 13],
+			"faces": {
+				"north": {"uv": [9, 2, 15, 8], "texture": "#texture"},
+				"east": {"uv": [1, 10, 10, 16], "texture": "#texture"},
+				"south": {"uv": [9, 2, 15, 8], "texture": "#texture"},
+				"west": {"uv": [0, 10, 9, 16], "texture": "#texture"},
+				"up": {"uv": [6, 0, 0, 9], "rotation": 180, "texture": "#texture"},
+				"down": {"uv": [0, 10, 9, 16], "rotation": 90, "texture": "#texture", "cullface": "down"}
+			}
+		}
+	]
+}

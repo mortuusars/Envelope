@@ -38,7 +38,7 @@ public class EnvelopeFabric implements ModInitializer {
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
             Envelope.Items.PIGEONHOLES.forEach(item -> content.accept(item.get()));
-            content.accept(Envelope.Items.CARDBOARD_BOX.get());
+            content.accept(Envelope.Items.PAPER_BOX.get());
             content.accept(Envelope.Items.PACKAGE.get());
         });
 
@@ -76,9 +76,10 @@ public class EnvelopeFabric implements ModInitializer {
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING, Pigeon::checkPigeonSpawnRules);
 
+        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PAPER_BOX.get(), 15, 50);
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 15, 50);
-        Envelope.Blocks.PIGEONHOLES.values().forEach(b -> {
-            FlammableBlockRegistry.getDefaultInstance().add(b.get(), 5, 20);
+        Envelope.Blocks.PIGEONHOLES.forEach((id, block) -> {
+            FlammableBlockRegistry.getDefaultInstance().add(block.get(), 5, 20);
         });
 
         FabricC2SPackets.register();

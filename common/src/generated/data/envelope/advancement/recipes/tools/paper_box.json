@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "envelope:cardboard_box"
+        "recipe": "envelope:paper_box"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "envelope:cardboard_box"
+      "envelope:paper_box"
     ]
   }
 }
