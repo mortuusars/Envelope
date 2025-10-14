@@ -74,7 +74,7 @@ public class AddressTagScreen extends Screen {
                 .setFontUnfocusedColor(0xFF7B593D)
                 .setSelectionColor(0xFF664488)
                 .setSelectionUnfocusedColor(0xFF696170)
-                .setHintColor(0xFFC2A57F)
+                .setAutocompleteSuggestionColor(0xFFB89B76)
                 .setOnTextChanged(this::addressTextChanged);
         addressBox.setTextAndUpdate(FormattedString.parse(getInitialAddressValue()));
         addressBox.getEditor().setCursorToEnd(false);
@@ -158,8 +158,21 @@ public class AddressTagScreen extends Screen {
 
     protected void addressTextChanged(FormattedString text) {
         String addressId = text.toString().trim();
+
+        addressBox.setAutocompleteSuggestion(getAutocompleteSuggestion(addressId));
+
         matchedKnownAddress = knownAddresses.byName(addressId);
         updateAddressTagAddress();
+    }
+
+    protected @Nullable FormattedString getAutocompleteSuggestion(String addressId) {
+        return knownAddresses.stream()
+            .map(a -> a.getDisplayName().getString())
+            .sorted(String.CASE_INSENSITIVE_ORDER)
+            .filter(a -> a.toLowerCase().startsWith(addressId.toLowerCase()))
+            .findFirst()
+            .map(FormattedString::parse)
+            .orElse(null);
     }
 
     protected void confirm() {

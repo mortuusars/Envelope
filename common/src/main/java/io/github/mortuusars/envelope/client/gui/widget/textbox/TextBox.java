@@ -42,6 +42,8 @@ public class TextBox extends AbstractWidget {
     protected boolean formattingEnabled = true;
     protected @Nullable Component hint = null;
     protected int hintColor = 0x77000000;
+    protected @Nullable FormattedString autocompleteSuggestion = null;
+    protected int autocompleteSuggestionColor = 0x77000000;
 
     protected FormattingToolbar formattingToolbar = new FormattingToolbar(this);
 
@@ -206,8 +208,26 @@ public class TextBox extends AbstractWidget {
         return hintColor;
     }
 
-    public TextBox setHintColor(int hintColor) {
-        this.hintColor = hintColor;
+    public TextBox setHintColor(int color) {
+        this.hintColor = color;
+        return this;
+    }
+
+    public @Nullable FormattedString getAutocompleteSuggestion() {
+        return autocompleteSuggestion;
+    }
+
+    public TextBox setAutocompleteSuggestion(FormattedString suggestion) {
+        this.autocompleteSuggestion = suggestion;
+        return this;
+    }
+
+    public int getAutocompleteSuggestionColor() {
+        return autocompleteSuggestionColor;
+    }
+
+    public TextBox setAutocompleteSuggestionColor(int color) {
+        this.autocompleteSuggestionColor = color;
         return this;
     }
 
@@ -220,6 +240,14 @@ public class TextBox extends AbstractWidget {
         if (getHint() != null && !isFocused() && getEditor().getText().toString().isBlank()) {
             int x = getX() + getHorizontalAlignment().align(getWidth(), font.width(getHint()));
             guiGraphics.drawString(font, getHint(), x, getY(), getHintColor(), false);
+        }
+
+        if (getAutocompleteSuggestion() != null && isFocused()) {
+            int x = getX() + getHorizontalAlignment().align(getWidth(), font.width(getAutocompleteSuggestion()));
+            x += font.width(getEditor().getText().toString());
+
+            String string = getAutocompleteSuggestion().toString().substring(Math.max(0, getEditor().length()));
+            guiGraphics.drawString(font, string, x, getY(), getAutocompleteSuggestionColor(), false);
         }
 
         renderLines(guiGraphics, mouseX, mouseY, partialTick, displayCache.getLines(), getCurrentFontColor());
@@ -315,6 +343,10 @@ public class TextBox extends AbstractWidget {
 
     protected boolean handleKeyPressed(int keyCode, int scanCode, int modifiers) {
         if (isFormattingEnabled() && getFormattingToolbar().keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (keyCode == InputConstants.KEY_TAB && getAutocompleteSuggestion() != null) {
+            getEditor().setText(getAutocompleteSuggestion());
+            getEditor().setCursorToEnd(false);
             return true;
         } else if (keyCode == InputConstants.KEY_UP) {
             changeLine(-1);
