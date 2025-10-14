@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.core.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
@@ -34,6 +35,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -43,6 +45,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/pigeonhole.png");
@@ -76,9 +79,9 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     protected List<@Nullable LivingEntity> occupants = new ArrayList<>();
     protected Int2ObjectMap<Rect2i> occupantAreas = new Int2ObjectOpenHashMap<>(Map.of(
-        0, new Rect2i(183, 30, 32, 32),
-        1, new Rect2i(145, 47, 32, 32),
-        2, new Rect2i(179, 68, 32, 32)
+          0, new Rect2i(183, 30, 32, 32),
+          1, new Rect2i(145, 47, 32, 32),
+          2, new Rect2i(179, 68, 32, 32)
     ));
 
     @Nullable
@@ -103,14 +106,15 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     // --
 
-    public void setOccupantsData(List<PigeonholeBlockEntity.Occupant> occupantsData) {
+    public void setOccupantsData(List<Occupant> occupantsData) {
         occupants.clear();
         occupants.add(0, null);
         occupants.add(1, null);
         occupants.add(2, null);
 
-        for (PigeonholeBlockEntity.Occupant occupant : occupantsData) {
-            if (occupant.slot() < 3 && occupant.createEntity(Minecrft.level(), BlockPos.ZERO) instanceof LivingEntity entity) {
+        for (Occupant occupant : occupantsData) {
+            if (occupant.slot() < 3 && EntityType.loadEntityRecursive(occupant.entityData().copyTag(),
+                  Minecrft.level(), Function.identity()) instanceof LivingEntity entity) {
                 entity.setOnGround(true);
                 if (entity instanceof Pigeon pigeon) {
                     pigeon.setSitting(true);
@@ -148,23 +152,23 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.ADDRESS_BUTTON_ID);
         }, Component.translatable("gui.envelope.pigeonhole.address"));
         addressButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
-            .append("\n")
-            .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
+              .append("\n")
+              .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
         addRenderableWidget(addressButton);
 
         addressAttentionButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10, ADDRESS_ATTENTION_BUTTON_SPRITES, btn -> {
             Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.ADDRESS_BUTTON_ID);
         }, Component.translatable("gui.envelope.pigeonhole.address"));
         addressAttentionButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
-            .append("\n")
-            .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
+              .append("\n")
+              .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
         addRenderableWidget(addressAttentionButton);
 
         addressDefaultButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10, ADDRESS_DEFAULT_BUTTON_SPRITES, btn -> {
         });
         addressDefaultButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address.default")
-            .append("\n")
-            .append(Component.translatable("gui.envelope.pigeonhole.address.default.tooltip"))));
+              .append("\n")
+              .append(Component.translatable("gui.envelope.pigeonhole.address.default.tooltip"))));
         addressDefaultButton.active = false;
         addRenderableWidget(addressDefaultButton);
 
@@ -173,8 +177,8 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             scrollTo(0);
         });
         newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail")
-            .append("\n")
-            .append(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh"))));
+              .append("\n")
+              .append(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh"))));
         addRenderableWidget(newMailButton);
 
         updateButtons();
@@ -221,22 +225,22 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         // Extend slot highlight for mail slot to cover whole rectangle (mail slot is slightly bigger):
 
         int mouseX = (int) (Minecrft.get().mouseHandler.xpos()
-            * (double) Minecrft.get().getWindow().getGuiScaledWidth()
-            / (double) Minecrft.get().getWindow().getScreenWidth());
+              * (double) Minecrft.get().getWindow().getGuiScaledWidth()
+              / (double) Minecrft.get().getWindow().getScreenWidth());
         int mouseY = (int) (Minecrft.get().mouseHandler.ypos()
-            * (double) Minecrft.get().getWindow().getGuiScaledHeight()
-            / (double) Minecrft.get().getWindow().getScreenHeight());
+              * (double) Minecrft.get().getWindow().getGuiScaledHeight()
+              / (double) Minecrft.get().getWindow().getScreenHeight());
 
         if (slot.isActive() && slot.getContainerSlot() == PigeonholeBlockEntity.SLOT_MAIL
-            && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
+              && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
             guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y - 1,
-                slot.x + 17, slot.y, 0x80FFFFFF, 0x80FFFFFF, 0);
+                  slot.x + 17, slot.y, 0x80FFFFFF, 0x80FFFFFF, 0);
             guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y,
-                slot.x, slot.y + 16, 0x80FFFFFF, 0x80FFFFFF, 0);
+                  slot.x, slot.y + 16, 0x80FFFFFF, 0x80FFFFFF, 0);
             guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x + 16, slot.y,
-                slot.x + 17, slot.y + 16, 0x80FFFFFF, 0x80FFFFFF, 0);
+                  slot.x + 17, slot.y + 16, 0x80FFFFFF, 0x80FFFFFF, 0);
             guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y + 16,
-                slot.x + 17, slot.y + 17, 0x80FFFFFF, 0x80FFFFFF, 0);
+                  slot.x + 17, slot.y + 17, 0x80FFFFFF, 0x80FFFFFF, 0);
         }
     }
 
@@ -284,7 +288,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         // Nest BG
         occupantAreas.forEach((i, area) -> {
             guiGraphics.blit(TEXTURE, leftPos + area.getX() - 1, topPos + area.getY() + area.getHeight() - 11,
-                0, 348, 0, 34, 16, 512, 256);
+                  0, 348, 0, 34, 16, 512, 256);
         });
 
         // Entity
@@ -295,18 +299,18 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             Rect2i area = occupantAreas.get(i);
 
             int yRotOffset = i == 0 ? 25
-                : i == 1 ? -25 : 15;
+                  : i == 1 ? -25 : 15;
 
             renderEntityFollowsMouse(guiGraphics,
-                leftPos + area.getX(), topPos + area.getY(),
-                leftPos + area.getX() + area.getWidth(), topPos + area.getY() + area.getHeight(),
-                Math.min(area.getWidth(), area.getHeight()), 0, mouseX, mouseY, entity, yRotOffset);
+                  leftPos + area.getX(), topPos + area.getY(),
+                  leftPos + area.getX() + area.getWidth(), topPos + area.getY() + area.getHeight(),
+                  Math.min(area.getWidth(), area.getHeight()), 0, mouseX, mouseY, entity, yRotOffset);
         }
 
         // Nest FG
         occupantAreas.forEach((i, area) -> {
             guiGraphics.blit(TEXTURE, leftPos + area.getX() - 1, topPos + area.getY() + area.getHeight() - 11,
-                300, 348, 16, 34, 16, 512, 256);
+                  300, 348, 16, 34, 16, 512, 256);
         });
     }
 
@@ -315,12 +319,12 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
 
         FormattedCharSequence inbox = Component.empty()
-            .append(inboxLabel)
-            .append(" (" + (getMenu().getMail().isEmpty()
-                ? Component.translatable("gui.envelope.pigeonhole.empty").getString()
-                : getMenu().getMail().size()))
-            .append(")")
-            .getVisualOrderText();
+              .append(inboxLabel)
+              .append(" (" + (getMenu().getMail().isEmpty()
+                    ? Component.translatable("gui.envelope.pigeonhole.empty").getString()
+                    : getMenu().getMail().size()))
+              .append(")")
+              .getVisualOrderText();
         int inboxLabelX = 71 - font.width(inbox) / 2;
         guiGraphics.drawString(font, inbox, inboxLabelX, 21, 0x404040, false);
 
@@ -360,32 +364,32 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
         // Top
         guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY(),
-            308, state * SCROLL_THUMB_HEIGHT, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT, 512, 256);
+              308, state * SCROLL_THUMB_HEIGHT, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT, 512, 256);
 
         // Middle
         int middlePartsCount = (scrollThumb.getHeight() - SCROLL_THUMB_TOP_HEIGHT - SCROLL_THUMB_BOT_HEIGHT) / SCROLL_THUMB_MID_HEIGHT;
 
         for (int i = 0; i < middlePartsCount; i++) {
             guiGraphics.blit(TEXTURE, scrollThumb.getX(),
-                scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + i * SCROLL_THUMB_MID_HEIGHT,
-                308, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
-                scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT, 512, 256);
+                  scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + i * SCROLL_THUMB_MID_HEIGHT,
+                  308, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                  scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT, 512, 256);
         }
 
         if (!canScroll()) {
             // Special case to allow full size scroll thumb fill all available area.
             guiGraphics.blit(TEXTURE, scrollThumb.getX(),
-                scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + middlePartsCount * SCROLL_THUMB_MID_HEIGHT - 1,
-                308, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
-                scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT, 512, 256);
+                  scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + middlePartsCount * SCROLL_THUMB_MID_HEIGHT - 1,
+                  308, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                  scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT, 512, 256);
             guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT) + 1,
-                308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
-                scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
+                  308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                  scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
         } else {
             // Bottom
             guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT),
-                308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
-                scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
+                  308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                  scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
         }
     }
 
@@ -409,7 +413,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         Address sender = getDisplayedSender(hoveredMail);
         if (font.width(sender.getDisplayName().getString()) > 76) {
             MutableComponent address = AddressDisplay.create(sender,
-                AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.withColor(ChatFormatting.WHITE));
+                  AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.withColor(ChatFormatting.WHITE));
             tooltip.add(address);
         }
 
@@ -426,11 +430,11 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             });
 
             deliveryLog.getLastRecordOfType(MailDeliveryLog.Record.Type.ARRIVED)
-                .flatMap(MailDeliveryLog.Record::timestamp)
-                .ifPresent(arrivedAt -> {
-                    long ageTicks = Minecrft.level().getGameTime() - arrivedAt;
-                    tooltip.add(Component.translatable("gui.envelope.time.elapsed", PrettyGameTime.durationLargest(ageTicks)));
-                });
+                  .flatMap(MailDeliveryLog.Record::timestamp)
+                  .ifPresent(arrivedAt -> {
+                      long ageTicks = Minecrft.level().getGameTime() - arrivedAt;
+                      tooltip.add(Component.translatable("gui.envelope.time.elapsed", PrettyGameTime.durationLargest(ageTicks)));
+                  });
         } else {
             if (!deliveryLog.isEmpty()) {
                 tooltip.add(Component.translatable("gui.envelope.mail.log"));
@@ -597,34 +601,34 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     protected Address getDisplayedSender(ItemStack mail) {
         return MailStatus.of(mail)
-            .map(status -> switch (status) {
-                case RETURNED -> Address.MAIL_SERVICE;
-                case REJECTED, UNCLAIMED -> mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT,
-                    mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
-            })
-            .orElse(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
+              .map(status -> switch (status) {
+                  case RETURNED -> Address.MAIL_SERVICE;
+                  case REJECTED, UNCLAIMED -> mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT,
+                        mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
+              })
+              .orElse(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
     }
 
     protected WidgetSprites getMailIconSprites(ItemStack mail) {
         return MailStatus.of(mail)
-            .map(status -> switch (status) {
-                case RETURNED -> ICON_RETURNED_SPRITES;
-                case REJECTED -> ICON_REJECTED_SPRITES;
-                case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
-            })
-            .orElseGet(() -> {
-                Address sender = mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);
-                if (sender == Address.UNKNOWN) return ICON_ADDRESS_UNKNOWN_SPRITES;
-                if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
-                if (sender.type() == Address.Type.PIGEONHOLE) return ICON_ADDRESS_PIGEONHOLE_SPRITES;
-                if (sender.type() == Address.Type.PLAYER) return ICON_ADDRESS_PLAYER_SPRITES;
-                if (sender.type() == Address.Type.NPC) return ICON_ADDRESS_NPC_SPRITES;
-                return ICON_ADDRESS_UNKNOWN_SPRITES;
-            });
+              .map(status -> switch (status) {
+                  case RETURNED -> ICON_RETURNED_SPRITES;
+                  case REJECTED -> ICON_REJECTED_SPRITES;
+                  case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
+              })
+              .orElseGet(() -> {
+                  Address sender = mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);
+                  if (sender == Address.UNKNOWN) return ICON_ADDRESS_UNKNOWN_SPRITES;
+                  if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
+                  if (sender.type() == Address.Type.PIGEONHOLE) return ICON_ADDRESS_PIGEONHOLE_SPRITES;
+                  if (sender.type() == Address.Type.PLAYER) return ICON_ADDRESS_PLAYER_SPRITES;
+                  if (sender.type() == Address.Type.NPC) return ICON_ADDRESS_NPC_SPRITES;
+                  return ICON_ADDRESS_UNKNOWN_SPRITES;
+              });
     }
 
     protected boolean isMouseOver(Rect2i rect, double mouseX, double mouseY) {
         return mouseX >= rect.getX() && mouseX < rect.getX() + rect.getWidth()
-            && mouseY >= rect.getY() && mouseY < rect.getY() + rect.getHeight();
+              && mouseY >= rect.getY() && mouseY < rect.getY() + rect.getHeight();
     }
 }

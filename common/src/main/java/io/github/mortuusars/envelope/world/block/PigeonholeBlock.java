@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.core.address.validation.PigeonholeAddressVa
 import io.github.mortuusars.envelope.core.address.validation.Validator;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
+import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -129,7 +130,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         if (blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
             if (!EnchantmentHelper.hasTag(tool, EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING)) {
-                pigeonholeBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
+                pigeonholeBlockEntity.releaseAllOccupants(level, pos, state, Occupiable.ReleaseReason.EMERGENCY);
                 level.updateNeighbourForOutputSignal(pos, this);
             }
         }
@@ -143,9 +144,8 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 || entity instanceof WitherSkull
                 || entity instanceof WitherBoss
                 || entity instanceof MinecartTNT) {
-            BlockEntity blockEntity = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-            if (blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
-                pigeonholeBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
+            if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof PigeonholeBlockEntity be) {
+                be.releaseAllOccupants(be.getLevelOrThrow(), be.getBlockPos(), state, Occupiable.ReleaseReason.EMERGENCY);
             }
         }
 
@@ -154,8 +154,9 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        if (level.getBlockState(neighborPos).getBlock() instanceof FireBlock && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity beehiveBlockEntity) {
-            beehiveBlockEntity.releaseAllOccupants(state, PigeonholeBlockEntity.ReleaseReason.EMERGENCY);
+        if (level.getBlockState(neighborPos).getBlock() instanceof FireBlock
+              && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
+            be.releaseAllOccupants(be.getLevelOrThrow(), be.getBlockPos(), state, Occupiable.ReleaseReason.EMERGENCY);
         }
 
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);

@@ -346,6 +346,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     public void releasedFromPigeonhole(BlockPos pos, BlockState state, PigeonholeBlockEntity.ReleaseReason releaseReason) {
+        getPigeonholeHandler().setPigeonholePos(pos);
         getPigeonholeHandler().setLastPigeonholePos(pos);
         getPigeonholeHandler().setLeftPigeonholeAt(level().getGameTime());
         getPigeonholeHandler().setWouldWantToEnterPigeonholeAfter(getRandom().nextInt(400, 800));

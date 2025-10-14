@@ -1,0 +1,204 @@
+package io.github.mortuusars.envelope.world.block.occupiable;
+
+import io.github.mortuusars.envelope.Envelope;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BeehiveBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+public interface Occupiable {
+    OccupiableProperties getOccupiableProperties();
+
+    List<Occupant> getOccupants();
+
+    SoundEvent getOccupantEnterSound(Entity entity);
+
+    SoundEvent getOccupantExitSound(Entity entity);
+
+    SoundEvent getOccupantWorkSound();
+
+    void playSound(SoundEvent soundEvent, float volume, float pitch);
+
+    default int getMaxOccupantsCount() {
+        return 3;
+    }
+
+    default boolean hasSpaceForAnotherOccupant() {
+        return getOccupants().size() < getMaxOccupantsCount();
+    }
+
+    default int getMinimumTicksInsideForOccupant(Entity entity) {
+        return 600;
+    }
+
+    default void addOccupant(BlockPos pos, BlockState state, Entity entity) {
+        if (!hasSpaceForAnotherOccupant() || !getOccupiableProperties().canOccupy().test(entity)) return;
+
+        entity.stopRiding();
+        entity.ejectPassengers();
+
+        CompoundTag tag = new CompoundTag();
+        entity.save(tag);
+        getOccupiableProperties().cleanupEntityTag(tag);
+        getOccupants().add(new Occupant(CustomData.of(tag), getFirstFreeSlotForOccupant(),
+            getMinimumTicksInsideForOccupant(entity), 0));
+
+        entity.level().gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, state));
+
+        playSound(getOccupantEnterSound(entity), 1f, 1f);
+
+        entity.discard();
+        onOccupantsChanged();
+    }
+
+    default Optional<Entity> releaseOccupant(Level level, BlockPos pos, BlockState state, Occupant occupant, ReleaseReason reason) {
+        if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
+        if ((level.isNight() || level.isThundering()) && reason != ReleaseReason.EMERGENCY) {
+            return Optional.empty();
+        }
+
+        Direction direction = state.getValue(BeehiveBlock.FACING);
+        BlockPos releasePos = pos.relative(direction);
+
+        boolean isFrontBlockedOff = !level.getBlockState(releasePos).getCollisionShape(level, releasePos).isEmpty();
+        if (isFrontBlockedOff && reason != ReleaseReason.EMERGENCY) {
+            return Optional.empty();
+        }
+
+        @Nullable Entity entity = createEntityFromOccupant(level, occupant, pos);
+        if (entity == null) return Optional.empty();
+
+        double offset = isFrontBlockedOff ? 0.0 : 0.55 + (double) (entity.getBbWidth() / 2.0F);
+        double x = (double) pos.getX() + 0.5 + offset * (double) direction.getStepX();
+        double y = (double) pos.getY() + 0.5 - (double) (entity.getBbHeight() / 2.0F);
+        double z = (double) pos.getZ() + 0.5 + offset * (double) direction.getStepZ();
+        entity.moveTo(x, y, z, entity.getYRot(), entity.getXRot());
+
+        playSound(getOccupantExitSound(entity), 1.0F, 1.0F);
+        level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, state));
+
+        if (level.addFreshEntity(entity)) {
+            onOccupantReleased(serverLevel, entity, reason);
+            return Optional.of(entity);
+        }
+
+        return Optional.empty();
+    }
+
+    default @Nullable Entity createEntityFromOccupant(Level level, Occupant occupant, BlockPos pos) {
+        CompoundTag tag = occupant.entityData().copyTag();
+        getOccupiableProperties().cleanupEntityTag(tag);
+
+        @Nullable Entity entity = EntityType.loadEntityRecursive(tag, level, Function.identity());
+        if (entity == null || !getOccupiableProperties().canOccupy().test(entity)) {
+            return null;
+        }
+
+        updateEntityAfterRelease(entity, occupant.ticksInside());
+        return entity;
+    }
+
+    default void releaseAllOccupants(Level level, BlockPos pos, BlockState state, ReleaseReason reason) {
+        if (getOccupants().removeIf(occupant -> releaseOccupant(level, pos, state, occupant, reason).isPresent())) {
+            onOccupantsChanged();
+        }
+    }
+
+    default void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
+
+    }
+
+    default void updateEntityAfterRelease(Entity entity, int ticksInside) {
+        entity.setNoGravity(true);
+
+        if (entity instanceof Animal animal) {
+            int ageTicks = animal.getAge();
+            if (ageTicks < 0) {
+                animal.setAge(Math.min(0, ageTicks + ticksInside));
+            } else if (ageTicks > 0) {
+                animal.setAge(Math.max(0, ageTicks - ticksInside));
+            }
+
+            animal.setInLoveTime(Math.max(0, animal.getInLoveTime() - ticksInside));
+        }
+    }
+
+    default void onOccupantsChanged() {
+    }
+
+    default void tickOccupants(Level level, BlockPos pos, BlockState state) {
+        if (getOccupants().removeIf(occupant -> occupant.tick()
+              && releaseOccupant(level, pos, state, occupant, ReleaseReason.RELEASED).isPresent())) {
+            onOccupantsChanged();
+        }
+
+        getOccupants().forEach(occupant -> {
+            if (level.getRandom().nextDouble() < 0.005) {
+                playSound(getOccupantWorkSound(), 0.5F, 1.0F);
+            }
+        });
+    }
+
+    // -- Save / Load
+
+    default String getSerializedOccupantsName() {
+        return "occupants";
+    }
+
+    default void saveOccupiable(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.put(getSerializedOccupantsName(), Occupant.LIST_CODEC.encodeStart(NbtOps.INSTANCE, getOccupants()).getOrThrow());
+    }
+
+    default void loadOccupiable(CompoundTag tag, HolderLookup.Provider registries) {
+        getOccupants().clear();
+        Occupant.LIST_CODEC
+            .parse(NbtOps.INSTANCE, tag.get(getSerializedOccupantsName()))
+            .resultOrPartial(error -> Envelope.LOGGER.error("Failed to parse occupants: '{}'", error))
+            .ifPresent(list -> getOccupants().addAll(list));
+    }
+
+    // --
+
+    default int getFirstFreeSlotForOccupant() {
+        List<Integer> slots = getOccupants().stream()
+            .map(Occupant::slot)
+            .sorted()
+            .toList();
+
+        int slot = 0;
+        while (true) {
+            if (!slots.contains(slot)) {
+                return slot;
+            }
+            slot++;
+        }
+    }
+
+    enum ReleaseReason {
+        RELEASED,
+        EMERGENCY;
+    }
+
+    record OccupiableProperties(Predicate<Entity> canOccupy, List<String> ignoredOccupantTags) {
+        public void cleanupEntityTag(CompoundTag tag) {
+            ignoredOccupantTags.forEach(tag::remove);
+        }
+    }
+}
