@@ -15,13 +15,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record PigeonholeSyncBlockDataS2CP(List<PigeonholeBlockEntity.Occupant> occupants) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("pigeonhole_sync_block_data");
-    public static final Type<PigeonholeSyncBlockDataS2CP> TYPE = new Type<>(ID);
+public record PigeonholeGuiSyncBlockDataS2CP(List<PigeonholeBlockEntity.Occupant> occupants) implements Packet {
+    public static final ResourceLocation ID = Envelope.resource("pigeonhole_gui_sync_block_data");
+    public static final Type<PigeonholeGuiSyncBlockDataS2CP> TYPE = new Type<>(ID);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeSyncBlockDataS2CP> STREAM_CODEC = StreamCodec.composite(
-            PigeonholeBlockEntity.Occupant.STREAM_CODEC.apply(ByteBufCodecs.list(3)), PigeonholeSyncBlockDataS2CP::occupants,
-            PigeonholeSyncBlockDataS2CP::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeGuiSyncBlockDataS2CP> STREAM_CODEC = StreamCodec.composite(
+            PigeonholeBlockEntity.Occupant.STREAM_CODEC.apply(ByteBufCodecs.list(3)), PigeonholeGuiSyncBlockDataS2CP::occupants,
+            PigeonholeGuiSyncBlockDataS2CP::new
     );
 
     @Override
@@ -31,7 +31,7 @@ public record PigeonholeSyncBlockDataS2CP(List<PigeonholeBlockEntity.Occupant> o
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        ClientPacketsHandler.syncPigeonholeBlockData(this);
+        ClientPacketsHandler.syncPigeonholeGuiBlockData(this);
         return true;
     }
 }

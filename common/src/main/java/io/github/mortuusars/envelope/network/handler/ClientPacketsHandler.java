@@ -8,7 +8,7 @@ import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditScreenS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeGuiSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +34,7 @@ public class ClientPacketsHandler {
         }
     }
 
-    public static void syncPigeonholeBlockData(PigeonholeSyncBlockDataS2CP packet) {
+    public static void syncPigeonholeGuiBlockData(PigeonholeGuiSyncBlockDataS2CP packet) {
         if (Minecrft.get().screen instanceof PigeonholeScreen screen) {
             screen.setOccupantsData(packet.occupants());
         }

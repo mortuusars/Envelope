@@ -38,27 +38,29 @@ public class PigeonholeManager {
     // -- Pigeonhole
 
     /**
-     * Ensures that address is properly registered at current block position.
+     * Ensures that address is properly registered at current block position.<br>
+     * If passed address is already in use elsewhere - it will be uniquified and registered properly.
+     *
      * @return Correct address for this BlockPos.
      */
     public Address.Pigeonhole resolve(Address.Pigeonhole address, BlockPos pos) {
         return findByPosition(pos)
             .map(PigeonholeData::getAddress) // Return correct (stored) address for that BlockPos
-            .orElseGet(() -> findByAddress(address)
-                .map(pigeonhole -> {
-                    AddressUniquifier uniquifier = new AddressUniquifier(AllAddresses.of(level), 22);
-                    Address.Pigeonhole newAddress = new Address.Pigeonhole(uniquifier.uniquify(address.id()));
-                    LOGGER.debug("Pigeonhole '{}' is already registered @[{}]. Pigeonhole @[{}] will have it's address changed to '{}' for uniqueness.",
-                        address.id(), pigeonhole.getPos().toShortString(), pos.toShortString(), newAddress.id());
-                    register(newAddress, pos);
-                    return newAddress;
-                })
-                .orElseGet(() -> {
+            .orElseGet(() -> {
+                    AllAddresses knownAddresses = AllAddresses.of(level);
+                    if (knownAddresses.isKnown(address)) {
+                        AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses, 22);
+                        Address.Pigeonhole newAddress = new Address.Pigeonhole(uniquifier.uniquify(address.id()));
+                        LOGGER.debug("Address '{}' is already registered. Pigeonhole @[{}] will have it's address changed to '{}' for uniqueness.",
+                            address.id(), pos.toShortString(), newAddress.id());
+                        register(newAddress, pos);
+                        return newAddress;
+                    } else {
                         LOGGER.debug("Pigeonhole '{}'@[{}] is not registered. Registering it now.", address.id(), pos.toShortString());
                         register(address, pos);
                         return address;
                     }
-                )
+                }
             );
     }
 

@@ -56,7 +56,7 @@ public class PigeonLocatePigeonholeGoal extends Goal {
         Stream<PoiRecord> stream = poiManager.getInRange(holder ->
                 holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 20, PoiManager.Occupancy.ANY);
         return stream.map(PoiRecord::getPos)
-                .filter(p -> pigeon.level().getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole && pigeonhole.hasSpace())
+                .filter(p -> pigeon.level().getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole && !pigeonhole.isFull())
                 .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
                 .collect(Collectors.toList());
     }

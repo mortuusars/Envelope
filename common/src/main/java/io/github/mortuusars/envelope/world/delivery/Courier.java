@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
@@ -91,7 +90,7 @@ public interface Courier {
 
                     pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
                         if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                            blockEntity.onMailDelivered(level, mail);
+                            blockEntity.onMailReceived(level, mail);
                         }
                     });
 

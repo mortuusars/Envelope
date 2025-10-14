@@ -34,4 +34,8 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
     public boolean isKnown(String name) {
         return byName(name).isPresent();
     }
+
+    public boolean isKnown(Address address) {
+        return stream().anyMatch(a -> a.matches(address.id()));
+    }
 }
