@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeSyncBlockDataS2CP;
@@ -169,8 +168,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
     protected void onOccupantsChanged() {
         for (Player player : getLevelOrThrow().players()) {
             if (player instanceof ServerPlayer serverPlayer
-                    && player.containerMenu instanceof PigeonholeMenu menu
-                    && menu.getAddress().equals(address)) {
+                && player.containerMenu instanceof PigeonholeMenu menu
+                && menu.getAddress().equals(address)) {
                 Packets.sendToClient(new PigeonholeSyncBlockDataS2CP(getOccupants()), serverPlayer);
             }
         }
@@ -183,6 +182,20 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         }
 
         super.setChanged();
+        updateBlockStateIfNeeded();
+    }
+
+    private void updateBlockStateIfNeeded() {
+        if (level instanceof ServerLevel serverLevel) {
+            BlockState state = getBlockState();
+            BlockState newState = state
+                .setValue(PigeonholeBlock.HAS_ADDRESS, address != null)
+                .setValue(PigeonholeBlock.HAS_MAIL, !getItem(PigeonholeBlockEntity.SLOT_MAIL).isEmpty());
+
+            if (state != newState) {
+                serverLevel.setBlockAndUpdate(getBlockPos(), newState);
+            }
+        }
     }
 
     // -- Mail
@@ -194,40 +207,19 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return Collections.emptyList();
     }
 
-//    public boolean sendMail(ItemStack mail, @Nullable Player player) {
-//        if (mail.isEmpty()) {
-//            Envelope.LOGGER.error("Cannot send empty mail.");
-//            return false;
-//        }
-//
-//        if (!mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
-//            Envelope.LOGGER.error("Cannot send mail: no 'envelope:recipient' defined. {}", mail);
-//            return false;
-//        }
-//
-//        Address sender = new Address.Mailbox(address);
-//        mail.set(Envelope.DataComponents.MAIL_SENDER, sender);
-//
-//        if (level instanceof ServerLevel) {
-//            Mail.send(mail, player);
-//        }
-//
-//        return true;
-//    }
-
     public ItemStack takeMail(MailId id, @Nullable Player player) {
         Preconditions.checkState(level instanceof ServerLevel, "Can only be called server-side.");
         Preconditions.checkState(address != null, "Can only be called when Pigeonhole has an address.");
 
         return ((ServerLevel) level).getEnvelopePigeonholeManager().removeMailById(address, id)
-                .mapValue(extractedMail -> {
-                    extractedMail.remove(Envelope.DataComponents.MAIL_ID);
-                    extractedMail.remove(Envelope.DataComponents.MAIL_STATUS);
-                    extractedMail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
-                    extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
-                    return extractedMail;
-                })
-                .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
+            .mapValue(extractedMail -> {
+                extractedMail.remove(Envelope.DataComponents.MAIL_ID);
+                extractedMail.remove(Envelope.DataComponents.MAIL_STATUS);
+                extractedMail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
+                extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
+                return extractedMail;
+            })
+            .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
     }
 
     public void dropOrReturnAllMail() {
@@ -268,32 +260,29 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot == SLOT_MAIL) {
-            stack.remove(Envelope.DataComponents.MAIL_SENDER);
-            stack.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
-        }
-        super.setItem(slot, stack);
-    }
-
-    @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (address == null) return false;
         if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
-        if (slot == SLOT_MAIL) return canSend(stack);
+        if (slot == SLOT_MAIL) return isSendable(stack);
         return false;
     }
 
-    public boolean canSend(ItemStack stack) {
+    public boolean isSendable(ItemStack stack) {
         return address != null
-                && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address recipient
-                && !recipient.equals(address);
+            && !stack.isEmpty()
+            && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address recipient
+            && !recipient.equals(address);
     }
 
+    /**
+     * This method is called only by Hopper
+     */
     @Override
     public boolean canTakeItem(Container target, int slot, ItemStack stack) {
         return false;
     }
+
+
 
     // -- Menu
 
@@ -365,7 +354,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         if (level != null) {
             BlockPos pos = getBlockPos();
             level.playSound(null, pos.getX(), pos.getY(), pos.getZ(),
-                    getEnterSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                getEnterSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
             level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(occupant, getBlockState()));
         }
 
@@ -422,29 +411,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, level.getBlockState(pos)));
 
         if (level.addFreshEntity(entity)) {
-            if (entity instanceof Pigeon pigeon) {
-                pigeon.releasedFromPigeonhole(pos, state, releaseStatus); // Calling before mail sending to set home pos etc
-
-                ItemStack mail = getItem(SLOT_MAIL);
-                if (canSend(mail) && !pigeon.isDelivering()) {
-                    mail.set(Envelope.DataComponents.MAIL_SENDER, address);
-                    pigeon.startDelivery(level, mail, getBlockPos());
-                    setItem(SLOT_MAIL, ItemStack.EMPTY);
-                }
-
-                float wasteChance = 0.2f;
-
-                if (pigeon.isDelivering()) {
-                    wasteChance = 1f;
-                }
-
-                if (releaseStatus != ReleaseReason.EMERGENCY
-                        && state.getBlock() instanceof PigeonholeBlock block
-                        && level.random.nextFloat() < wasteChance) {
-                    block.addWaste(level, pos, state);
-                    setChanged();
-                }
-            }
+            onOccupantReleased(pos, state, releaseStatus, level, entity);
 
             return Optional.of(entity);
         }
@@ -452,9 +419,45 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         return Optional.empty();
     }
 
+    protected void onOccupantReleased(BlockPos pos, BlockState state, ReleaseReason releaseStatus, ServerLevel level, Entity entity) {
+        if (!(entity instanceof Pigeon pigeon)) return;
+
+        pigeon.releasedFromPigeonhole(pos, state, releaseStatus); // Calling before mail sending to set home pos etc
+
+        ItemStack mail = getItem(SLOT_MAIL);
+        if (isSendable(mail) && !getItem(SLOT_FOOD).isEmpty() && !pigeon.isDelivering()) {
+            mail = mail.copyWithCount(1);
+            mail.set(Envelope.DataComponents.MAIL_SENDER, address);
+            pigeon.startDelivery(level, mail, getBlockPos());
+
+            getItem(SLOT_FOOD).shrink(1);
+            if (getItem(SLOT_FOOD).isEmpty()) {
+                setItem(SLOT_FOOD, ItemStack.EMPTY);
+            }
+
+            getItem(SLOT_MAIL).shrink(1);
+            if (getItem(SLOT_MAIL).isEmpty()) {
+                setItem(SLOT_MAIL, ItemStack.EMPTY);
+            }
+        }
+
+        float wasteChance = 0.2f;
+
+        if (pigeon.isDelivering()) {
+            wasteChance = 1f;
+        }
+
+        if (releaseStatus != ReleaseReason.EMERGENCY
+            && state.getBlock() instanceof PigeonholeBlock block
+            && level.random.nextFloat() < wasteChance) {
+            block.addWaste(level, pos, state);
+            setChanged();
+        }
+    }
+
     public void releaseAllOccupants(BlockState state, ReleaseReason reason) {
         boolean releasedSomeone = occupants.removeIf(occupant ->
-                releaseOccupant(getBlockPos(), state, occupant.toOccupant(), reason).isPresent());
+            releaseOccupant(getBlockPos(), state, occupant.toOccupant(), reason).isPresent());
 
         if (releasedSomeone) {
             super.setChanged();
@@ -482,18 +485,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
         occupants.clear();
         if (tag.contains("pigeons")) {
             Occupant.LIST_CODEC
-                    .parse(NbtOps.INSTANCE, tag.get("pigeons"))
-                    .resultOrPartial(string -> Envelope.LOGGER.error("Failed to parse pigeons: '{}'", string))
-                    .ifPresent(list -> list.forEach(this::storeOccupant));
+                .parse(NbtOps.INSTANCE, tag.get("pigeons"))
+                .resultOrPartial(string -> Envelope.LOGGER.error("Failed to parse pigeons: '{}'", string))
+                .ifPresent(list -> list.forEach(this::storeOccupant));
         }
 
         ensureAddressCorrectness();
-
-        if (level instanceof ServerLevel serverLevel) {
-            serverLevel.setBlockAndUpdate(getBlockPos(), getBlockState()
-                .setValue(PigeonholeBlock.HAS_ADDRESS, getAddress().isPresent())
-                .setValue(PigeonholeBlock.HAS_MAIL, !getItem(PigeonholeBlockEntity.SLOT_MAIL).isEmpty()));
-        }
+        updateBlockStateIfNeeded();
     }
 
     @Override
@@ -538,22 +536,22 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
     public record Occupant(CustomData entityData, int slot, int ticksInPigeonhole, int minTicksInPigeonhole) {
         public static final Codec<PigeonholeBlockEntity.Occupant> CODEC = RecordCodecBuilder.create(
-                instance -> instance.group(
-                                CustomData.CODEC.optionalFieldOf("entity_data", CustomData.EMPTY).forGetter(PigeonholeBlockEntity.Occupant::entityData),
-                                Codec.INT.fieldOf("slot").forGetter(PigeonholeBlockEntity.Occupant::slot),
-                                Codec.INT.fieldOf("ticks_in_pigeonhole").forGetter(PigeonholeBlockEntity.Occupant::ticksInPigeonhole),
-                                Codec.INT.fieldOf("min_ticks_in_pigeonhole").forGetter(PigeonholeBlockEntity.Occupant::minTicksInPigeonhole)
-                        )
-                        .apply(instance, PigeonholeBlockEntity.Occupant::new)
+            instance -> instance.group(
+                    CustomData.CODEC.optionalFieldOf("entity_data", CustomData.EMPTY).forGetter(PigeonholeBlockEntity.Occupant::entityData),
+                    Codec.INT.fieldOf("slot").forGetter(PigeonholeBlockEntity.Occupant::slot),
+                    Codec.INT.fieldOf("ticks_in_pigeonhole").forGetter(PigeonholeBlockEntity.Occupant::ticksInPigeonhole),
+                    Codec.INT.fieldOf("min_ticks_in_pigeonhole").forGetter(PigeonholeBlockEntity.Occupant::minTicksInPigeonhole)
+                )
+                .apply(instance, PigeonholeBlockEntity.Occupant::new)
         );
         public static final Codec<List<PigeonholeBlockEntity.Occupant>> LIST_CODEC = CODEC.listOf();
         @SuppressWarnings("deprecation")
         public static final StreamCodec<ByteBuf, PigeonholeBlockEntity.Occupant> STREAM_CODEC = StreamCodec.composite(
-                CustomData.STREAM_CODEC, PigeonholeBlockEntity.Occupant::entityData,
-                ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::slot,
-                ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::ticksInPigeonhole,
-                ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::minTicksInPigeonhole,
-                PigeonholeBlockEntity.Occupant::new
+            CustomData.STREAM_CODEC, PigeonholeBlockEntity.Occupant::entityData,
+            ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::slot,
+            ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::ticksInPigeonhole,
+            ByteBufCodecs.VAR_INT, PigeonholeBlockEntity.Occupant::minTicksInPigeonhole,
+            PigeonholeBlockEntity.Occupant::new
         );
 
         public static PigeonholeBlockEntity.Occupant of(Entity entity, int slot, int minTicksInPigeonhole) {
