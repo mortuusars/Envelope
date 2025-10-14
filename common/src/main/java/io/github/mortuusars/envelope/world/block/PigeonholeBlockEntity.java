@@ -286,7 +286,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity {
 
     public boolean canSend(ItemStack stack) {
         return address != null
-                && !stack.has(Envelope.DataComponents.MAIL_SENDER)
                 && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address recipient
                 && !recipient.equals(address);
     }
