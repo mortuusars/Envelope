@@ -50,9 +50,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     public static final int SLOT_FOOD = 1;
     public static final int SLOT_MAIL = 2;
 
-    protected OccupiableProperties occupiableProperties = new OccupiableProperties(
-          entity -> entity.getType().is(Envelope.Tags.EntityTypes.PIGEONHOLE_INHABITORS),
-          Pigeon.IGNORED_TAGS);
     protected List<Occupant> occupants = new ArrayList<>();
     protected NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
 
@@ -311,8 +308,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     // -- Occupiable
 
     @Override
-    public OccupiableProperties getOccupiableProperties() {
-        return occupiableProperties;
+    public boolean canBeOccupiedBy(Entity entity) {
+        return entity.getType().is(Envelope.Tags.EntityTypes.PIGEONHOLE_INHABITORS);
     }
 
     @Override
@@ -385,6 +382,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
                 Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getOccupants()), serverPlayer);
             }
         }
+    }
+
+    @Override
+    public String getSerializedOccupantsName() {
+        return "pigeons";
     }
 
     public boolean isFireNearby() {

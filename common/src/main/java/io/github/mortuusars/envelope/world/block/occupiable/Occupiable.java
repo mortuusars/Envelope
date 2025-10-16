@@ -18,13 +18,48 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public interface Occupiable {
-    OccupiableProperties getOccupiableProperties();
+    List<String> IGNORED_OCCUPANT_TAGS = Arrays.asList(
+          "Air",
+          "ArmorDropChances",
+          "ArmorItems",
+          "Brain",
+          "CanPickUpLoot",
+          "DeathTime",
+          "FallDistance",
+          "FallFlying",
+          "Fire",
+          "HandDropChances",
+          "HandItems",
+          "HurtByTimestamp",
+          "HurtTime",
+          "LeftHanded",
+          "Motion",
+          "NoGravity",
+          "OnGround",
+          "PortalCooldown",
+          "Pos",
+          "Rotation",
+          "SleepingX",
+          "SleepingY",
+          "SleepingZ",
+          "Passengers",
+          "UUID",
+          "leash",
+          "PigeonholePos",
+          "LastPigeonholePos",
+          "LeftPigeonholeAt",
+          "WouldWantToEnterPigeonholeAfter",
+          "Sitting",
+          "Delivery"
+    );
+
+    boolean canBeOccupiedBy(Entity entity);
 
     List<Occupant> getOccupants();
 
@@ -35,6 +70,7 @@ public interface Occupiable {
     SoundEvent getOccupantWorkSound();
 
     void playSound(SoundEvent soundEvent, float volume, float pitch);
+
 
     default int getMaxOccupantsCount() {
         return 3;
@@ -49,14 +85,14 @@ public interface Occupiable {
     }
 
     default void addOccupant(BlockPos pos, BlockState state, Entity entity) {
-        if (!hasSpaceForAnotherOccupant() || !getOccupiableProperties().canOccupy().test(entity)) return;
+        if (!hasSpaceForAnotherOccupant() || !canBeOccupiedBy(entity)) return;
 
         entity.stopRiding();
         entity.ejectPassengers();
 
         CompoundTag tag = new CompoundTag();
         entity.save(tag);
-        getOccupiableProperties().cleanupEntityTag(tag);
+        cleanupEntityTag(tag);
         getOccupants().add(new Occupant(CustomData.of(tag), getFirstFreeSlotForOccupant(),
             getMinimumTicksInsideForOccupant(entity), 0));
 
@@ -104,10 +140,10 @@ public interface Occupiable {
 
     default @Nullable Entity createEntityFromOccupant(Level level, Occupant occupant, BlockPos pos) {
         CompoundTag tag = occupant.entityData().copyTag();
-        getOccupiableProperties().cleanupEntityTag(tag);
+        cleanupEntityTag(tag);
 
         @Nullable Entity entity = EntityType.loadEntityRecursive(tag, level, Function.identity());
-        if (entity == null || !getOccupiableProperties().canOccupy().test(entity)) {
+        if (entity == null || !canBeOccupiedBy(entity)) {
             return null;
         }
 
@@ -158,6 +194,10 @@ public interface Occupiable {
 
     // -- Save / Load
 
+    default void cleanupEntityTag(CompoundTag tag) {
+        IGNORED_OCCUPANT_TAGS.forEach(tag::remove);
+    }
+
     default String getSerializedOccupantsName() {
         return "occupants";
     }
@@ -194,11 +234,5 @@ public interface Occupiable {
     enum ReleaseReason {
         RELEASED,
         EMERGENCY;
-    }
-
-    record OccupiableProperties(Predicate<Entity> canOccupy, List<String> ignoredOccupantTags) {
-        public void cleanupEntityTag(CompoundTag tag) {
-            ignoredOccupantTags.forEach(tag::remove);
-        }
     }
 }
