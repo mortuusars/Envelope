@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/orientable_with_bottom",
-  "textures": {
-    "bottom": "envelope:block/birch_pigeonhole_end",
-    "front": "envelope:block/birch_pigeonhole_front_waste_address_mail",
-    "side": "envelope:block/birch_pigeonhole_side",
-    "top": "envelope:block/birch_pigeonhole_end"
-  }
-}

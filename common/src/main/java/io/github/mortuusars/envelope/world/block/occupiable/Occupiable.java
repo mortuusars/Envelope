@@ -61,7 +61,7 @@ public interface Occupiable {
 
     boolean canBeOccupiedBy(Entity entity);
 
-    List<Occupant> getOccupants();
+    List<Occupant.Mutable> getOccupants();
 
     SoundEvent getOccupantEnterSound(Entity entity);
 
@@ -71,6 +71,9 @@ public interface Occupiable {
 
     void playSound(SoundEvent soundEvent, float volume, float pitch);
 
+    default List<Occupant> getImmutableOccupants() {
+        return getOccupants().stream().map(Occupant.Mutable::toImmutable).toList();
+    }
 
     default int getMaxOccupantsCount() {
         return 3;
@@ -94,7 +97,7 @@ public interface Occupiable {
         entity.save(tag);
         cleanupEntityTag(tag);
         getOccupants().add(new Occupant(CustomData.of(tag), getFirstFreeSlotForOccupant(),
-            getMinimumTicksInsideForOccupant(entity), 0));
+            getMinimumTicksInsideForOccupant(entity), 0).toMutable());
 
         entity.level().gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, state));
 
@@ -152,7 +155,7 @@ public interface Occupiable {
     }
 
     default void releaseAllOccupants(Level level, BlockPos pos, BlockState state, ReleaseReason reason) {
-        if (getOccupants().removeIf(occupant -> releaseOccupant(level, pos, state, occupant, reason).isPresent())) {
+        if (getOccupants().removeIf(occupant -> releaseOccupant(level, pos, state, occupant.toImmutable(), reason).isPresent())) {
             onOccupantsChanged();
         }
     }
@@ -181,7 +184,7 @@ public interface Occupiable {
 
     default void tickOccupants(Level level, BlockPos pos, BlockState state) {
         if (getOccupants().removeIf(occupant -> occupant.tick()
-              && releaseOccupant(level, pos, state, occupant, ReleaseReason.RELEASED).isPresent())) {
+              && releaseOccupant(level, pos, state, occupant.toImmutable(), ReleaseReason.RELEASED).isPresent())) {
             onOccupantsChanged();
         }
 
@@ -203,7 +206,7 @@ public interface Occupiable {
     }
 
     default void saveOccupiable(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.put(getSerializedOccupantsName(), Occupant.LIST_CODEC.encodeStart(NbtOps.INSTANCE, getOccupants()).getOrThrow());
+        tag.put(getSerializedOccupantsName(), Occupant.LIST_CODEC.encodeStart(NbtOps.INSTANCE, getImmutableOccupants()).getOrThrow());
     }
 
     default void loadOccupiable(CompoundTag tag, HolderLookup.Provider registries) {
@@ -211,13 +214,14 @@ public interface Occupiable {
         Occupant.LIST_CODEC
             .parse(NbtOps.INSTANCE, tag.get(getSerializedOccupantsName()))
             .resultOrPartial(error -> Envelope.LOGGER.error("Failed to parse occupants: '{}'", error))
+            .map(list -> list.stream().map(Occupant::toMutable).toList())
             .ifPresent(list -> getOccupants().addAll(list));
     }
 
     // --
 
     default int getFirstFreeSlotForOccupant() {
-        List<Integer> slots = getOccupants().stream()
+        List<Integer> slots = getImmutableOccupants().stream()
             .map(Occupant::slot)
             .sorted()
             .toList();

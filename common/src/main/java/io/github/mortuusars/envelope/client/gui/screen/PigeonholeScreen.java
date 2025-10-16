@@ -27,7 +27,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -590,7 +589,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (isMouseOver(mailArea, mouseX, mouseY)) {
+        if (isMouseOver(mailArea, mouseX, mouseY) || isMouseOver(scrollBarArea, mouseX, mouseY)) {
             scroll((int) -scrollY);
             return true;
         }

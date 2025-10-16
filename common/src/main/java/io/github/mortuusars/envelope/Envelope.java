@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
+import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
@@ -30,6 +31,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -97,6 +99,7 @@ public class Envelope {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
                 () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
+                      .strength(2f)
                       .mapColor(color)));
             PIGEONHOLES.put(Envelope.resource(id), block);
             return block;
@@ -202,6 +205,13 @@ public class Envelope {
             arg -> arg.persistent(StoredItemStack.CODEC).networkSynchronized(StoredItemStack.STREAM_CODEC));
         public static final DataComponentType<Integer> PACKAGE_TIMES_PACKED = Register.dataComponentType("package_times_packed",
             arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+        public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType(
+              "pigeons",
+              arg -> arg.persistent(Occupant.LIST_CODEC)
+                    .networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list()))
+                    .cacheEncoding()
+        );
 
         static void init() {
         }

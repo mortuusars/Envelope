@@ -30,5 +30,8 @@ public class BlockTagsDatagen extends BlockTagsProvider {
 
         tag(Envelope.Tags.Blocks.PIGEONHOLES)
                 .add(Envelope.Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(Block[]::new));
+
+        tag(BlockTags.MINEABLE_WITH_AXE)
+              .addTag(Envelope.Tags.Blocks.PIGEONHOLES);
     }
 }

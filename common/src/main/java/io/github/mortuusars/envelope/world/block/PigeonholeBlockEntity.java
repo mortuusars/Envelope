@@ -18,6 +18,8 @@ import io.github.mortuusars.envelope.world.item.component.MailId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -35,6 +37,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -50,7 +53,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     public static final int SLOT_FOOD = 1;
     public static final int SLOT_MAIL = 2;
 
-    protected List<Occupant> occupants = new ArrayList<>();
+    protected List<Occupant.Mutable> occupants = new ArrayList<>();
     protected NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
 
     @Nullable
@@ -169,17 +172,16 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     public void onBlockRemoved() {
-        if (address == null) {
-            return;
-        }
+        items.stream().skip(1).forEach(stack -> {
+            Containers.dropItemStack(getLevelOrThrow(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), stack);
+        });
 
-        if (getLevel() instanceof ServerLevel serverLevel) {
+        if (address != null && getLevel() instanceof ServerLevel serverLevel) {
             PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
             dropOrReturnAllMail();
             pigeonholeManager.remove(address);
+            address = null;
         }
-
-        address = null;
     }
 
     @Override
@@ -188,12 +190,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             releaseAllOccupants(getLevel(), getBlockPos(), getBlockState(), ReleaseReason.EMERGENCY);
         }
 
-        super.setChanged();
         updateBlockStateIfNeeded();
+        super.setChanged();
     }
 
     protected void updateBlockStateIfNeeded() {
-        if (level instanceof ServerLevel serverLevel) {
+        if (!isRemoved() && level instanceof ServerLevel serverLevel) {
             BlockState state = getBlockState();
             BlockState newState = state
                   .setValue(PigeonholeBlock.HAS_ADDRESS, address != null)
@@ -209,7 +211,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Override
     public int getContainerSize() {
-        return SLOTS;
+        return address != null ? SLOTS : 0;
     }
 
     @Override
@@ -300,7 +302,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             Address.Pigeonhole.STREAM_CODEC.encode(buffer, address);
         });
 
-        Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getOccupants()), player);
+        Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getImmutableOccupants()), player);
 
         return true;
     }
@@ -313,7 +315,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     @Override
-    public List<Occupant> getOccupants() {
+    public List<Occupant.Mutable> getOccupants() {
         return occupants;
     }
 
@@ -329,7 +331,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Override
     public SoundEvent getOccupantWorkSound() {
-        return SoundEvents.BEEHIVE_WORK;
+        return Envelope.SoundEvents.PIGEON_AMBIENT.get();
     }
 
     @Override
@@ -379,7 +381,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             if (player instanceof ServerPlayer serverPlayer
                   && player.containerMenu instanceof PigeonholeMenu menu
                   && menu.getAddress().equals(address)) {
-                Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getOccupants()), serverPlayer);
+                Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getImmutableOccupants()), serverPlayer);
             }
         }
     }
@@ -403,6 +405,28 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     protected float getWasteIncreaseChanceOnRelease(Entity releasedEntity) {
         return releasedEntity instanceof Pigeon pigeon && pigeon.isDelivering() ? 1f : 0.2f;
+    }
+
+    // -- Component
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        this.occupants.clear();
+        List<Occupant> occupants = componentInput.getOrDefault(Envelope.DataComponents.PIGEONS, List.of());
+        occupants.forEach(o -> getOccupants().add(o.toMutable()));
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(Envelope.DataComponents.PIGEONS, getImmutableOccupants());
+    }
+
+    @Override
+    public void removeComponentsFromTag(CompoundTag tag) {
+        super.removeComponentsFromTag(tag);
+        tag.remove(getSerializedOccupantsName());
     }
 
     // -- Save/Load

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.neoforge.datagen.server;
+package io.github.mortuusars.envelope.neoforge.datagen.server.loot;
 
 import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.core.HolderLookup;
@@ -17,11 +17,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
-public class EntityLootDatagen extends EntityLootSubProvider {
-    protected EntityLootDatagen(HolderLookup.Provider registries) {
+public class EntityLootTableProvider extends EntityLootSubProvider {
+    public EntityLootTableProvider(HolderLookup.Provider registries) {
         super(FeatureFlags.REGISTRY.allFlags(), registries);
     }
 
+    /**
+     * This method is for the datagen to check that all known entries have a loot table associated with them.
+     */
     @Override
     protected @NotNull Stream<EntityType<?>> getKnownEntityTypes() {
         return Stream.of(Envelope.EntityTypes.PIGEON.get());
