@@ -19,8 +19,8 @@ public class RecipesDatagen extends RecipeProvider {
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
         pigeonhole(output, Envelope.Items.OAK_PIGEONHOLE.get(), Items.OAK_PLANKS);
-        pigeonhole(output, Envelope.Items.SPRUCE_PIGEONHOLE.get(), Items.SPRUCE_PLANKS);
-        pigeonhole(output, Envelope.Items.BIRCH_PIGEONHOLE.get(), Items.BIRCH_PLANKS);
+//        pigeonhole(output, Envelope.Items.SPRUCE_PIGEONHOLE.get(), Items.SPRUCE_PLANKS);
+//        pigeonhole(output, Envelope.Items.BIRCH_PIGEONHOLE.get(), Items.BIRCH_PLANKS);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.LETTER.get())
                 .requires(Items.PAPER)

@@ -73,9 +73,7 @@ public class Envelope {
     public static class Blocks {
         public static final Map<ResourceLocation, Supplier<PigeonholeBlock>> PIGEONHOLES = new HashMap<>();
 
-        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak");
-        public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = pigeonhole("spruce");
-        public static final Supplier<PigeonholeBlock> BIRCH_PIGEONHOLE = pigeonhole("birch");
+        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak", MapColor.WOOD);
 
         public static final Supplier<PaperBoxBlock> PAPER_BOX = Register.block("paper_box",
             () -> new PaperBoxBlock(BlockBehaviour.Properties.of()
@@ -95,11 +93,11 @@ public class Envelope {
                 .mapColor(MapColor.SAND)
                 .noOcclusion()));
 
-        private static Supplier<PigeonholeBlock> pigeonhole(String type) {
+        private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
                 () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
-                    .noOcclusion()));
+                      .mapColor(color)));
             PIGEONHOLES.put(Envelope.resource(id), block);
             return block;
         }
@@ -146,8 +144,6 @@ public class Envelope {
         public static final List<Supplier<BlockItem>> PIGEONHOLES = new ArrayList<>();
 
         public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
-        public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = pigeonhole("spruce", Blocks.SPRUCE_PIGEONHOLE);
-        public static final Supplier<BlockItem> BIRCH_PIGEONHOLE = pigeonhole("birch", Blocks.BIRCH_PIGEONHOLE);
 
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
             () -> new LetterItem(new Item.Properties().stacksTo(1)));
