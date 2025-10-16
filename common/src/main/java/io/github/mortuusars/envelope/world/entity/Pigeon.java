@@ -611,7 +611,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {
         if (Courier.super.tryDeliverMail(level, mail, address)) {
-            level().playSound(null, this, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
+            level().playSound(null, blockPosition(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
             return true;
         }
         return false;

@@ -115,6 +115,12 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+            && blockEntity.hasAddress()
+            && !blockEntity.getAllMail().isEmpty()) {
+            return 15;
+        }
+
         return state.getValue(WASTE_LEVEL);
     }
 
@@ -189,7 +195,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 level.setBlockAndUpdate(pos, state.setValue(WASTE_LEVEL, 0));
             }
 
-            level.playSound(player, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(player, pos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
 
             return ItemInteractionResult.SUCCESS;
         }

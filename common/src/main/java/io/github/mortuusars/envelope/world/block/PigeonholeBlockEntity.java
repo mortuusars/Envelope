@@ -69,8 +69,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     // -- Address
 
+    public @Nullable Address.Pigeonhole address() {
+        return address;
+    }
+
     public Optional<Address.Pigeonhole> getAddress() {
-        return Optional.ofNullable(address);
+        return Optional.ofNullable(address());
     }
 
     public void setAddress(@NotNull Address.Pigeonhole address) {
@@ -91,6 +95,10 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         this.address = address;
         setChanged();
+    }
+
+    public boolean hasAddress() {
+        return address() != null;
     }
 
     protected void ensureAddressCorrectness() {
@@ -126,6 +134,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
                       }
                   }
 
+                  setChanged();
+
                   return extractedMail;
               })
               .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
@@ -142,6 +152,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     public void onMailReceived(ServerLevel level, ItemStack mail) {
+        setChanged();
         getAddress().ifPresent(address -> {
             for (ServerPlayer player : level.players()) {
                 if (player.containerMenu instanceof PigeonholeMenu menu && menu.getAddress().equals(address)) {

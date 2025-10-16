@@ -14,10 +14,14 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue MAIL_TRAVEL_DURATION;
 
         public static class Pigeonhole {
+            public static final ModConfigSpec.BooleanValue DISPENSER_WASTE_SCOOPING;
             public static final ModConfigSpec.IntValue ADDRESS_EXPERIENCE_LEVELS_COST;
 
             static {
                 BUILDER.push("pigeonhole");
+                DISPENSER_WASTE_SCOOPING = BUILDER
+                      .comment("Waste from Pigeonhole can be scooped with dispenser that has a shovel (#envelope:waste_scoopable). Default: true.")
+                      .define("dispenser_waste_scooping", true);
                 ADDRESS_EXPERIENCE_LEVELS_COST = BUILDER
                         .comment("Levels of experience needed to set or change an address. Default: 5")
                         .defineInRange("address_experience_levels_cost", 5, 0, 128);

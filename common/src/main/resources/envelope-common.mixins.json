@@ -11,6 +11,7 @@
     "package_tooltip.ClientTooltipComponentMixin"
   ],
   "mixins": [
+    "dispenser_waste_scooping.DispenserBlockMixin",
     "event.ServerLevelMixin",
     "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
