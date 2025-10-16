@@ -55,16 +55,26 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         this.blockEntity = be;
         this.mail = new ArrayList<>(mail.reversed());
 
-        addSlot(new Slot(be, 0, 227, 62) {
+        addSlot(new Slot(be, PigeonholeBlockEntity.SLOT_INBOX, -999, -999) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return be.canPlaceItem(0, stack);
+                return false;
+            }
+            @Override
+            public boolean mayPickup(Player player) {
+                return false;
             }
         });
-        addSlot(new Slot(be, 1, 248, 62) {
+        addSlot(new Slot(be, PigeonholeBlockEntity.SLOT_FOOD, 227, 62) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return be.canPlaceItem(1, stack);
+                return be.canPlaceItem(PigeonholeBlockEntity.SLOT_FOOD, stack);
+            }
+        });
+        addSlot(new Slot(be, PigeonholeBlockEntity.SLOT_MAIL, 248, 62) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return be.canPlaceItem(PigeonholeBlockEntity.SLOT_MAIL, stack);
             }
         });
         addPlayerSlots(playerInventory, 140, 121);

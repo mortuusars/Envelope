@@ -274,10 +274,10 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
         }
 
-        if (!getMenu().getSlot(0).hasItem()) {
+        if (!getMenu().getSlot(PigeonholeBlockEntity.SLOT_FOOD).hasItem()) {
             guiGraphics.blit(TEXTURE, leftPos + 227, topPos + 62, 314, 0, 16, 16, 512, 256);
         }
-        if (!getMenu().getSlot(1).hasItem()) {
+        if (!getMenu().getSlot(PigeonholeBlockEntity.SLOT_MAIL).hasItem()) {
             guiGraphics.blit(TEXTURE, leftPos + 247, topPos + 61, 330, 0, 18, 18, 512, 256);
         }
 

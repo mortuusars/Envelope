@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeGuiSyncBlockDataS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
@@ -44,9 +45,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements Occupiable {
-    public static final int SLOTS = 2;
-    public static final int SLOT_FOOD = 0;
-    public static final int SLOT_MAIL = 1;
+    public static final int SLOTS = 3;
+    public static final int SLOT_INBOX = 0;
+    public static final int SLOT_FOOD = 1;
+    public static final int SLOT_MAIL = 2;
 
     protected OccupiableProperties occupiableProperties = new OccupiableProperties(
           entity -> entity.getType().is(Envelope.Tags.EntityTypes.PIGEONHOLE_INHABITORS),
@@ -105,16 +107,25 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         return Collections.emptyList();
     }
 
-    public ItemStack takeMail(MailId id, @Nullable Player player) {
-        Preconditions.checkState(level instanceof ServerLevel, "Can only be called server-side.");
-        Preconditions.checkState(address != null, "Can only be called when Pigeonhole has an address.");
+    public ItemStack takeMail(MailId mailId, @Nullable Player player) {
+        if (address == null || !(level instanceof ServerLevel serverLevel)) return ItemStack.EMPTY;
 
-        return ((ServerLevel) level).getEnvelopePigeonholeManager().removeMailById(address, id)
+        return serverLevel.getEnvelopePigeonholeManager().removeMailById(address, mailId)
               .mapValue(extractedMail -> {
                   extractedMail.remove(Envelope.DataComponents.MAIL_ID);
                   extractedMail.remove(Envelope.DataComponents.MAIL_STATUS);
                   extractedMail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
                   extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
+
+                  for (ServerPlayer pl : serverLevel.players()) {
+                      if (pl.containerMenu instanceof PigeonholeMenu menu
+                            && menu.getAddress().equals(address)
+                            && (player == null || pl.getUUID().equals(player.getUUID()))) {
+                          menu.getMail().removeIf(stack -> MailId.from(stack).map(id -> id.matches(mailId)).orElse(false));
+                          Packets.sendToClient(new PigeonholeMenuMailRemovedS2CP(mailId), pl);
+                      }
+                  }
+
                   return extractedMail;
               })
               .handleFailure(f -> Envelope.LOGGER.error(f.getMessage()), ItemStack.EMPTY);
@@ -215,6 +226,38 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     @Override
+    public @NotNull ItemStack getItem(int slot) {
+        if (slot == SLOT_INBOX) {
+            return getFirstAvailableMailToExtract();
+        }
+        return super.getItem(slot);
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        if (slot == SLOT_INBOX) return;
+        super.setItem(slot, stack);
+    }
+
+    public ItemStack getFirstAvailableMailToExtract() {
+        for (ItemStack stack : getAllMail()) {
+            //TODO: Unextractable mail check (payback, etc)
+            return stack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public @NotNull ItemStack removeItem(int slot, int amount) {
+        if (slot == SLOT_INBOX) {
+            return MailId.from(getFirstAvailableMailToExtract())
+                  .map(id -> takeMail(id, null))
+                  .orElse(ItemStack.EMPTY);
+        }
+        return super.removeItem(slot, amount);
+    }
+
+    @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (address == null) return false;
         if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
@@ -229,12 +272,9 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
               && !recipient.equals(address);
     }
 
-    /**
-     * This method is called only by Hopper
-     */
     @Override
     public boolean canTakeItem(Container target, int slot, ItemStack stack) {
-        return false;
+        return slot == SLOT_INBOX;
     }
 
     // -- Menu

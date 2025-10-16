@@ -11,6 +11,8 @@ import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -196,6 +198,28 @@ public class PigeonholeBlock extends BaseEntityBlock {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
                 AllAddresses knownAddresses = AllAddresses.of(serverPlayer.serverLevel());
                 Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        if (stack.is(Envelope.Tags.Items.MAILABLE)
+              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Pigeonhole pigeonhole) {
+            if (player instanceof ServerPlayer serverPlayer
+                  && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+                    && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
+                PigeonholeManager pigeonholeManager = serverPlayer.serverLevel().getEnvelopePigeonholeManager();
+                ItemStack mail = stack.copy().split(1);
+                if (!mail.has(Envelope.DataComponents.MAIL_SENDER)) {
+                    mail.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
+                }
+                if (pigeonholeManager.putMail(pigeonhole, mail)) {
+                    MailDeliveryLog.addRecords(mail,
+                          MailDeliveryLog.Record.arrivedTo(pigeonhole)
+                                .atTime(level.getGameTime())
+                                .withOperatorMessage(Optional.of(player.getName())));
+                    blockEntity.onMailReceived(serverPlayer.serverLevel(), mail);
+                    stack.split(1);
+                }
             }
             return ItemInteractionResult.SUCCESS;
         }
