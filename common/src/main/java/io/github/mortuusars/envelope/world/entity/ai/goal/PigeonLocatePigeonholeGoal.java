@@ -35,7 +35,7 @@ public class PigeonLocatePigeonholeGoal extends Goal {
 
     @Override
     public void start() {
-        pigeon.getPigeonholeHandler().setCooldownBeforeLocatingNewPigeonhole();
+        pigeon.getPigeonholeHandler().setDefaultCooldownBeforeLocatingNewPigeonhole();
         List<BlockPos> pigeonholes = findNearbyPigeonholesWithSpace();
         if (!pigeonholes.isEmpty()) {
             for (BlockPos pos : pigeonholes) {

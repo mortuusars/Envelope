@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.mixin.bugger.ScreenRenderLinesInvoker;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -231,14 +232,14 @@ public class Bugger {
         poseStack.scale(0.015F, -0.015F, 0.015F);
         Matrix4f matrix4f = poseStack.last().pose();
         float opacity = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
-        int backgroundColor = (int)(opacity * 255.0F) << 24;
+        int backgroundColor = (int) (opacity * 255.0F) << 24;
         Font font = Minecrft.get().font;
 
         float y = -5 - lines.size() * (font.lineHeight + 1);
         for (Component text : lines) {
-            float x = (float)(-font.width(text) / 2);
+            float x = (float) (-font.width(text) / 2);
             font.drawInBatch(text, x, y, 0x20FFFFFF, false, matrix4f,
-                    bufferSource, Font.DisplayMode.SEE_THROUGH, backgroundColor, packedLight);
+                  bufferSource, Font.DisplayMode.SEE_THROUGH, backgroundColor, packedLight);
             font.drawInBatch(text, x, y, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
             y += font.lineHeight + 1;
         }
@@ -247,13 +248,27 @@ public class Bugger {
     }
 
     private static List<Component> getOverheadEntityInfoLines(Entity entity) {
-        if (entity instanceof Pigeon pigeon && pigeon.getDelivery() != null) {
-            return List.of(
-                    Component.empty()
+        if (entity instanceof Pigeon pigeon) {
+            if (pigeon.getDelivery() != null) {
+                return List.of(
+                      Component.empty()
                             .append(pigeon.getDelivery().getSender().getDisplayName())
                             .append(" → ")
                             .append(pigeon.getDelivery().getRecipient().getDisplayName()),
-                    Component.literal(WordUtils.capitalize(pigeon.getDelivery().getPhase().getType().getSerializedName().replace('_', ' '))));
+                      Component.literal(WordUtils.capitalize(pigeon.getDelivery().getPhase().getType().getSerializedName().replace('_', ' '))));
+            }
+
+            List<Component> list = new ArrayList<>();
+            PigeonholeHandler handler = pigeon.getPigeonholeHandler();
+            if (handler.wantsToEnterPigeonhole()) {
+                list.add(Component.literal(handler.getPigeonholePos() != null ? "Going to Pigeonhole" : "Looking for Pigeonhole"));
+            } else {
+                list.add(Component.literal("Would want to enter after: " + handler.getCooldownBeforeWantingToEnterPigeonhole() / 20));
+                if (handler.getCooldownBeforeEnteringPigeonhole() > 0) {
+                    list.add(Component.literal("Could enter after: " + handler.getCooldownBeforeEnteringPigeonhole() / 20));
+                }
+            }
+            return list;
         }
         return Collections.emptyList();
     }

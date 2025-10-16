@@ -2,16 +2,11 @@ package io.github.mortuusars.envelope.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import org.jetbrains.annotations.NotNull;
 
 public class PigeonFancyHatModel extends HierarchicalModel<Pigeon> {
@@ -36,12 +31,6 @@ public class PigeonFancyHatModel extends HierarchicalModel<Pigeon> {
 	@Override
 	public @NotNull ModelPart root() {
 		return this.root;
-	}
-
-	public void renderOnShoulder(PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay,
-								 float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch, int tickCount) {
-		VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutout(PigeonRenderer.FANCY_HAT));
-		renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, -1);
 	}
 
 	@Override

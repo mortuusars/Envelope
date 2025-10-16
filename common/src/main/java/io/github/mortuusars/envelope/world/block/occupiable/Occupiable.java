@@ -50,13 +50,7 @@ public interface Occupiable {
           "SleepingZ",
           "Passengers",
           "UUID",
-          "leash",
-          "PigeonholePos",
-          "LastPigeonholePos",
-          "LeftPigeonholeAt",
-          "WouldWantToEnterPigeonholeAfter",
-          "Sitting",
-          "Delivery"
+          "leash"
     );
 
     boolean canBeOccupiedBy(Entity entity);

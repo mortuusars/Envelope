@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -174,7 +173,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         tickOccupants(level, pos, state);
 
         // Make some nearby pigeons prioritize this pigeonhole to pick up and deliver mail
-        if (getOccupants().isEmpty() && !getItem(SLOT_MAIL).isEmpty()) {
+        if (getOccupants().isEmpty() && !getItem(SLOT_MAIL).isEmpty() && !getItem(SLOT_FOOD).isEmpty()) {
             for (Pigeon nearbyPigeon : level.getEntitiesOfClass(Pigeon.class, new AABB(getBlockPos()).inflate(16))) {
                 nearbyPigeon.getPigeonholeHandler().setPigeonholePos(getBlockPos());
                 break;
@@ -348,7 +347,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     public int getMinimumTicksInsideForOccupant(Entity entity) {
         return entity instanceof Pigeon
-              ? Config.Server.Pigeon.MIN_TICKS_IN_PIGEONHOLE.get()
+              ? Config.Server.Pigeon.MIN_TICKS_INSIDE_PIGEONHOLE.get()
               : Occupiable.super.getMinimumTicksInsideForOccupant(entity);
     }
 
@@ -400,6 +399,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     public String getSerializedOccupantsName() {
         return "pigeons";
+    }
+
+    @Override
+    public void cleanupEntityTag(CompoundTag tag) {
+        Pigeon.IGNORED_TAGS.forEach(tag::remove);
     }
 
     public boolean isFireNearby() {

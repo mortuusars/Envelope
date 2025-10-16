@@ -34,7 +34,8 @@ public abstract class Config {
         public static class Pigeon {
             public static final ModConfigSpec.BooleanValue SPAWNS_NATURALLY;
             public static final ModConfigSpec.BooleanValue SPAWNS_IN_VILLAGE;
-            public static final ModConfigSpec.IntValue MIN_TICKS_IN_PIGEONHOLE;
+            public static final ModConfigSpec.IntValue MIN_TICKS_INSIDE_PIGEONHOLE;
+            public static final ModConfigSpec.IntValue MIN_TICKS_OUTSIDE_PIGEONHOLE;
 
             static {
                 BUILDER.push("pigeon");
@@ -44,9 +45,12 @@ public abstract class Config {
                 SPAWNS_IN_VILLAGE = BUILDER
                         .comment("Pigeon can spawn in the village (similar to Cats). Default: true")
                         .define("spawns_in_village", true);
-                MIN_TICKS_IN_PIGEONHOLE = BUILDER
-                      .comment("Time (in ticks) that a Pigeon will be sitting in the Pigeonhole after entering. Default: 600 (30 seconds)")
-                      .defineInRange("min_ticks_in_pigeonhole", 600, 1, Integer.MAX_VALUE);
+                MIN_TICKS_INSIDE_PIGEONHOLE = BUILDER
+                      .comment("Minimum time (in ticks) that a Pigeon will be sitting in the Pigeonhole after entering. Default: 600 (30 seconds)")
+                      .defineInRange("min_ticks_inside_pigeonhole", 600, 1, Integer.MAX_VALUE);
+                MIN_TICKS_OUTSIDE_PIGEONHOLE = BUILDER
+                      .comment("Minimum time (in ticks) that a Pigeon will spend outside of a Pigeonhole. Default: 1200 (1 min)")
+                      .defineInRange("min_ticks_outside_pigeonhole", 1200, 100, Integer.MAX_VALUE);
                 BUILDER.pop();
             }
 
