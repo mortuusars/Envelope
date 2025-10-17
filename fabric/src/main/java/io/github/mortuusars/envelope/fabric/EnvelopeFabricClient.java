@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.PackageScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
+import io.github.mortuusars.envelope.client.model.PigeonBackpackModel;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
@@ -28,6 +29,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(Envelope.EntityTypes.PIGEON.get(), PigeonRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON, PigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_LEG_BAND, PigeonLegBandModel::createLayerDefinition);
+        EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_BACKPACK, PigeonBackpackModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
 
         MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);

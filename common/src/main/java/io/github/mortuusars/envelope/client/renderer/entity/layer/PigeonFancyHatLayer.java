@@ -27,7 +27,7 @@ public class PigeonFancyHatLayer extends RenderLayer<Pigeon, PigeonModel> {
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Pigeon pigeon, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         if (pigeon.hasFancyHat()) {
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(PigeonRenderer.FANCY_HAT));
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(PigeonRenderer.FANCY_HAT_TEXTURE));
             hatModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         }
     }

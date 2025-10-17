@@ -5,7 +5,6 @@ import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.network.packet.clientbound.BuggerPigeonPigeonholeDataS2CP;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.BackgroundDelivery;
@@ -98,7 +97,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     );
 
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DATA_IS_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
 
     public float flap;
@@ -249,11 +249,22 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     // -- Properties
 
     public boolean isSitting() {
-        return entityData.get(DATA_IS_SITTING);
+        return entityData.get(DATA_SITTING);
     }
 
     public void setSitting(boolean sitting) {
-        entityData.set(DATA_IS_SITTING, sitting);
+        entityData.set(DATA_SITTING, sitting);
+    }
+
+    public boolean isDelivering() {
+        if (level() instanceof ServerLevel) {
+            return getDelivery() != null;
+        }
+        return entityData.get(DATA_DELIVERING);
+    }
+
+    public void setDelivering(boolean delivering) {
+        entityData.set(DATA_DELIVERING, delivering);
     }
 
     public boolean hasMail() {
@@ -282,7 +293,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_VARIANT_ID, 0);
-        builder.define(DATA_IS_SITTING, false);
+        builder.define(DATA_SITTING, false);
+        builder.define(DATA_DELIVERING, false);
         builder.define(DATA_HAS_MAIL, false);
     }
 
@@ -458,6 +470,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void onDeliveryChanged(ServerLevel level) {
         setHasMail(getDelivery() != null && !getDelivery().getMail().isEmpty());
+        setDelivering(isDelivering());
         BuggerPackets.sendPigeonDelivery(this);
     }
 

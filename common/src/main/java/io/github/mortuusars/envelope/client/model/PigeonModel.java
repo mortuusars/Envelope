@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.client.model;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.EasingFunction;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -59,14 +59,9 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 		this.setupAnim(getState(entity), entity, entity.tickCount, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 	}
 
-	public void renderOnShoulder(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
-								 float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch, int tickCount) {
-		this.setupAnim(PigeonModel.State.ON_SHOULDER, null, tickCount, limbSwing, limbSwingAmount, 0.0F, netHeadYaw, headPitch);
-		this.root.render(poseStack, buffer, packedLight, packedOverlay);
-	}
-
 	private void setupAnim(PigeonModel.State state, @Nullable Pigeon pigeon, int tickCount, float limbSwing, float limbSwingAmount,
 						   float ageInTicks, float netHeadYaw, float headPitch) {
+		body.xRot = 0f;
 		body.y = 24F;
 		head.xRot = headPitch * (float) (Math.PI / 180.0);
 		head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
@@ -79,6 +74,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 		rightLeg.xRot = 0f;
 		leftLeg.yRot = 0f;
 		rightLeg.yRot = 0f;
+		tail.xRot = 0f;
 
 		if (pigeon != null && pigeon.isBaby()) {
 			head.xScale = 1.3f;
@@ -103,6 +99,16 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 				rightWing.zRot = 0.3f + 0.0873F + ageInTicks;
 				leftLeg.xRot = 0.85f;
 				rightLeg.xRot = 0.85f;
+
+				float anim = ((tickCount + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) % 60) / 60;
+				// Back and forth
+				anim *= 2;
+				if (anim > 1) {
+					anim = 2 - anim;
+				}
+				anim = ((float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim));
+				body.xRot = anim * 0.1f;
+				tail.xRot = 1.3f + (anim * 0.1f);
 				break;
 			case ON_SHOULDER:
 				leftLeg.xRot = 0f;
