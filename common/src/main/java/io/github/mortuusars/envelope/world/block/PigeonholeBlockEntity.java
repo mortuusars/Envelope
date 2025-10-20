@@ -57,6 +57,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Nullable
     protected Address.Pigeonhole address = null;
+    protected boolean updatedAfterLoading = false;
 
     public PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -170,6 +171,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     protected void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        if (!updatedAfterLoading) {
+            setChanged();
+            updatedAfterLoading = true;
+        }
+
         tickOccupants(level, pos, state);
 
         // Make some nearby pigeons prioritize this pigeonhole to pick up and deliver mail
