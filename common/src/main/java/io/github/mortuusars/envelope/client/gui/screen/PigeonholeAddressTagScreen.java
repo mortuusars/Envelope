@@ -150,7 +150,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (isCurrentIdSameAsExistingAddress()) return;
 
-        int cost = Config.Server.Pigeonhole.ADDRESS_EXPERIENCE_LEVELS_COST.get();
+        int cost = Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get();
         if (cost <= 0) return;
 
         boolean hasEnough = player.experienceLevel >= cost;

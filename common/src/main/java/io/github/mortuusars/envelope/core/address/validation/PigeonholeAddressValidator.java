@@ -11,7 +11,7 @@ public class PigeonholeAddressValidator extends AddressValidator {
     public static final Validator.Issue NOT_ENOUGH_XP_LEVELS = () -> "address.not_enough_xp_levels";
 
     protected final Player player;
-    protected int xpLevelsCost = Config.Server.Pigeonhole.ADDRESS_EXPERIENCE_LEVELS_COST.get();
+    protected int xpLevelsCost = Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get();
     protected Optional<Address> existingAddress = Optional.empty();
 
     public PigeonholeAddressValidator(Player player, Optional<Address> existingAddress) {

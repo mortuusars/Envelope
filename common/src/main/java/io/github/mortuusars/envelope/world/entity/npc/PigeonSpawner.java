@@ -54,7 +54,7 @@ public class PigeonSpawner implements CustomSpawner {
         }
 
         if (SpawnPlacements.isSpawnPositionOk(Envelope.EntityTypes.PIGEON.get(), level, spawnPos)) {
-            if (Config.Server.Pigeon.SPAWNS_IN_VILLAGE.get() && level.isCloseToVillage(spawnPos, 2)) {
+            if (Config.Server.PIGEON_SPAWNS_IN_VILLAGE.get() && level.isCloseToVillage(spawnPos, 2)) {
                 return this.spawnInVillage(level, spawnPos);
             }
 

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class DispenserBlockMixin {
     @Inject(method = "getDispenseMethod", at = @At("HEAD"), cancellable = true)
     private void onGetDispenseMethod(Level level, ItemStack item, CallbackInfoReturnable<DispenseItemBehavior> cir) {
-        if (Config.Server.Pigeonhole.DISPENSER_WASTE_SCOOPING.get() && item.is(Envelope.Tags.Items.WASTE_SCOOPABLE)) {
+        if (Config.Server.PIGEONHOLE_DISPENSER_WASTE_SCOOPING.get() && item.is(Envelope.Tags.Items.WASTE_SCOOPABLE)) {
             cir.setReturnValue(WasteScoopingDispenseItemBehavior.INSTANCE);
         }
     }

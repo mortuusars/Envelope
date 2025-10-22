@@ -53,7 +53,7 @@ public class PigeonholeHandler {
     }
 
     public void setDefaultCooldownBeforeWantingToEnterPigeonhole() {
-        cooldownBeforeWantingToEnterPigeonhole = Config.Server.Pigeon.MIN_TICKS_OUTSIDE_PIGEONHOLE.get();
+        cooldownBeforeWantingToEnterPigeonhole = Config.Server.PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE.get();
     }
 
     public int getCooldownBeforeLocatingNewPigeonhole() {

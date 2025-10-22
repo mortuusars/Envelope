@@ -38,7 +38,7 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
 
     @Override
     public boolean isPauseScreen() {
-        return Config.Server.Letter.PAUSE.get();
+        return Config.Server.LETTER_PAUSE.get();
     }
 
     @Override

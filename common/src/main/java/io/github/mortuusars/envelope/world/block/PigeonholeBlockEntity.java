@@ -353,7 +353,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     public int getMinimumTicksInsideForOccupant(Entity entity) {
         return entity instanceof Pigeon
-              ? Config.Server.Pigeon.MIN_TICKS_INSIDE_PIGEONHOLE.get()
+              ? Config.Server.PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE.get()
               : Occupiable.super.getMinimumTicksInsideForOccupant(entity);
     }
 

@@ -115,11 +115,11 @@ public class PackageItem extends BlockItem {
     }
 
     public int getRemainingPacks(ItemStack stack) {
-        return Config.Server.Package.PACK_LIMIT.get() - getTimesPacked(stack);
+        return Config.Server.PACKAGE_PACK_LIMIT.get() - getTimesPacked(stack);
     }
 
     public boolean canPack(ItemStack stack) {
-        return getTimesPacked(stack) < Config.Server.Package.PACK_LIMIT.get();
+        return getTimesPacked(stack) < Config.Server.PACKAGE_PACK_LIMIT.get();
     }
 
     public boolean shouldBeDestroyedWhenEmpty(ItemStack stack) {
