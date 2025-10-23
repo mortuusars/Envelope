@@ -13,7 +13,6 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
-import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -220,7 +219,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                AllAddresses knownAddresses = AllAddresses.of(serverPlayer.serverLevel());
+                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().getKnownAddresses();
                 Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
             }
             return ItemInteractionResult.SUCCESS;
@@ -228,15 +227,15 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
         if (stack.is(Envelope.Tags.Items.MAILABLE)
               && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Pigeonhole pigeonhole) {
+            //TODO: this blocks opening GUI if not inserted. need to sync the address to client probably
             if (player instanceof ServerPlayer serverPlayer
                   && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
                     && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
-                PigeonholeManager pigeonholeManager = serverPlayer.serverLevel().getEnvelopePigeonholeManager();
                 ItemStack mail = stack.copy().split(1);
                 if (!mail.has(Envelope.DataComponents.MAIL_SENDER)) {
                     mail.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
                 }
-                if (pigeonholeManager.putMail(pigeonhole, mail)) {
+                if (serverPlayer.serverLevel().getEnvelopeContext().getPigeonholeManager().putMail(pigeonhole, mail)) {
                     MailDeliveryLog.addRecords(mail,
                           MailDeliveryLog.Record.arrivedTo(pigeonhole)
                                 .atTime(level.getGameTime())

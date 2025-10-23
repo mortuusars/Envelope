@@ -8,8 +8,6 @@ import io.github.mortuusars.envelope.core.address.AllAddresses;
 import io.github.mortuusars.envelope.util.result.Failure;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.item.component.MailId;
-import io.github.mortuusars.envelope.world.mail.MailReceiver;
-import io.github.mortuusars.envelope.world.mail.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.storage.PigeonholeSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -49,7 +47,7 @@ public class PigeonholeManager {
         return byPosition(pos)
               .map(PigeonholeData::getAddress) // Return correct (stored) address for that BlockPos
               .orElseGet(() -> {
-                        AllAddresses knownAddresses = AllAddresses.of(level);
+                        AllAddresses knownAddresses = level.getEnvelopeContext().getKnownAddresses();
                         if (knownAddresses.isKnown(address)) {
                             AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses, 22);
                             Address.Pigeonhole newAddress = new Address.Pigeonhole(uniquifier.uniquify(address.id()));

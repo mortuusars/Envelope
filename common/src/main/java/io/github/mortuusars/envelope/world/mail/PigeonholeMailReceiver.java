@@ -20,7 +20,7 @@ public class PigeonholeMailReceiver implements MailReceiver {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
+        PigeonholeManager pigeonholeManager = level.getEnvelopeContext().getPigeonholeManager();
         if (pigeonholeManager.putMail(address, mail)) {
             MailDeliveryLog.addRecords(mail,
                   MailDeliveryLog.Record.arrivedTo(address).atTime(level.getGameTime()));
@@ -32,9 +32,9 @@ public class PigeonholeMailReceiver implements MailReceiver {
             });
 
             return ItemStack.EMPTY;
+        } else {
+            LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
+            return Mail.returned(mail, address);
         }
-
-        LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
-        return Mail.returned(mail, address);
     }
 }

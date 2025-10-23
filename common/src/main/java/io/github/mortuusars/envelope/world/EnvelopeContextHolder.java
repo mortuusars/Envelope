@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.pigeonhole;
+package io.github.mortuusars.envelope.world;
 
 /**
  * Injected in ServerLevel.<br>
@@ -12,8 +12,8 @@ package io.github.mortuusars.envelope.world.pigeonhole;
  * }
  * </pre>
  */
-public interface PigeonholeManagerHolder {
-    default PigeonholeManager getEnvelopePigeonholeManager() {
+public interface EnvelopeContextHolder {
+    default EnvelopeContext getEnvelopeContext() {
         throw new IllegalStateException("This method must be implemented");
     }
 }

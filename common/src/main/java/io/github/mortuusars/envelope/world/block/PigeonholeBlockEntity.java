@@ -83,7 +83,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         if (getLevel() instanceof ServerLevel serverLevel) {
-            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
+            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopeContext().getPigeonholeManager();
 
             if (this.address != null) {
                 dropOrReturnAllMail();
@@ -103,28 +103,22 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     protected void ensureAddressCorrectness() {
         if (address == null || !(level instanceof ServerLevel serverLevel)) return;
-        address = serverLevel.getEnvelopePigeonholeManager().resolve(address, getBlockPos());
+        address = serverLevel.getEnvelopeContext().getPigeonholeManager().resolve(address, getBlockPos());
     }
 
     // -- Mail
 
     public List<ItemStack> getAllMail() {
         if (address != null && level instanceof ServerLevel serverLevel) {
-            return serverLevel.getEnvelopePigeonholeManager().getAllMail(address);
+            return serverLevel.getEnvelopeContext().getPigeonholeManager().getAllMail(address);
         }
         return Collections.emptyList();
     }
 
-//    @Override
-//    public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-//
-//        return null;
-//    }
-
     public ItemStack takeMail(MailId mailId, @Nullable Player player) {
         if (address == null || !(level instanceof ServerLevel serverLevel)) return ItemStack.EMPTY;
 
-        return serverLevel.getEnvelopePigeonholeManager().removeMailById(address, mailId)
+        return serverLevel.getEnvelopeContext().getPigeonholeManager().removeMailById(address, mailId)
               .mapValue(extractedMail -> {
                   extractedMail.remove(Envelope.DataComponents.MAIL_ID);
                   extractedMail.remove(Envelope.DataComponents.MAIL_STATUS);
@@ -200,7 +194,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         });
 
         if (address != null && getLevel() instanceof ServerLevel serverLevel) {
-            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopePigeonholeManager();
+            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopeContext().getPigeonholeManager();
             dropOrReturnAllMail();
             pigeonholeManager.remove(address);
             address = null;
