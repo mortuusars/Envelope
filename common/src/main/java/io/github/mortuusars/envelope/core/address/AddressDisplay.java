@@ -60,7 +60,7 @@ public abstract class AddressDisplay {
         return switch (address.type()) {
             case PIGEONHOLE -> EnvelopeSymbols.ADDRESS_PIGEONHOLE;
             case PLAYER -> EnvelopeSymbols.ADDRESS_PLAYER;
-            case NPC -> EnvelopeSymbols.ADDRESS_NPC;
+            case ENTITY -> EnvelopeSymbols.ADDRESS_NPC;
         };
     }
 }

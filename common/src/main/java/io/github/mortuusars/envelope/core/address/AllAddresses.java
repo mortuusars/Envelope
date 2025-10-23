@@ -7,16 +7,16 @@ import net.minecraft.network.codec.StreamCodec;
 import java.util.*;
 import java.util.stream.Stream;
 
-public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Player> players, Set<Address.Npc> npcs) {
+public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Player> players, Set<Address.Entity> entities) {
     public static final StreamCodec<RegistryFriendlyByteBuf, AllAddresses> STREAM_CODEC = StreamCodec.composite(
             Address.Pigeonhole.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::pigeonholes,
             Address.Player.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::players,
-            Address.Npc.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::npcs,
+            Address.Entity.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::entities,
             AllAddresses::new
     );
 
     public Stream<Address> stream() {
-        return Stream.of(pigeonholes, players, npcs).flatMap(Set::stream);
+        return Stream.of(pigeonholes, players, entities).flatMap(Set::stream);
     }
 
     public Optional<Address> byName(String name) {

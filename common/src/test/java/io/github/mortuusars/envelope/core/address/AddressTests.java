@@ -17,9 +17,9 @@ class AddressTests {
         assertEquals(new Address.Player("Case Insensitive"), new Address.Player("caSE iNSeNSitiVe"));
         assertNotEquals(new Address.Player("Case Insensitive"), new Address.Player("Different caSE iNSeNSitiVe"));
 
-        assertEquals(new Address.Npc("Id"), new Address.Npc("Id"));
-        assertEquals(new Address.Npc("Case Insensitive"), new Address.Npc("caSE iNSeNSitiVe"));
-        assertNotEquals(new Address.Npc("Case Insensitive"), new Address.Npc("Different caSE iNSeNSitiVe"));
+        assertEquals(new Address.Entity("Id"), new Address.Entity("Id"));
+        assertEquals(new Address.Entity("Case Insensitive"), new Address.Entity("caSE iNSeNSitiVe"));
+        assertNotEquals(new Address.Entity("Case Insensitive"), new Address.Entity("Different caSE iNSeNSitiVe"));
     }
 
     @Test
@@ -32,30 +32,30 @@ class AddressTests {
         assertEquals(new Address.Player("Case Insensitive").hashCode(), new Address.Player("caSE iNSeNSitiVe").hashCode());
         assertNotEquals(new Address.Player("Case Insensitive").hashCode(), new Address.Player("Different caSE iNSeNSitiVe").hashCode());
 
-        assertEquals(new Address.Npc("Id").hashCode(), new Address.Npc("Id").hashCode());
-        assertEquals(new Address.Npc("Case Insensitive").hashCode(), new Address.Npc("caSE iNSeNSitiVe").hashCode());
-        assertNotEquals(new Address.Npc("Case Insensitive").hashCode(), new Address.Npc("Different caSE iNSeNSitiVe").hashCode());
+        assertEquals(new Address.Entity("Id").hashCode(), new Address.Entity("Id").hashCode());
+        assertEquals(new Address.Entity("Case Insensitive").hashCode(), new Address.Entity("caSE iNSeNSitiVe").hashCode());
+        assertNotEquals(new Address.Entity("Case Insensitive").hashCode(), new Address.Entity("Different caSE iNSeNSitiVe").hashCode());
     }
 
     @Test
     void hashCodesOfSameIdButDifferentTypeAreDifferent() {
         assertNotEquals(new Address.Pigeonhole("Id").hashCode(), new Address.Player("Id").hashCode());
-        assertNotEquals(new Address.Pigeonhole("Id").hashCode(), new Address.Npc("Id").hashCode());
+        assertNotEquals(new Address.Pigeonhole("Id").hashCode(), new Address.Entity("Id").hashCode());
         assertNotEquals(new Address.Player("Id").hashCode(), new Address.Pigeonhole("Id").hashCode());
-        assertNotEquals(new Address.Player("Id").hashCode(), new Address.Npc("Id").hashCode());
+        assertNotEquals(new Address.Player("Id").hashCode(), new Address.Entity("Id").hashCode());
     }
 
     @Test
     void addressWorksAsMapKey() {
         Map<Address, Integer> map = Map.of(
                 new Address.Pigeonhole("dev"), 42,
-                new Address.Npc("villager"), 23,
+                new Address.Entity("villager"), 23,
                 new Address.Player("villager"), 64,
                 new Address.Player("dev"), 11
         );
 
         assertEquals(map.get(new Address.Player("villager")), 64);
-        assertEquals(map.get(new Address.Npc("villager")), 23);
+        assertEquals(map.get(new Address.Entity("villager")), 23);
         assertEquals(map.get(new Address.Pigeonhole("dev")), 42);
     }
 }

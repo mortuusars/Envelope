@@ -12,18 +12,18 @@ import java.util.Set;
 public class MailEntities {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Map<Address.Npc, MailEntity> entities = new HashMap<>();
+    private final Map<Address.Entity, MailEntity> entities = new HashMap<>();
 
-    public Optional<MailEntity> byAddress(Address.Npc address) {
+    public Optional<MailEntity> byAddress(Address.Entity address) {
         return Optional.ofNullable(entities.get(address));
     }
 
-    public Set<Address.Npc> getAllAddresses() {
+    public Set<Address.Entity> getAllAddresses() {
         return entities.keySet();
     }
 
     public void register(MailEntity entity) {
-        Address.Npc address = entity.getAddress();
+        Address.Entity address = entity.getAddress();
         if (entities.containsKey(address)) {
             LOGGER.warn("Mail entity with address '{}' is already registered. Old one will be overwritten.", address);
         }

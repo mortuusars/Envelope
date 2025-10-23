@@ -621,7 +621,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                   if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
                   if (sender.type() == Address.Type.PIGEONHOLE) return ICON_ADDRESS_PIGEONHOLE_SPRITES;
                   if (sender.type() == Address.Type.PLAYER) return ICON_ADDRESS_PLAYER_SPRITES;
-                  if (sender.type() == Address.Type.NPC) return ICON_ADDRESS_NPC_SPRITES;
+                  if (sender.type() == Address.Type.ENTITY) return ICON_ADDRESS_NPC_SPRITES;
                   return ICON_ADDRESS_UNKNOWN_SPRITES;
               });
     }

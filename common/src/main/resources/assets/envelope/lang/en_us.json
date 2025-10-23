@@ -127,7 +127,7 @@
 
   "address.envelope.type.pigeonhole": "Pigeonhole",
   "address.envelope.type.player": "Personal",
-  "address.envelope.type.npc": "Entity",
+  "address.envelope.type.entity": "Entity",
 
   "subtitles.envelope.entity.pigeon.ambient": "Pigeon coos",
   "subtitles.envelope.entity.pigeon.death": "Pigeon dies",

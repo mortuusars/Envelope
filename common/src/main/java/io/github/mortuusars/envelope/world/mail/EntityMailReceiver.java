@@ -6,9 +6,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
 public class EntityMailReceiver implements MailReceiver {
-    private final Address.Npc address;
+    private final Address.Entity address;
 
-    public EntityMailReceiver(Address.Npc address) {
+    public EntityMailReceiver(Address.Entity address) {
         this.address = address;
     }
 

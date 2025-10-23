@@ -18,7 +18,6 @@ import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -68,7 +67,7 @@ public class Envelope {
         SoundEvents.init();
         ArgumentTypes.init();
 
-        MAIL_ENTITIES.register(new VillagerMailEntity(new Address.Npc("Villager")));
+        MAIL_ENTITIES.register(new VillagerMailEntity(new Address.Entity("Villager")));
     }
 
     /**

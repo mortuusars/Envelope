@@ -26,8 +26,8 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public interface Address {
-    Address MAIL_SERVICE = new Npc("Mail Service", Component.translatable("address.envelope.mail_service"));
-    Address UNKNOWN = new Npc("Unknown", Component.translatable("address.envelope.unknown"));
+    Address MAIL_SERVICE = new Entity("Mail Service", Component.translatable("address.envelope.mail_service"));
+    Address UNKNOWN = new Entity("Unknown", Component.translatable("address.envelope.unknown"));
 
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::type, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
@@ -54,30 +54,21 @@ public interface Address {
         return this;
     }
 
-    default Address ifNpc(Consumer<Npc> consumer) {
-        if (this instanceof Npc npc) {
-            consumer.accept(npc);
+    default Address ifNpc(Consumer<Entity> consumer) {
+        if (this instanceof Entity entity) {
+            consumer.accept(entity);
         }
         return this;
     }
 
-    default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Npc, R> ifNpc) {
+    default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Entity, R> ifNpc) {
         return switch (this) {
             case Pigeonhole pigeonhole -> ifPigeonhole.apply(pigeonhole);
             case Player player -> ifPlayer.apply(player);
-            case Npc npc -> ifNpc.apply(npc);
+            case Entity entity -> ifNpc.apply(entity);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
         };
     }
-
-//    default Address mapPlayerToPigeonholeIfApplicable(ServerLevel level) {
-//        if (this instanceof Player player) {
-//            return level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
-//                .map(Address.class::cast)
-//                .orElse(this);
-//        }
-//        return this;
-//    }
 
     default ItemStack receiveMail(ServerLevel level, ItemStack mail) {
         return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new)
@@ -154,29 +145,29 @@ public interface Address {
         }
     }
 
-    record Npc(String id, Optional<Component> displayName) implements Address {
-        public static final MapCodec<Npc> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Npc::id),
-                ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Npc::displayName)
-        ).apply(instance, Npc::new));
+    record Entity(String id, Optional<Component> displayName) implements Address {
+        public static final MapCodec<Entity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.fieldOf("id").forGetter(Entity::id),
+                ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Entity::displayName)
+        ).apply(instance, Entity::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, Npc> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Npc::id,
-                ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Npc::displayName,
-                Npc::new
+        public static final StreamCodec<RegistryFriendlyByteBuf, Entity> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, Entity::id,
+                ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Entity::displayName,
+                Entity::new
         );
 
-        public Npc(String id, Component displayName) {
+        public Entity(String id, Component displayName) {
             this(id, Optional.ofNullable(displayName));
         }
 
-        public Npc(String id) {
+        public Entity(String id) {
             this(id, Optional.empty());
         }
 
         @Override
         public Type type() {
-            return Type.NPC;
+            return Type.ENTITY;
         }
 
         @Override
@@ -194,7 +185,7 @@ public interface Address {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Npc that = (Npc) o;
+            Entity that = (Entity) o;
             return this.id.equalsIgnoreCase(that.id);
         }
 
@@ -207,7 +198,7 @@ public interface Address {
     enum Type implements StringRepresentable {
         PIGEONHOLE(0, "pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC),
         PLAYER(1, "player", Player.CODEC, Player.STREAM_CODEC),
-        NPC(2, "npc", Npc.CODEC, Npc.STREAM_CODEC);
+        ENTITY(2, "entity", Entity.CODEC, Entity.STREAM_CODEC);
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
         public static final IntFunction<Type> BY_ID = ByIdMap.continuous(Type::getId, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
@@ -240,6 +231,10 @@ public interface Address {
 
         public StreamCodec<RegistryFriendlyByteBuf, ? extends Address> getStreamCodec() {
             return streamCodec;
+        }
+
+        public MutableComponent translate() {
+            return Component.translatable("address.envelope.type." + getSerializedName());
         }
     }
 }

@@ -4,13 +4,13 @@ import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailReceiver;
 
 public abstract class MailEntity implements MailReceiver {
-    private final Address.Npc address;
+    private final Address.Entity address;
 
-    public MailEntity(Address.Npc address) {
+    public MailEntity(Address.Entity address) {
         this.address = address;
     }
 
-    public Address.Npc getAddress() {
+    public Address.Entity getAddress() {
         return address;
     }
 }

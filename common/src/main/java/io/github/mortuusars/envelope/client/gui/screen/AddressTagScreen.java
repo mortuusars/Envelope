@@ -209,8 +209,7 @@ public class AddressTagScreen extends Screen {
         guiGraphics.drawString(font, AddressDisplay.getIcon(address),
                 leftPos + 12, topPos + 18, color, false);
         if (address != Address.UNKNOWN && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, Component.translatable("address.envelope.type."
-                    + address.type().getSerializedName()), mouseX, mouseY);
+            guiGraphics.renderTooltip(font, address.type().translate(), mouseX, mouseY);
         }
     }
 
