@@ -17,6 +17,6 @@ public class PlayerMailReceiver implements MailReceiver {
               .flatMap(uuid -> level.getEnvelopeContext().getDefaultAddresses().of(uuid))
               .map(PigeonholeMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
-              .orElseGet(() -> Mail.returned(mail, address));
+              .orElseGet(() -> Mail.returnedRecipientNotFound(mail));
     }
 }

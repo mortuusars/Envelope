@@ -196,7 +196,7 @@ public class Delivery {
     }
 
     public String toShortString() {
-        return createSenderToRecipientComponent("->").getString();
+        return createSenderToRecipientComponent(" > ").getString();
     }
 
     // --

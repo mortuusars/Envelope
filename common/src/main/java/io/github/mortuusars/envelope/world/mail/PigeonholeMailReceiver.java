@@ -34,7 +34,7 @@ public class PigeonholeMailReceiver implements MailReceiver {
             return ItemStack.EMPTY;
         } else {
             LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
-            return Mail.returned(mail, address);
+            return Mail.returnedRecipientNotFound(mail);
         }
     }
 }

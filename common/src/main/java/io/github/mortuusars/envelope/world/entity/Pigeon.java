@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.service.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
@@ -17,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -496,7 +498,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                   .setTicks(0);
 
             if (!delivery.getMail().isEmpty()) {
-                delivery.setMail(Mail.returned(delivery.getMail(), delivery.getRecipientAddress()));
+                delivery.setMail(Mail.returned(delivery.getMail(), Address.MAIL_SERVICE,
+                      Component.translatable("gui.envelope.mail.log.returned.unable_to_reach")));
             }
 
             onDeliveryChanged(level);

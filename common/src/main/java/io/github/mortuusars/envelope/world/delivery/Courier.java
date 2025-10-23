@@ -40,7 +40,7 @@ public interface Courier {
         onDeliveryChanged(level);
 
         if (Envelope.debug())
-            LOGGER.info("{}[{}]: started delivering '{}'", getCourierName(), delivery.getMail(), delivery.toShortString());
+            LOGGER.info("{} [{}]: started delivering '{}'", getCourierName(), delivery.getMail(), delivery.toShortString());
     }
 
     default void tickDelivery(ServerLevel level, Delivery delivery) {
@@ -63,11 +63,25 @@ public interface Courier {
 
     default void advanceDeliveryPhase(ServerLevel level, Delivery delivery) {
         delivery.advancePhase();
+
+        if (delivery.getPhase().getType() == Delivery.Phase.Type.APPROACHING_TARGET
+              && !level.getEnvelopeContext().getKnownAddresses().isKnown(delivery.getTargetAddress())) {
+
+            delivery.setPhase(delivery.getPhase()
+                  .setType(Delivery.Phase.Type.TRAVELING_TO_HOME)
+                  .setTicks(0));
+            delivery.setMail(Mail.returnedRecipientNotFound(delivery.getMail()));
+
+            if (Envelope.debug())
+                LOGGER.info("{} [{}]: returning: recipient not found.", getCourierName(), delivery.toShortString());
+
+            onDeliveryChanged(level);
+        }
     }
 
     default void startDeliveryPhase(ServerLevel level, Delivery delivery) {
         if (Envelope.debug())
-            LOGGER.info("{}[{}]: starting phase '{}'", getCourierName(), delivery.toShortString(), delivery.getPhase().getType().getSerializedName());
+            LOGGER.info("{} [{}]: starting phase '{}'", getCourierName(), delivery.toShortString(), delivery.getPhase().getType().getSerializedName());
         updatePhasePositions(level, delivery);
     }
 
@@ -75,13 +89,13 @@ public interface Courier {
         switch (delivery.getPhase().getType()) {
             case APPROACHING_TARGET, APPROACHING_HOME -> {
                 if (Envelope.debug() && !delivery.getMail().isEmpty())
-                    LOGGER.info("{}[{}]: dropping off '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().toString());
+                    LOGGER.info("{} [{}]: dropping off '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().getItem());
 
                 ItemStack result = delivery.getTargetAddress().receiveMail(level, delivery.getMail());
                 delivery.setMail(result);
 
                 if (Envelope.debug() && delivery.getPhase().getType().hasNext() && !delivery.getMail().isEmpty())
-                    LOGGER.info("{}[{}]: returning home with '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().toString());
+                    LOGGER.info("{} [{}]: returning home with '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().getItem());
             }
         }
     }
@@ -90,7 +104,7 @@ public interface Courier {
         if (!delivery.getMail().isEmpty()) {
             handleUndeliveredMail(level, delivery);
         }
-        LOGGER.debug("{}[{}]: finished.", getCourierName(), delivery.toShortString());
+        LOGGER.debug("{} [{}]: finished.", getCourierName(), delivery.toShortString());
         setDelivery(null);
     }
 

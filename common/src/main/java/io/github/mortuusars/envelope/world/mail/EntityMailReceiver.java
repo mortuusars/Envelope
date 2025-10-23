@@ -16,6 +16,6 @@ public class EntityMailReceiver implements MailReceiver {
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
         return Envelope.MAIL_ENTITIES.byAddress(address)
               .map(entity -> entity.receiveMail(level, mail))
-              .orElseGet(() -> Mail.returned(mail, address));
+              .orElseGet(() -> Mail.returnedRecipientNotFound(mail));
     }
 }

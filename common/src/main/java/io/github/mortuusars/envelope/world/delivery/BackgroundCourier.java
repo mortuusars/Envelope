@@ -90,9 +90,6 @@ public class BackgroundCourier implements Courier {
     @Override
     public void advanceDeliveryPhase(ServerLevel level, Delivery delivery) {
         Courier.super.advanceDeliveryPhase(level, delivery);
-        if (!delivery.getPhase().getType().isTraveling()) {
-            delivery.getPhase().setDuration(Delivery.Phase.DEFAULT_DURATION / 2);
-        }
     }
 
     @Override
