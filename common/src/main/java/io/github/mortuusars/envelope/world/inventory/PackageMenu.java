@@ -78,7 +78,7 @@ public class PackageMenu extends AbstractContainerMenu {
                 addSlot(new Slot(packageContainer, index, x, y) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        return !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED);
+                        return getPackage().map((i, s) -> i.canInsert(stack));
                     }
                 });
             }

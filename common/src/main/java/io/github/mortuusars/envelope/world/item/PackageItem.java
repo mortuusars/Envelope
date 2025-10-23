@@ -47,6 +47,11 @@ public class PackageItem extends BlockItem {
     }
 
     @Override
+    public boolean canFitInsideContainerItems() {
+        return false;
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (stack.has(Envelope.DataComponents.PACKAGE_LETTER)) {
             tooltipComponents.add(Component.translatable(
@@ -142,5 +147,10 @@ public class PackageItem extends BlockItem {
         }
 
         return items;
+    }
+
+    public boolean canInsert(ItemStack stack) {
+        return !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED)
+              && stack.getItem().canFitInsideContainerItems();
     }
 }
