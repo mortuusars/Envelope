@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
-import io.github.mortuusars.envelope.world.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.service.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.Courier;
@@ -542,7 +542,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     protected void transitionToBackground(ServerLevel level, boolean effects) {
         if (Envelope.debug()) LOGGER.info("Transitioning delivering Pigeon to background...");
-        BackgroundDelivery.get(level).add(toBackgroundCourier());
+        level.getEnvelopeContext().getBackgroundDelivery().add(toBackgroundCourier());
         if (effects) {
             level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
             level.playSound(null, position().x, position().y, position().z,

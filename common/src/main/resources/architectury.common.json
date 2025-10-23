@@ -2,8 +2,7 @@
   "accessWidener": "envelope.accesswidener",
   "injected_interfaces": {
     "net/minecraft/class_3218": [
-      "io/github/mortuusars/envelope/world/EnvelopeContextHolder",
-      "io/github/mortuusars/envelope/world/PlayerInformationHolder"
+      "io/github/mortuusars/envelope/world/service/EnvelopeContextHolder"
     ]
   }
 }

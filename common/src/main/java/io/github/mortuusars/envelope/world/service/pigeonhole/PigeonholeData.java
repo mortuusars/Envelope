@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.pigeonhole;
+package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

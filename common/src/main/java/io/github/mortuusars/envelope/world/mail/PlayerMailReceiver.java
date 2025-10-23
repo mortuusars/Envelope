@@ -13,7 +13,8 @@ public class PlayerMailReceiver implements MailReceiver {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        return level.getEnvelopePlayerInformation().getDefaultAddress().of(address)
+        return level.getEnvelopeContext().getKnownPlayers().getUuid(address)
+              .flatMap(uuid -> level.getEnvelopeContext().getDefaultAddresses().of(uuid))
               .map(PigeonholeMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
               .orElseGet(() -> Mail.returned(mail, address));

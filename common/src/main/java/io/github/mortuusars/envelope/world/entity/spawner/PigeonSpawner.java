@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.entity.npc;
+package io.github.mortuusars.envelope.world.entity.spawner;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;

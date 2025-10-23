@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.pigeonhole;
+package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.core.address.AllAddresses;
 import io.github.mortuusars.envelope.util.result.Failure;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.item.component.MailId;
-import io.github.mortuusars.envelope.world.storage.PigeonholeSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -94,7 +93,7 @@ public class PigeonholeManager {
     public void remove(Address.Pigeonhole address) {
         @Nullable PigeonholeData removed = data().getPigeonholes().remove(address);
         if (removed != null) {
-            level.getEnvelopePlayerInformation().getDefaultAddress().remove(address);
+            level.getEnvelopeContext().getDefaultAddresses().remove(address);
             data().setDirty();
             LOGGER.debug("Removed Pigeonhole '{}'@[{}]", removed.getAddress().id(), removed.getPos().toShortString());
         }

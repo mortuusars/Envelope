@@ -22,8 +22,9 @@ public class Position {
     public static Optional<BlockPos> ofAddress(ServerLevel level, Address address) {
         return address.map(
             pigeonhole -> level.getEnvelopeContext().getPigeonholeManager().getPositionOf(pigeonhole),
-            player -> level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
-                .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
+            player -> level.getEnvelopeContext().getKnownPlayers().getUuid(player)
+                  .flatMap(uuid -> level.getEnvelopeContext().getDefaultAddresses().of(uuid))
+                  .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
             npc -> Optional.empty());
     }
 

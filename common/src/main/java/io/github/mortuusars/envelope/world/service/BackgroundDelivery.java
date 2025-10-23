@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world;
+package io.github.mortuusars.envelope.world.service;
 
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Pair;
@@ -18,16 +18,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class BackgroundDelivery extends SavedData {
-    protected static final String SAVED_DATA_NAME = "envelope_background_delivery";
-
     public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.list(BackgroundCourier.CODEC).fieldOf("couriers").forGetter(BackgroundDelivery::getCouriers)
+          Codec.list(BackgroundCourier.CODEC).fieldOf("couriers").forGetter(BackgroundDelivery::getCouriers)
     ).apply(instance, BackgroundDelivery::new));
 
-    protected List<BackgroundCourier> couriers;
+    protected final List<BackgroundCourier> couriers;
 
     public BackgroundDelivery(List<BackgroundCourier> couriers) {
         this.couriers = new ArrayList<>(couriers);
+    }
+
+    public BackgroundDelivery() {
+        this.couriers = new ArrayList<>();
     }
 
     public List<BackgroundCourier> getCouriers() {
@@ -41,42 +43,40 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public void tick(ServerLevel level) {
-        couriers.removeIf(pigeon -> {
-            @Nullable Delivery delivery = pigeon.delivery();
+        couriers.removeIf(courier -> {
+            @Nullable Delivery delivery = courier.delivery();
             if (delivery != null) {
-                pigeon.tickDelivery(level, delivery);
+                courier.tickDelivery(level, delivery);
             }
             setDirty();
-            return pigeon.shouldBeRemoved();
+            return courier.shouldBeRemoved();
         });
     }
 
     // -- Save / Load
 
     public static BackgroundDelivery get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(factory(), SAVED_DATA_NAME);
+        return level.getDataStorage().computeIfAbsent(factory(), "envelope_background_delivery");
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), this)
-                .ifError(e -> Envelope.LOGGER.error("Cannot save BackgroundDelivery: {}", e.message()))
-                .result()
-                .filter(t -> t instanceof CompoundTag)
-                .map(t -> ((CompoundTag) t))
-                .orElse(tag);
+        return CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
+              .ifError(e -> Envelope.LOGGER.error("Cannot save BackgroundDelivery: {}", e.message()))
+              .result()
+              .filter(t -> t instanceof CompoundTag)
+              .map(t -> ((CompoundTag) t))
+              .orElse(tag);
+    }
+
+    private static BackgroundDelivery load(CompoundTag tag, HolderLookup.Provider registries) {
+        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
+              .ifError(e -> Envelope.LOGGER.error("Cannot load BackgroundDelivery: {}", e.message()))
+              .result()
+              .map(Pair::getFirst)
+              .orElseGet(BackgroundDelivery::new);
     }
 
     private static Factory<BackgroundDelivery> factory() {
-        return new Factory<>(BackgroundDelivery::createEmpty, BackgroundDelivery::loadFromTag, null);
-    }
-
-    private static BackgroundDelivery createEmpty() {
-        return new BackgroundDelivery(new ArrayList<>());
-    }
-
-    private static BackgroundDelivery loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
-                .ifError(e -> Envelope.LOGGER.error("Cannot load BackgroundDelivery: {}", e.message()))
-                .result().map(Pair::getFirst).orElse(createEmpty());
+        return new Factory<>(BackgroundDelivery::new, BackgroundDelivery::load, null);
     }
 }

@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.mail.EntityMailReceiver;
-import io.github.mortuusars.envelope.world.mail.MailReceiver;
 import io.github.mortuusars.envelope.world.mail.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.mail.PlayerMailReceiver;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -71,14 +70,14 @@ public interface Address {
         };
     }
 
-    default Address mapPlayerToPigeonholeIfApplicable(ServerLevel level) {
-        if (this instanceof Player player) {
-            return level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
-                .map(Address.class::cast)
-                .orElse(this);
-        }
-        return this;
-    }
+//    default Address mapPlayerToPigeonholeIfApplicable(ServerLevel level) {
+//        if (this instanceof Player player) {
+//            return level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
+//                .map(Address.class::cast)
+//                .orElse(this);
+//        }
+//        return this;
+//    }
 
     default ItemStack receiveMail(ServerLevel level, ItemStack mail) {
         return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new)

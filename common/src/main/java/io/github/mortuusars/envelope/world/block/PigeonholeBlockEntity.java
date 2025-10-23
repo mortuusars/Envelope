@@ -11,7 +11,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeGuiSyn
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
-import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
+import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.component.MailId;

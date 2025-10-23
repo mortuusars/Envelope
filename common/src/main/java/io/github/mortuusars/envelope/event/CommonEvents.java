@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.event;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.service.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.block.dispenser.PackageDispenseItemBehavior;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +16,7 @@ public class CommonEvents {
 
     public static void levelTick(Level level) {
         if (level instanceof ServerLevel serverLevel) {
-            BackgroundDelivery.get(serverLevel).tick(serverLevel);
+            serverLevel.getEnvelopeContext().getBackgroundDelivery().tick(serverLevel);
         }
     }
 
