@@ -59,7 +59,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     protected Address.Pigeonhole address = null;
     protected boolean updatedAfterLoading = false;
 
-    public PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+    protected PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }
 
@@ -115,6 +115,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         return Collections.emptyList();
     }
 
+//    @Override
+//    public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
+//
+//        return null;
+//    }
+
     public ItemStack takeMail(MailId mailId, @Nullable Player player) {
         if (address == null || !(level instanceof ServerLevel serverLevel)) return ItemStack.EMPTY;
 
@@ -153,6 +159,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     public void onMailReceived(ServerLevel level, ItemStack mail) {
         setChanged();
+        level.playSound(null, getBlockPos(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
         getAddress().ifPresent(address -> {
             for (ServerPlayer player : level.players()) {
                 if (player.containerMenu instanceof PigeonholeMenu menu && menu.getAddress().equals(address)) {
@@ -367,7 +374,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         if (isSendable(mail) && !getItem(SLOT_FOOD).isEmpty() && !pigeon.isDelivering()) {
             mail = mail.copyWithCount(1);
             mail.set(Envelope.DataComponents.MAIL_SENDER, address);
-            pigeon.startDelivery(serverLevel, mail, getBlockPos());
+            pigeon.startDelivery(serverLevel, mail);
 
             getItem(SLOT_FOOD).shrink(1);
             if (getItem(SLOT_FOOD).isEmpty()) {

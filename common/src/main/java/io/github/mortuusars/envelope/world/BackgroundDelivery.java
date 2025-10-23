@@ -6,12 +6,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -33,14 +35,17 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public void add(BackgroundCourier courier) {
-        Preconditions.checkNotNull(courier.getDelivery(), "Courier must be delivering mail.");
+        Preconditions.checkNotNull(courier.delivery(), "Courier must be delivering mail.");
         couriers.add(courier);
         setDirty();
     }
 
     public void tick(ServerLevel level) {
         couriers.removeIf(pigeon -> {
-            pigeon.tickDelivery(level);
+            @Nullable Delivery delivery = pigeon.delivery();
+            if (delivery != null) {
+                pigeon.tickDelivery(level, delivery);
+            }
             setDirty();
             return pigeon.shouldBeRemoved();
         });
@@ -53,7 +58,7 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.encodeStart(NbtOps.INSTANCE, this)
+        return CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), this)
                 .ifError(e -> Envelope.LOGGER.error("Cannot save BackgroundDelivery: {}", e.message()))
                 .result()
                 .filter(t -> t instanceof CompoundTag)
@@ -70,7 +75,7 @@ public class BackgroundDelivery extends SavedData {
     }
 
     private static BackgroundDelivery loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.decode(NbtOps.INSTANCE, tag)
+        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
                 .ifError(e -> Envelope.LOGGER.error("Cannot load BackgroundDelivery: {}", e.message()))
                 .result().map(Pair::getFirst).orElse(createEmpty());
     }

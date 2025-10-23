@@ -14,6 +14,8 @@ import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
+import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -48,6 +50,8 @@ public class Envelope {
     public static final String ID = "envelope";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    public static final MailEntities MAIL_ENTITIES = new MailEntities();
+
     public static void init() {
         Blocks.init();
         BlockEntityTypes.init();
@@ -62,6 +66,8 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
+
+        MAIL_ENTITIES.register(new VillagerMailEntity(new Address.Npc("Villager")));
     }
 
     /**

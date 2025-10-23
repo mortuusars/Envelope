@@ -1,27 +1,24 @@
 package io.github.mortuusars.envelope.world.delivery;
 
-import com.google.common.base.Preconditions;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -30,8 +27,9 @@ import java.util.function.Function;
 public class BackgroundCourier implements Courier {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             CompoundTag.CODEC.fieldOf("entity_tag").forGetter(BackgroundCourier::getEntityTag),
-            Delivery.CODEC.optionalFieldOf("delivery", null).forGetter(BackgroundCourier::getDelivery)
+            Delivery.CODEC.optionalFieldOf("delivery", null).forGetter(BackgroundCourier::delivery)
     ).apply(instance, BackgroundCourier::new));
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final CompoundTag entityTag;
     protected @Nullable Delivery delivery;
@@ -46,7 +44,7 @@ public class BackgroundCourier implements Courier {
         return entityTag;
     }
 
-    public @Nullable Delivery getDelivery() {
+    public @Nullable Delivery delivery() {
         return delivery;
     }
 
@@ -55,80 +53,53 @@ public class BackgroundCourier implements Courier {
         this.delivery = delivery;
     }
 
+    @Override
+    public String getCourierName() {
+        return "Background Courier";
+    }
+
     public boolean shouldBeRemoved() {
-        return remove;
+        return delivery() == null || remove;
     }
 
     @Override
     public Optional<BlockPos> getCurrentPos() {
-        Preconditions.checkNotNull(getDelivery());
-        return getDelivery().getPhase().estimateCurrentPos();
+        return getDelivery().flatMap(d -> d.getPhase().estimateCurrentPos());
     }
 
     // --
 
     @Override
-    public void tickDelivery(ServerLevel level) {
-        if (getDelivery() == null) {
-            remove = true;
-            return;
-        }
-        Courier.super.tickDelivery(level);
-    }
+    public void startDeliveryPhase(ServerLevel level, Delivery delivery) {
+        Courier.super.startDeliveryPhase(level, delivery);
 
-    @Override
-    public void startDeliveryPhase(ServerLevel level) {
-        Preconditions.checkNotNull(getDelivery());
-        Envelope.LOGGER.info("BackgroundPigeon has started phase '{}'", getDelivery().getPhase().getType().getSerializedName());
-
-        switch (getDelivery().getPhase().getType()) {
-            case APPROACHING_TARGET -> {
-                getDelivery().getRecipientPos()
-                        .flatMap(pos -> trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getSenderPos()), true))
-                        .ifPresent(pigeon -> {
-                            pigeon.startDeliveryPhase(level);
-                            pigeon.onDeliveryChanged(level);
-                            remove = true;
-                        });
-            }
-            case APPROACHING_HOME -> {
-                getDelivery().getSenderPos()
-                        .flatMap(pos -> trySpawnNearby(level, Position.ascent(level, pos, getDelivery().getRecipientPos()), true))
-                        .ifPresent(pigeon -> {
-                            pigeon.startDeliveryPhase(level);
-                            pigeon.onDeliveryChanged(level);
-                            remove = true;
-                        });
+        switch (delivery.getPhase().getType()) {
+            case APPROACHING_TARGET, APPROACHING_HOME -> {
+                delivery.getTargetPos()
+                      .flatMap(pos -> trySpawnNearby(level, Position.ascendTowards(level, pos,
+                            delivery.getOriginPos(), getAscendPosDistance()), true))
+                      .ifPresent(pigeon -> {
+                          pigeon.startDeliveryPhase(level, delivery);
+                          pigeon.onDeliveryChanged(level);
+                          remove = true;
+                      });
             }
         }
     }
 
     @Override
-    public void endDeliveryPhase(ServerLevel level) {
-        Preconditions.checkNotNull(getDelivery());
-        switch (getDelivery().getPhase().getType()) {
-            case APPROACHING_TARGET -> {
-                ItemStack mail = getDelivery().getMail();
-                if (mail.isEmpty()) return;
-
-                if (tryDeliverMail(level, mail, getDelivery().getRecipient())) {
-                    getDelivery().setMail(ItemStack.EMPTY);
-                } else {
-                    mail.set(Envelope.DataComponents.MAIL_STATUS, MailStatus.RETURNED);
-                    MailDeliveryLog.addRecords(mail,
-                        MailDeliveryLog.Record.returned(getDelivery().getRecipient()));
-                }
-            }
-            case APPROACHING_HOME -> {
-                ItemStack mail = getDelivery().getMail();
-
-                if (!mail.isEmpty() && tryDeliverMail(level, mail, getDelivery().getSender())) {
-                    remove = true;
-                }
-
-                Envelope.LOGGER.error("Waiting for spawn is not implemented yet.");
-            }
+    public void advanceDeliveryPhase(ServerLevel level, Delivery delivery) {
+        Courier.super.advanceDeliveryPhase(level, delivery);
+        if (!delivery.getPhase().getType().isTraveling()) {
+            delivery.getPhase().setDuration(Delivery.Phase.DEFAULT_DURATION / 2);
         }
+    }
+
+    @Override
+    public void endDelivery(ServerLevel level, Delivery delivery) {
+        Courier.super.endDelivery(level, delivery);
+        remove = true;
+        LOGGER.error("Spawning couriers after delivery is not implemented yet.");
     }
 
     public Optional<Pigeon> trySpawnNearby(ServerLevel level, BlockPos pos, boolean effects) {

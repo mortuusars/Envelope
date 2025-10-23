@@ -1,21 +1,18 @@
 package io.github.mortuusars.envelope.world.entity;
 
-import com.google.common.base.Preconditions;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.BackgroundDelivery;
-import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
-import io.github.mortuusars.envelope.world.item.component.MailStatus;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -56,11 +53,14 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.function.IntFunction;
 
 public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, Courier {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public static final List<String> IGNORED_TAGS = Arrays.asList(
           "Air",
           "ArmorDropChances",
@@ -215,7 +215,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         this.flapping *= 0.9F;
         Vec3 vec3 = this.getDeltaMovement();
         if (!this.onGround() && vec3.y < 0.0) {
-            this.setDeltaMovement(vec3.multiply(1, 0.75, 1));
+            float descendRate = delivery != null
+                  && (delivery.getPhase().getType() == Delivery.Phase.Type.APPROACHING_HOME
+                  || delivery.getPhase().getType() == Delivery.Phase.Type.APPROACHING_TARGET)
+                  ? 0.95f : 0.75f;
+            this.setDeltaMovement(vec3.multiply(1, descendRate, 1));
         }
 
         this.flap = this.flap + this.flapping * 2.0F;
@@ -240,10 +244,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
-        if (getDelivery() != null && !getDelivery().getMail().isEmpty()) {
-            spawnAtLocation(getDelivery().getMail());
-            getDelivery().setMail(ItemStack.EMPTY);
-        }
+        getDelivery()
+              .filter(delivery -> !delivery.getMail().isEmpty())
+              .ifPresent(delivery -> {
+                  spawnAtLocation(delivery.getMail());
+                  delivery.setMail(ItemStack.EMPTY);
+              });
     }
 
     // -- Properties
@@ -258,7 +264,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public boolean isDelivering() {
         if (level() instanceof ServerLevel) {
-            return getDelivery() != null;
+            return delivery() != null;
         }
         return entityData.get(DATA_DELIVERING);
     }
@@ -459,7 +465,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     // -- Delivery
 
-    public @Nullable Delivery getDelivery() {
+    public @Nullable Delivery delivery() {
         return delivery;
     }
 
@@ -469,7 +475,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public void onDeliveryChanged(ServerLevel level) {
-        setHasMail(getDelivery() != null && !getDelivery().getMail().isEmpty());
+        Delivery delivery = delivery();
+        setHasMail(delivery != null && !delivery.getMail().isEmpty());
         setDelivering(isDelivering());
         BuggerPackets.sendPigeonDelivery(this);
     }
@@ -480,93 +487,61 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     @Override
-    public void advanceDeliveryPhase(ServerLevel level) {
-        Preconditions.checkNotNull(getDelivery());
-
-        if (getDelivery().getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
-              && !hasReachedTarget(getDelivery().getPhase().getEnd().orElseThrow())) {
+    public void advanceDeliveryPhase(ServerLevel level, Delivery delivery) {
+        if (delivery.getPhase().getType() == Delivery.Phase.Type.LEAVING_HOME
+              && !hasReachedTarget(delivery.getPhase().getEnd().orElseThrow())) {
             // Return home if ascent position cannot be reached.
-            getDelivery().getPhase()
+            delivery.getPhase()
                   .setType(Delivery.Phase.Type.APPROACHING_HOME)
                   .setTicks(0);
 
-            MailDeliveryLog.addRecords(getDelivery().getMail(),
-                  MailDeliveryLog.Record.returned(getDelivery().getRecipient()).atTime(level.getGameTime()));
+            if (!delivery.getMail().isEmpty()) {
+                delivery.setMail(Mail.returned(delivery.getMail(), delivery.getRecipientAddress()));
+            }
+
+            onDeliveryChanged(level);
+
             return;
         }
 
-        Courier.super.advanceDeliveryPhase(level);
+        Courier.super.advanceDeliveryPhase(level, delivery);
     }
 
     @Override
-    public void startDeliveryPhase(ServerLevel level) {
-        Preconditions.checkNotNull(getDelivery());
+    public void startDeliveryPhase(ServerLevel level, Delivery delivery) {
+        Courier.super.startDeliveryPhase(level, delivery);
+        switch (delivery.getPhase().getType()) {
+            case TRAVELING_TO_TARGET, TRAVELING_TO_HOME -> transitionToBackground(level, true);
+        }
 
-        getDelivery().getPhase().setStart(blockPosition());
-
-        Envelope.LOGGER.info("Starting phase '{}'", getDelivery().getPhase().getType().getSerializedName());
-
-        switch (getDelivery().getPhase().getType()) {
-            case LEAVING_HOME ->
-                  getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getRecipientPos()));
-            case TRAVELING_TO_TARGET -> {
-                getDelivery().getRecipientPos().ifPresent(recipientPos -> {
-                    getDelivery().getPhase().setEnd(Position.ascent(level, recipientPos, Optional.of(blockPosition())));
-                });
-                transitionToBackground(level, true);
-            }
-            case APPROACHING_TARGET -> getDelivery().getPhase().setEnd(getDelivery().getRecipientPos().orElseThrow());
-            case LEAVING_TARGET ->
-                  getDelivery().getPhase().setEnd(Position.ascent(level, blockPosition(), getDelivery().getSenderPos()));
-            case TRAVELING_TO_HOME -> {
-                getDelivery().getSenderPos().ifPresent(senderPos -> {
-                    getDelivery().getPhase().setEnd(Position.ascent(level, senderPos, Optional.of(blockPosition())));
-                });
-                transitionToBackground(level, true);
-            }
-            case APPROACHING_HOME -> getDelivery().getPhase().setEnd(getDelivery().getSenderPos().orElseThrow());
+        if (!delivery.getPhase().getType().isTraveling()) {
+            // Increase duration of flying stages to give more time to the pathfinding:
+            delivery.getPhase().setDuration(delivery.getPhase().getDuration() * 2);
         }
     }
 
     @Override
-    public void endDeliveryPhase(ServerLevel level) {
-        Preconditions.checkNotNull(getDelivery());
-
-        switch (getDelivery().getPhase().getType()) {
-            case APPROACHING_TARGET -> {
-                ItemStack mail = getDelivery().getMail();
-                if (mail.isEmpty()) return;
-
-                if (tryDeliverMail(level, mail, getDelivery().getRecipient())) {
-                    getDelivery().setMail(ItemStack.EMPTY);
-                } else {
-                    mail.set(Envelope.DataComponents.MAIL_STATUS, MailStatus.RETURNED);
-                    MailDeliveryLog.addRecords(mail,
-                          MailDeliveryLog.Record.returned(getDelivery().getRecipient()).atTime(level.getGameTime()));
-                }
-            }
-            case APPROACHING_HOME -> {
-                ItemStack mail = getDelivery().getMail();
-
-                if (!mail.isEmpty() && !tryDeliverMail(level, mail, getDelivery().getSender())) {
-                    spawnAtLocation(mail);
-                    Envelope.LOGGER.info("Returning mail has been dropped on the ground because it cannot be delivered to Pigeonhole.");
-                }
-            }
-        }
+    public void endDelivery(ServerLevel level, Delivery delivery) {
+        Courier.super.endDelivery(level, delivery);
+        // Prevent Pigeon entering Pigeonhole immediately:
+        getPigeonholeHandler().setCooldownBeforeWantingToEnterPigeonhole(40);
     }
 
     @Override
-    public boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {
-        if (Courier.super.tryDeliverMail(level, mail, address)) {
-            level().playSound(null, blockPosition(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
-            return true;
-        }
-        return false;
+    public void handleUndeliveredMail(ServerLevel level, Delivery delivery) {
+        if (delivery.getMail().isEmpty()) return;
+        spawnAtLocation(delivery.getMail());
+        delivery.setMail(ItemStack.EMPTY);
+        LOGGER.info("{} has dropped returning mail on the ground because it cannot be delivered to sender Pigeonhole.", getCourierName());
+    }
+
+    @Override
+    public String getCourierName() {
+        return "Pigeon";
     }
 
     protected void transitionToBackground(ServerLevel level, boolean effects) {
-        Envelope.LOGGER.debug("Transitioning a delivering Pigeon to background...");
+        if (Envelope.debug()) LOGGER.info("Transitioning delivering Pigeon to background...");
         BackgroundDelivery.get(level).add(toBackgroundCourier());
         if (effects) {
             level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
@@ -577,14 +552,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     protected BackgroundCourier toBackgroundCourier() {
-        return new BackgroundCourier(saveToRecreatableTag().orElse(new CompoundTag()), getDeliveryOrThrow());
+        return new BackgroundCourier(saveToRecreatableTag().orElse(new CompoundTag()), getDelivery().orElseThrow());
     }
 
     protected Optional<CompoundTag> saveToRecreatableTag() {
         CompoundTag tag = new CompoundTag();
 
         if (!save(tag)) {
-            Envelope.LOGGER.error("Failed to save Pigeon to a tag. " +
+            LOGGER.error("Failed to save Pigeon to a tag. " +
                   "Entity is passenger, about to be removed or entity type is not serializable.");
             return Optional.empty();
         }
@@ -603,8 +578,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         tag.putInt("Variant", getVariant().id);
         tag.putBoolean("Sitting", isSitting());
 
-        if (getDelivery() != null) {
-            tag.put("Delivery", Delivery.CODEC.encodeStart(NbtOps.INSTANCE, getDelivery()).getOrThrow());
+        if (delivery() != null) {
+            tag.put("Delivery", Delivery.CODEC.encodeStart(registryAccess()
+                  .createSerializationContext(NbtOps.INSTANCE), delivery()).getOrThrow());
         }
     }
 
@@ -615,7 +591,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         setVariant(Variant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
         if (tag.contains("Delivery")) {
-            setDelivery(Delivery.CODEC.parse(NbtOps.INSTANCE, tag.get("Delivery")).getOrThrow());
+            setDelivery(Delivery.CODEC.parse(registryAccess()
+                  .createSerializationContext(NbtOps.INSTANCE), tag.get("Delivery")).getOrThrow());
         }
     }
 

@@ -8,7 +8,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.Optional;
 
@@ -25,9 +24,7 @@ public class Position {
             pigeonhole -> level.getEnvelopePigeonholeManager().getPositionOf(pigeonhole),
             player -> level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
                 .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
-            npc -> {
-                throw new NotImplementedException("NPC address is not implemented yet.");
-            });
+            npc -> Optional.empty());
     }
 
     public static BlockPos towardsDirection(BlockPos origin, BlockPos target, double distance) {
@@ -45,7 +42,7 @@ public class Position {
         return origin.relative(Direction.Plane.HORIZONTAL.getRandomDirection(random), distance);
     }
 
-    public static BlockPos ascent(Level level, BlockPos origin, Optional<BlockPos> target, int distance) {
+    public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance) {
         BlockPos pos = target
             .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
             .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
@@ -60,7 +57,7 @@ public class Position {
         return pos;
     }
 
-    public static BlockPos ascent(Level level, BlockPos origin, Optional<BlockPos> target) {
-        return ascent(level, origin, target, 8);
+    public static Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> origin, Optional<BlockPos> target, int distance) {
+        return origin.map(pos -> ascendTowards(level, pos, target, distance));
     }
 }

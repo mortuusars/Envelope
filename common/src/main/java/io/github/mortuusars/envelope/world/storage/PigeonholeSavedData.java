@@ -43,7 +43,7 @@ public class PigeonholeSavedData extends SavedData {
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.encode(this, NbtOps.INSTANCE, tag)
+        return CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
                 .ifError(e -> Envelope.LOGGER.error("Cannot save PigeonholeSavedData: {}", e.message()))
                 .result()
                 .filter(t -> t instanceof CompoundTag)
@@ -52,7 +52,7 @@ public class PigeonholeSavedData extends SavedData {
     }
 
     private static PigeonholeSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.decode(NbtOps.INSTANCE, tag)
+        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
                 .ifError(e -> Envelope.LOGGER.error("Cannot load PigeonholeSavedData: {}", e.message()))
                 .result().map(Pair::getFirst).orElseGet(PigeonholeSavedData::new);
     }

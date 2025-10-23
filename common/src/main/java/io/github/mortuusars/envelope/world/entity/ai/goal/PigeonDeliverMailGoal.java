@@ -1,9 +1,11 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
@@ -29,14 +31,16 @@ public class PigeonDeliverMailGoal extends Goal {
 
     @Override
     public void tick() {
-        if (!(pigeon.level() instanceof ServerLevel level) || pigeon.getDelivery() == null) return;
+        if (!(pigeon.level() instanceof ServerLevel level)) return;
+        @Nullable Delivery delivery = pigeon.delivery();
+        if (delivery == null) return;
 
-        pigeon.tickDelivery(level);
+        pigeon.tickDelivery(level, delivery);
 
-        if (pigeon.getDelivery() != null && pigeon.getDelivery().getPhase().getEnd().isPresent()) {
-            BlockPos pos = pigeon.getDelivery().getPhase().getEnd().get();
+        if (delivery.getPhase().getEnd().isPresent()) {
+            BlockPos pos = delivery.getPhase().getEnd().get();
             if (pigeon.hasReachedTarget(pos)) {
-                pigeon.getDelivery().getPhase().setTicks(pigeon.getDelivery().getPhase().getDuration());
+                delivery.getPhase().setTicks(delivery.getPhase().getDuration());
             } else if (!pigeon.getNavigation().isInProgress()) {
                 if (!pigeon.pathfindDirectlyTowards(pos)) {
                     pigeon.pathfindRandomlyTowards(pos);

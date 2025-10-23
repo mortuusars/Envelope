@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.item.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.core.address.Address;
 import io.github.mortuusars.envelope.core.address.AddressDisplay;
 import io.github.mortuusars.envelope.util.PrettyGameTime;
@@ -113,7 +112,7 @@ public record MailDeliveryLog(List<Record> records) {
             return new Record(Type.SENT, address);
         }
 
-        public static Record returned(Address address) {
+        public static Record returnedFrom(Address address) {
             return new Record(Type.RETURNED, address);
         }
 

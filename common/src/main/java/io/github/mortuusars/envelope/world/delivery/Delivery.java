@@ -27,9 +27,9 @@ import java.util.function.IntFunction;
 public class Delivery {
     public static final Codec<Delivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ItemStack.OPTIONAL_CODEC.fieldOf("mail").forGetter(Delivery::getMail),
-            Address.CODEC.optionalFieldOf("sender", Address.UNKNOWN).forGetter(Delivery::getSender),
+            Address.CODEC.optionalFieldOf("sender", Address.UNKNOWN).forGetter(Delivery::getSenderAddress),
             BlockPos.CODEC.optionalFieldOf("sender_pos").forGetter(Delivery::getSenderPos),
-            Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
+            Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipientAddress),
             BlockPos.CODEC.optionalFieldOf("recipient_pos").forGetter(Delivery::getRecipientPos),
             Codec.INT.optionalFieldOf("travel_duration", -1).forGetter(Delivery::getTravelDuration),
             Phase.CODEC.optionalFieldOf("phase", null).forGetter(Delivery::getPhase)
@@ -51,9 +51,9 @@ public class Delivery {
         @Override
         public void encode(RegistryFriendlyByteBuf buffer, Delivery delivery) {
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, delivery.getMail());
-            Address.STREAM_CODEC.encode(buffer, delivery.getSender());
+            Address.STREAM_CODEC.encode(buffer, delivery.getSenderAddress());
             ByteBufCodecs.optional(BlockPos.STREAM_CODEC).encode(buffer, delivery.getSenderPos());
-            Address.STREAM_CODEC.encode(buffer, delivery.getRecipient());
+            Address.STREAM_CODEC.encode(buffer, delivery.getRecipientAddress());
             ByteBufCodecs.optional(BlockPos.STREAM_CODEC).encode(buffer, delivery.getRecipientPos());
             ByteBufCodecs.VAR_INT.encode(buffer, delivery.getTravelDuration());
             Phase.STREAM_CODEC.encode(buffer, delivery.getPhase());
@@ -108,11 +108,11 @@ public class Delivery {
         return this;
     }
 
-    public Address getSender() {
+    public Address getSenderAddress() {
         return sender;
     }
 
-    public Delivery setSender(Address sender) {
+    public Delivery setSenderAddress(Address sender) {
         this.sender = sender;
         return this;
     }
@@ -126,13 +126,21 @@ public class Delivery {
         return this;
     }
 
-    public Address getRecipient() {
+    public Address getRecipientAddress() {
         return recipient;
     }
 
-    public Delivery setRecipient(Address recipient) {
+    public Delivery setRecipientAddress(Address recipient) {
         this.recipient = recipient;
         return this;
+    }
+
+    public Address getTargetAddress() {
+        return getPhase().getType().isReturning() ? getSenderAddress() : getRecipientAddress();
+    }
+
+    public Address getOriginAddress() {
+        return getPhase().getType().isReturning() ? getRecipientAddress() : getSenderAddress();
     }
 
     public Optional<BlockPos> getRecipientPos() {
@@ -162,6 +170,14 @@ public class Delivery {
         return this;
     }
 
+    public Optional<BlockPos> getTargetPos() {
+        return getPhase().getType().isReturning() ? getSenderPos() : getRecipientPos();
+    }
+
+    public Optional<BlockPos> getOriginPos() {
+        return getPhase().getType().isReturning() ? getRecipientPos() : getSenderPos();
+    }
+
     public void advancePhase() {
         getPhase().setType(phase.getType().next(this))
                 .setStart(phase.getEnd())
@@ -176,7 +192,11 @@ public class Delivery {
     }
 
     public MutableComponent createSenderToRecipientComponent(String middle) {
-        return getSender().getDisplayName().append(middle).append(getRecipient().getDisplayName());
+        return getSenderAddress().getDisplayName().append(middle).append(getRecipientAddress().getDisplayName());
+    }
+
+    public String toShortString() {
+        return createSenderToRecipientComponent("->").getString();
     }
 
     // --
@@ -321,6 +341,10 @@ public class Delivery {
 
             public boolean isTraveling() {
                 return this == TRAVELING_TO_TARGET || this == TRAVELING_TO_HOME;
+            }
+
+            public boolean isReturning() {
+                return this == LEAVING_TARGET || this == TRAVELING_TO_HOME || this == APPROACHING_HOME;
             }
 
             public boolean hasNext() {

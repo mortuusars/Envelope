@@ -1,116 +1,135 @@
 package io.github.mortuusars.envelope.world.delivery;
 
-import com.google.common.base.Preconditions;
+import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
-import io.github.mortuusars.envelope.world.pigeonhole.PigeonholeManager;
+import io.github.mortuusars.envelope.world.mail.*;
 import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.lang3.NotImplementedException;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 
 public interface Courier {
+    Logger LOGGER = LogUtils.getLogger();
+
     @Nullable
-    Delivery getDelivery();
+    Delivery delivery();
 
     void setDelivery(@Nullable Delivery delivery);
 
+    String getCourierName();
+
+    default Optional<Delivery> getDelivery() {
+        return Optional.ofNullable(delivery());
+    }
+
     Optional<BlockPos> getCurrentPos();
 
-    void startDeliveryPhase(ServerLevel level);
-
-    void endDeliveryPhase(ServerLevel level);
-
-    default @NotNull Delivery getDeliveryOrThrow() {
-        Preconditions.checkNotNull(getDelivery(), "Courier is not delivering.");
-        return getDelivery();
-    }
-
     default boolean isDelivering() {
-        return getDelivery() != null;
+        return delivery() != null;
     }
 
-    default void startDelivery(ServerLevel level, ItemStack mail, @Nullable BlockPos homePos) {
-        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG); // Remove previous log before new send
-        mail.remove(Envelope.DataComponents.MAIL_STATUS); // Remove previous log before new send
+    default void startDelivery(ServerLevel level, ItemStack mail) {
+        Delivery delivery = Delivery.start(level, Mail.sent(mail, level));
 
-        MailDeliveryLog.addRecords(mail,
-            MailDeliveryLog.Record.sentFrom(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN)).atTime(level.getGameTime()));
-
-        setDelivery(Delivery.start(level, mail).setSenderPos(Optional.ofNullable(homePos)));
-        startDeliveryPhase(level);
+        setDelivery(delivery);
+        startDeliveryPhase(level, delivery);
         onDeliveryChanged(level);
 
-        Envelope.LOGGER.debug("Starting delivery '{}'", getDeliveryOrThrow().createSenderToRecipientComponent("➡").getString());
+        if (Envelope.debug())
+            LOGGER.info("{}[{}]: started delivering '{}'", getCourierName(), delivery.getMail(), delivery.toShortString());
     }
 
-    default void advanceDeliveryPhase(ServerLevel level) {
-        Preconditions.checkNotNull(getDelivery());
-        getDelivery().advancePhase();
-    }
+    default void tickDelivery(ServerLevel level, Delivery delivery) {
+        delivery.getPhase().tick();
 
-    default void tickDelivery(ServerLevel level) {
-        if (getDelivery() == null) return;
+        if (delivery.getPhase().isComplete()) {
+            endDeliveryPhase(level, delivery);
 
-        getDelivery().getPhase().tick();
-
-        if (getDelivery().getPhase().isComplete()) {
-            endDeliveryPhase(level);
-
-            if (getDelivery().getPhase().getType().hasNext()) {
-                advanceDeliveryPhase(level);
-                updateAddressPositions(level, getDelivery());
-                startDeliveryPhase(level);
+            if (delivery.getPhase().getType().hasNext()) {
+                advanceDeliveryPhase(level, delivery);
+                updateAddressPositions(level, delivery);
+                startDeliveryPhase(level, delivery);
             } else {
-                Envelope.LOGGER.debug("Delivery '{}' is finished.", getDeliveryOrThrow().createSenderToRecipientComponent("➡").getString());
-                setDelivery(null);
+                endDelivery(level, delivery);
             }
 
             onDeliveryChanged(level);
         }
     }
 
+    default void advanceDeliveryPhase(ServerLevel level, Delivery delivery) {
+        delivery.advancePhase();
+    }
+
+    default void startDeliveryPhase(ServerLevel level, Delivery delivery) {
+        if (Envelope.debug())
+            LOGGER.info("{}[{}]: starting phase '{}'", getCourierName(), delivery.toShortString(), delivery.getPhase().getType().getSerializedName());
+        updatePhasePositions(level, delivery);
+    }
+
+    default void endDeliveryPhase(ServerLevel level, Delivery delivery) {
+        switch (delivery.getPhase().getType()) {
+            case APPROACHING_TARGET, APPROACHING_HOME -> {
+                if (Envelope.debug() && !delivery.getMail().isEmpty())
+                    LOGGER.info("{}[{}]: dropping off '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().toString());
+
+                ItemStack result = delivery.getTargetAddress().receiveMail(level, delivery.getMail());
+                delivery.setMail(result);
+
+                if (Envelope.debug() && delivery.getPhase().getType().hasNext() && !delivery.getMail().isEmpty())
+                    LOGGER.info("{}[{}]: returning home with '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().toString());
+            }
+        }
+    }
+
+    default void endDelivery(ServerLevel level, Delivery delivery) {
+        if (!delivery.getMail().isEmpty()) {
+            handleUndeliveredMail(level, delivery);
+        }
+        LOGGER.debug("{}[{}]: finished.", getCourierName(), delivery.toShortString());
+        setDelivery(null);
+    }
+
+    default void handleUndeliveredMail(ServerLevel level, Delivery delivery) {
+
+    }
+
     default void onDeliveryChanged(ServerLevel level) {
 
     }
 
-    default boolean tryDeliverMail(ServerLevel level, ItemStack mail, Address address) {
-        return address.map(pigeonhole -> {
-                PigeonholeManager pigeonholeManager = level.getEnvelopePigeonholeManager();
-                if (pigeonholeManager.putMail(pigeonhole, mail)) {
-                    MailDeliveryLog.addRecords(mail,
-                        MailDeliveryLog.Record.arrivedTo(pigeonhole).atTime(level.getGameTime()));
-
-                    pigeonholeManager.getPositionOf(pigeonhole).ifPresent(pos -> {
-                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                            blockEntity.onMailReceived(level, mail);
-                        }
-                    });
-
-                    return true;
-                }
-
-                return false;
-            },
-            player -> level.getEnvelopePlayerInformation().getDefaultAddress().of(player)
-                .map(pigeonholeAddress -> tryDeliverMail(level, mail, pigeonholeAddress))
-                .orElse(false),
-            npc -> {
-                throw new NotImplementedException("NPC addresses are not implemented yet");
-            });
-    }
-
     // --
 
-    static void updateAddressPositions(ServerLevel level, Delivery delivery) {
-        Position.ofAddress(level, delivery.getSender()).ifPresent(pos -> delivery.setSenderPos(Optional.of(pos)));
-        Position.ofAddress(level, delivery.getRecipient()).ifPresent(pos -> delivery.setRecipientPos(Optional.of(pos)));
+    default void updateAddressPositions(ServerLevel level, Delivery delivery) {
+        Position.ofAddress(level, delivery.getSenderAddress()).ifPresent(pos -> delivery.setSenderPos(Optional.of(pos)));
+        Position.ofAddress(level, delivery.getRecipientAddress()).ifPresent(pos -> delivery.setRecipientPos(Optional.of(pos)));
+    }
+
+    default void updatePhasePositions(ServerLevel level, Delivery delivery) {
+        final Optional<BlockPos> currentPos = getCurrentPos();
+        final Optional<BlockPos> recipientPos = delivery.getRecipientPos();
+        final Optional<BlockPos> senderPos = delivery.getSenderPos();
+        final int distance = getAscendPosDistance();
+
+        delivery.getPhase().setStart(currentPos);
+
+        Optional<BlockPos> endPos = switch (delivery.getPhase().getType()) {
+            case LEAVING_HOME -> Position.ascendTowards(level, currentPos, recipientPos, distance);
+            case TRAVELING_TO_TARGET -> Position.ascendTowards(level, recipientPos, currentPos, distance);
+            case APPROACHING_TARGET -> recipientPos;
+            case LEAVING_TARGET -> Position.ascendTowards(level, currentPos, senderPos, distance);
+            case TRAVELING_TO_HOME -> Position.ascendTowards(level, senderPos, currentPos, distance);
+            case APPROACHING_HOME -> senderPos;
+        };
+
+        delivery.getPhase().setEnd(endPos);
+    }
+
+    default int getAscendPosDistance() {
+        return 10;
     }
 }

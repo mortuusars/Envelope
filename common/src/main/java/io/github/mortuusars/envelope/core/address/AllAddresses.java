@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.core.address;
 
+import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -20,7 +21,7 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
         return new AllAddresses(
                 level.getEnvelopePigeonholeManager().getAllAddresses(),
                 level.getEnvelopePlayerInformation().getKnownPlayers().getAllAddresses(),
-                Collections.emptySet());
+                Envelope.MAIL_ENTITIES.getAllAddresses());
     }
 
     public Stream<Address> stream() {
