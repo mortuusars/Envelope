@@ -7,7 +7,6 @@ import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeGuiSyncBlockDataS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
@@ -37,6 +36,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -212,6 +212,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         updateBlockStateIfNeeded();
         super.setChanged();
+
+        if (level instanceof ServerLevel serverLevel
+              && serverLevel.players().stream()
+              .anyMatch(pl -> pl.containerMenu instanceof PigeonholeMenu menu
+                    && menu.getAddress().equals(address))) {
+            serverLevel.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        }
     }
 
     protected void updateBlockStateIfNeeded() {
@@ -312,6 +319,9 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         ensureAddressCorrectness();
 
+        // Forces sync of be data to the client
+        player.level().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+
         PlatformHelper.openMenu(player, this, buffer -> {
             List<ItemStack> mail = getAllMail();
             buffer.writeBlockPos(getBlockPos());
@@ -321,8 +331,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             }
             Address.Pigeonhole.STREAM_CODEC.encode(buffer, address);
         });
-
-        Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getImmutableOccupants()), player);
 
         return true;
     }
@@ -397,13 +405,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     public void onOccupantsChanged() {
         setChanged();
-        for (Player player : getLevelOrThrow().players()) {
-            if (player instanceof ServerPlayer serverPlayer
-                  && player.containerMenu instanceof PigeonholeMenu menu
-                  && menu.getAddress().equals(address)) {
-                Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getImmutableOccupants()), serverPlayer);
-            }
-        }
+//        for (Player player : getLevelOrThrow().players()) {
+//            if (player instanceof ServerPlayer serverPlayer
+//                  && player.containerMenu instanceof PigeonholeMenu menu
+//                  && menu.getAddress().equals(address)) {
+//                Packets.sendToClient(new PigeonholeGuiSyncBlockDataS2CP(getImmutableOccupants()), serverPlayer);
+//            }
+//        }
     }
 
     @Override

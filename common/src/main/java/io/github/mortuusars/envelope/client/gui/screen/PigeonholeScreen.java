@@ -76,6 +76,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     protected Component inboxLabel = Component.translatable("gui.envelope.pigeonhole.inbox");
     protected Component sendLabel = Component.translatable("gui.envelope.pigeonhole.send");
 
+    protected List<Occupant> occupantsData = new ArrayList<>();
     protected List<@Nullable LivingEntity> occupants = new ArrayList<>();
     protected Int2ObjectMap<Rect2i> occupantAreas = new Int2ObjectOpenHashMap<>(Map.of(
           0, new Rect2i(183, 30, 32, 32),
@@ -101,17 +102,24 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     public PigeonholeScreen(PigeonholeMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
+        updateOccupantsData(getMenu().getBlockEntity().getImmutableOccupants());
     }
 
     // --
 
-    public void setOccupantsData(List<Occupant> occupantsData) {
+    public void updateOccupantsData(List<Occupant> occupantsData) {
+        if (this.occupantsData.size() == occupantsData.size() && Minecrft.level().getGameTime() % 40 != 0) {
+            return;
+        }
+
+        this.occupantsData = occupantsData;
+
         occupants.clear();
         occupants.add(0, null);
         occupants.add(1, null);
         occupants.add(2, null);
 
-        for (Occupant occupant : occupantsData) {
+        for (Occupant occupant : this.occupantsData) {
             if (occupant.slot() < 3 && EntityType.loadEntityRecursive(occupant.entityData().copyTag(),
                   Minecrft.level(), Function.identity()) instanceof LivingEntity entity) {
                 entity.setOnGround(true);
@@ -126,7 +134,8 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     @Override
     protected void containerTick() {
         super.containerTick();
-        occupants.forEach(o -> {
+        updateOccupantsData(getMenu().getBlockEntity().getImmutableOccupants());
+        this.occupants.forEach(o -> {
             if (o != null) {
                 o.tick();
             }
