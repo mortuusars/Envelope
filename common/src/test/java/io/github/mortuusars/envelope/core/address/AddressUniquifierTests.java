@@ -1,5 +1,8 @@
 package io.github.mortuusars.envelope.core.address;
 
+import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

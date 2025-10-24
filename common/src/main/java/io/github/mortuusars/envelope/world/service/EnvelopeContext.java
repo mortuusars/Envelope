@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.service;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;

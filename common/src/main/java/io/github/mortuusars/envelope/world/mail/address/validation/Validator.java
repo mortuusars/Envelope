@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.core.address.validation;
+package io.github.mortuusars.envelope.world.mail.address.validation;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

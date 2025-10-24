@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world;
 
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

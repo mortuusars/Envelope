@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.entity;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.mail.Mail;

@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;

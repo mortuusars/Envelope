@@ -19,21 +19,29 @@ import java.util.*;
 
 public class BackgroundDelivery extends SavedData {
     public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          Codec.list(BackgroundCourier.CODEC).fieldOf("couriers").forGetter(BackgroundDelivery::getCouriers)
+          Codec.list(BackgroundCourier.CODEC).optionalFieldOf("couriers", Collections.emptyList()).forGetter(BackgroundDelivery::getCouriers),
+          Codec.list(BackgroundCourier.CODEC).optionalFieldOf("awaiting_spawn", Collections.emptyList()).forGetter(BackgroundDelivery::getAwaitingSpawn)
     ).apply(instance, BackgroundDelivery::new));
 
     protected final List<BackgroundCourier> couriers;
+    protected final List<BackgroundCourier> awaitingSpawn;
 
-    public BackgroundDelivery(List<BackgroundCourier> couriers) {
+    public BackgroundDelivery(List<BackgroundCourier> couriers, List<BackgroundCourier> awaitingSpawn) {
         this.couriers = new ArrayList<>(couriers);
+        this.awaitingSpawn = new ArrayList<>(awaitingSpawn);
     }
 
     public BackgroundDelivery() {
         this.couriers = new ArrayList<>();
+        this.awaitingSpawn = new ArrayList<>();
     }
 
     public List<BackgroundCourier> getCouriers() {
         return couriers;
+    }
+
+    public List<BackgroundCourier> getAwaitingSpawn() {
+        return awaitingSpawn;
     }
 
     public void add(BackgroundCourier courier) {
@@ -49,8 +57,19 @@ public class BackgroundDelivery extends SavedData {
                 courier.tickDelivery(level, delivery);
             }
             setDirty();
-            return courier.shouldBeRemoved();
+
+            boolean shouldBeRemoved = courier.shouldBeRemoved();
+
+            if (shouldBeRemoved && courier.getSpawnPos() != null) {
+                awaitingSpawn.add(courier);
+            }
+
+            return shouldBeRemoved;
         });
+
+        if (level.getGameTime() % 10 == 0) {
+            awaitingSpawn.removeIf(courier -> courier.trySpawn(level).isPresent());
+        }
     }
 
     // -- Save / Load

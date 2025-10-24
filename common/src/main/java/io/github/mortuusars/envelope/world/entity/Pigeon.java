@@ -4,9 +4,8 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
-import io.github.mortuusars.envelope.world.service.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.Courier;
@@ -46,6 +45,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -189,20 +189,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                 BuggerPackets.sendPigeonPigeonholeData(this);
             }
 
-            if (isDelivering() && !isInSafeSimulationDistance(level)) {
+            if (isDelivering() && !isInSafeSimulationDistance(level, blockPosition())) {
                 transitionToBackground(level, true);
             }
         }
-    }
-
-    protected boolean isInSafeSimulationDistance(ServerLevel level) {
-        int simDistance = level.getServer().getPlayerList().getSimulationDistance();
-        int range = simDistance - 1; // Reduce by 1 chunk to be safe.
-        return level.players().stream().anyMatch(player -> {
-            double dx = Math.abs(getX() - player.getX()) / 16.0;
-            double dz = Math.abs(getZ() - player.getZ()) / 16.0;
-            return Math.max(dx, dz) <= range;
-        });
     }
 
     protected void calculateFlapping() {
@@ -228,7 +218,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     public void unloaded(ServerLevel level) {
-        if (level().isClientSide()) return;
+        if (level.getServer().isStopped()) return;
         if (getRemovalReason() != null) return;
         if (!isDelivering()) return;
 
@@ -236,22 +226,24 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     @Override
-    public void die(DamageSource damageSource) {
-        super.die(damageSource);
-        if (!isRemoved() && !dead && isDelivering()) {
-            Envelope.LOGGER.info("Delivering pigeon has died!");
-            //TODO: send pigeon death notice to sender
-        }
-    }
+    protected void dropAllDeathLoot(ServerLevel level, DamageSource damageSource) {
+        super.dropAllDeathLoot(level, damageSource);
 
-    @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
-        getDelivery()
-              .filter(delivery -> !delivery.getMail().isEmpty())
-              .ifPresent(delivery -> {
-                  spawnAtLocation(delivery.getMail());
-                  delivery.setMail(ItemStack.EMPTY);
-              });
+        @Nullable Delivery delivery = delivery();
+        if (delivery == null) return;
+
+        String message = damageSource.getLocalizedDeathMessage(this).getString();
+        String carriedItem = delivery.getMailString().map(itemName -> " a " + itemName).orElse("");
+        Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!", message,
+              blockPosition().toShortString(), carriedItem, delivery.createSenderToRecipientComponent(" to ").getString());
+
+        //TODO: send pigeon death notice to sender
+
+        if (!delivery.getMail().isEmpty()) {
+            //TODO: COD mail should not drop probably
+            spawnAtLocation(delivery.getMail());
+            delivery.setMail(ItemStack.EMPTY);
+        }
     }
 
     // -- Properties
@@ -477,7 +469,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public void onDeliveryChanged(ServerLevel level) {
-        Delivery delivery = delivery();
+        @Nullable Delivery delivery = delivery();
         setHasMail(delivery != null && !delivery.getMail().isEmpty());
         setDelivering(isDelivering());
         BuggerPackets.sendPigeonDelivery(this);
@@ -555,7 +547,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     protected BackgroundCourier toBackgroundCourier() {
-        return new BackgroundCourier(saveToRecreatableTag().orElse(new CompoundTag()), getDelivery().orElseThrow());
+        return new BackgroundCourier(CustomData.of(saveToRecreatableTag().orElse(new CompoundTag())), getDelivery().orElseThrow());
     }
 
     protected Optional<CompoundTag> saveToRecreatableTag() {
@@ -597,6 +589,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             setDelivery(Delivery.CODEC.parse(registryAccess()
                   .createSerializationContext(NbtOps.INSTANCE), tag.get("Delivery")).getOrThrow());
         }
+        setDelivering(delivery != null);
+        setHasMail(delivery != null && !delivery.getMail().isEmpty());
     }
 
     // --

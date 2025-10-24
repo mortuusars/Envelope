@@ -1,6 +1,6 @@
-package io.github.mortuusars.envelope.core.address.validation;
+package io.github.mortuusars.envelope.world.mail.address.validation;
 
-import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import net.minecraft.util.StringUtil;
 
 import java.util.ArrayList;

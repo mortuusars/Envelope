@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.service;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;

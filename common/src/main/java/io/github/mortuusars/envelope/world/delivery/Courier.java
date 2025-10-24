@@ -36,11 +36,12 @@ public interface Courier {
         Delivery delivery = Delivery.start(level, Mail.sent(mail, level));
 
         setDelivery(delivery);
+
+        if (Envelope.debug()) LOGGER.info("{} started delivering '{}' from '{}' to '{}'", getCourierName(), delivery.getMail(),
+              delivery.getSenderAddress().getDisplayName().getString(), delivery.getRecipientAddress().getDisplayName().getString());
+
         startDeliveryPhase(level, delivery);
         onDeliveryChanged(level);
-
-        if (Envelope.debug())
-            LOGGER.info("{} [{}]: started delivering '{}'", getCourierName(), delivery.getMail(), delivery.toShortString());
     }
 
     default void tickDelivery(ServerLevel level, Delivery delivery) {
@@ -72,8 +73,7 @@ public interface Courier {
                   .setTicks(0));
             delivery.setMail(Mail.returnedRecipientNotFound(delivery.getMail()));
 
-            if (Envelope.debug())
-                LOGGER.info("{} [{}]: returning: recipient not found.", getCourierName(), delivery.toShortString());
+            if (Envelope.debug()) LOGGER.info("{}: returning: recipient not found.", toLoggableString());
 
             onDeliveryChanged(level);
         }
@@ -81,21 +81,30 @@ public interface Courier {
 
     default void startDeliveryPhase(ServerLevel level, Delivery delivery) {
         if (Envelope.debug())
-            LOGGER.info("{} [{}]: starting phase '{}'", getCourierName(), delivery.toShortString(), delivery.getPhase().getType().getSerializedName());
+            LOGGER.info("{}: > '{}'", toLoggableString(), delivery.getPhase().getType().getSerializedName());
         updatePhasePositions(level, delivery);
     }
 
     default void endDeliveryPhase(ServerLevel level, Delivery delivery) {
+        if (delivery.getMail().isEmpty()) {
+            return;
+        }
+
         switch (delivery.getPhase().getType()) {
-            case APPROACHING_TARGET, APPROACHING_HOME -> {
-                if (Envelope.debug() && !delivery.getMail().isEmpty())
-                    LOGGER.info("{} [{}]: dropping off '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().getItem());
+            case APPROACHING_TARGET -> {
+                if (Envelope.debug()) LOGGER.info("{}: delivered '{}'", toLoggableString(), delivery.getMail().getItem());
 
                 ItemStack result = delivery.getTargetAddress().receiveMail(level, delivery.getMail());
                 delivery.setMail(result);
 
-                if (Envelope.debug() && delivery.getPhase().getType().hasNext() && !delivery.getMail().isEmpty())
-                    LOGGER.info("{} [{}]: returning home with '{}'", getCourierName(), delivery.toShortString(), delivery.getMail().getItem());
+                if (Envelope.debug() && !delivery.getMail().isEmpty())
+                    LOGGER.info("{}: returning home with '{}'", toLoggableString(), delivery.getMail().getItem());
+            }
+            case APPROACHING_HOME -> {
+                if (Envelope.debug()) LOGGER.info("{}: returned home with '{}'", toLoggableString(), delivery.getMail().getItem());
+
+                ItemStack result = delivery.getTargetAddress().receiveMail(level, delivery.getMail());
+                delivery.setMail(result);
             }
         }
     }
@@ -104,7 +113,7 @@ public interface Courier {
         if (!delivery.getMail().isEmpty()) {
             handleUndeliveredMail(level, delivery);
         }
-        LOGGER.debug("{} [{}]: finished.", getCourierName(), delivery.toShortString());
+        if (Envelope.debug()) LOGGER.info("{}: finished.", toLoggableString());
         setDelivery(null);
     }
 
@@ -145,5 +154,21 @@ public interface Courier {
 
     default int getAscendPosDistance() {
         return 10;
+    }
+
+    default String toLoggableString() {
+        return getDelivery()
+              .map(delivery -> getCourierName() + " [" + delivery.toShortString() + "]")
+              .orElseGet(this::getCourierName);
+    }
+
+    default boolean isInSafeSimulationDistance(ServerLevel level, BlockPos pos) {
+        int simDistance = level.getServer().getPlayerList().getSimulationDistance();
+        int range = simDistance - 1; // Reduce by 1 chunk to be safe.
+        return level.players().stream().anyMatch(player -> {
+            double dx = Math.abs(pos.getX() - player.getX()) / 16.0;
+            double dz = Math.abs(pos.getZ() - player.getZ()) / 16.0;
+            return Math.max(dx, dz) <= range;
+        });
     }
 }

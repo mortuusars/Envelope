@@ -2,18 +2,19 @@ package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PigeonholeData {
     public static final Codec<PigeonholeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Address.Pigeonhole.STRING_CODEC.fieldOf("address").forGetter(PigeonholeData::getAddress),
             BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPos),
-            Codec.list(ItemStack.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
+            Codec.list(ItemStack.CODEC).optionalFieldOf("mail", Collections.emptyList()).forGetter(PigeonholeData::getMail)
     ).apply(instance, PigeonholeData::new));
 
     private Address.Pigeonhole address;

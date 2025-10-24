@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.handler.ClientPacketsHandler;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import net.minecraft.core.BlockPos;

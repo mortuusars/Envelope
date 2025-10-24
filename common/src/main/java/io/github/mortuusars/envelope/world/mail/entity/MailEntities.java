@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.entity;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import org.slf4j.Logger;
 
 import java.util.HashMap;

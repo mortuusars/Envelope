@@ -2,9 +2,9 @@ package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
-import io.github.mortuusars.envelope.core.address.AddressUniquifier;
-import io.github.mortuusars.envelope.core.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.util.result.Failure;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.item.component.MailId;
@@ -129,6 +129,11 @@ public class PigeonholeManager {
     }
 
     public boolean putMail(Address.Pigeonhole address, ItemStack mail) {
+        if (mail.isEmpty()) {
+            LOGGER.warn("Trying to insert empty mail at '{}'", address);
+            return false;
+        }
+
         return byAddress(address)
               .map(data -> {
                   mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());

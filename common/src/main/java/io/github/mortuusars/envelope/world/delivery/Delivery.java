@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.core.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.Position;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.SharedConstants;
@@ -199,6 +199,12 @@ public class Delivery {
         return createSenderToRecipientComponent(" > ").getString();
     }
 
+    public Optional<String> getMailString() {
+        return !getMail().isEmpty()
+              ? Optional.of(getMail().getHoverName().getString())
+              : Optional.empty();
+    }
+
     // --
 
     public static class Phase {
@@ -312,6 +318,17 @@ public class Delivery {
                 return Optional.of(BlockPos.containing(Position.lerp(getStart().get(), getEnd().get(), getProgress())));
             }
             return Optional.empty();
+        }
+
+        public boolean is(Type type) {
+            return this.getType() == type;
+        }
+
+        public boolean is(Type... types) {
+            for (Type type : types) {
+                return this.getType() == type;
+            }
+            return false;
         }
 
         // --

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.core.address;
+package io.github.mortuusars.envelope.world.mail.address;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
