@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.delivery.RealCourier;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
@@ -60,7 +61,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.IntFunction;
 
-public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, Courier {
+public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, RealCourier {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -188,10 +189,18 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                 }
                 BuggerPackets.sendPigeonPigeonholeData(this);
             }
+        }
+    }
 
-            if (isDelivering() && !isInSafeSimulationDistance(level, blockPosition())) {
-                transitionToBackground(level, true);
-            }
+    @Override
+    public void checkDespawn() {
+        super.checkDespawn();
+        // This method seems to be properly called when entity about to be unloaded (when chunk unloads)
+        // We need to switch to background fot the entity to not freeze in unloaded chunk.
+        if (level() instanceof ServerLevel level
+              && isDelivering()
+              && !isInSafeSimulationDistance(level, blockPosition())) {
+            transitionToBackground(level);
         }
     }
 
@@ -215,14 +224,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
 
         this.flap = this.flap + this.flapping * 2.0F;
-    }
-
-    public void unloaded(ServerLevel level) {
-        if (level.getServer().isStopped()) return;
-        if (getRemovalReason() != null) return;
-        if (!isDelivering()) return;
-
-        transitionToBackground(level, false);
     }
 
     @Override
@@ -359,6 +360,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public void releasedFromPigeonhole(BlockPos pos, BlockState state, PigeonholeBlockEntity.ReleaseReason releaseReason) {
         getPigeonholeHandler().setPigeonholePos(pos);
+        getPigeonholeHandler().setLastPigeonholePos(pos);
         getPigeonholeHandler().setDefaultCooldownBeforeWantingToEnterPigeonhole();
     }
 
@@ -457,7 +459,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
     }
 
-    // -- Delivery
+    // -- Courier
 
     public @Nullable Delivery delivery() {
         return delivery;
@@ -499,55 +501,57 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             return;
         }
 
-        Courier.super.advanceDeliveryPhase(level, delivery);
+        RealCourier.super.advanceDeliveryPhase(level, delivery);
     }
 
     @Override
     public void startDeliveryPhase(ServerLevel level, Delivery delivery) {
-        Courier.super.startDeliveryPhase(level, delivery);
-        switch (delivery.getPhase().getType()) {
-            case TRAVELING_TO_TARGET, TRAVELING_TO_HOME -> transitionToBackground(level, true);
-        }
-
-        if (!delivery.getPhase().getType().isTraveling()) {
-            // Increase duration of flying stages to give more time to the pathfinding:
-            delivery.getPhase().setDuration(delivery.getPhase().getDuration() * 2);
+        RealCourier.super.startDeliveryPhase(level, delivery);
+        if (delivery.getPhase().getType().isTraveling()) {
+            transitionToBackground(level);
         }
     }
 
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
-        Courier.super.endDelivery(level, delivery);
+        RealCourier.super.endDelivery(level, delivery);
         // Prevent Pigeon entering Pigeonhole immediately:
         getPigeonholeHandler().setCooldownBeforeWantingToEnterPigeonhole(40);
     }
 
     @Override
-    public void handleUndeliveredMail(ServerLevel level, Delivery delivery) {
-        if (delivery.getMail().isEmpty()) return;
-        spawnAtLocation(delivery.getMail());
-        delivery.setMail(ItemStack.EMPTY);
-        LOGGER.info("{} has dropped returning mail on the ground because it cannot be delivered to sender Pigeonhole.", getCourierName());
+    public void handleUndeliveredMail(ServerLevel level, ItemStack mail) {
+        spawnAtLocation(mail);
+        LOGGER.info("{} has dropped returning mail on the ground because it cannot be delivered to sender Pigeonhole.", getName().getString());
     }
 
     @Override
-    public String getCourierName() {
-        return "Pigeon";
+    public void onCourierSpawned(ServerLevel level) {
+        level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
+        level.playSound(null, position().x, position().y, position().z,
+              SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
     }
 
-    protected void transitionToBackground(ServerLevel level, boolean effects) {
+    @Override
+    public void onCourierDespawned(ServerLevel level) {
+        level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
+        level.playSound(null, position().x, position().y, position().z,
+              SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
+    }
+
+    protected void transitionToBackground(ServerLevel level) {
+        if (level.getServer().isStopped() || isRemoved() || !isDelivering()) return;
         if (Envelope.debug()) LOGGER.info("Transitioning delivering Pigeon to background...");
         level.getEnvelopeContext().getBackgroundDelivery().add(toBackgroundCourier());
-        if (effects) {
-            level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
-            level.playSound(null, position().x, position().y, position().z,
-                  SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
-        }
+        onCourierDespawned(level);
         discard();
     }
 
     protected BackgroundCourier toBackgroundCourier() {
-        return new BackgroundCourier(CustomData.of(saveToRecreatableTag().orElse(new CompoundTag())), getDelivery().orElseThrow());
+        return new BackgroundCourier(
+              CustomData.of(saveToRecreatableTag().orElse(new CompoundTag())),
+              getDelivery().orElseThrow(),
+              Optional.ofNullable(getPigeonholeHandler().getLastPigeonholePos()).orElse(blockPosition()));
     }
 
     protected Optional<CompoundTag> saveToRecreatableTag() {

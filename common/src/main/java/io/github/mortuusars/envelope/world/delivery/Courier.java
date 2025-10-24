@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.*;
 import io.github.mortuusars.envelope.world.Position;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,9 @@ public interface Courier {
 
     void setDelivery(@Nullable Delivery delivery);
 
-    String getCourierName();
+    Component getName();
+
+    void handleUndeliveredMail(ServerLevel level, ItemStack mail);
 
     default Optional<Delivery> getDelivery() {
         return Optional.ofNullable(delivery());
@@ -37,7 +40,7 @@ public interface Courier {
 
         setDelivery(delivery);
 
-        if (Envelope.debug()) LOGGER.info("{} started delivering '{}' from '{}' to '{}'", getCourierName(), delivery.getMail(),
+        if (Envelope.debug()) LOGGER.info("{} started delivering '{}' from '{}' to '{}'", getName().getString(), delivery.getMail(),
               delivery.getSenderAddress().getDisplayName().getString(), delivery.getRecipientAddress().getDisplayName().getString());
 
         startDeliveryPhase(level, delivery);
@@ -111,14 +114,11 @@ public interface Courier {
 
     default void endDelivery(ServerLevel level, Delivery delivery) {
         if (!delivery.getMail().isEmpty()) {
-            handleUndeliveredMail(level, delivery);
+            handleUndeliveredMail(level, delivery.getMail());
+            delivery.setMail(ItemStack.EMPTY);
         }
         if (Envelope.debug()) LOGGER.info("{}: finished.", toLoggableString());
         setDelivery(null);
-    }
-
-    default void handleUndeliveredMail(ServerLevel level, Delivery delivery) {
-
     }
 
     default void onDeliveryChanged(ServerLevel level) {
@@ -133,22 +133,29 @@ public interface Courier {
     }
 
     default void updatePhasePositions(ServerLevel level, Delivery delivery) {
-        final Optional<BlockPos> currentPos = getCurrentPos();
         final Optional<BlockPos> recipientPos = delivery.getRecipientPos();
         final Optional<BlockPos> senderPos = delivery.getSenderPos();
         final int distance = getAscendPosDistance();
 
-        delivery.getPhase().setStart(currentPos);
+        Optional<BlockPos> startPos = switch (delivery.getPhase().getType()) {
+            case LEAVING_HOME -> senderPos;
+            case TRAVELING_TO_TARGET -> Position.ascendTowards(level, senderPos, recipientPos, distance);
+            case APPROACHING_TARGET -> Position.ascendTowards(level, recipientPos, senderPos, distance);
+            case LEAVING_TARGET -> recipientPos;
+            case TRAVELING_TO_HOME -> Position.ascendTowards(level, recipientPos, senderPos, distance);
+            case APPROACHING_HOME -> Position.ascendTowards(level, senderPos, recipientPos, distance);
+        };
 
         Optional<BlockPos> endPos = switch (delivery.getPhase().getType()) {
-            case LEAVING_HOME -> Position.ascendTowards(level, currentPos, recipientPos, distance);
-            case TRAVELING_TO_TARGET -> Position.ascendTowards(level, recipientPos, currentPos, distance);
+            case LEAVING_HOME -> Position.ascendTowards(level, senderPos, recipientPos, distance);
+            case TRAVELING_TO_TARGET -> Position.ascendTowards(level, recipientPos, senderPos, distance);
             case APPROACHING_TARGET -> recipientPos;
-            case LEAVING_TARGET -> Position.ascendTowards(level, currentPos, senderPos, distance);
-            case TRAVELING_TO_HOME -> Position.ascendTowards(level, senderPos, currentPos, distance);
+            case LEAVING_TARGET -> Position.ascendTowards(level, recipientPos, senderPos, distance);
+            case TRAVELING_TO_HOME -> Position.ascendTowards(level, senderPos, recipientPos, distance);
             case APPROACHING_HOME -> senderPos;
         };
 
+        delivery.getPhase().setStart(startPos);
         delivery.getPhase().setEnd(endPos);
     }
 
@@ -158,8 +165,8 @@ public interface Courier {
 
     default String toLoggableString() {
         return getDelivery()
-              .map(delivery -> getCourierName() + " [" + delivery.toShortString() + "]")
-              .orElseGet(this::getCourierName);
+              .map(delivery -> getName().getString() + " [" + delivery.toShortString() + "]")
+              .orElseGet(() -> getName().getString());
     }
 
     default boolean isInSafeSimulationDistance(ServerLevel level, BlockPos pos) {

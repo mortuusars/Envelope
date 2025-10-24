@@ -20,6 +20,7 @@ public class PigeonholeHandler {
     protected final List<BlockPos> blacklistedPositions = new ArrayList<>();
 
     protected @Nullable BlockPos pigeonholePos;
+    protected @Nullable BlockPos lastPigeonholePos;
     protected int cooldownBeforeEnteringPigeonhole;
     protected int cooldownBeforeWantingToEnterPigeonhole;
     protected int cooldownBeforeLocatingNewPigeonhole;
@@ -34,6 +35,15 @@ public class PigeonholeHandler {
 
     public void setPigeonholePos(@Nullable BlockPos pigeonholePos) {
         this.pigeonholePos = pigeonholePos;
+    }
+
+    public @Nullable BlockPos getLastPigeonholePos() {
+        return lastPigeonholePos;
+    }
+
+    public PigeonholeHandler setLastPigeonholePos(@Nullable BlockPos lastPigeonholePos) {
+        this.lastPigeonholePos = lastPigeonholePos;
+        return this;
     }
 
     public int getCooldownBeforeEnteringPigeonhole() {
@@ -138,13 +148,15 @@ public class PigeonholeHandler {
 
     public void load(CompoundTag tag) {
         pigeonholePos = NbtUtils.readBlockPos(tag, "PigeonholePos").orElse(null);
+        lastPigeonholePos = NbtUtils.readBlockPos(tag, "LastPigeonholePos").orElse(null);
         cooldownBeforeEnteringPigeonhole = tag.getInt("CooldownBeforeEnteringPigeonhole");
         cooldownBeforeWantingToEnterPigeonhole = tag.getInt("CooldownBeforeWantingToEnterPigeonhole");
         cooldownBeforeLocatingNewPigeonhole = tag.getInt("CooldownBeforeLocatingNewPigeonhole");
     }
 
     public void save(CompoundTag tag) {
-        if (getPigeonholePos() != null) tag.put("PigeonholePos", NbtUtils.writeBlockPos(getPigeonholePos()));
+        if (pigeonholePos != null) tag.put("PigeonholePos", NbtUtils.writeBlockPos(pigeonholePos));
+        if (lastPigeonholePos != null) tag.put("LastPigeonholePos", NbtUtils.writeBlockPos(lastPigeonholePos));
         if (cooldownBeforeEnteringPigeonhole > 0) tag.putInt("CooldownBeforeEnteringPigeonhole", cooldownBeforeEnteringPigeonhole);
         if (cooldownBeforeWantingToEnterPigeonhole > 0) tag.putInt("CooldownBeforeWantingToEnterPigeonhole", cooldownBeforeWantingToEnterPigeonhole);
         if (cooldownBeforeLocatingNewPigeonhole > 0) tag.putInt("CooldownBeforeLocatingNewPigeonhole", cooldownBeforeLocatingNewPigeonhole);
