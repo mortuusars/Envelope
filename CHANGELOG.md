@@ -10,7 +10,7 @@
   - Pigeons now attempt to spawn continuously when delivering, instead of just at the beginning of new phase.
   - Many other changes and cleanups of delivery system.
 - Added simple mail command `/mail send [item]`
-  - `sender` and `recipient` must be defined (sender could be fake)
+  - `sender` and `recipient` must be defined (sender can be fake)
 - Added test NPC (mail entity) implementation: Villager
   - When a Letter is sent to this address, returns a reply (a primitive one)
 - Pigeon Spawn Egg could be used to conveniently place pigeons inside Pigeonhole.
