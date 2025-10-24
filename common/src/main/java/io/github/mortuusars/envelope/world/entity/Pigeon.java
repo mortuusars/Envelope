@@ -527,6 +527,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public void onCourierSpawned(ServerLevel level) {
+        if (delivery() == null) return;
         level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
         level.playSound(null, position().x, position().y, position().z,
               SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);

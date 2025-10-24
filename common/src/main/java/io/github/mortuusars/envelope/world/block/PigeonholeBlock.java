@@ -188,11 +188,12 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.is(Envelope.Items.PIGEON_SPAWN_EGG.get())) {
-
             if (level instanceof ServerLevel serverLevel
                   && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
                   && blockEntity.hasSpaceForAnotherOccupant()) {
-                stack.shrink(1);
+                if (!player.isCreative()) {
+                    stack.shrink(1);
+                }
 
                 @Nullable Pigeon pigeon = Envelope.EntityTypes.PIGEON.get().spawn(serverLevel, pos, MobSpawnType.SPAWN_EGG);
                 if (pigeon != null) {
@@ -226,25 +227,19 @@ public class PigeonholeBlock extends BaseEntityBlock {
         }
 
         if (stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Pigeonhole pigeonhole) {
-            //TODO: this blocks opening GUI if not inserted. need to sync the address to client probably
-            if (player instanceof ServerPlayer serverPlayer
-                  && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-                    && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
-                ItemStack mail = stack.copy().split(1);
-                if (!mail.has(Envelope.DataComponents.MAIL_SENDER)) {
-                    mail.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
+              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Pigeonhole pigeonhole
+              && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+              && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
+            if (level instanceof ServerLevel serverLevel) {
+                ItemStack result = blockEntity.getAddress().orElseThrow().receiveMail(serverLevel, stack);
+
+                if (!stack.has(Envelope.DataComponents.MAIL_SENDER)) {
+                    stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
                 }
-                if (serverPlayer.serverLevel().getEnvelopeContext().getPigeonholeManager().putMail(pigeonhole, mail)) {
-                    MailDeliveryLog.addRecords(mail,
-                          MailDeliveryLog.Record.arrivedTo(pigeonhole)
-                                .atTime(level.getGameTime())
-                                .withOperatorMessage(Optional.of(player.getName())));
-                    blockEntity.onMailReceived(serverPlayer.serverLevel(), mail);
-                    stack.split(1);
-                }
+
+                player.setItemInHand(hand, result);
             }
-            return ItemInteractionResult.SUCCESS;
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
 
         if (state.getValue(HAS_ADDRESS)) {

@@ -22,6 +22,9 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -431,16 +434,16 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     // -- Sync
 
-//    @Nullable
-//    @Override
-//    public Packet<ClientGamePacketListener> getUpdatePacket() {
-//        return ClientboundBlockEntityDataPacket.create(this);
-//    }
-//
-//    @Override
-//    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-//        return saveCustomOnly(registries);
-//    }
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveCustomOnly(registries);
+    }
 
     // -- Component
 
