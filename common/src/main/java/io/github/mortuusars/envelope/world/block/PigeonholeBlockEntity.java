@@ -128,6 +128,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
                   extractedMail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
                   extractedMail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
 
+                  if (!extractedMail.is(Envelope.Tags.Items.MAILABLE)) {
+                      extractedMail.remove(Envelope.DataComponents.MAIL_SENDER);
+                      extractedMail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+                  }
+
                   for (ServerPlayer pl : serverLevel.players()) {
                       if (pl.containerMenu instanceof PigeonholeMenu menu
                             && menu.getAddress().equals(address)

@@ -104,7 +104,7 @@ public class NeoForgeCommonEvents {
     public static class GameBus {
         @SubscribeEvent
         public static void registerCommands(RegisterCommandsEvent event) {
-            MailCommand.register(event.getDispatcher());
+            MailCommand.register(event.getDispatcher(), event.getBuildContext());
         }
 
         @SubscribeEvent

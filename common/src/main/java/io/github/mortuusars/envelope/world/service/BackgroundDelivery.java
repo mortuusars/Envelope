@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.service;
 
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -21,6 +23,7 @@ public class BackgroundDelivery extends SavedData {
                 .optionalFieldOf("couriers", Collections.emptyList())
                 .forGetter(BackgroundDelivery::getCouriers)
     ).apply(instance, BackgroundDelivery::new));
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final List<BackgroundCourier> couriers;
 
@@ -44,7 +47,10 @@ public class BackgroundDelivery extends SavedData {
 
     public void tick(ServerLevel level) {
         couriers.removeIf(courier -> {
-            if (courier.canBeRemoved()) return true;
+            if (courier.canBeRemoved()) {
+                if (Envelope.debug()) LOGGER.info("{} has been removed.", courier.getName().getString());
+                return true;
+            }
             courier.tick(level);
             return courier.trySpawn(level).isPresent();
         });

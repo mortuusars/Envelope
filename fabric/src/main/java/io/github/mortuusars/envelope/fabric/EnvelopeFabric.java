@@ -67,7 +67,7 @@ public class EnvelopeFabric implements ModInitializer {
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            MailCommand.register(dispatcher);
+            MailCommand.register(dispatcher, registryAccess);
         });
 
         BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_PIGEON_SPAWNS),

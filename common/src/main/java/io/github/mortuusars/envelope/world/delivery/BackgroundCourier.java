@@ -36,7 +36,7 @@ public class BackgroundCourier implements Courier {
     protected @Nullable BlockPos homePos;
     protected ItemStack undeliveredMail;
 
-    protected BackgroundCourier(CustomData entity, @NotNull Delivery delivery,
+    protected BackgroundCourier(CustomData entity, @Nullable Delivery delivery,
                              @Nullable BlockPos homePos, ItemStack undeliveredMail) {
         this.entity = entity;
         this.delivery = delivery;
@@ -46,6 +46,10 @@ public class BackgroundCourier implements Courier {
 
     public BackgroundCourier(CustomData entity, @NotNull Delivery delivery, @NotNull BlockPos homePos) {
         this(entity, delivery, homePos, ItemStack.EMPTY);
+    }
+
+    public static BackgroundCourier virtual() {
+        return new BackgroundCourier(CustomData.EMPTY, null, null, ItemStack.EMPTY);
     }
 
     public CustomData entity() {
@@ -144,6 +148,7 @@ public class BackgroundCourier implements Courier {
                 return null;
             }
             pigeon.setVariant(Pigeon.Variant.getRandom(level.getRandom()));
+            pigeon.setService(true);
             return pigeon;
         }
 

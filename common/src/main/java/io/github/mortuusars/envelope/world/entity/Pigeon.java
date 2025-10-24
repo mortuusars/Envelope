@@ -114,11 +114,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected PigeonholeHandler pigeonholeHandler;
 
     protected @Nullable Delivery delivery = null;
+    protected boolean service;
 
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new FlyingMoveControl(this, 10, false);
-        this.pigeonholeHandler = new PigeonholeHandler(level);
+        moveControl = new FlyingMoveControl(this, 10, false);
+        pigeonholeHandler = new PigeonholeHandler(level);
         pigeonholeHandler.setDefaultCooldownBeforeWantingToEnterPigeonhole();
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
@@ -182,13 +183,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         this.calculateFlapping();
         getPigeonholeHandler().tick();
 
-        if (level() instanceof ServerLevel level) {
-            if (this.tickCount % 20 == 0) {
-                if (!getPigeonholeHandler().isPigeonholeValid(blockPosition())) {
-                    getPigeonholeHandler().setPigeonholePos(null);
-                }
-                BuggerPackets.sendPigeonPigeonholeData(this);
+        if (level() instanceof ServerLevel && this.tickCount % 20 == 0) {
+            if (!getPigeonholeHandler().isPigeonholeValid(blockPosition())) {
+                getPigeonholeHandler().setPigeonholePos(null);
             }
+            BuggerPackets.sendPigeonPigeonholeData(this);
         }
     }
 
@@ -274,6 +273,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public void setHasMail(boolean hasMail) {
         entityData.set(DATA_HAS_MAIL, hasMail);
+    }
+
+    public boolean isService() {
+        return service;
+    }
+
+    public void setService(boolean service) {
+        this.service = service;
     }
 
     public boolean hasFancyHat() {
@@ -549,10 +556,16 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     protected BackgroundCourier toBackgroundCourier() {
-        return new BackgroundCourier(
-              CustomData.of(saveToRecreatableTag().orElse(new CompoundTag())),
-              getDelivery().orElseThrow(),
-              Optional.ofNullable(getPigeonholeHandler().getLastPigeonholePos()).orElse(blockPosition()));
+        if (isService()) {
+            BackgroundCourier courier = BackgroundCourier.virtual();
+            courier.setDelivery(delivery);
+            return courier;
+        } else {
+            return new BackgroundCourier(
+                  CustomData.of(saveToRecreatableTag().orElse(new CompoundTag())),
+                  getDelivery().orElseThrow(),
+                  Optional.ofNullable(getPigeonholeHandler().getLastPigeonholePos()).orElse(blockPosition()));
+        }
     }
 
     protected Optional<CompoundTag> saveToRecreatableTag() {
@@ -582,6 +595,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             tag.put("Delivery", Delivery.CODEC.encodeStart(registryAccess()
                   .createSerializationContext(NbtOps.INSTANCE), delivery()).getOrThrow());
         }
+        if (service) {
+            tag.putBoolean("Service", true);
+        }
     }
 
     @Override
@@ -596,6 +612,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
         setDelivering(delivery != null);
         setHasMail(delivery != null && !delivery.getMail().isEmpty());
+        service = tag.getBoolean("Service");
     }
 
     // --
