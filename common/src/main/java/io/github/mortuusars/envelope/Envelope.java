@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -53,6 +54,8 @@ public class Envelope {
     public static final MailEntities MAIL_ENTITIES = new MailEntities();
 
     public static void init() {
+        Bugger.setup(() -> Config.Server.SPEC.isLoaded() && Config.Server.DEBUG.get());
+
         Blocks.init();
         BlockEntityTypes.init();
         PoiTypes.init();

@@ -6,6 +6,7 @@
   "client": [
     "bugger.EntityRendererMixin",
     "bugger.KeyboardHandlerMixin",
+    "bugger.MouseHandlerMixin",
     "bugger.ScreenOverlayMixin",
     "bugger.ScreenRenderLinesInvoker",
     "package_tooltip.ClientTooltipComponentMixin"

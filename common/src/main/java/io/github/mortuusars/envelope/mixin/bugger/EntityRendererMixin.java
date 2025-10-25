@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.mixin.bugger;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.util.bugger.BuggerGui;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -19,8 +19,6 @@ public abstract class EntityRendererMixin<T extends Entity> {
 
     @Inject(method = "render", at = @At("RETURN"))
     private void onRender(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
-        if (Bugger.shouldShowOverheadEntityInfo(entity)) {
-            Bugger.renderOverheadEntityInfo(entityRenderDispatcher, entity, partialTick, poseStack, bufferSource, packedLight);
-        }
+        BuggerGui.onRenderEntity(entityRenderDispatcher, entity, partialTick, poseStack, bufferSource, packedLight);
     }
 }
