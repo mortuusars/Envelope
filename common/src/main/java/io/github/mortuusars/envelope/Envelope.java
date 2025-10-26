@@ -54,7 +54,7 @@ public class Envelope {
     public static final MailEntities MAIL_ENTITIES = new MailEntities();
 
     public static void init() {
-        Bugger.setup(() -> Config.Server.SPEC.isLoaded() && Config.Server.DEBUG.get());
+        Bugger.enabler = () -> Config.Server.SPEC.isLoaded() && Config.Server.DEBUG.get();
 
         Blocks.init();
         BlockEntityTypes.init();

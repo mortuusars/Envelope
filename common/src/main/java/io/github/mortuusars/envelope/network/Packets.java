@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.network;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.network.packet.Packet;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Packets {
@@ -32,6 +34,15 @@ public class Packets {
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             sendToClient(packet, player);
+        }
+    }
+
+    public static void sendToAllClients(Function<RegistryAccess, Packet> packet) {
+        MinecraftServer server = Objects.requireNonNull(PlatformHelper.getCurrentServer(),
+              "Cannot send clientbound payloads on the client");
+
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            sendToClient(packet.apply(server.registryAccess()), player);
         }
     }
 
