@@ -27,11 +27,11 @@ public class PigeonGoToPigeonholeGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return pigeon.getPigeonholeHandler().getPigeonholePos() != null
+        return pigeon.getPigeonholeHandler().getCurrentPos() != null
                 && !pigeon.hasRestriction()
-                && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole()
-                && !pigeon.hasReachedTarget(pigeon.getPigeonholeHandler().getPigeonholePos())
-                && pigeon.level().getBlockState(pigeon.getPigeonholeHandler().getPigeonholePos()).is(Envelope.Tags.Blocks.PIGEONHOLES);
+                && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon.level())
+                && !pigeon.hasReachedTarget(pigeon.getPigeonholeHandler().getCurrentPos())
+                && pigeon.level().getBlockState(pigeon.getPigeonholeHandler().getCurrentPos()).is(Envelope.Tags.Blocks.PIGEONHOLES);
     }
 
     @Override
@@ -53,20 +53,20 @@ public class PigeonGoToPigeonholeGoal extends Goal {
     public void tick() {
         PigeonholeHandler handler = pigeon.getPigeonholeHandler();
 
-        if (handler.getPigeonholePos() == null) return;
+        if (handler.getCurrentPos() == null) return;
 
         travellingTicks++;
         if (travellingTicks > adjustedTickDelay(MAX_TRAVELLING_TICKS)) {
             handler.dropAndBlacklistPigeonhole();
         } else if (!pigeon.getNavigation().isInProgress()) {
-            if (!pigeon.closerThan(handler.getPigeonholePos(), 16)) {
-                if (!pigeon.blockPosition().closerThan(handler.getPigeonholePos(), 32)) {
+            if (!pigeon.closerThan(handler.getCurrentPos(), 16)) {
+                if (!pigeon.blockPosition().closerThan(handler.getCurrentPos(), 32)) {
                     handler.dropPigeonhole();
                 } else {
-                    pigeon.pathfindRandomlyTowards(handler.getPigeonholePos());
+                    pigeon.pathfindRandomlyTowards(handler.getCurrentPos());
                 }
             } else {
-                boolean bl = pathfindDirectlyTowards(handler.getPigeonholePos());
+                boolean bl = pathfindDirectlyTowards(handler.getCurrentPos());
                 if (!bl) {
                     handler.dropAndBlacklistPigeonhole();
                 } else if (lastPath != null && lastPath.sameAs(pigeon.getNavigation().getPath())) {

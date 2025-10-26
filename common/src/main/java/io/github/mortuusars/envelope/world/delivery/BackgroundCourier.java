@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -23,28 +22,28 @@ import java.util.function.Function;
 
 public class BackgroundCourier implements Courier {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          CustomData.CODEC.optionalFieldOf("entity", CustomData.EMPTY).forGetter(BackgroundCourier::entity),
-          Delivery.CODEC.optionalFieldOf("delivery", null).forGetter(BackgroundCourier::delivery),
-          BlockPos.CODEC.optionalFieldOf("home_pos", null).forGetter(BackgroundCourier::homePos),
-          ItemStack.OPTIONAL_CODEC.optionalFieldOf("undelivered_mail", ItemStack.EMPTY).forGetter(BackgroundCourier::undeliveredMail)
+          CustomData.CODEC.optionalFieldOf("entity", CustomData.EMPTY).forGetter(BackgroundCourier::getEntity),
+          Delivery.CODEC.optionalFieldOf("delivery").forGetter(BackgroundCourier::getDelivery),
+          BlockPos.CODEC.optionalFieldOf("home_pos").forGetter(BackgroundCourier::getHomePos),
+          ItemStack.OPTIONAL_CODEC.optionalFieldOf("undelivered_mail", ItemStack.EMPTY).forGetter(BackgroundCourier::getUndeliveredMail)
     ).apply(instance, BackgroundCourier::new));
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final CustomData entity;
-    protected @Nullable Delivery delivery;
-    protected @Nullable BlockPos homePos;
+    protected Optional<Delivery> delivery;
+    protected Optional<BlockPos> homePos;
     protected ItemStack undeliveredMail;
 
-    protected BackgroundCourier(CustomData entity, @Nullable Delivery delivery,
-                             @Nullable BlockPos homePos, ItemStack undeliveredMail) {
+    protected BackgroundCourier(CustomData entity, Optional<Delivery> delivery,
+                             Optional<BlockPos> homePos, ItemStack undeliveredMail) {
         this.entity = entity;
         this.delivery = delivery;
         this.homePos = homePos;
         this.undeliveredMail = undeliveredMail;
     }
 
-    public BackgroundCourier(CustomData entity, @NotNull Delivery delivery, @NotNull BlockPos homePos) {
+    public BackgroundCourier(CustomData entity, Optional<Delivery> delivery, Optional<BlockPos> homePos) {
         this(entity, delivery, homePos, ItemStack.EMPTY);
     }
 
@@ -52,24 +51,24 @@ public class BackgroundCourier implements Courier {
         return new BackgroundCourier(CustomData.EMPTY, null, null, ItemStack.EMPTY);
     }
 
-    public CustomData entity() {
+    public CustomData getEntity() {
         return entity;
     }
 
-    public @Nullable Delivery delivery() {
+    public Optional<Delivery> getDelivery() {
         return delivery;
     }
 
-    public @Nullable BlockPos homePos() {
+    public Optional<BlockPos> getHomePos() {
         return homePos;
     }
 
-    public ItemStack undeliveredMail() {
+    public ItemStack getUndeliveredMail() {
         return undeliveredMail;
     }
 
     @Override
-    public void setDelivery(@Nullable Delivery delivery) {
+    public void setDelivery(Optional<Delivery> delivery) {
         this.delivery = delivery;
     }
 
@@ -84,26 +83,24 @@ public class BackgroundCourier implements Courier {
     }
 
     public boolean canBeRemoved() {
-        return delivery() == null && homePos() == null;
+        return getDelivery().isEmpty() && getHomePos().isEmpty();
     }
 
     @Override
     public Optional<BlockPos> getCurrentPos() {
-        return delivery != null
+        return isDelivering()
               ? getDelivery().flatMap(delivery -> delivery.getPhase().estimateCurrentPos())
-              : Optional.ofNullable(homePos);
+              : getHomePos();
     }
 
     // --
 
     public void tick(ServerLevel level) {
-        if (delivery != null) {
-            tickDelivery(level, delivery);
-        }
+        getDelivery().ifPresent(delivery -> tickDelivery(level, delivery));
     }
 
     public Optional<RealCourier> trySpawn(ServerLevel level) {
-        if (delivery != null && delivery.getPhase().getType().isTraveling()) {
+        if (getDelivery().isPresent() && getDelivery().get().getPhase().getType().isTraveling()) {
             return Optional.empty();
         }
         return getCurrentPos().flatMap(pos -> trySpawnNearby(level, pos));

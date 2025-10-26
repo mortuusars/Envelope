@@ -41,8 +41,9 @@ public class PigeonWanderGoal extends Goal {
     @Nullable
     private Vec3 findPos() {
         Vec3 pos;
-        BlockPos pigeonholePos = pigeon.getPigeonholeHandler().getPigeonholePos();
-        if (pigeon.getPigeonholeHandler().isPigeonholeValid(pigeon.blockPosition()) && pigeonholePos != null && !pigeon.closerThan(pigeonholePos, WANDER_THRESHOLD)) {
+        @Nullable BlockPos pigeonholePos = pigeon.getPigeonholeHandler().getCurrentPos();
+        if (pigeon.getPigeonholeHandler().isPigeonholeValid(pigeon.level(), pigeon.blockPosition())
+              && pigeonholePos != null && !pigeon.closerThan(pigeonholePos, WANDER_THRESHOLD)) {
             Vec3 pigeonholeCenter = Vec3.atCenterOf(pigeonholePos);
             pos = pigeonholeCenter.subtract(pigeon.position()).normalize();
         } else {

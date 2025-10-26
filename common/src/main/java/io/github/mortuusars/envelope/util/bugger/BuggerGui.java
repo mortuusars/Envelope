@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.mixin.bugger.ScreenRenderLinesInvoker;
 import io.github.mortuusars.envelope.util.bugger.page.BuggerPage;
 import io.github.mortuusars.envelope.util.bugger.page.DataPage;
 import io.github.mortuusars.envelope.util.bugger.page.VanillaDebugPage;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.client.Minecraft;
@@ -124,7 +125,7 @@ public class BuggerGui {
         int titleFontColor = 0xFFFFFFFF;
         int sideFontColor = 0xFFEEEEEE;
 
-        String prevTitle = getPreviousPage().map(buggerPage ->  "‹ " + buggerPage.getTitle()).orElse("");
+        String prevTitle = getPreviousPage().map(buggerPage -> "‹ " + buggerPage.getTitle()).orElse("");
         String title = getCurrentPage().getTitle();
         String nextTitle = getNextPage().map(buggerPage -> buggerPage.getTitle() + " ›").orElse("");
 
@@ -195,23 +196,25 @@ public class BuggerGui {
 
     private static List<Component> getOverheadEntityInfoLines(Entity entity) {
         if (entity instanceof Pigeon pigeon) {
-            if (pigeon.delivery() != null) {
+            if (pigeon.getDelivery().isPresent()) {
+                Delivery delivery = pigeon.getDelivery().get();
                 return List.of(
                       Component.empty()
-                            .append(pigeon.delivery().getSenderAddress().getDisplayName())
+                            .append(delivery.getSenderAddress().getDisplayName())
                             .append(" → ")
-                            .append(pigeon.delivery().getRecipientAddress().getDisplayName()),
-                      Component.literal(WordUtils.capitalize(pigeon.delivery().getPhase().getType().getSerializedName().replace('_', ' '))));
+                            .append(delivery.getRecipientAddress().getDisplayName()),
+                      Component.literal(WordUtils.capitalize(delivery.getPhase().getType()
+                            .getSerializedName().replace('_', ' '))));
             }
 
             List<Component> list = new ArrayList<>();
             PigeonholeHandler handler = pigeon.getPigeonholeHandler();
-            if (handler.wantsToEnterPigeonhole()) {
-                list.add(Component.literal(handler.getPigeonholePos() != null ? "Going to Pigeonhole" : "Looking for Pigeonhole"));
+            if (handler.wantsToEnterPigeonhole(entity.level())) {
+                list.add(Component.literal(handler.getCurrentPos() != null ? "Going to Pigeonhole" : "Looking for Pigeonhole"));
             } else {
-                list.add(Component.literal("Would want to enter after: " + handler.getCooldownBeforeWantingToEnterPigeonhole() / 20));
-                if (handler.getCooldownBeforeEnteringPigeonhole() > 0) {
-                    list.add(Component.literal("Could enter after: " + handler.getCooldownBeforeEnteringPigeonhole() / 20));
+                list.add(Component.literal("Would want to enter after: " + handler.getWantCooldown() / 20));
+                if (handler.getEnterCooldown() > 0) {
+                    list.add(Component.literal("Could enter after: " + handler.getEnterCooldown() / 20));
                 }
             }
             return list;
@@ -269,7 +272,14 @@ public class BuggerGui {
             nextPage();
             return true;
         }
+        if (key == InputConstants.KEY_END && Screen.hasControlDown()) {
+            test();
+            return true;
+        }
         return getCurrentPage().onKeyPress(key, scanCode, modifiers);
+    }
+
+    private static void test() {
     }
 
     public static boolean onKeyRepeat(int key, int scanCode, int modifiers) {

@@ -23,9 +23,9 @@ public class PigeonLocatePigeonholeGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return pigeon.getPigeonholeHandler().getCooldownBeforeLocatingNewPigeonhole() == 0
-                && pigeon.getPigeonholeHandler().getPigeonholePos() == null
-                && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole();
+        return pigeon.getPigeonholeHandler().getLocateCooldown() == 0
+                && pigeon.getPigeonholeHandler().getCurrentPos() == null
+                && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon.level());
     }
 
     @Override
@@ -35,18 +35,18 @@ public class PigeonLocatePigeonholeGoal extends Goal {
 
     @Override
     public void start() {
-        pigeon.getPigeonholeHandler().setDefaultCooldownBeforeLocatingNewPigeonhole();
+        pigeon.getPigeonholeHandler().resetLocateCooldown();
         List<BlockPos> pigeonholes = findNearbyPigeonholesWithSpace();
         if (!pigeonholes.isEmpty()) {
             for (BlockPos pos : pigeonholes) {
                 if (!pigeon.getPigeonholeHandler().isTargetBlacklisted(pos)) {
-                    pigeon.getPigeonholeHandler().setPigeonholePos(pos);
+                    pigeon.getPigeonholeHandler().setCurrentPos(pos);
                     return;
                 }
             }
 
             pigeon.getPigeonholeHandler().clearBlacklist();
-            pigeon.getPigeonholeHandler().setPigeonholePos(pigeonholes.getFirst());
+            pigeon.getPigeonholeHandler().setCurrentPos(pigeonholes.getFirst());
         }
     }
 

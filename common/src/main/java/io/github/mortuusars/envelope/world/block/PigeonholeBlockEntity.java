@@ -190,7 +190,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         // Make some nearby pigeons prioritize this pigeonhole to pick up and deliver mail
         if (getOccupants().isEmpty() && !getItem(SLOT_MAIL).isEmpty() && !getItem(SLOT_FOOD).isEmpty()) {
             for (Pigeon nearbyPigeon : level.getEntitiesOfClass(Pigeon.class, new AABB(getBlockPos()).inflate(16))) {
-                nearbyPigeon.getPigeonholeHandler().setPigeonholePos(getBlockPos());
+                nearbyPigeon.getPigeonholeHandler().setCurrentPos(getBlockPos());
                 break;
             }
         }

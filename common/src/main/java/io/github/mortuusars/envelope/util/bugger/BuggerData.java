@@ -1,7 +1,8 @@
 package io.github.mortuusars.envelope.util.bugger;
 
+import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.util.bugger.data.DataDefinition;
+import io.github.mortuusars.envelope.util.bugger.data.Data;
 import io.github.mortuusars.envelope.util.bugger.network.BuggerDataS2CP;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +26,9 @@ import java.util.function.Function;
  * but it simplifies data writing and reading, which is more important than performance for debug cases.
  */
 public class BuggerData {
-    public static final Map<ResourceLocation, DataDefinition<?>> DEFINITIONS = new HashMap<>();
+    public static final Map<ResourceLocation, Data<?>> DEFINITIONS = new HashMap<>();
     public static final Map<ResourceLocation, Object> DATA = new HashMap<>();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public static <T> Optional<T> get(ResourceLocation id) {
         if (!Bugger.isEnabled()) return Optional.empty();
@@ -34,7 +37,7 @@ public class BuggerData {
             T value = (T) BuggerData.DATA.get(id);
             return Optional.ofNullable(value);
         } catch (ClassCastException e) {
-            Bugger.LOGGER.error("Stored bugger data '{}' has incorrect type: ", id, e);
+            LOGGER.error("Stored bugger data '{}' has incorrect type: ", id, e);
             return Optional.empty();
         }
     }
@@ -51,7 +54,7 @@ public class BuggerData {
 
     public static void receive(ResourceLocation id, CompoundTag tag, RegistryAccess registryAccess) {
         if (!Bugger.isEnabled()) return;
-        DataDefinition<?> definition = Objects.requireNonNull(DEFINITIONS.get(id), "Definition '" + id + "' was not registered.");
+        Data<?> definition = Objects.requireNonNull(DEFINITIONS.get(id), "Definition '" + id + "' was not registered.");
         @Nullable Object newValue = tag.contains("data") ? definition.decode(tag.get("data"), registryAccess) : null;
 
         if (newValue == null) {
@@ -62,14 +65,16 @@ public class BuggerData {
     }
 
     // Glorious generics magick
-    private static <T> void receiveInternal(DataDefinition<T> definition, ResourceLocation id, @NotNull Object newValueObj) {
+    private static <T> void receiveInternal(Data<T> definition, ResourceLocation id, @NotNull Object newValueObj) {
         DATA.compute(id, (dataId, existingValueObj) -> {
             if (existingValueObj == null) return newValueObj;
             @SuppressWarnings("unchecked")
             T existingValue = (T) existingValueObj;
             @SuppressWarnings("unchecked")
             T newValue = (T) newValueObj;
-            return definition.apply(existingValue, newValue);
+            T appliedValue = definition.apply(existingValue, newValue);
+            definition.handle(appliedValue);
+            return appliedValue;
         });
     }
 }

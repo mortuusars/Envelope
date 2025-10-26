@@ -19,17 +19,17 @@ public class PigeonEnterPigeonholeGoal extends Goal {
             return false;
         }
 
-        @Nullable BlockPos pos = pigeon.getPigeonholeHandler().getPigeonholePos();
+        @Nullable BlockPos pos = pigeon.getPigeonholeHandler().getCurrentPos();
 
         if (pos != null
-                && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole()
-                && pos.closerToCenterThan(pigeon.position(), 2.0)
-                && pigeon.level().getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+              && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon.level())
+              && pos.closerToCenterThan(pigeon.position(), 2.0)
+              && pigeon.level().getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             if (blockEntity.hasSpaceForAnotherOccupant()) {
                 return true;
             }
 
-            pigeon.getPigeonholeHandler().setPigeonholePos(null);
+            pigeon.getPigeonholeHandler().setCurrentPos(null);
         }
 
         return false;
@@ -42,7 +42,7 @@ public class PigeonEnterPigeonholeGoal extends Goal {
 
     @Override
     public void start() {
-        pigeon.getPigeonholeHandler().getPigeonholeBlockEntity().ifPresent(pigeonhole ->
-              pigeonhole.addOccupant(pigeonhole.getBlockPos(), pigeonhole.getBlockState(), pigeon));
+        pigeon.getPigeonholeHandler().getPigeonholeAtCurrentPos(pigeon.level())
+              .ifPresent(pigeonhole -> pigeonhole.addOccupant(pigeonhole.getBlockPos(), pigeonhole.getBlockState(), pigeon));
     }
 }

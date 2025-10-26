@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -16,33 +15,28 @@ import java.util.Optional;
 public interface Courier {
     Logger LOGGER = LogUtils.getLogger();
 
-    @Nullable
-    Delivery delivery();
-
-    void setDelivery(@Nullable Delivery delivery);
+    Optional<Delivery> getDelivery();
+    void setDelivery(Optional<Delivery> delivery);
 
     Component getName();
 
     void handleUndeliveredMail(ServerLevel level, ItemStack mail);
 
-    default Optional<Delivery> getDelivery() {
-        return Optional.ofNullable(delivery());
-    }
-
     Optional<BlockPos> getCurrentPos();
 
     default boolean isDelivering() {
-        return delivery() != null;
+        return getDelivery().isPresent();
     }
 
     default void startDelivery(ServerLevel level, ItemStack mail) {
-        Delivery delivery = Delivery.start(level, Mail.sent(mail, level));
+        Delivery delivery = Delivery.start(Mail.sent(mail, level));
 
-        setDelivery(delivery);
+        setDelivery(Optional.of(delivery));
 
         if (Envelope.debug()) LOGGER.info("{} started delivering '{}' from '{}' to '{}'", getName().getString(), delivery.getMail(),
               delivery.getSenderAddress().getDisplayName().getString(), delivery.getRecipientAddress().getDisplayName().getString());
 
+        updateAddressPositions(level, delivery);
         startDeliveryPhase(level, delivery);
         onDeliveryChanged(level);
     }
@@ -118,7 +112,7 @@ public interface Courier {
             delivery.setMail(ItemStack.EMPTY);
         }
         if (Envelope.debug()) LOGGER.info("{}: finished.", toLoggableString());
-        setDelivery(null);
+        setDelivery(Optional.empty());
     }
 
     default void onDeliveryChanged(ServerLevel level) {

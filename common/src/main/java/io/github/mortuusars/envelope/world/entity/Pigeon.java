@@ -7,10 +7,8 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.RealCourier;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.util.bugger.BuggerPackets;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
-import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
@@ -120,8 +118,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
         moveControl = new FlyingMoveControl(this, 10, false);
-        pigeonholeHandler = new PigeonholeHandler(level);
-        pigeonholeHandler.setDefaultCooldownBeforeWantingToEnterPigeonhole();
+        pigeonholeHandler = new PigeonholeHandler();
+        pigeonholeHandler.setDefaultWantCooldown();
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
 
@@ -182,13 +180,13 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void aiStep() {
         super.aiStep();
         this.calculateFlapping();
-        getPigeonholeHandler().tick();
+        getPigeonholeHandler().tick(level());
 
         if (level() instanceof ServerLevel && this.tickCount % 20 == 0) {
-            if (!getPigeonholeHandler().isPigeonholeValid(blockPosition())) {
-                getPigeonholeHandler().setPigeonholePos(null);
+            if (!getPigeonholeHandler().isPigeonholeValid(level(), blockPosition())) {
+                getPigeonholeHandler().setCurrentPos(null);
             }
-            BuggerPackets.sendPigeonPigeonholeData(this);
+            Bugger.PIGEON_PIGEONHOLE_HANDLER.send(getId(), getPigeonholeHandler());
         }
     }
 
@@ -230,7 +228,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected void dropAllDeathLoot(ServerLevel level, DamageSource damageSource) {
         super.dropAllDeathLoot(level, damageSource);
 
-        @Nullable Delivery delivery = delivery();
         if (delivery == null) return;
 
         String message = damageSource.getLocalizedDeathMessage(this).getString();
@@ -259,7 +256,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public boolean isDelivering() {
         if (level() instanceof ServerLevel) {
-            return delivery() != null;
+            return delivery != null;
         }
         return entityData.get(DATA_DELIVERING);
     }
@@ -366,10 +363,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         return pigeonholeHandler;
     }
 
+    public void setPigeonholeHandler(PigeonholeHandler handler) {
+        this.pigeonholeHandler = handler;
+    }
+
     public void releasedFromPigeonhole(BlockPos pos, BlockState state, PigeonholeBlockEntity.ReleaseReason releaseReason) {
-        getPigeonholeHandler().setPigeonholePos(pos);
-        getPigeonholeHandler().setLastPigeonholePos(pos);
-        getPigeonholeHandler().setDefaultCooldownBeforeWantingToEnterPigeonhole();
+        getPigeonholeHandler().setCurrentPos(pos);
+        getPigeonholeHandler().setLastReleasePos(pos);
+        getPigeonholeHandler().setDefaultWantCooldown();
     }
 
     public boolean pathfindDirectlyTowards(BlockPos pos) {
@@ -469,8 +470,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     // -- Courier
 
-    public @Nullable Delivery delivery() {
-        return delivery;
+    @Override
+    public Optional<Delivery> getDelivery() {
+        return Optional.ofNullable(delivery);
     }
 
     public void setDelivery(@Nullable Delivery delivery) {
@@ -478,11 +480,18 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     @Override
+    public void setDelivery(Optional<Delivery> delivery) {
+        setDelivery(delivery.orElse(null));
+    }
+
+    @Override
     public void onDeliveryChanged(ServerLevel level) {
-        @Nullable Delivery delivery = delivery();
         setHasMail(delivery != null && !delivery.getMail().isEmpty());
         setDelivering(isDelivering());
-        BuggerPackets.sendPigeonDelivery(this);
+
+        Bugger.PIGEON_DELIVERY.send(getId(), Optional.ofNullable(delivery));
+
+//        BuggerPackets.sendPigeonDelivery(this);
     }
 
     @Override
@@ -524,7 +533,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void endDelivery(ServerLevel level, Delivery delivery) {
         RealCourier.super.endDelivery(level, delivery);
         // Prevent Pigeon entering Pigeonhole immediately:
-        getPigeonholeHandler().setCooldownBeforeWantingToEnterPigeonhole(40);
+        getPigeonholeHandler().setWantCooldown(40);
     }
 
     @Override
@@ -535,7 +544,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public void onCourierSpawned(ServerLevel level) {
-        if (delivery() == null) return;
+        if (delivery == null) return;
         level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
         level.playSound(null, position().x, position().y, position().z,
               SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
@@ -559,13 +568,13 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected BackgroundCourier toBackgroundCourier() {
         if (isService()) {
             BackgroundCourier courier = BackgroundCourier.virtual();
-            courier.setDelivery(delivery);
+            courier.setDelivery(Optional.ofNullable(delivery));
             return courier;
         } else {
             return new BackgroundCourier(
                   CustomData.of(saveToRecreatableTag().orElse(new CompoundTag())),
-                  getDelivery().orElseThrow(),
-                  Optional.ofNullable(getPigeonholeHandler().getLastPigeonholePos()).orElse(blockPosition()));
+                  getDelivery(),
+                  Optional.ofNullable(getPigeonholeHandler().getLastReleasePos()).or(() -> Optional.of(blockPosition())));
         }
     }
 
@@ -587,14 +596,13 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        getPigeonholeHandler().save(tag);
-
+        PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, tag).getOrThrow();
         tag.putInt("Variant", getVariant().id);
         tag.putBoolean("Sitting", isSitting());
 
-        if (delivery() != null) {
+        if (delivery != null) {
             tag.put("Delivery", Delivery.CODEC.encodeStart(registryAccess()
-                  .createSerializationContext(NbtOps.INSTANCE), delivery()).getOrThrow());
+                  .createSerializationContext(NbtOps.INSTANCE), delivery).getOrThrow());
         }
         if (service) {
             tag.putBoolean("Service", true);
@@ -604,7 +612,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        getPigeonholeHandler().load(tag);
+        setPigeonholeHandler(PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow());
         setVariant(Variant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
         if (tag.contains("Delivery")) {

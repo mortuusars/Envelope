@@ -14,7 +14,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +31,7 @@ public class Delivery {
             Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipientAddress),
             BlockPos.CODEC.optionalFieldOf("recipient_pos").forGetter(Delivery::getRecipientPos),
             Codec.INT.optionalFieldOf("travel_duration", -1).forGetter(Delivery::getTravelDuration),
-            Phase.CODEC.optionalFieldOf("phase", null).forGetter(Delivery::getPhase)
+            Phase.CODEC.optionalFieldOf("phase", Phase.start()).forGetter(Delivery::getPhase)
     ).apply(instance, Delivery::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Delivery> STREAM_CODEC = new StreamCodec<>() {
@@ -69,32 +68,30 @@ public class Delivery {
     protected Phase phase;
 
     public Delivery(ItemStack mail, Address sender, Optional<BlockPos> senderPos, Address recipient,
-                    Optional<BlockPos> recipientPos, int travelDuration, @Nullable Phase phase) {
+                    Optional<BlockPos> recipientPos, int travelDuration, Phase phase) {
         this.mail = mail;
         this.sender = sender;
         this.senderPos = senderPos;
         this.recipient = recipient;
         this.recipientPos = recipientPos;
         this.travelDuration = travelDuration;
-        if (phase == null) {
-            phase = new Phase(Phase.Type.LEAVING_HOME, Optional.empty(), Optional.empty(), Phase.DEFAULT_DURATION, 0);
-        }
         this.phase = phase;
     }
 
-    public static Delivery start(ServerLevel level, ItemStack mail) {
+    public static Delivery start(ItemStack mail) {
         @Nullable Address sender = mail.get(Envelope.DataComponents.MAIL_SENDER);
         Preconditions.checkNotNull(sender, "Mail '" + mail + "' does not have 'envelope:mail_sender' defined.");
         @Nullable Address recipient = mail.get(Envelope.DataComponents.MAIL_RECIPIENT);
         Preconditions.checkNotNull(recipient, "Mail '" + mail + "' does not have 'envelope:mail_recipient' defined.");
 
         return new Delivery(mail,
-                sender,
-                Position.ofAddress(level, sender),
-                mail.get(Envelope.DataComponents.MAIL_RECIPIENT),
-                Position.ofAddress(level, recipient),
-                mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, Config.Server.MAIL_TRAVEL_DURATION.get()),
-                Phase.start());
+              sender,
+              Optional.empty(),
+              mail.get(Envelope.DataComponents.MAIL_RECIPIENT),
+              Optional.empty(),
+              mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION,
+              Config.Server.MAIL_TRAVEL_DURATION.get()),
+              Phase.start());
     }
 
     // --

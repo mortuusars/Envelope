@@ -1,10 +1,10 @@
 package io.github.mortuusars.envelope.world.entity.ai;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,108 +13,124 @@ import java.util.List;
 import java.util.Optional;
 
 public class PigeonholeHandler {
-    protected static final int MAX_BLACKLISTED_TARGETS = 3;
-    public static final int COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE = 200;
+    public static final int MAX_BLACKLISTED_TARGETS = 3;
+    public static final int DEFAULT_LOCATE_COOLDOWN = 200;
 
-    protected final Level level;
+    public static final Codec<PigeonholeHandler> CODEC = RecordCodecBuilder.create(i -> i.group(
+          BlockPos.CODEC.optionalFieldOf("current_pos").forGetter(o -> Optional.ofNullable(o.getCurrentPos())),
+          BlockPos.CODEC.optionalFieldOf("last_release_pos").forGetter(o -> Optional.ofNullable(o.getLastReleasePos())),
+          Codec.INT.optionalFieldOf("locate_cooldown", 0).forGetter(PigeonholeHandler::getLocateCooldown),
+          Codec.INT.optionalFieldOf("want_cooldown", 0).forGetter(PigeonholeHandler::getWantCooldown),
+          Codec.INT.optionalFieldOf("enter_cooldown", 0).forGetter(PigeonholeHandler::getEnterCooldown)
+    ).apply(i, PigeonholeHandler::new));
+
     protected final List<BlockPos> blacklistedPositions = new ArrayList<>();
 
-    protected @Nullable BlockPos pigeonholePos;
-    protected @Nullable BlockPos lastPigeonholePos;
-    protected int cooldownBeforeEnteringPigeonhole;
-    protected int cooldownBeforeWantingToEnterPigeonhole;
-    protected int cooldownBeforeLocatingNewPigeonhole;
+    protected @Nullable BlockPos currentPos;
+    protected @Nullable BlockPos lastReleasePos;
+    protected int locateCooldown;
+    protected int wantCooldown;
+    protected int enterCooldown;
 
-    public PigeonholeHandler(Level level) {
-        this.level = level;
+    public PigeonholeHandler(Optional<BlockPos> currentPos, Optional<BlockPos> lastReleasePos,
+                             int locateCooldown, int wantCooldown, int enterCooldown) {
+        this.currentPos = currentPos.orElse(null);
+        this.lastReleasePos = lastReleasePos.orElse(null);
+        this.locateCooldown = locateCooldown;
+        this.wantCooldown = wantCooldown;
+        this.enterCooldown = enterCooldown;
     }
 
-    public @Nullable BlockPos getPigeonholePos() {
-        return pigeonholePos;
+    public PigeonholeHandler() {
+        this(Optional.empty(), Optional.empty(), 0, 0, 0);
     }
 
-    public void setPigeonholePos(@Nullable BlockPos pigeonholePos) {
-        this.pigeonholePos = pigeonholePos;
+    public @Nullable BlockPos getCurrentPos() {
+        return currentPos;
     }
 
-    public @Nullable BlockPos getLastPigeonholePos() {
-        return lastPigeonholePos;
+    public void setCurrentPos(@Nullable BlockPos currentPos) {
+        this.currentPos = currentPos;
     }
 
-    public PigeonholeHandler setLastPigeonholePos(@Nullable BlockPos lastPigeonholePos) {
-        this.lastPigeonholePos = lastPigeonholePos;
+    public @Nullable BlockPos getLastReleasePos() {
+        return lastReleasePos;
+    }
+
+    public PigeonholeHandler setLastReleasePos(@Nullable BlockPos lastReleasePos) {
+        this.lastReleasePos = lastReleasePos;
         return this;
     }
 
-    public int getCooldownBeforeEnteringPigeonhole() {
-        return cooldownBeforeEnteringPigeonhole;
+    public int getEnterCooldown() {
+        return enterCooldown;
     }
 
-    public void setCooldownBeforeEnteringPigeonhole(int cooldown) {
-        this.cooldownBeforeEnteringPigeonhole = cooldown;
+    public void setEnterCooldown(int cooldown) {
+        this.enterCooldown = cooldown;
     }
 
-    public int getCooldownBeforeWantingToEnterPigeonhole() {
-        return cooldownBeforeWantingToEnterPigeonhole;
+    public int getWantCooldown() {
+        return wantCooldown;
     }
 
-    public void setCooldownBeforeWantingToEnterPigeonhole(int cooldown) {
-        this.cooldownBeforeWantingToEnterPigeonhole = cooldown;
+    public void setWantCooldown(int cooldown) {
+        this.wantCooldown = cooldown;
     }
 
-    public void setDefaultCooldownBeforeWantingToEnterPigeonhole() {
-        cooldownBeforeWantingToEnterPigeonhole = Config.Server.PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE.get();
+    public void setDefaultWantCooldown() {
+        wantCooldown = Config.Server.PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE.get();
     }
 
-    public int getCooldownBeforeLocatingNewPigeonhole() {
-        return cooldownBeforeLocatingNewPigeonhole;
+    public int getLocateCooldown() {
+        return locateCooldown;
     }
 
-    public void setCooldownBeforeLocatingNewPigeonhole(int cooldown) {
-        this.cooldownBeforeLocatingNewPigeonhole = cooldown;
+    public void setLocateCooldown(int cooldown) {
+        this.locateCooldown = cooldown;
     }
 
-    public void setDefaultCooldownBeforeLocatingNewPigeonhole() {
-        setCooldownBeforeLocatingNewPigeonhole(COOLDOWN_BEFORE_LOCATING_NEW_PIGEONHOLE);
-    }
-
-    // --
-
-    public void tick() {
-        if (cooldownBeforeWantingToEnterPigeonhole > 0) {
-            cooldownBeforeWantingToEnterPigeonhole--;
-        }
-        if (cooldownBeforeLocatingNewPigeonhole > 0) {
-            cooldownBeforeLocatingNewPigeonhole--;
-        }
+    public void resetLocateCooldown() {
+        setLocateCooldown(DEFAULT_LOCATE_COOLDOWN);
     }
 
     // --
 
-    public Optional<PigeonholeBlockEntity> getPigeonholeBlockEntity() {
-        BlockPos pos = getPigeonholePos();
+    public void tick(Level level) {
+        if (wantCooldown > 0) {
+            wantCooldown--;
+        }
+        if (locateCooldown > 0) {
+            locateCooldown--;
+        }
+    }
+
+    // --
+
+    public Optional<PigeonholeBlockEntity> getPigeonholeAtCurrentPos(Level level) {
+        @Nullable BlockPos pos = getCurrentPos();
         if (pos != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
             return Optional.of(be);
         }
         return Optional.empty();
     }
 
-    public boolean wantsToEnterPigeonhole() {
-        if (getCooldownBeforeEnteringPigeonhole() > 0) return false;
+    public boolean wantsToEnterPigeonhole(Level level) {
+        if (getEnterCooldown() > 0) return false;
         boolean wouldHateToBeOutside = level.isNight() || level.isRaining() || level.isThundering();
-        boolean tiredOfOutside = getCooldownBeforeWantingToEnterPigeonhole() <= 0;
-        return (wouldHateToBeOutside || tiredOfOutside) && !isPigeonholeNearFire();
+        boolean tiredOfOutside = getWantCooldown() <= 0;
+        return (wouldHateToBeOutside || tiredOfOutside) && !isPigeonholeNearFire(level);
     }
 
-    protected boolean isPigeonholeNearFire() {
-        return getPigeonholeBlockEntity().map(PigeonholeBlockEntity::isFireNearby).orElse(false);
+    protected boolean isPigeonholeNearFire(Level level) {
+        return getPigeonholeAtCurrentPos(level).map(PigeonholeBlockEntity::isFireNearby).orElse(false);
     }
 
-    public boolean isPigeonholeValid(BlockPos currentPos) {
-        BlockPos pos = getPigeonholePos();
-        if (pos == null) return false;
-        if (!currentPos.closerThan(pos, 32)) return false;
-        return level.getBlockEntity(pos) instanceof PigeonholeBlockEntity;
+    public boolean isPigeonholeValid(Level level, BlockPos entityPos) {
+        @Nullable BlockPos currentPos = getCurrentPos();
+        if (currentPos == null) return false;
+        if (!entityPos.closerThan(currentPos, 32)) return false;
+        return level.getBlockEntity(currentPos) instanceof PigeonholeBlockEntity;
     }
 
     public boolean isTargetBlacklisted(BlockPos pos) {
@@ -134,31 +150,15 @@ public class PigeonholeHandler {
     }
 
     public void dropAndBlacklistPigeonhole() {
-        if (getPigeonholePos() != null) {
-            blacklistTarget(getPigeonholePos());
+        if (getCurrentPos() != null) {
+            blacklistTarget(getCurrentPos());
         }
 
         dropPigeonhole();
     }
 
     public void dropPigeonhole() {
-        setPigeonholePos(null);
-        setDefaultCooldownBeforeLocatingNewPigeonhole();
-    }
-
-    public void load(CompoundTag tag) {
-        pigeonholePos = NbtUtils.readBlockPos(tag, "PigeonholePos").orElse(null);
-        lastPigeonholePos = NbtUtils.readBlockPos(tag, "LastPigeonholePos").orElse(null);
-        cooldownBeforeEnteringPigeonhole = tag.getInt("CooldownBeforeEnteringPigeonhole");
-        cooldownBeforeWantingToEnterPigeonhole = tag.getInt("CooldownBeforeWantingToEnterPigeonhole");
-        cooldownBeforeLocatingNewPigeonhole = tag.getInt("CooldownBeforeLocatingNewPigeonhole");
-    }
-
-    public void save(CompoundTag tag) {
-        if (pigeonholePos != null) tag.put("PigeonholePos", NbtUtils.writeBlockPos(pigeonholePos));
-        if (lastPigeonholePos != null) tag.put("LastPigeonholePos", NbtUtils.writeBlockPos(lastPigeonholePos));
-        if (cooldownBeforeEnteringPigeonhole > 0) tag.putInt("CooldownBeforeEnteringPigeonhole", cooldownBeforeEnteringPigeonhole);
-        if (cooldownBeforeWantingToEnterPigeonhole > 0) tag.putInt("CooldownBeforeWantingToEnterPigeonhole", cooldownBeforeWantingToEnterPigeonhole);
-        if (cooldownBeforeLocatingNewPigeonhole > 0) tag.putInt("CooldownBeforeLocatingNewPigeonhole", cooldownBeforeLocatingNewPigeonhole);
+        setCurrentPos(null);
+        resetLocateCooldown();
     }
 }

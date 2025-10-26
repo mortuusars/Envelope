@@ -1,18 +1,19 @@
 package io.github.mortuusars.envelope.util.bugger.data;
 
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
-public class TagDataDefinition extends DataDefinition<CompoundTag> {
+public class NbtData extends Data<CompoundTag> {
     private final boolean accumulate;
 
-    public TagDataDefinition(ResourceLocation id) {
+    public NbtData(ResourceLocation id) {
         this(id, false);
     }
 
-    public TagDataDefinition(ResourceLocation id, boolean accumulate) {
+    public NbtData(ResourceLocation id, boolean accumulate) {
         super(id, CompoundTag.CODEC);
         this.accumulate = accumulate;
     }
@@ -23,7 +24,8 @@ public class TagDataDefinition extends DataDefinition<CompoundTag> {
         return newValue;
     }
 
-    public TagDataDefinition sendValues(Consumer<CompoundTag> tag) {
+    public NbtData sendValues(Consumer<CompoundTag> tag) {
+        if (!Bugger.isEnabled()) return this;
         CompoundTag compoundTag = new CompoundTag();
         tag.accept(compoundTag);
         send(compoundTag);

@@ -40,7 +40,7 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public void add(BackgroundCourier courier) {
-        Preconditions.checkNotNull(courier.delivery(), "Courier must be delivering mail.");
+        Preconditions.checkArgument(courier.isDelivering(), "Courier must be delivering mail.");
         couriers.add(courier);
         setDirty();
     }

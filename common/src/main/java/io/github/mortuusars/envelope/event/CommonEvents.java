@@ -16,7 +16,7 @@ public class CommonEvents {
 
     public static void levelTick(Level level) {
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.getEnvelopeContext().getBackgroundDelivery().tick(serverLevel);
+            serverLevel.getEnvelopeContext().tick();
         }
     }
 
