@@ -1,32 +1,17 @@
 package io.github.mortuusars.envelope.util.bugger;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.mixin.bugger.ScreenRenderLinesInvoker;
 import io.github.mortuusars.envelope.util.bugger.page.BuggerPage;
 import io.github.mortuusars.envelope.util.bugger.page.DataPage;
 import io.github.mortuusars.envelope.util.bugger.page.VanillaDebugPage;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityAttachment;
-import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.text.WordUtils;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -161,66 +146,6 @@ public class BuggerGui {
 //        }
 //        return ret;
 //    }
-
-    public static <T extends Entity> void onRenderEntity(EntityRenderDispatcher dispatcher, T entity, float partialTick,
-                                                         PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        if (!BuggerGui.isActive()) return;
-        if (dispatcher.distanceToSqr(entity) > 4096.0) return;
-
-        @Nullable Vec3 vec3 = entity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, entity.getViewYRot(partialTick));
-        if (vec3 == null) return;
-
-        List<Component> lines = getOverheadEntityInfoLines(entity);
-        if (lines.isEmpty()) return;
-
-        poseStack.pushPose();
-        poseStack.translate(vec3.x, vec3.y + 0.5, vec3.z);
-        poseStack.mulPose(dispatcher.cameraOrientation());
-        poseStack.scale(0.015F, -0.015F, 0.015F);
-        Matrix4f matrix4f = poseStack.last().pose();
-        float opacity = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
-        int backgroundColor = (int) (opacity * 255.0F) << 24;
-        Font font = Minecrft.get().font;
-
-        float y = -5 - lines.size() * (font.lineHeight + 1);
-        for (Component text : lines) {
-            float x = (float) (-font.width(text) / 2);
-            font.drawInBatch(text, x, y, 0x20FFFFFF, false, matrix4f,
-                  bufferSource, Font.DisplayMode.SEE_THROUGH, backgroundColor, packedLight);
-            font.drawInBatch(text, x, y, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
-            y += font.lineHeight + 1;
-        }
-
-        poseStack.popPose();
-    }
-
-    private static List<Component> getOverheadEntityInfoLines(Entity entity) {
-        if (entity instanceof Pigeon pigeon) {
-            if (pigeon.getDelivery().isPresent()) {
-                Delivery delivery = pigeon.getDelivery().get();
-                return List.of(
-                      Component.empty()
-                            .append(delivery.getSenderAddress().getDisplayName())
-                            .append(" → ")
-                            .append(delivery.getRecipientAddress().getDisplayName()),
-                      Component.literal(WordUtils.capitalize(delivery.getPhase().getType()
-                            .getSerializedName().replace('_', ' '))));
-            }
-
-            List<Component> list = new ArrayList<>();
-            PigeonholeHandler handler = pigeon.getPigeonholeHandler();
-            if (handler.wantsToEnterPigeonhole(entity.level())) {
-                list.add(Component.literal(handler.getCurrentPos() != null ? "Going to Pigeonhole" : "Looking for Pigeonhole"));
-            } else {
-                list.add(Component.literal("Would want to enter after: " + handler.getWantCooldown() / 20));
-                if (handler.getEnterCooldown() > 0) {
-                    list.add(Component.literal("Could enter after: " + handler.getEnterCooldown() / 20));
-                }
-            }
-            return list;
-        }
-        return Collections.emptyList();
-    }
 
     // -- Input
 

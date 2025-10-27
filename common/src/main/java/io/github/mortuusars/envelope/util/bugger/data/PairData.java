@@ -13,6 +13,7 @@ public class PairData<A, B> extends Data<Pair<A, B>> {
     }
 
     public PairData<A, B> send(A first, B second) {
+        if (!Bugger.isEnabled()) return this;
         send(new Pair<>(first, second));
         return this;
     }

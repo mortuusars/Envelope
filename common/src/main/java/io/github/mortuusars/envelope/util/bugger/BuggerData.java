@@ -43,7 +43,6 @@ public class BuggerData {
     }
 
     public static void send(ResourceLocation id, Function<RegistryAccess, @Nullable Tag> dataSupplier) {
-        if (!Bugger.isEnabled()) return;
         Packets.sendToAllClients(registryAccess -> {
             CompoundTag tag = new CompoundTag();
             @Nullable Tag data = dataSupplier.apply(registryAccess);

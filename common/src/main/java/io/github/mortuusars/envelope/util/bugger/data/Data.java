@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.util.bugger.BuggerData;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.NbtOps;
@@ -42,6 +43,7 @@ public class Data<T> {
     }
 
     public Data<T> send(@Nullable T value) {
+        if (!Bugger.isEnabled()) return this;
         BuggerData.send(id, registryAccess -> encode(value, registryAccess));
         return this;
     }
