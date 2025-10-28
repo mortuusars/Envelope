@@ -7,11 +7,21 @@ import java.util.List;
 
 public interface BuggerPage {
     String getTitle();
+
     default List<String> getLeftLines() {
         return Collections.emptyList();
     }
+
     default List<String> getRightLines() {
         return Collections.emptyList();
+    }
+
+    default void activated() {
+
+    }
+
+    default void deactivated() {
+
     }
 
     default void render(GuiGraphics guiGraphics, float partialTicks, float scale) {

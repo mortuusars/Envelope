@@ -88,7 +88,7 @@ public abstract class Config {
 
             {
                 builder.push("debug");
-                DEBUG = builder.comment("Enable debug features. Default: false.").define("debug", false);
+                DEBUG = builder.comment("Enable debug features. Will affect performance negatively. Don't enabled unless it's needed. Default: false.").define("debug_mode", false);
                 builder.pop();
             }
 

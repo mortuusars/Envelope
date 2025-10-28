@@ -63,7 +63,7 @@ public class EnvelopeContext {
         if (Bugger.isEnabled() && level.dimension() == Level.OVERWORLD && level.getGameTime() % 20 == 0) {
             int activeCouriers = (int) getBackgroundDelivery().getCouriers().stream().filter(Courier::isDelivering).count();
             int finishedCouriers = getBackgroundDelivery().getCouriers().size() - activeCouriers;
-            Bugger.STATS.sendValues(tag -> {
+            Bugger.ENVELOPE.sendValues(tag -> {
                 tag.putInt("pigeonholes", getPigeonholeManager().getAllAddresses().size());
                 tag.putInt("delivering_pigeons", level.getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering).size());
                 tag.putInt("background_delivering_pigeons", activeCouriers);

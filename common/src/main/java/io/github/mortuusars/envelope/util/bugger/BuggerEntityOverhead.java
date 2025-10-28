@@ -18,15 +18,15 @@ import java.util.List;
 
 public class BuggerEntityOverhead {
     private static final ArrayList<Component> LINES = new ArrayList<>();
-    private static final ArrayList<EntityOverheadData> DATA = new ArrayList<>();
+    private static final ArrayList<EntityDataDisplay> DATA = new ArrayList<>();
 
-    public static void addData(EntityOverheadData data) {
+    public static void addData(EntityDataDisplay data) {
         DATA.add(data);
     }
 
     public static <T extends Entity> void onRenderEntity(EntityRenderDispatcher dispatcher, T entity, float partialTick,
                                                          PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        if (!BuggerGui.isActive()) return;
+        if (!BuggerDebugScreen.active()) return;
         if (dispatcher.distanceToSqr(entity) > 4096.0) return;
 
         @Nullable Vec3 vec3 = entity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, entity.getViewYRot(partialTick));
@@ -62,7 +62,7 @@ public class BuggerEntityOverhead {
         return LINES;
     }
 
-    public interface EntityOverheadData {
+    public interface EntityDataDisplay {
         void addLines(Entity entity, ArrayList<Component> lines);
 
         default Component line(String text) {

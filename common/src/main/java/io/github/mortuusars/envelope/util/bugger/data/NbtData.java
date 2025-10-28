@@ -24,11 +24,11 @@ public class NbtData extends Data<CompoundTag> {
         return newValue;
     }
 
-    public NbtData sendValues(Consumer<CompoundTag> tag) {
-        if (!Bugger.isEnabled()) return this;
-        CompoundTag compoundTag = new CompoundTag();
-        tag.accept(compoundTag);
-        send(compoundTag);
-        return this;
+    public void sendValues(Consumer<CompoundTag> tag) {
+        if (Bugger.isEnabled()) {
+            CompoundTag compoundTag = new CompoundTag();
+            tag.accept(compoundTag);
+            send(compoundTag);
+        }
     }
 }

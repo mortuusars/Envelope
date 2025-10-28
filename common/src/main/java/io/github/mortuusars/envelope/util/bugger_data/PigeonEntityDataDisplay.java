@@ -10,7 +10,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 
-public class PigeonEntityOverheadData implements BuggerEntityOverhead.EntityOverheadData {
+public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataDisplay {
     @Override
     public void addLines(Entity entity, ArrayList<Component> lines) {
         if (!(entity instanceof Pigeon pigeon)) return;

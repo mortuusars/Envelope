@@ -23,7 +23,7 @@ import java.util.function.Function;
  * Utility system to simplify debug data transferring from server to client.<br>
  * Data is stored only on the client, server only sends.<br>
  * Uses CompoundTag to encode/decode data, which is not ideal for sending data over network (StreamCodecs exist),
- * but it simplifies data writing and reading, which is more important than performance for debug cases.
+ * but it simplifies data writing and reading (and allows sending arbitrary data), which is more important than performance for debug cases.
  */
 public class BuggerData {
     public static final Map<ResourceLocation, Data<?>> DEFINITIONS = new HashMap<>();

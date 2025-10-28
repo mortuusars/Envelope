@@ -12,10 +12,9 @@ public class PairData<A, B> extends Data<Pair<A, B>> {
         super(id, codec(firstCodec, secondCodec));
     }
 
-    public PairData<A, B> send(A first, B second) {
-        if (!Bugger.isEnabled()) return this;
+    public void send(A first, B second) {
+        if (!Bugger.isEnabled()) return;
         send(new Pair<>(first, second));
-        return this;
     }
 
     @Override

@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.util.bugger.page.BuggerPage;
 import java.util.Collections;
 import java.util.List;
 
-public class EnvelopeStatsBuggerPage implements BuggerPage {
+public class EnvelopeBuggerPage implements BuggerPage {
     @Override
     public String getTitle() {
         return "Envelope";
@@ -14,7 +14,7 @@ public class EnvelopeStatsBuggerPage implements BuggerPage {
 
     @Override
     public List<String> getLeftLines() {
-        return Bugger.STATS.get()
+        return Bugger.ENVELOPE.get()
               .map(tag -> List.of(
                     "Pigeonholes: " + tag.getInt("pigeonholes"),
                     "",

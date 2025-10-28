@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class Data<T> {
@@ -42,10 +41,9 @@ public class Data<T> {
         return BuggerData.get(id);
     }
 
-    public Data<T> send(@Nullable T value) {
-        if (!Bugger.isEnabled()) return this;
+    public void send(@Nullable T value) {
+        if (!Bugger.isEnabled()) return;
         BuggerData.send(id, registryAccess -> encode(value, registryAccess));
-        return this;
     }
 
     public T apply(T oldValue, T newValue) {
@@ -71,28 +69,5 @@ public class Data<T> {
               .result()
               .map(Pair::getFirst)
               .orElse(null);
-    }
-
-    // --
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Data<?>) obj;
-        return Objects.equals(this.id, that.id) &&
-              Objects.equals(this.codec, that.codec);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, codec);
-    }
-
-    @Override
-    public String toString() {
-        return "Definition[" +
-              "id=" + id + ", " +
-              "codec=" + codec + ", " + ']';
     }
 }

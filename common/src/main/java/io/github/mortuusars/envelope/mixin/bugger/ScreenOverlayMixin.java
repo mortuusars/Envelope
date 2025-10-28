@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.mixin.bugger;
 
-import io.github.mortuusars.envelope.util.bugger.BuggerGui;
+import io.github.mortuusars.envelope.util.bugger.BuggerDebugScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ScreenOverlayMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (BuggerGui.render(guiGraphics)) {
+        if (BuggerDebugScreen.render(guiGraphics)) {
             ci.cancel();
         }
     }

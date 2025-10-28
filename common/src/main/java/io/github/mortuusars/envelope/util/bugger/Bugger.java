@@ -27,7 +27,7 @@ public class Bugger {
 
     // --
 
-    public static final NbtData STATS = new NbtData(Envelope.resource("stats"));
+    public static final NbtData ENVELOPE = new NbtData(Envelope.resource("envelope"));
 
     public static final EntityData<PigeonholeHandler> PIGEON_PIGEONHOLE_HANDLER =
           new EntityData<>(Envelope.resource("pigeon_pigeonhole_handler"), PigeonholeHandler.CODEC)

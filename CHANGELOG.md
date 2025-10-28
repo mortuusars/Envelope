@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.0.2
+- Improvements to Bugger (Debug utility enabled with `debug.debug` server config option. Adds more info to F3 screen, more log messages, etc).
+
 ## 0.2.0.1
 - Added restrictions for items that can be placed inside a Package:
   - Added Bundle to `envelope:cannot_be_packaged` tag
