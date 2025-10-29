@@ -14,6 +14,7 @@ import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -79,6 +80,11 @@ public class AddressTagScreen extends Screen {
         addressBox.setTextAndUpdate(FormattedString.parse(getInitialAddressValue()));
         addressBox.getEditor().setCursorToEnd(false);
         addRenderableWidget(addressBox);
+
+//        EditBox editBox = new EditBox(font, leftPos + 20, topPos - 18, 140, 9, Component.empty());
+//        editBox.setResponder();
+//        editBox.setSuggestion();
+//        editBox.setMaxLength(50);
 
         confirmButton = new ImageButton(leftPos + 162, topPos + 16, 11, 11, CONFIRM_BUTTON_SPRITES,
                 button -> confirm(), Component.translatable("gui.envelope.confirm"));

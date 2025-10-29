@@ -2,7 +2,7 @@
 
 ## 0.2.0.2
 - Changed command `/mail send [item]` to `/envelope send [item]`
-- Added `/envelope pigeonhole [list|position|rename]`  commands
+- Added `/envelope pigeonhole [list|position|rename]`  command
 - Improvements to Bugger (Debug utility enabled with `debug.debug` server config option. Adds more info to F3 screen, more log messages, etc).
 
 ## 0.2.0.1

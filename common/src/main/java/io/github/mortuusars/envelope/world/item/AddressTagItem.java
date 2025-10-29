@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +61,11 @@ public class AddressTagItem extends Item {
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+        if (state.getBlock() instanceof PigeonholeBlock) {
+            return InteractionResult.FAIL;
+        }
+
         return super.useOn(context);
     }
 

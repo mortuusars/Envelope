@@ -37,8 +37,8 @@ public class PigeonholeSavedData extends SavedData {
 
     // -- Save / Load
 
-    public static PigeonholeSavedData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(factory(), "envelope_pigeonholes");
+    public static PigeonholeSavedData get(ServerLevel level, String name) {
+        return level.getDataStorage().computeIfAbsent(factory(), name);
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {

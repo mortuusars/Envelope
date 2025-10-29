@@ -12,8 +12,10 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAd
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -217,6 +219,12 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
+        if (!isValidDimension(level)) {
+            Envelope.LOGGER.error("Pigeonhole cannot work in {}", level.dimension().location());
+            player.displayClientMessage(Component.literal("Environment is not suitable for deliveries").withStyle(ChatFormatting.RED), true);
+            return ItemInteractionResult.FAIL;
+        }
+
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
                 AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().getKnownAddresses();
@@ -258,6 +266,11 @@ public class PigeonholeBlock extends BaseEntityBlock {
     public void applyAddress(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
         Level level = player.level();
 
+        if (!isValidDimension(level)) {
+            Envelope.LOGGER.error("Cannot apply an address in {}", level.dimension().location());
+            return;
+        }
+
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             Optional<Address.Pigeonhole> currentAddress = blockEntity.getAddress();
 
@@ -283,6 +296,10 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
             }
         }
+    }
+
+    public boolean isValidDimension(Level level) {
+        return level.dimension() == Level.OVERWORLD;
     }
 
     @Nullable

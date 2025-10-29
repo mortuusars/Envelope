@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -60,8 +61,8 @@ public class DefaultAddresses extends SavedData {
 
     // -- Save / Load
 
-    public static DefaultAddresses get(ServerLevel level) {
-        return level.getServer().overworld().getDataStorage().computeIfAbsent(DefaultAddresses.factory(), "envelope_default_addresses");
+    public static DefaultAddresses get(ServerLevel level, String name) {
+        return level.getDataStorage().computeIfAbsent(factory(), name);
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -60,8 +61,8 @@ public class BackgroundDelivery extends SavedData {
 
     // -- Save / Load
 
-    public static BackgroundDelivery get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(factory(), "envelope_background_delivery");
+    public static BackgroundDelivery get(ServerLevel level, String name) {
+        return level.getDataStorage().computeIfAbsent(factory(), name);
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {

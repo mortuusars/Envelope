@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.service;
 
+import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.Courier;
@@ -21,6 +22,7 @@ public class EnvelopeContext {
     protected @Nullable BackgroundDelivery backgroundDelivery;
 
     public EnvelopeContext(ServerLevel level) {
+        Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "EnvelopeContext can exist only on overworld level.");
         this.level = level;
         this.pigeonholeManager = new PigeonholeManager(level);
     }
@@ -34,15 +36,21 @@ public class EnvelopeContext {
     }
 
     public @NotNull KnownPlayers getKnownPlayers() {
-        return knownPlayers == null ? knownPlayers = KnownPlayers.get(level) : knownPlayers;
+        return knownPlayers == null
+              ? knownPlayers = KnownPlayers.get(level, "envelope_known_players")
+              : knownPlayers;
     }
 
     public @NotNull DefaultAddresses getDefaultAddresses() {
-        return defaultAddresses == null ? defaultAddresses = DefaultAddresses.get(level) : defaultAddresses;
+        return defaultAddresses == null
+              ? defaultAddresses = DefaultAddresses.get(level, "envelope_default_addresses")
+              : defaultAddresses;
     }
 
     public @NotNull BackgroundDelivery getBackgroundDelivery() {
-        return backgroundDelivery == null ? backgroundDelivery = BackgroundDelivery.get(level) : backgroundDelivery;
+        return backgroundDelivery == null
+              ? backgroundDelivery = BackgroundDelivery.get(level, "envelope_background_delivery")
+              : backgroundDelivery;
     }
 
     // --
@@ -60,12 +68,12 @@ public class EnvelopeContext {
     public void tick() {
         getBackgroundDelivery().tick(level);
 
-        if (Bugger.isEnabled() && level.dimension() == Level.OVERWORLD && level.getGameTime() % 20 == 0) {
+        if (Bugger.isEnabled() && this.level.getGameTime() % 20 == 0) {
             int activeCouriers = (int) getBackgroundDelivery().getCouriers().stream().filter(Courier::isDelivering).count();
             int finishedCouriers = getBackgroundDelivery().getCouriers().size() - activeCouriers;
             Bugger.ENVELOPE.sendValues(tag -> {
                 tag.putInt("pigeonholes", getPigeonholeManager().getAllAddresses().size());
-                tag.putInt("delivering_pigeons", level.getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering).size());
+                tag.putInt("delivering_pigeons", this.level.getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering).size());
                 tag.putInt("background_delivering_pigeons", activeCouriers);
                 tag.putInt("background_finished_pigeons", finishedCouriers);
             });

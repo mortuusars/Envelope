@@ -29,7 +29,7 @@ public class PigeonholeManager {
 
     protected @NotNull PigeonholeSavedData data() {
         if (data == null) {
-            data = PigeonholeSavedData.get(level);
+            data = PigeonholeSavedData.get(level, "envelope_pigeonholes");
         }
         return data;
     }
@@ -181,7 +181,8 @@ public class PigeonholeManager {
                   }
 
                   if (result == null) {
-                      result = Result.failure(new Failure("Mail with mailId '" + id.toString() + "' is not found in pigeonhole '" + address + "'."));
+                      result = Result.failure(new Failure("Mail with mailId '" + id.toString()
+                            + "' is not found in pigeonhole '" + address + "'."));
                   }
 
                   return result;
