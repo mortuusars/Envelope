@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.neoforge.event;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.command.MailCommand;
+import io.github.mortuusars.envelope.command.EnvelopeCommand;
 import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.neoforge.RegisterImpl;
@@ -104,7 +104,7 @@ public class NeoForgeCommonEvents {
     public static class GameBus {
         @SubscribeEvent
         public static void registerCommands(RegisterCommandsEvent event) {
-            MailCommand.register(event.getDispatcher(), event.getBuildContext());
+            EnvelopeCommand.register(event.getDispatcher(), event.getBuildContext());
         }
 
         @SubscribeEvent

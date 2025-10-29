@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.fabric;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.command.MailCommand;
+import io.github.mortuusars.envelope.command.EnvelopeCommand;
 import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
@@ -67,7 +67,7 @@ public class EnvelopeFabric implements ModInitializer {
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            MailCommand.register(dispatcher, registryAccess);
+            EnvelopeCommand.register(dispatcher, registryAccess);
         });
 
         BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_PIGEON_SPAWNS),

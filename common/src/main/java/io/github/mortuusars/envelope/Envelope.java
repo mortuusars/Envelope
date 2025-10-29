@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
@@ -17,6 +18,8 @@ import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -353,6 +356,9 @@ public class Envelope {
     }
 
     public static class ArgumentTypes {
+        public static final Supplier<ArgumentTypeInfo<AddressArgument, SingletonArgumentInfo<AddressArgument>.Template>> ADDRESS =
+              Register.commandArgumentType("address", AddressArgument.class, SingletonArgumentInfo.contextFree(AddressArgument::all));
+
         public static void init() {
         }
     }

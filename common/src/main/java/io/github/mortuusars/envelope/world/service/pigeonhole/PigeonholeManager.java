@@ -99,6 +99,27 @@ public class PigeonholeManager {
         }
     }
 
+    public void rename(Address.Pigeonhole oldAddress, Address.Pigeonhole newAddress) {
+        byAddress(oldAddress)
+              .ifPresent(data -> {
+                  level.getEnvelopeContext().getDefaultAddresses().get()
+                        .entrySet()
+                        .stream()
+                        .filter(entry -> entry.getValue().equals(oldAddress))
+                        .map(Map.Entry::getKey)
+                        .toList()
+                        .forEach(uuid -> level.getEnvelopeContext().getDefaultAddresses().set(uuid, newAddress));
+
+                  PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail());
+
+                  data().getPigeonholes().remove(oldAddress);
+                  data().getPigeonholes().put(newAddress, newData);
+                  LOGGER.debug("Renamed Pigeonhole '{}'@[{}] to '{}'", data.getAddress().id(), data.getPos().toShortString(), newAddress.id());
+
+                  data().setDirty();
+              });
+    }
+
     public boolean exists(Address.Pigeonhole pigeonhole) {
         return data().getPigeonholes().containsKey(pigeonhole);
     }
