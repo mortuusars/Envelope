@@ -23,6 +23,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -118,8 +119,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-            && blockEntity.hasAddress()
-            && !blockEntity.getAllMail().isEmpty()) {
+              && blockEntity.mapAddressed((serverLevel, address, data) -> data.hasMail()).orElse(false)) {
             return 15;
         }
 
@@ -249,18 +249,23 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
 
-        //TODO: useWithoutItem
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                                        Player player, BlockHitResult hitResult) {
         if (state.getValue(HAS_ADDRESS)) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                if (!blockEntity.openMenu(serverPlayer, hand)) {
-                    return ItemInteractionResult.FAIL;
+                if (!blockEntity.openMenu(serverPlayer)) {
+                    return InteractionResult.FAIL;
                 }
             }
 
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        return super.useWithoutItem(state, level, pos, player, hitResult);
     }
 
     public void applyAddress(Player player, BlockState state, BlockPos pos, int slot, String addressId) {

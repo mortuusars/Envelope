@@ -19,7 +19,7 @@ public record MailId(UUID id) {
         return new MailId(UUID.randomUUID());
     }
 
-    public static Optional<MailId> from(ItemStack mail) {
+    public static Optional<MailId> of(ItemStack mail) {
         return Optional.ofNullable(mail.get(Envelope.DataComponents.MAIL_ID));
     }
 

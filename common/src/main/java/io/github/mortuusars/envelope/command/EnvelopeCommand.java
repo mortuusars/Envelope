@@ -39,13 +39,13 @@ public class EnvelopeCommand {
                           .then(Commands.argument("address", AddressArgument.pigeonhole())
                                 .suggests(AddressSuggestions.pigeonhole())
                                 .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address")))))
-                    .then(Commands.literal("rename")
+                    /*.then(Commands.literal("rename")
                           .then(Commands.argument("address", AddressArgument.pigeonhole())
                                 .suggests(AddressSuggestions.pigeonhole())
                                 .then(Commands.argument("new_address", AddressArgument.all())
                                       .executes(c -> renamePigeonhole(c,
                                             AddressArgument.getPigeonhole(c, "address"),
-                                            AddressArgument.getPigeonhole(c, "new_address"))))))));
+                                            AddressArgument.getPigeonhole(c, "new_address"))))))*/));
     }
 
     // -- Mail

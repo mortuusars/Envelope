@@ -1,9 +1,8 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -21,20 +20,22 @@ public class PigeonholeMailReceiver implements MailReceiver {
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
         PigeonholeManager pigeonholeManager = level.getEnvelopeContext().getPigeonholeManager();
-        if (pigeonholeManager.putMail(address, mail)) {
-            MailDeliveryLog.addRecords(mail,
-                  MailDeliveryLog.Record.arrivedTo(address).atTime(level.getGameTime()));
 
-            pigeonholeManager.getPositionOf(address).ifPresent(pos -> {
-                if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                    blockEntity.onMailReceived(level, mail);
-                }
-            });
-
-            return ItemStack.EMPTY;
-        } else {
-            LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
-            return Mail.returnedRecipientNotFound(mail);
-        }
+        return pigeonholeManager.getBlockEntityOf(address)
+              .map(blockEntity -> {
+                  MailDeliveryLog.addRecords(mail, MailDeliveryLog.Record.arrivedTo(address).atTime(level.getGameTime()));
+                  blockEntity.insertMail(mail);
+                  return ItemStack.EMPTY;
+              })
+              .orElseGet(() -> pigeonholeManager.byAddress(address)
+                    .map(data -> {
+                        MailDeliveryLog.addRecords(mail, MailDeliveryLog.Record.arrivedTo(address).atTime(level.getGameTime()));
+                        data.insertMail(mail);
+                        return ItemStack.EMPTY;
+                    })
+                    .orElseGet(() -> {
+                        LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
+                        return Mail.returnedRecipientNotFound(mail);
+                    }));
     }
 }

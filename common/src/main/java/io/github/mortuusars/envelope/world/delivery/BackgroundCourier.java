@@ -48,7 +48,7 @@ public class BackgroundCourier implements Courier {
     }
 
     public static BackgroundCourier virtual() {
-        return new BackgroundCourier(CustomData.EMPTY, null, null, ItemStack.EMPTY);
+        return new BackgroundCourier(CustomData.EMPTY, Optional.empty(), Optional.empty(), ItemStack.EMPTY);
     }
 
     public CustomData getEntity() {

@@ -1,11 +1,14 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.MailId;
+import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -24,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PigeonholeMenu extends AbstractContainerMenu {
@@ -60,6 +64,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             public boolean mayPlace(ItemStack stack) {
                 return false;
             }
+
             @Override
             public boolean mayPickup(Player player) {
                 return false;
@@ -102,9 +107,9 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return player.distanceToSqr(Vec3.atCenterOf(pigeonholePos)) <= 64.0D
-                && player.level().getBlockEntity(getBlockPosition()) instanceof PigeonholeBlockEntity be
-                // Close menu if address changes. Easier than resyncing it to the client.
-                && be.getAddress().map(a -> a.equals(address)).orElse(false);
+              && player.level().getBlockEntity(getBlockPosition()) instanceof PigeonholeBlockEntity be
+              // Close menu if address changes. Easier than resyncing it to the client.
+              && be.getAddress().map(a -> a.equals(address)).orElse(false);
     }
 
     // --
@@ -137,8 +142,8 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     public boolean isDefaultAddress() {
         if (player instanceof ServerPlayer serverPlayer) {
             return serverPlayer.serverLevel().getEnvelopeContext().getDefaultAddresses().of(player)
-                    .map(address::equals)
-                    .orElse(false);
+                  .map(address::equals)
+                  .orElse(false);
         }
         return isDefault.get() == 1;
     }
@@ -196,8 +201,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(clickedStack, PigeonholeBlockEntity.SLOTS, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        }
-        else if (index < slots.size()) {
+        } else if (index < slots.size()) {
             if (!moveItemStackTo(clickedStack, 0, PigeonholeBlockEntity.SLOTS, false))
                 return ItemStack.EMPTY;
         }
@@ -227,34 +231,25 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             return false;
         }
 
-        ItemStack mail = getMail().remove(index);
-
-        if (player.level() instanceof ServerLevel) {
-            MailId.from(mail).ifPresent(id -> {
-                ItemStack takenMail = getBlockEntity().takeMail(id, player);
-                setCarried(takenMail);
-            });
+        if (player.level() instanceof ServerLevel serverLevel) {
+            setCarried(extractMail(serverLevel, index));
         }
 
         return true;
     }
 
     protected boolean moveMailToInventory(Player player, int index) {
-        ItemStack mail = getMail().get(index);
+        ItemStack mail = Mail.stripInboxData(getMail().get(index).copy());
 
         if (!PlayerInventoryUtil.canAddWholeStack(player, mail)) {
             return false;
         }
 
-        mail = getMail().remove(index);
-
-        if (player.level() instanceof ServerLevel) {
-            MailId.from(mail).ifPresent(id -> {
-                ItemStack takenMail = getBlockEntity().takeMail(id, player);
-                if (!takenMail.isEmpty()) {
-                    player.getInventory().add(takenMail);
-                }
-            });
+        if (player.level() instanceof ServerLevel serverLevel) {
+            ItemStack taken = extractMail(serverLevel, index);
+            if (!taken.isEmpty()) {
+                player.getInventory().add(taken);
+            }
         }
 
         return true;
@@ -269,6 +264,21 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             movedSomething = true;
         }
         return true;
+    }
+
+    protected ItemStack extractMail(ServerLevel level, int index) {
+        return MailId.of(getMail().get(index))
+              .map(id -> {
+                  ItemStack extractedMail = getBlockEntity().extractMail(id);
+                  if (!extractedMail.isEmpty()) {
+                      playersWithMenu(level, address).forEach(player -> {
+                          ((PigeonholeMenu) player.containerMenu).getMail().removeIf(id::matches);
+                          Packets.sendToClient(new PigeonholeMenuMailRemovedS2CP(id), player);
+                      });
+                  }
+                  return extractedMail;
+              })
+              .orElse(ItemStack.EMPTY);
     }
 
     protected boolean rejectMail(Player player, int index) {
@@ -287,13 +297,19 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         }
 
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            List<ItemStack> mail = getBlockEntity().getAllMail();
+            List<ItemStack> mail = getBlockEntity().getData().map(PigeonholeData::getMail).orElse(Collections.emptyList());
             setMail(mail);
             Packets.sendToClient(new PigeonholeMenuMailS2CP(mail), serverPlayer);
             return true;
         }
 
         return false;
+    }
+
+    public static List<ServerPlayer> playersWithMenu(ServerLevel level, Address.Pigeonhole address) {
+        return level.players().stream()
+              .filter(pl -> pl.containerMenu instanceof PigeonholeMenu menu && menu.getAddress().equals(address))
+              .toList();
     }
 
     // --
@@ -305,6 +321,6 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         REJECT;
 
         public static final StreamCodec<ByteBuf, MailAction> STREAM_CODEC = ByteBufCodecs.idMapper(
-                ByIdMap.continuous(MailAction::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), MailAction::ordinal);
+              ByIdMap.continuous(MailAction::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), MailAction::ordinal);
     }
 }

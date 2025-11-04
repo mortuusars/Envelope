@@ -2,6 +2,8 @@ package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
@@ -9,49 +11,106 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 public class PigeonholeData {
     public static final Codec<PigeonholeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Address.Pigeonhole.STRING_CODEC.fieldOf("address").forGetter(PigeonholeData::getAddress),
-            BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPos),
-            Codec.list(ItemStack.CODEC).optionalFieldOf("mail", Collections.emptyList()).forGetter(PigeonholeData::getMail)
+          Address.Pigeonhole.STRING_CODEC.fieldOf("address").forGetter(PigeonholeData::getAddress),
+          BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPos),
+          Codec.list(ItemStack.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
     ).apply(instance, PigeonholeData::new));
 
-    private Address.Pigeonhole address;
-    private BlockPos pos;
-    private List<ItemStack> mail;
+    private final Address.Pigeonhole address;
+    private final BlockPos pos;
+    private final List<ItemStack> mail;
+    private boolean valid = true;
+    private boolean dirty;
 
-    protected PigeonholeData(Address.Pigeonhole address, BlockPos pos, List<ItemStack> mail) {
+    public PigeonholeData(Address.Pigeonhole address, BlockPos pos, List<ItemStack> mail) {
         this.address = address;
         this.pos = pos;
-        this.mail = new ArrayList<>(mail); // Make sure the list is writable.
+        this.mail = new ArrayList<>(mail); // Make sure it's mutable
     }
 
     public PigeonholeData(Address.Pigeonhole address, BlockPos pos) {
-        this(address, pos, new ArrayList<>());
+        this(address, pos, Collections.emptyList());
     }
 
     public Address.Pigeonhole getAddress() {
         return address;
     }
 
-    public void setAddress(Address.Pigeonhole address) {
-        this.address = address;
-    }
-
     public BlockPos getPos() {
         return pos;
-    }
-
-    public void setPos(BlockPos pos) {
-        this.pos = pos;
     }
 
     public List<ItemStack> getMail() {
         return mail;
     }
 
-    public void setMail(List<ItemStack> mail) {
-        this.mail = mail;
+    public boolean hasMail() {
+        return !mail.isEmpty();
+    }
+
+    public void insertMail(ItemStack mail) {
+        if (!mail.isEmpty()) {
+            if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
+                mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());
+            }
+            this.mail.add(mail);
+            setDirty();
+        }
+    }
+
+    public ItemStack extractMail(MailId id) {
+        ItemStack result = ItemStack.EMPTY;
+
+        ListIterator<ItemStack> iterator = this.mail.listIterator();
+        while (iterator.hasNext()) {
+            ItemStack mail = iterator.next();
+            if (id.matches(mail)) {
+                iterator.remove();
+                setDirty();
+                result = mail;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    public List<ItemStack> extractAllMail() {
+        if (!hasMail()) {
+            return Collections.emptyList();
+        }
+
+        List<ItemStack> mail = new ArrayList<>(this.mail);
+        this.mail.clear();
+        setDirty();
+        return mail;
+    }
+
+    // --
+
+    public boolean stillValid() {
+        return valid;
+    }
+
+    public void invalidate() {
+        valid = false;
+    }
+
+    // --
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty() {
+        setDirty(true);
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 }

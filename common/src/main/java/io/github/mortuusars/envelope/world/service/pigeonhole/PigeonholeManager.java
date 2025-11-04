@@ -1,16 +1,12 @@
 package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.util.result.Failure;
-import io.github.mortuusars.envelope.util.result.Result;
-import io.github.mortuusars.envelope.world.item.component.MailId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -21,15 +17,15 @@ public class PigeonholeManager {
     protected static final Logger LOGGER = LogUtils.getLogger();
 
     private final ServerLevel level;
-    private @Nullable PigeonholeSavedData data;
+    private @Nullable PigeonholeRegistry data;
 
     public PigeonholeManager(ServerLevel level) {
         this.level = level;
     }
 
-    protected @NotNull PigeonholeSavedData data() {
+    protected @NotNull PigeonholeRegistry data() {
         if (data == null) {
-            data = PigeonholeSavedData.get(level, "envelope_pigeonholes");
+            data = PigeonholeRegistry.get(level, "envelope_pigeonholes");
         }
         return data;
     }
@@ -42,7 +38,7 @@ public class PigeonholeManager {
      *
      * @return Correct address for this BlockPos.
      */
-    public Address.Pigeonhole resolve(Address.Pigeonhole address, BlockPos pos) {
+    public Address.Pigeonhole correctOrRegister(Address.Pigeonhole address, BlockPos pos) {
         return byPosition(pos)
               .map(PigeonholeData::getAddress) // Return correct (stored) address for that BlockPos
               .orElseGet(() -> {
@@ -101,7 +97,7 @@ public class PigeonholeManager {
 
     public void rename(Address.Pigeonhole oldAddress, Address.Pigeonhole newAddress) {
         byAddress(oldAddress)
-              .ifPresent(data -> {
+              .ifPresent(oldData -> {
                   level.getEnvelopeContext().getDefaultAddresses().get()
                         .entrySet()
                         .stream()
@@ -110,11 +106,12 @@ public class PigeonholeManager {
                         .toList()
                         .forEach(uuid -> level.getEnvelopeContext().getDefaultAddresses().set(uuid, newAddress));
 
-                  PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail());
+                  PigeonholeData newData = new PigeonholeData(newAddress, oldData.getPos(), oldData.getMail());
+                  oldData.invalidate();
 
                   data().getPigeonholes().remove(oldAddress);
                   data().getPigeonholes().put(newAddress, newData);
-                  LOGGER.debug("Renamed Pigeonhole '{}'@[{}] to '{}'", data.getAddress().id(), data.getPos().toShortString(), newAddress.id());
+                  LOGGER.debug("Renamed Pigeonhole '{}'@[{}] to '{}'", oldData.getAddress().id(), oldData.getPos().toShortString(), newAddress.id());
 
                   data().setDirty();
               });
@@ -127,6 +124,8 @@ public class PigeonholeManager {
     public Set<Address.Pigeonhole> getAllAddresses() {
         return data().getPigeonholes().keySet();
     }
+
+    // --
 
     public Optional<PigeonholeData> byAddress(Address.Pigeonhole address) {
         return Optional.ofNullable(data().getPigeonholes().get(address));
@@ -145,48 +144,10 @@ public class PigeonholeManager {
         return byAddress(address).map(PigeonholeData::getPos);
     }
 
-    public List<ItemStack> getAllMail(Address.Pigeonhole address) {
-        return byAddress(address).map(PigeonholeData::getMail).orElse(Collections.emptyList());
-    }
-
-    public boolean putMail(Address.Pigeonhole address, ItemStack mail) {
-        if (mail.isEmpty()) {
-            LOGGER.warn("Trying to insert empty mail at '{}'", address);
-            return false;
-        }
-
-        return byAddress(address)
-              .map(data -> {
-                  mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());
-                  data.getMail().add(mail);
-                  data().setDirty();
-                  return true;
-              })
-              .orElse(false);
-    }
-
-    public Result<ItemStack> removeMailById(Address.Pigeonhole address, MailId id) {
-        return byAddress(address)
-              .map(data -> {
-                  @Nullable Result<ItemStack> result = null;
-                  ListIterator<ItemStack> iterator = data.getMail().listIterator();
-                  while (iterator.hasNext()) {
-                      ItemStack mail = iterator.next();
-                      if (id.matches(mail)) {
-                          iterator.remove();
-                          result = Result.success(mail);
-                          data().setDirty();
-                          break;
-                      }
-                  }
-
-                  if (result == null) {
-                      result = Result.failure(new Failure("Mail with mailId '" + id.toString()
-                            + "' is not found in pigeonhole '" + address + "'."));
-                  }
-
-                  return result;
-              })
-              .orElseGet(() -> Result.failure(new Failure("No mailbox with address '" + address + "' exists.")));
+    public Optional<PigeonholeBlockEntity> getBlockEntityOf(Address.Pigeonhole address) {
+        return getPositionOf(address)
+              .flatMap(pos -> level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+                    ? Optional.of(blockEntity)
+                    : Optional.empty());
     }
 }

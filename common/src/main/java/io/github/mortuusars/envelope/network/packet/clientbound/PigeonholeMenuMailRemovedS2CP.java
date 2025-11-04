@@ -36,8 +36,7 @@ public record PigeonholeMenuMailRemovedS2CP(MailId mailId) implements Packet {
             return false;
         }
 
-        pigeonholeMenu.getMail().removeIf(stack -> MailId.from(stack).map(id -> id.matches(mailId)).orElse(false));
-
+        pigeonholeMenu.getMail().removeIf(mailId::matches);
         return true;
     }
 }

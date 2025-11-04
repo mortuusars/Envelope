@@ -37,4 +37,24 @@ public class Mail {
               .withMessage(Component.translatable("gui.envelope.mail.log.returned.recipient_not_found")));
         return mail;
     }
+
+    // --
+
+    public static ItemStack stripInboxData(ItemStack mail) {
+        if (mail.isEmpty()) {
+            return mail;
+        }
+
+        mail.remove(Envelope.DataComponents.MAIL_ID);
+        mail.remove(Envelope.DataComponents.MAIL_STATUS);
+        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
+        mail.remove(Envelope.DataComponents.MAIL_TRAVEL_DURATION);
+
+        if (!mail.is(Envelope.Tags.Items.MAILABLE)) {
+            mail.remove(Envelope.DataComponents.MAIL_SENDER);
+            mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+        }
+
+        return mail;
+    }
 }
