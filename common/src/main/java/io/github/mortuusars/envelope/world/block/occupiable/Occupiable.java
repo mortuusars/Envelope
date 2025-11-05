@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +92,7 @@ public interface Occupiable {
         entity.save(tag);
         cleanupEntityTag(tag);
         getOccupants().add(new Occupant(CustomData.of(tag), getFirstFreeSlotForOccupant(),
-            getMinimumTicksInsideForOccupant(entity), 0).toMutable());
+              getMinimumTicksInsideForOccupant(entity), 0).toMutable());
 
         entity.level().gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, state));
 
@@ -148,10 +149,21 @@ public interface Occupiable {
         return entity;
     }
 
-    default void releaseAllOccupants(Level level, BlockPos pos, BlockState state, ReleaseReason reason) {
-        if (getOccupants().removeIf(occupant -> releaseOccupant(level, pos, state, occupant.toImmutable(), reason).isPresent())) {
+    default List<Entity> releaseAllOccupants(Level level, BlockPos pos, BlockState state, ReleaseReason reason) {
+        List<Entity> releasedEntities = new ArrayList<>();
+
+        getOccupants().removeIf(occupant ->
+              releaseOccupant(level, pos, state, occupant.toImmutable(), reason)
+              .map(entity -> {
+                  releasedEntities.add(entity);
+                  return true;
+              }).orElse(false));
+
+        if (!releasedEntities.isEmpty()) {
             onOccupantsChanged();
         }
+
+        return releasedEntities;
     }
 
     default void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
@@ -206,19 +218,19 @@ public interface Occupiable {
     default void loadOccupiable(CompoundTag tag, HolderLookup.Provider registries) {
         getOccupants().clear();
         Occupant.LIST_CODEC
-            .parse(NbtOps.INSTANCE, tag.get(getSerializedOccupantsName()))
-            .resultOrPartial(error -> Envelope.LOGGER.error("Failed to parse occupants: '{}'", error))
-            .map(list -> list.stream().map(Occupant::toMutable).toList())
-            .ifPresent(list -> getOccupants().addAll(list));
+              .parse(NbtOps.INSTANCE, tag.get(getSerializedOccupantsName()))
+              .resultOrPartial(error -> Envelope.LOGGER.error("Failed to parse occupants: '{}'", error))
+              .map(list -> list.stream().map(Occupant::toMutable).toList())
+              .ifPresent(list -> getOccupants().addAll(list));
     }
 
     // --
 
     default int getFirstFreeSlotForOccupant() {
         List<Integer> slots = getImmutableOccupants().stream()
-            .map(Occupant::slot)
-            .sorted()
-            .toList();
+              .map(Occupant::slot)
+              .sorted()
+              .toList();
 
         int slot = 0;
         while (true) {

@@ -33,10 +33,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -62,6 +64,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     protected @Nullable Address.Pigeonhole address;
     protected @Nullable PigeonholeData data;
+    protected @Nullable UUID owner;
     protected boolean updatedAfterLoading;
 
     protected PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -89,6 +92,22 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         this.address = address;
         this.data = null; // Force re-query
         setChanged();
+    }
+
+    // -- Owner
+
+    public Optional<Player> getOwner() {
+        if (owner == null || level == null) return Optional.empty();
+        for (Player player : level.players()) {
+            if (player.getUUID().equals(owner)) {
+                return Optional.of(player);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public void setOwner(@Nullable UUID owner) {
+        this.owner = owner;
     }
 
     // -- Mail
@@ -156,6 +175,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         if (!updatedAfterLoading) {
             setChanged();
             updatedAfterLoading = true;
+        }
+
+        if (!getOccupants().isEmpty()
+              && (level.getGameTime() + pos.hashCode()) % 20 == 0
+              && CampfireBlock.isSmokeyPos(level, pos)) {
+            releaseAllOccupants(level, pos, state, ReleaseReason.EMERGENCY);
         }
 
         tickOccupants(level, pos, state);
@@ -455,23 +480,19 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.loadAllItems(tag, items, registries);
-
-        if (tag.contains("address", Tag.TAG_STRING)) {
-            address = new Address.Pigeonhole(tag.getString("address"));
-            data = null;
-        }
-
+        address = tag.contains("address", Tag.TAG_STRING) ? new Address.Pigeonhole(tag.getString("address")) : null;
+        data = null; // Force re-query
+        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         loadOccupiable(tag, registries);
+
         updateBlockStateIfNeeded();
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.saveAllItems(tag, items, registries);
-        if (address != null) {
-            tag.putString("address", address.id());
-        }
-
+        if (address != null) tag.putString("address", address.id());
+        if (owner != null) tag.putUUID("owner", owner);
         saveOccupiable(tag, registries);
     }
 

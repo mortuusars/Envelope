@@ -239,7 +239,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         if (!delivery.getMail().isEmpty()) {
             //TODO: COD mail should not drop probably
-            spawnAtLocation(delivery.getMail());
+            spawnAtLocation(Mail.stripInboxData(delivery.getMail()));
             delivery.setMail(ItemStack.EMPTY);
         }
     }

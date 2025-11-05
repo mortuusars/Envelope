@@ -288,6 +288,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
             }
 
             blockEntity.setAddress(new Address.Pigeonhole(addressId));
+            blockEntity.setOwner(player.getUUID());
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
 
             boolean hasChanged = currentAddress.isEmpty() || !currentAddress.get().matches(addressId);
