@@ -378,7 +378,9 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Override
     public void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
-        if (!(entity instanceof Pigeon pigeon) || !(level instanceof ServerLevel serverLevel)) return;
+        if (reason == ReleaseReason.EMERGENCY) return;
+        if (!(entity instanceof Pigeon pigeon)) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
 
         pigeon.releasedFromPigeonhole(getBlockPos(), getBlockState(), reason); // Calling before mail sending to set home pos etc
 
@@ -400,10 +402,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         float wasteChance = getWasteIncreaseChanceOnRelease(entity);
-
-        if (reason != ReleaseReason.EMERGENCY
-              && getBlockState().getBlock() instanceof PigeonholeBlock block
-              && level.random.nextFloat() < wasteChance) {
+        if (getBlockState().getBlock() instanceof PigeonholeBlock block && level.random.nextFloat() < wasteChance) {
             block.addWaste(level, getBlockPos(), getBlockState());
             setChanged();
         }
