@@ -246,7 +246,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
                 player.setItemInHand(hand, result);
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+            return ItemInteractionResult.SUCCESS;
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);

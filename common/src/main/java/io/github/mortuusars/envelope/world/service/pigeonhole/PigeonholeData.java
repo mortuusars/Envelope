@@ -24,7 +24,7 @@ public class PigeonholeData {
     private final BlockPos pos;
     private final List<ItemStack> mail;
     private boolean valid = true;
-    private boolean dirty;
+    private boolean dirty = true;
 
     public PigeonholeData(Address.Pigeonhole address, BlockPos pos, List<ItemStack> mail) {
         this.address = address;
@@ -44,12 +44,16 @@ public class PigeonholeData {
         return pos;
     }
 
+    /**
+     * This method is not suitable for outside modification (at least without calling {@link PigeonholeData#setDirty()})
+     * Use dedicated methods to add/remove mail.
+     */
     public List<ItemStack> getMail() {
         return mail;
     }
 
     public boolean hasMail() {
-        return !mail.isEmpty();
+        return !getMail().isEmpty();
     }
 
     public void insertMail(ItemStack mail) {
@@ -57,7 +61,7 @@ public class PigeonholeData {
             if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
                 mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());
             }
-            this.mail.add(mail);
+            getMail().add(mail);
             setDirty();
         }
     }
@@ -65,7 +69,7 @@ public class PigeonholeData {
     public ItemStack extractMail(MailId id) {
         ItemStack result = ItemStack.EMPTY;
 
-        ListIterator<ItemStack> iterator = this.mail.listIterator();
+        ListIterator<ItemStack> iterator = getMail().listIterator();
         while (iterator.hasNext()) {
             ItemStack mail = iterator.next();
             if (id.matches(mail)) {
@@ -84,8 +88,8 @@ public class PigeonholeData {
             return Collections.emptyList();
         }
 
-        List<ItemStack> mail = new ArrayList<>(this.mail);
-        this.mail.clear();
+        List<ItemStack> mail = new ArrayList<>(getMail());
+        getMail().clear();
         setDirty();
         return mail;
     }
@@ -97,7 +101,11 @@ public class PigeonholeData {
     }
 
     public void invalidate() {
-        valid = false;
+        setValid(false);
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 
     // --

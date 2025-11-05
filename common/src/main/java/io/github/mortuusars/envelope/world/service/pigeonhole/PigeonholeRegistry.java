@@ -44,7 +44,7 @@ public class PigeonholeRegistry extends SavedData {
 
     @Override
     public boolean isDirty() {
-        return getPigeonholes().values().stream().anyMatch(PigeonholeData::isDirty);
+        return super.isDirty() || getPigeonholes().values().stream().anyMatch(PigeonholeData::isDirty);
     }
 
     @Override

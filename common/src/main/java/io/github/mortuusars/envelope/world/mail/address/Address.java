@@ -36,6 +36,10 @@ public interface Address {
     String id();
     MutableComponent getDisplayName();
 
+    default boolean matches(Address address) {
+        return matches(address.getDisplayName().getString());
+    }
+
     default boolean matches(String name) {
         return id().equalsIgnoreCase(name);
     }

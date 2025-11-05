@@ -27,7 +27,7 @@ public class PigeonholeMailReceiver implements MailReceiver {
                   blockEntity.insertMail(mail);
                   return ItemStack.EMPTY;
               })
-              .orElseGet(() -> pigeonholeManager.byAddress(address)
+              .orElseGet(() -> pigeonholeManager.getData(address)
                     .map(data -> {
                         MailDeliveryLog.addRecords(mail, MailDeliveryLog.Record.arrivedTo(address).atTime(level.getGameTime()));
                         data.insertMail(mail);

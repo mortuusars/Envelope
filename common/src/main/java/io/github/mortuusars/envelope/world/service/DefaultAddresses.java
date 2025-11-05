@@ -11,7 +11,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -49,6 +48,11 @@ public class DefaultAddresses extends SavedData {
         if (map.entrySet().removeIf(entry -> entry.getValue().equals(address))) {
             setDirty();
         }
+    }
+
+    public void update(Address.Pigeonhole oldAddress, Address.Pigeonhole newAddress) {
+        map.replaceAll((uuid, address) -> address.matches(oldAddress) ? newAddress : address);
+        setDirty();
     }
 
     public Optional<Address.Pigeonhole> of(UUID uuid) {

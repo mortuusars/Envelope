@@ -12,7 +12,6 @@ import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
-import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.component.MailId;
@@ -53,10 +52,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements Occupiable {
-    public static final int SLOTS = 3;
-    public static final int SLOT_INBOX = 0;
-    public static final int SLOT_FOOD = 1;
-    public static final int SLOT_MAIL = 2;
+    public static final int SLOTS = 2;
+    public static final int SLOT_FOOD = 0;
+    public static final int SLOT_MAIL = 1;
+    public static final int SLOT_INBOX = 2;
 
     protected List<Occupant.Mutable> occupants = new ArrayList<>();
     protected NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
@@ -84,24 +83,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             return;
         }
 
-        if (getLevel() instanceof ServerLevel serverLevel) {
-            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopeContext().getPigeonholeManager();
-
-            if (this.address != null) {
-                dropOrReturnAllMail();
-                pigeonholeManager.remove(this.address);
-            }
-
-            pigeonholeManager.register(address, getBlockPos());
-        }
+        ifAddressed((level, address_, data) ->
+              dropOrReturnAllMail());
 
         this.address = address;
+        this.data = null; // Force re-query
         setChanged();
-    }
-
-    protected void ensureAddressCorrectness() {
-        if (address == null || !(level instanceof ServerLevel serverLevel)) return;
-        address = serverLevel.getEnvelopeContext().getPigeonholeManager().correctOrRegister(address, getBlockPos());
     }
 
     // -- Mail
@@ -111,7 +98,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         if (level instanceof ServerLevel serverLevel) {
             if (data == null || !data.stillValid()) {
-                data = serverLevel.getEnvelopeContext().getPigeonholeManager().byAddress(address).orElse(null);
+                data = serverLevel.getEnvelopeContext().getPigeonholeManager().getOrRegister(address, getBlockPos());
+                address = data.getAddress(); // Update address to correct and registered value
             }
         }
 
@@ -142,8 +130,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         ifAddressed((level, address, data) -> {
             List<ItemStack> allMail = data.extractAllMail();
 
-            NonNullList<ItemStack> items = allMail.stream().collect(Collectors.toCollection(NonNullList::create));
-            Containers.dropContents(level, getBlockPos(), items);
+            NonNullList<ItemStack> itemsToDrop = allMail.stream()
+                  .filter(this::isExtractable)
+                  .map(Mail::stripInboxData)
+                  .collect(Collectors.toCollection(NonNullList::create));
+
+            Containers.dropContents(level, getBlockPos(), itemsToDrop);
 
             PigeonholeMenu.playersWithMenu(level, address).forEach(player ->
                   Packets.sendToClient(new PigeonholeMenuMailS2CP(Collections.emptyList()), player));
@@ -182,12 +174,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             Containers.dropItemStack(getLevelOrThrow(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), stack);
         });
 
-        if (address != null && getLevel() instanceof ServerLevel serverLevel) {
-            PigeonholeManager pigeonholeManager = serverLevel.getEnvelopeContext().getPigeonholeManager();
+        ifAddressed((level, address, data) -> {
             dropOrReturnAllMail();
-            pigeonholeManager.remove(address);
-            address = null;
-        }
+            level.getEnvelopeContext().getPigeonholeManager().remove(address);
+            this.data = null;
+            this.address = null;
+        });
     }
 
     @Override
@@ -199,10 +191,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         updateBlockStateIfNeeded();
         super.setChanged();
 
-        if (level instanceof ServerLevel serverLevel
-              && serverLevel.players().stream()
-              .anyMatch(pl -> pl.containerMenu instanceof PigeonholeMenu menu
-                    && menu.getAddress().equals(address))) {
+        if (level instanceof ServerLevel serverLevel && !PigeonholeMenu.playersWithMenu(serverLevel, address).isEmpty()) {
             serverLevel.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
     }
@@ -224,7 +213,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Override
     public int getContainerSize() {
-        return address != null ? SLOTS : 0;
+        return address != null ? SLOTS + 1 : 0; // +1 for inbox
     }
 
     @Override
@@ -311,8 +300,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             Envelope.LOGGER.error("Cannot open Pigeonhole: it doesn't have an address.");
             return false;
         }
-
-        ensureAddressCorrectness();
 
         // Forces sync of be data to the client
         player.level().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
@@ -471,11 +458,10 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         if (tag.contains("address", Tag.TAG_STRING)) {
             address = new Address.Pigeonhole(tag.getString("address"));
+            data = null;
         }
 
         loadOccupiable(tag, registries);
-
-        ensureAddressCorrectness();
         updateBlockStateIfNeeded();
     }
 

@@ -59,17 +59,6 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         this.blockEntity = be;
         this.mail = new ArrayList<>(mail.reversed());
 
-        addSlot(new Slot(be, PigeonholeBlockEntity.SLOT_INBOX, -999, -999) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return false;
-            }
-
-            @Override
-            public boolean mayPickup(Player player) {
-                return false;
-            }
-        });
         addSlot(new Slot(be, PigeonholeBlockEntity.SLOT_FOOD, 227, 62) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -306,7 +295,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         return false;
     }
 
-    public static List<ServerPlayer> playersWithMenu(ServerLevel level, Address.Pigeonhole address) {
+    public static List<ServerPlayer> playersWithMenu(ServerLevel level, @Nullable Address.Pigeonhole address) {
         return level.players().stream()
               .filter(pl -> pl.containerMenu instanceof PigeonholeMenu menu && menu.getAddress().equals(address))
               .toList();

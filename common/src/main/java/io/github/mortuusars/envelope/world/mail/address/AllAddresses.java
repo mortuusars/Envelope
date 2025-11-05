@@ -28,6 +28,14 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
     }
 
     public boolean isKnown(Address address) {
-        return stream().anyMatch(a -> a.matches(address.id()));
+        return stream().anyMatch(a -> a.matches(address));
+    }
+
+    public boolean isKnownOfType(Address address, Address.Type type) {
+        return switch (type) {
+            case PIGEONHOLE -> pigeonholes.stream().anyMatch(a -> a.matches(address));
+            case PLAYER -> players.stream().anyMatch(a -> a.matches(address));
+            case ENTITY -> entities.stream().anyMatch(a -> a.matches(address));
+        };
     }
 }
