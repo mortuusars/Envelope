@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.mail.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.mail.PlayerMailReceiver;
@@ -35,6 +36,14 @@ public interface Address {
     Type type();
     String id();
     MutableComponent getDisplayName();
+
+    default String getName() {
+        return getDisplayName().getString();
+    }
+
+    default String getString() {
+        return AddressDisplay.getIcon(this) + EnvelopeSymbols.SMALL_SPACE + getName();
+    }
 
     default boolean matches(Address address) {
         return matches(address.getDisplayName().getString());

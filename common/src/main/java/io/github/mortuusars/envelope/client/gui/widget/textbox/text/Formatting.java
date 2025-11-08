@@ -108,6 +108,14 @@ public record Formatting(@Nullable Color color, EnumSet<Format> format) {
         return new Formatting(color, EnumSet.copyOf(format));
     }
 
+    public String apply(String text) {
+        StringBuilder sb = new StringBuilder();
+        append(sb);
+        sb.append(text);
+        RESET.append(sb);
+        return sb.toString();
+    }
+
     public enum Color implements Type {
         BLACK("black", '0'),
         DARK_BLUE("dark_blue", '1'),

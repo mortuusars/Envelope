@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
-import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
+import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
 import io.github.mortuusars.envelope.world.mail.address.validation.AddressValidator;
@@ -55,11 +55,9 @@ public class EnvelopeCommand {
         ItemStack mail = item.createItemStack(1, false);
 
         try {
-            BackgroundCourier courier = BackgroundCourier.virtual();
-            courier.startDelivery(level, mail);
-            level.getEnvelopeContext().getBackgroundDelivery().add(courier);
+            Courier courier = level.getEnvelopeContext().startDelivery(mail);
             Component senderName = courier.getDelivery()
-                  .map(d -> d.getSenderAddress().getDisplayName().withStyle(Style.EMPTY.withColor(AddressDisplay.SENDER_COLOR)))
+                  .map(d -> d.getSender().getDisplayName().withStyle(Style.EMPTY.withColor(AddressDisplay.SENDER_COLOR)))
                   .orElse(Component.empty());
             context.getSource().sendSuccess(() ->
                   Component.literal("Mail sent to ").append(senderName), true);

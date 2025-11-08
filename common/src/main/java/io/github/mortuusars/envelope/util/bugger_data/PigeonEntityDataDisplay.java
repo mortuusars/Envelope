@@ -18,10 +18,10 @@ public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataD
         if (pigeon.getDelivery().isPresent()) {
             Delivery delivery = pigeon.getDelivery().get();
             lines.add(Component.empty()
-                  .append(delivery.getSenderAddress().getDisplayName())
+                  .append(delivery.getSender().getDisplayName())
                   .append(" → ")
-                  .append(delivery.getRecipientAddress().getDisplayName()));
-            lines.add(line(WordUtils.capitalize(delivery.getPhase().getType().getSerializedName().replace('_', ' '))));
+                  .append(delivery.getRecipient().getDisplayName()));
+            lines.add(line(delivery.getCurrentPhase().toPrettyString()));
         } else {
             PigeonholeHandler handler = pigeon.getPigeonholeHandler();
             if (handler.wantsToEnterPigeonhole(entity.level())) {

@@ -6,7 +6,6 @@ import io.github.mortuusars.envelope.util.bugger.data.EntityData;
 import io.github.mortuusars.envelope.util.bugger.data.OptionalEntityData;
 import io.github.mortuusars.envelope.util.bugger.data.NbtData;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.RealCourier;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import org.slf4j.Logger;
@@ -40,8 +39,8 @@ public class Bugger {
     public static final OptionalEntityData<Delivery> PIGEON_DELIVERY =
           new OptionalEntityData<>(Envelope.resource("pigeon_delivery"), Delivery.CODEC)
                 .handle((entity, delivery) -> {
-                    if (entity instanceof RealCourier courier) {
-                        courier.setDelivery(delivery);
+                    if (entity instanceof Pigeon pigeon) {
+                        pigeon.setDelivery(delivery.orElse(null));
                     }
                 });
 }

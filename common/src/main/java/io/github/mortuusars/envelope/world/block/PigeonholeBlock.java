@@ -276,7 +276,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return;
         }
 
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+        if (level instanceof ServerLevel serverLevel && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             Optional<Address.Pigeonhole> currentAddress = blockEntity.getAddress();
 
             PigeonholeAddressValidator validator = new PigeonholeAddressValidator(player, currentAddress.map(Address.class::cast));
@@ -287,12 +287,15 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 return;
             }
 
-            blockEntity.setAddress(new Address.Pigeonhole(addressId));
+            Address.Pigeonhole address = new Address.Pigeonhole(addressId);
+            blockEntity.setAddress(address);
             blockEntity.setOwner(player.getUUID());
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
 
             boolean hasChanged = currentAddress.isEmpty() || !currentAddress.get().matches(addressId);
             if (hasChanged) {
+                serverLevel.getEnvelopeContext().getPigeonholeManager().getOrRegister(address, pos);
+
                 if (!player.isCreative()) {
                     player.getInventory().getItem(slot).shrink(1);
                     player.giveExperienceLevels(-Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get());

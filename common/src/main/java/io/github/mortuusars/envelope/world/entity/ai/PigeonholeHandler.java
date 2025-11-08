@@ -161,4 +161,15 @@ public class PigeonholeHandler {
         setCurrentPos(null);
         resetLocateCooldown();
     }
+
+    @Override
+    public String toString() {
+        return "PigeonholeHandler{" +
+              "currentPos=" + currentPos +
+              ", lastReleasePos=" + lastReleasePos +
+              ", locateCooldown=" + locateCooldown +
+              ", wantCooldown=" + wantCooldown +
+              ", enterCooldown=" + enterCooldown +
+              '}';
+    }
 }

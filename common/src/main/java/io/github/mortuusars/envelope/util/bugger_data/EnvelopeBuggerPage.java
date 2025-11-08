@@ -2,7 +2,10 @@ package io.github.mortuusars.envelope.util.bugger_data;
 
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.util.bugger.page.BuggerPage;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,13 +18,31 @@ public class EnvelopeBuggerPage implements BuggerPage {
     @Override
     public List<String> getLeftLines() {
         return Bugger.ENVELOPE.get()
-              .map(tag -> List.of(
-                    "Pigeonholes: " + tag.getInt("pigeonholes"),
-                    "",
-                    "Delivering Pigeons: " + tag.getInt("delivering_pigeons"),
-                    "Background Delivering Pigeons: " + tag.getInt("background_delivering_pigeons"),
-                    "Background Pigeons (Waiting For Spawn): " + tag.getInt("background_finished_pigeons")
-              ))
+              .map(tag -> {
+                  int realPigeons = tag.getInt("delivering_pigeons");
+                  int backgroundPigeons = tag.getInt("background_delivering_pigeons");
+                  int backgroundFinishedPigeons = tag.getInt("background_finished_pigeons");
+
+                  List<String> lines = new ArrayList<>(List.of(
+                        "Pigeonholes: " + tag.getInt("pigeonholes"),
+                        "",
+                        "Couriers:",
+                        "  Real: " + realPigeons,
+                        "  Background: " + backgroundPigeons,
+                        "  Finished: " + backgroundFinishedPigeons,
+                        ""
+                  ));
+
+                  ListTag deliveries = tag.getList("deliveries", Tag.TAG_STRING);
+                  if (!deliveries.isEmpty()) {
+                      lines.add("Deliveries:");
+                      for (Tag delivery : deliveries) {
+                          lines.add("  " + delivery.getAsString());
+                      }
+                  }
+
+                  return lines;
+              })
               .orElse(Collections.emptyList());
     }
 }

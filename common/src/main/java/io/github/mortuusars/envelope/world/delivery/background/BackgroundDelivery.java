@@ -1,18 +1,15 @@
-package io.github.mortuusars.envelope.world.service;
+package io.github.mortuusars.envelope.world.delivery.background;
 
-import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.delivery.BackgroundCourier;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -22,47 +19,69 @@ public class BackgroundDelivery extends SavedData {
     public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           Codec.list(BackgroundCourier.CODEC)
                 .optionalFieldOf("couriers", Collections.emptyList())
-                .forGetter(BackgroundDelivery::getCouriers)
+                .forGetter(BackgroundDelivery::getCouriers),
+          Codec.list(FinishedBackgroundCourier.CODEC)
+                .optionalFieldOf("finished_couriers", Collections.emptyList())
+                .forGetter(BackgroundDelivery::getFinishedCouriers)
     ).apply(instance, BackgroundDelivery::new));
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final List<BackgroundCourier> couriers;
+    protected final List<FinishedBackgroundCourier> finishedCouriers;
 
-    public BackgroundDelivery(List<BackgroundCourier> couriers) {
+    public BackgroundDelivery(List<BackgroundCourier> couriers, List<FinishedBackgroundCourier> finishedCouriers) {
         this.couriers = new ArrayList<>(couriers);
+        this.finishedCouriers = finishedCouriers;
     }
 
     public BackgroundDelivery() {
         this.couriers = new ArrayList<>();
+        this.finishedCouriers = new ArrayList<>();
     }
 
     public List<BackgroundCourier> getCouriers() {
         return couriers;
     }
 
-    public void add(BackgroundCourier courier) {
-        Preconditions.checkArgument(courier.isDelivering(), "Courier must be delivering mail.");
+    public List<FinishedBackgroundCourier> getFinishedCouriers() {
+        return finishedCouriers;
+    }
+
+    public void addCourier(BackgroundCourier courier) {
         couriers.add(courier);
         setDirty();
     }
 
-    public void tick(ServerLevel level) {
-        couriers.removeIf(courier -> {
-            if (courier.canBeRemoved()) {
-                if (Envelope.debug()) LOGGER.info("{} has been removed.", courier.getName().getString());
-                return true;
-            }
-            courier.tick(level);
-            return courier.trySpawn(level).isPresent();
-        });
+    public void removeCourier(BackgroundCourier courier) {
+        if (couriers.remove(courier)) {
+            setDirty();
+        }
+    }
 
+    public void addFinishedCourier(FinishedBackgroundCourier courier) {
+        finishedCouriers.add(courier);
         setDirty();
+    }
+
+    public void removeFinishedCourier(FinishedBackgroundCourier courier) {
+        if (finishedCouriers.remove(courier)) {
+            setDirty();
+        }
+    }
+
+    public void tick(ServerLevel level) {
+        couriers.removeIf(courier -> courier.tick(level));
     }
 
     // -- Save / Load
 
     public static BackgroundDelivery get(ServerLevel level, String name) {
         return level.getDataStorage().computeIfAbsent(factory(), name);
+    }
+
+    @Override
+    public boolean isDirty() {
+        return !couriers.isEmpty() || super.isDirty();
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {

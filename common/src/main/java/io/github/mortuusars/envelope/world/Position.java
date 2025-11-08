@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -8,8 +9,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class Position {
     public static Vec3 lerp(BlockPos origin, BlockPos target, double delta) {
@@ -21,11 +26,11 @@ public class Position {
 
     public static Optional<BlockPos> ofAddress(ServerLevel level, Address address) {
         return address.map(
-            pigeonhole -> level.getEnvelopeContext().getPigeonholeManager().getPositionOf(pigeonhole),
-            player -> level.getEnvelopeContext().getKnownPlayers().getUuid(player)
-                  .flatMap(uuid -> level.getEnvelopeContext().getDefaultAddresses().of(uuid))
-                  .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
-            npc -> Optional.empty());
+              pigeonhole -> level.getEnvelopeContext().getPigeonholeManager().getPositionOf(pigeonhole),
+              player -> level.getEnvelopeContext().getKnownPlayers().getUuid(player)
+                    .flatMap(uuid -> level.getEnvelopeContext().getDefaultAddresses().of(uuid))
+                    .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
+              entity -> Optional.empty());
     }
 
     public static BlockPos towardsDirection(BlockPos origin, BlockPos target, double distance) {
@@ -45,9 +50,9 @@ public class Position {
 
     public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance) {
         BlockPos pos = target
-            .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
-            .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
-            .above(distance);
+              .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
+              .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
+              .above(distance);
 
         int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ()) + 5;
 
@@ -60,5 +65,53 @@ public class Position {
 
     public static Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> origin, Optional<BlockPos> target, int distance) {
         return origin.map(pos -> ascendTowards(level, pos, target, distance));
+    }
+
+    public static boolean isInSafeSimulationDistance(ServerLevel level, BlockPos pos) {
+        if (!level.isLoaded(pos)) {
+            return false;
+        }
+        int simDistance = level.getServer().getPlayerList().getSimulationDistance();
+        int range = simDistance - 1; // Reduce by 1 chunk to be safe.
+        return level.players().stream().anyMatch(player -> {
+            double dx = Math.abs(pos.getX() - player.getX()) / 16.0;
+            double dz = Math.abs(pos.getZ() - player.getZ()) / 16.0;
+            return Math.max(dx, dz) <= range;
+        });
+    }
+
+    public static @Nullable BlockPos findNearbyHeightmapSpawnPosition(ServerLevel level, BlockPos pos, int altitude) {
+        double lowestDistance = Double.MAX_VALUE;
+        @Nullable BlockPos closestRandomPos = null;
+
+        for (int i = 0; i < 5; i++) {
+            BlockPos randomPos = aboveGround(level, level.getBlockRandomPos(pos.getX(), pos.getY(), pos.getZ(), 15), altitude);
+
+            if (Position.isInSafeSimulationDistance(level, randomPos)) {
+                double distance = randomPos.distSqr(pos);
+
+                if (distance < lowestDistance) {
+                    lowestDistance = distance;
+                    closestRandomPos = randomPos;
+                }
+            }
+        }
+
+        if (closestRandomPos != null) {
+            return closestRandomPos;
+        }
+
+        BlockPos blockPos = aboveGround(level, pos, altitude);
+        if (Position.isInSafeSimulationDistance(level, blockPos)) {
+            return blockPos;
+        }
+
+        return null;
+    }
+
+    public static BlockPos aboveGround(Level level, BlockPos pos, int altitude) {
+        int heightmapY = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY();
+        int y = Math.max(pos.getY(), heightmapY + altitude);
+        return pos.atY(y);
     }
 }
