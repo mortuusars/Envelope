@@ -9,6 +9,12 @@ public interface DeliveryHandler {
     void endDelivery(ServerLevel level, Delivery delivery);
 
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
+        if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT
+              && !level.getEnvelopeContext().getKnownAddresses().isKnown(delivery.getRecipient())) {
+            delivery.setMail(Mail.returnedRecipientNotFound(delivery.getMail()));
+            return DeliveryPhase.APPROACHING_SENDER;
+        }
+
         return currentPhase.hasNext() ? currentPhase.next(delivery.getRoute().canSkipTraveling()) : currentPhase;
     }
 

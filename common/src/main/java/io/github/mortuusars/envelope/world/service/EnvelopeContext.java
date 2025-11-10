@@ -107,11 +107,11 @@ public class EnvelopeContext {
 
                 ListTag deliveries = Stream.concat(pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
                             backgroundCouriers.stream().map(BackgroundCourier::delivery))
-                      .map(delivery ->
-                            StringTag.valueOf("§b" + delivery.getSender().getString() + "§r "
-                                  + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT
-                                  + " §a" + delivery.getRecipient().getString() + "§r - "
-                            + delivery.getCurrentPhase().toPrettyString()))
+                      .map(delivery -> StringTag.valueOf(
+                            ChatFormatting.AQUA + delivery.getSender().getString() + ChatFormatting.RESET +
+                                  " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
+                                  ChatFormatting.GREEN + delivery.getRecipient().getString() + ChatFormatting.RESET +
+                                  " // " + delivery.getCurrentPhase().toPrettyString()))
                       .collect(Collectors.toCollection(ListTag::new));
 
                 tag.put("deliveries", deliveries);
