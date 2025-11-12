@@ -54,8 +54,6 @@ public class Envelope {
     public static final String ID = "envelope";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final MailEntities MAIL_ENTITIES = new MailEntities();
-
     public static void init() {
         Bugger.enabler = () -> Config.Server.SPEC.isLoaded() && Config.Server.DEBUG.get();
 
@@ -72,8 +70,6 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
-
-        MAIL_ENTITIES.register(new VillagerMailEntity(new Address.Entity("Villager")));
     }
 
     /**

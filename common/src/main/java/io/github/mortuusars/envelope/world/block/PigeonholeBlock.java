@@ -227,7 +227,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().getKnownAddresses();
+                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().addresses().getAll();
                 Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
             }
             return ItemInteractionResult.SUCCESS;

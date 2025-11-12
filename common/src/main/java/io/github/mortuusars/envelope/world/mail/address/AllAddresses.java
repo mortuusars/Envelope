@@ -15,6 +15,18 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
             AllAddresses::new
     );
 
+    public static AllAddresses pigeonholes(Set<Address.Pigeonhole> addresses) {
+        return new AllAddresses(addresses, Collections.emptySet(), Collections.emptySet());
+    }
+
+    public static AllAddresses players(Set<Address.Player> addresses) {
+        return new AllAddresses(Collections.emptySet(), addresses, Collections.emptySet());
+    }
+
+    public static AllAddresses entities(Set<Address.Entity> addresses) {
+        return new AllAddresses(Collections.emptySet(), Collections.emptySet(), addresses);
+    }
+
     public Stream<Address> stream() {
         return Stream.of(pigeonholes, players, entities).flatMap(Set::stream);
     }

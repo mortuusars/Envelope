@@ -79,9 +79,9 @@ public final class DeliveryRoute {
 
     // --
 
-    public float getTotalDistance() {
-        if (senderPos.isEmpty() || recipientPos.isEmpty()) return Float.MAX_VALUE;
-        return (float) Math.sqrt(senderPos.get().distSqr(recipientPos.get()));
+    public int getTotalDistance() {
+        if (senderPos.isEmpty() || recipientPos.isEmpty()) return Integer.MAX_VALUE;
+        return (int)Math.sqrt(senderPos.get().distSqr(recipientPos.get()));
     }
 
     public boolean canSkipTraveling() {

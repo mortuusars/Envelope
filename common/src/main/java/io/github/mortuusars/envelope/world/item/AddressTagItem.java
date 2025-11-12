@@ -72,7 +72,7 @@ public class AddressTagItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
-            AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().getKnownAddresses();
+            AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().addresses().getAll();
             Packets.sendToClient(new OpenAddressTagScreenS2CP(usedHand, knownAddresses), serverPlayer);
             player.getCooldowns().addCooldown(this, 6);
         }

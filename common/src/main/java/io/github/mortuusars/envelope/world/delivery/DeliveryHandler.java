@@ -10,7 +10,7 @@ public interface DeliveryHandler {
 
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT
-              && !level.getEnvelopeContext().getKnownAddresses().isKnown(delivery.getRecipient())) {
+              && !level.getEnvelopeContext().addresses().getAll().isKnown(delivery.getRecipient())) {
             delivery.setMail(Mail.returnedRecipientNotFound(delivery.getMail()));
             return DeliveryPhase.APPROACHING_SENDER;
         }

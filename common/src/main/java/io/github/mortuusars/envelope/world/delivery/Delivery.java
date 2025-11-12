@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
@@ -15,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -57,9 +56,12 @@ public class Delivery {
         Preconditions.checkNotNull(sender, "Mail '" + mail + "' does not have 'envelope:mail_sender' defined.");
         @Nullable Address recipient = mail.get(Envelope.DataComponents.MAIL_RECIPIENT);
         Preconditions.checkNotNull(recipient, "Mail '" + mail + "' does not have 'envelope:mail_recipient' defined.");
-        int travelDuration = mail.getOrDefault(Envelope.DataComponents.MAIL_TRAVEL_DURATION, Config.Server.MAIL_TRAVEL_DURATION.get());
 
         DeliveryRoute route = DeliveryRoute.create(level, sender, recipient, 10);
+
+        int travelDuration = mail.getOrDefault(
+              Envelope.DataComponents.MAIL_TRAVEL_DURATION,
+              calculateTravelDuration(level, sender, recipient));
 
         return new Delivery(sender, recipient, travelDuration, mail, route, DeliveryProgress.start());
     }
@@ -70,6 +72,18 @@ public class Delivery {
               .ifError(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag, e))
               .result()
               .orElse(null);
+    }
+
+    public static int calculateTravelDuration(ServerLevel level, Address sender, Address recipient) {
+        Optional<BlockPos> senderPos = Position.ofAddress(level, sender);
+        Optional<BlockPos> recipientPos = Position.ofAddress(level, recipient);
+        int distance = senderPos.isEmpty() || recipientPos.isEmpty()
+              ? Integer.MAX_VALUE
+              : (int) Math.sqrt(senderPos.get().distSqr(recipientPos.get()));
+
+        double modifier = 1.0f;
+        double seconds = (Math.min(180, 4 + Math.sqrt(distance) * 2.5) * modifier);
+        return Ticks.fromSeconds(seconds);
     }
 
     public Address getSender() {

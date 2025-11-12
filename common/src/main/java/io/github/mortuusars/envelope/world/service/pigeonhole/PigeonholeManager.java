@@ -153,13 +153,13 @@ public class PigeonholeManager {
     // --
 
     protected boolean inUseAsPlayerOrEntity(Address.Pigeonhole address) {
-        AllAddresses knownAddresses = level.getEnvelopeContext().getKnownAddresses();
+        AllAddresses knownAddresses = level.getEnvelopeContext().addresses().getAll();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
               || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
     }
 
     protected Address.Pigeonhole uniquifyIfKnown(Address.Pigeonhole address) {
-        AllAddresses knownAddresses = level.getEnvelopeContext().getKnownAddresses();
+        AllAddresses knownAddresses = level.getEnvelopeContext().addresses().getAll();
         if (!knownAddresses.isKnown(address)) {
             return address;
         }

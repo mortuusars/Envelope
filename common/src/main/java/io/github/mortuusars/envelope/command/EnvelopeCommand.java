@@ -117,7 +117,7 @@ public class EnvelopeCommand {
             return 1;
         }
 
-        List<Validator.Issue> validate = new AddressValidator().setKnownAddresses(level.getEnvelopeContext().getKnownAddresses())
+        List<Validator.Issue> validate = new AddressValidator().setKnownAddresses(level.getEnvelopeContext().addresses().getAll())
               .validate(newAddress.id());
         if (!validate.isEmpty()) {
             context.getSource().sendFailure(Component.literal("Invalid address: ").append(validate.getFirst().translate()));
