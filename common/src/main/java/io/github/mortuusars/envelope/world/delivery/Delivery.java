@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public class Delivery {
     public static final Codec<Delivery> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -104,6 +105,12 @@ public class Delivery {
 
     public void setMail(ItemStack mail) {
         this.mail = mail;
+    }
+
+    public void updateMail(Function<ItemStack, ItemStack> updater) {
+        if (!getMail().isEmpty()) {
+            setMail(updater.apply(getMail()));
+        }
     }
 
     public DeliveryRoute getRoute() {

@@ -11,7 +11,7 @@ public interface DeliveryHandler {
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT
               && !level.getEnvelopeContext().addresses().getAll().isKnown(delivery.getRecipient())) {
-            delivery.setMail(Mail.returnedRecipientNotFound(delivery.getMail()));
+            delivery.updateMail(Mail::returnedRecipientNotFound);
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
@@ -30,7 +30,7 @@ public interface DeliveryHandler {
 
     default void phaseStarted(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         if (phase == DeliveryPhase.STARTED) {
-            delivery.setMail(Mail.sent(delivery.getMail(), level));
+            delivery.updateMail(item -> Mail.sent(item, level));
         }
     }
 
@@ -45,10 +45,10 @@ public interface DeliveryHandler {
 
         switch (phase) {
             case HANDLING_DELIVERY -> {
-                delivery.setMail(delivery.getRecipient().receiveMail(level, delivery.getMail()));
+                delivery.updateMail(mail -> delivery.getRecipient().receiveMail(level, mail));
             }
             case HANDLING_RETURN -> {
-                delivery.setMail(delivery.getSender().receiveMail(level, delivery.getMail()));
+                delivery.updateMail(mail -> delivery.getSender().receiveMail(level, mail));
             }
         }
     }

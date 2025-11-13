@@ -12,6 +12,8 @@ import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -231,12 +233,27 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         if (delivery == null) return;
 
-//        String message = damageSource.getLocalizedDeathMessage(this).getString();
-//        String carriedItem = delivery.getMailString().map(itemName -> " a " + itemName).orElse("");
-//        Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!", message,
-//              blockPosition().toShortString(), carriedItem, delivery.createSenderToRecipientComponent(" to ").getString());
+        String message = damageSource.getLocalizedDeathMessage(this).getString();
+        String carriedItem = !delivery.getMail().isEmpty()
+              ? " a " + delivery.getMail().getHoverName().getString()
+              : "";
+        String addresses = delivery.getSender().getName() + " to " + delivery.getRecipient().getName();
+
+        Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!",
+              message, blockPosition().toShortString(), carriedItem, addresses);
 
         //TODO: send pigeon death notice to sender
+//        if (delivery.getSender() instanceof Address.Pigeonhole
+//              && level.getEnvelopeContext().addresses().getAll(Address.Type.PIGEONHOLE).isKnown(delivery.getSender())) {
+//            ItemStack letter = new ItemStack(Envelope.Items.LETTER.get());
+//            letter.set(Envelope.DataComponents.LETTER_SUBJECT, "Courier Death Notice");
+//            letter.set(Envelope.DataComponents.LETTER_MESSAGE, message + " at " + "[" + blockPosition().toShortString() + "]");
+//
+//            letter.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
+//            letter.set(Envelope.DataComponents.MAIL_RECIPIENT, delivery.getSender());
+//
+//            level.getEnvelopeContext().startDelivery(letter);
+//        }
 
         if (!delivery.getMail().isEmpty()) {
             //TODO: COD mail should not drop probably

@@ -40,10 +40,9 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            if (!delivery.getMail().isEmpty()) {
-                delivery.setMail(Mail.returned(delivery.getMail(), Address.MAIL_SERVICE,
+            delivery.updateMail(mail -> Mail.returned(mail, Address.MAIL_SERVICE,
                       Component.translatable("gui.envelope.mail.log.returned.unable_to_reach")));
-            }
+
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
