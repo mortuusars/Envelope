@@ -16,8 +16,6 @@ import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.component.DataComponentType;

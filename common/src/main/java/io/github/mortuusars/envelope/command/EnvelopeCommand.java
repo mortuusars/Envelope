@@ -8,8 +8,6 @@ import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
-import io.github.mortuusars.envelope.world.mail.address.validation.AddressValidator;
-import io.github.mortuusars.envelope.world.mail.address.validation.Validator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -21,7 +19,6 @@ import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,14 +35,7 @@ public class EnvelopeCommand {
                     .then(Commands.literal("position")
                           .then(Commands.argument("address", AddressArgument.pigeonhole())
                                 .suggests(AddressSuggestions.pigeonhole())
-                                .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address")))))
-                    /*.then(Commands.literal("rename")
-                          .then(Commands.argument("address", AddressArgument.pigeonhole())
-                                .suggests(AddressSuggestions.pigeonhole())
-                                .then(Commands.argument("new_address", AddressArgument.all())
-                                      .executes(c -> renamePigeonhole(c,
-                                            AddressArgument.getPigeonhole(c, "address"),
-                                            AddressArgument.getPigeonhole(c, "new_address"))))))*/));
+                                .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address")))))));
     }
 
     // -- Mail
@@ -99,36 +89,6 @@ public class EnvelopeCommand {
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
                     () -> context.getSource().sendFailure(address.getDisplayName()
                           .append(" does not have a position associated with it.")));
-        return 0;
-    }
-
-    private static int renamePigeonhole(CommandContext<CommandSourceStack> context,
-                                        Address.Pigeonhole oldAddress, Address.Pigeonhole newAddress) {
-        ServerLevel level = context.getSource().getLevel();
-
-        if (!level.getEnvelopeContext().getPigeonholeManager().exists(oldAddress)) {
-            context.getSource().sendFailure(Component.literal("Address '"
-                  + oldAddress.getDisplayName().getString() + "' does not exist."));
-            return 1;
-        }
-
-        if (oldAddress.equals(newAddress)) {
-            context.getSource().sendFailure(Component.literal("Addresses are the same.").withStyle(ChatFormatting.RED));
-            return 1;
-        }
-
-        List<Validator.Issue> validate = new AddressValidator().setKnownAddresses(level.getEnvelopeContext().addresses().getAll())
-              .validate(newAddress.id());
-        if (!validate.isEmpty()) {
-            context.getSource().sendFailure(Component.literal("Invalid address: ").append(validate.getFirst().translate()));
-            return 1;
-        }
-
-        level.getEnvelopeContext().getPigeonholeManager().rename(oldAddress, newAddress);
-
-        context.getSource().sendSuccess(() -> Component.literal(
-              oldAddress.getDisplayName().getString() + " has been renamed to " + newAddress.id() + "."), true);
-
         return 0;
     }
 

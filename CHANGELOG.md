@@ -1,9 +1,16 @@
 # Changelog
 
 ## 0.2.0.2
+- Rewritten delivery system to fix some bugs and introduce new ones
+- Delivery travel duration is now based on distance between addresses
+  - Added config options for delivery duration
+  - Can still be overwritten with `envelope:mail_travel_duration` component on mail item itself
+- Restricted all operations to overworld only
 - Changed command `/mail send [item]` to `/envelope send [item]`
-- Added `/envelope pigeonhole [list|position|rename]`  command
-- Improvements to Bugger (Debug utility enabled with `debug.debug` server config option. Adds more info to F3 screen, more log messages, etc).
+- Added `/envelope pigeonhole [list|position]` command
+- Improvements to Bugger (Debug utility enabled with `debug.debug_mode` server config option. Adds more info to F3 screen, more log messages, etc).
+- Pigeon movement should be smoother in some cases
+- Pigeons released from Pigeonhole for emergency reasons will no longer start delivering mail as usual 
 
 ## 0.2.0.1
 - Added restrictions for items that can be placed inside a Package:

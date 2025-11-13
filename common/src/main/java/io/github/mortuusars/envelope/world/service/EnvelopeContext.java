@@ -47,7 +47,7 @@ public class EnvelopeContext {
         this.mailEntities = new MailEntities();
         this.addressHelper = new AddressHelper(this);
 
-        this.mailEntities.register(new VillagerMailEntity(new Address.Entity("Villager")));
+        this.mailEntities.register(new VillagerMailEntity(new Address.Entity("Villager"), 1500));
     }
 
     public static EnvelopeContext of(ServerLevel level) {
@@ -129,7 +129,18 @@ public class EnvelopeContext {
                     ChatFormatting.AQUA + delivery.getSender().getString() + ChatFormatting.RESET +
                           " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
                           ChatFormatting.GREEN + delivery.getRecipient().getString() + ChatFormatting.RESET +
-                          " // " + delivery.getCurrentPhase().toPrettyString()))
+
+                          ChatFormatting.GRAY +
+                          (!delivery.getMail().isEmpty() ? " ✉" : "") +
+                          addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " ↔" + d).orElse("") +
+                          " ⌚" + delivery.getTravelDuration() / 20 + "s" +
+                          ChatFormatting.RESET +
+
+                          " // " + delivery.getCurrentPhase().toPrettyString() +
+
+                          ChatFormatting.GRAY +
+                          " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
+                          ChatFormatting.RESET))
               .collect(Collectors.toCollection(ListTag::new));
 
         tag.put("deliveries", deliveries);

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
@@ -75,15 +76,14 @@ public class Delivery {
     }
 
     public static int calculateTravelDuration(ServerLevel level, Address sender, Address recipient) {
-        Optional<BlockPos> senderPos = Position.ofAddress(level, sender);
-        Optional<BlockPos> recipientPos = Position.ofAddress(level, recipient);
-        int distance = senderPos.isEmpty() || recipientPos.isEmpty()
-              ? Integer.MAX_VALUE
-              : (int) Math.sqrt(senderPos.get().distSqr(recipientPos.get()));
+        int distance = level.getEnvelopeContext().addresses().getDistanceTo(sender, recipient).orElse(1000);
+        return calculateTravelDuration(distance);
+    }
 
-        double modifier = 1.0f;
-        double seconds = (Math.min(180, 4 + Math.sqrt(distance) * 2.5) * modifier);
-        return Ticks.fromSeconds(seconds);
+    public static int calculateTravelDuration(int distance) {
+        distance = Math.min(distance, Config.Server.DELIVERY_TRAVEL_DURATION_DISTANCE_CAP.get());
+        double seconds = distance / Config.Server.DELIVERY_COURIER_TRAVEL_SPEED.get();
+        return Math.max(1, Ticks.fromSeconds(seconds));
     }
 
     public Address getSender() {

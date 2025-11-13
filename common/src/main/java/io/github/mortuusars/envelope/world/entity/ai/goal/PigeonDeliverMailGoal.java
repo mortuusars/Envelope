@@ -16,6 +16,11 @@ public class PigeonDeliverMailGoal extends Goal {
     }
 
     @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
+    @Override
     public boolean canUse() {
         return pigeon.isDelivering();
     }

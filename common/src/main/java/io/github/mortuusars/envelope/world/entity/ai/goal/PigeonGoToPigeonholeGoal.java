@@ -26,6 +26,11 @@ public class PigeonGoToPigeonholeGoal extends Goal {
     }
 
     @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
+    @Override
     public boolean canUse() {
         return pigeon.getPigeonholeHandler().getCurrentPos() != null
                 && !pigeon.hasRestriction()

@@ -80,7 +80,7 @@ public final class DeliveryRoute {
     // --
 
     public int getTotalDistance() {
-        if (senderPos.isEmpty() || recipientPos.isEmpty()) return Integer.MAX_VALUE;
+        if (senderPos.isEmpty() || recipientPos.isEmpty()) return -1;
         return (int)Math.sqrt(senderPos.get().distSqr(recipientPos.get()));
     }
 

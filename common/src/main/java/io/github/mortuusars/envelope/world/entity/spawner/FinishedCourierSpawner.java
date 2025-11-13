@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity.spawner;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.background.FinishedBackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
@@ -28,15 +29,14 @@ public class FinishedCourierSpawner implements CustomSpawner {
 
         nextAttemptDelay = SPAWN_ATTEMPT_DELAY;
 
-
         BackgroundDelivery backgroundDelivery = level.getEnvelopeContext().getBackgroundDelivery();
         List<FinishedBackgroundCourier> couriers = backgroundDelivery.getFinishedCouriers();
 
         if (couriers.isEmpty()) {
             return 0;
         }
-        
-        FinishedBackgroundCourier courier = couriers.getFirst();
+
+        FinishedBackgroundCourier courier = Util.getRandom(couriers, level.getRandom());
 
         @Nullable BlockPos spawnPos = Position.findNearbyHeightmapSpawnPosition(level, courier.spawnPos(), 2);
         if (spawnPos == null) {

@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.TransitionableCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
@@ -22,18 +23,24 @@ public class DeliveringCourierSpawner implements CustomSpawner {
         }
 
         BackgroundDelivery backgroundDelivery = level.getEnvelopeContext().getBackgroundDelivery();
-        List<BackgroundCourier> couriers = backgroundDelivery.getCouriers();
 
-        if (couriers.isEmpty()) {
+        List<BackgroundCourier> spawnableCouriers = backgroundDelivery.getCouriers()
+              .stream()
+              .filter(courier -> !courier.delivery().isFinished() && !courier.delivery().getCurrentPhase().isTraveling())
+              .toList();
+
+        if (spawnableCouriers.isEmpty()) {
             return 0;
         }
 
-        BackgroundCourier backgroundCourier = couriers.getFirst();
+        BackgroundCourier courier = Util.getRandom(spawnableCouriers, level.getRandom());
+        trySpawn(level, courier);
+
+        return 0;
+    }
+
+    protected void trySpawn(ServerLevel level, BackgroundCourier backgroundCourier) {
         Delivery delivery = backgroundCourier.delivery();
-
-        if (delivery.getCurrentPhase().isTraveling()) {
-            return 0;
-        }
 
         @Nullable BlockPos spawnPos = delivery.estimateCurrentPos()
               .map(pos -> Position.aboveGround(level, pos, 2))
@@ -41,7 +48,7 @@ public class DeliveringCourierSpawner implements CustomSpawner {
               .orElse(null);
 
         if (spawnPos == null) {
-            return 0;
+            return;
         }
 
         @Nullable Entity entity = backgroundCourier.getEntityData().createEntity(level);
@@ -60,9 +67,7 @@ public class DeliveringCourierSpawner implements CustomSpawner {
             courier.onAppeared(level);
             courier.continueDelivery(level, delivery);
 
-            backgroundDelivery.removeCourier(backgroundCourier);
+            level.getEnvelopeContext().getBackgroundDelivery().removeCourier(backgroundCourier);
         }
-
-        return 0;
     }
 }

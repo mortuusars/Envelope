@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.delivery.background;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
@@ -11,7 +10,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -24,19 +22,17 @@ public class BackgroundDelivery extends SavedData {
                 .optionalFieldOf("finished_couriers", Collections.emptyList())
                 .forGetter(BackgroundDelivery::getFinishedCouriers)
     ).apply(instance, BackgroundDelivery::new));
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final List<BackgroundCourier> couriers;
     protected final List<FinishedBackgroundCourier> finishedCouriers;
 
     public BackgroundDelivery(List<BackgroundCourier> couriers, List<FinishedBackgroundCourier> finishedCouriers) {
         this.couriers = new ArrayList<>(couriers);
-        this.finishedCouriers = finishedCouriers;
+        this.finishedCouriers = new ArrayList<>(finishedCouriers);
     }
 
     public BackgroundDelivery() {
-        this.couriers = new ArrayList<>();
-        this.finishedCouriers = new ArrayList<>();
+        this(Collections.emptyList(), Collections.emptyList());
     }
 
     public List<BackgroundCourier> getCouriers() {
