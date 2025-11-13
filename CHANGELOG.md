@@ -4,8 +4,10 @@
 - Rewritten delivery system to fix some bugs and introduce new ones
 - Delivery travel duration is now based on distance between addresses
   - Added config options for delivery duration
-  - Can still be overwritten with `envelope:mail_travel_duration` component on mail item itself
+  - Removed `envelope:mail_travel_duration` item data component 
 - Restricted all operations to overworld only
+- Removed `envelope:mail_id`, `envelope:mail_delivery_log`, `envelope:mail_status` item data components
+  - These things are now handled internally. Not much has changed for the player, they were for internal use anyway
 - Changed command `/mail send [item]` to `/envelope send [item]`
 - Added `/envelope pigeonhole [list|position]` command
 - Improvements to Bugger (Debug utility enabled with `debug.debug_mode` server config option. Adds more info to F3 screen, more log messages, etc).

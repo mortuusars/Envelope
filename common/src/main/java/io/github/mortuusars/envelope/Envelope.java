@@ -186,22 +186,10 @@ public class Envelope {
         public static final DataComponentType<Address> ADDRESS = Register.dataComponentType("address",
             arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
-        /**
-         * Used in Pigeonhole inbox to differentiate between mail items.
-         */
-        public static final DataComponentType<MailId> MAIL_ID = Register.dataComponentType("mail_id",
-            arg -> arg.persistent(MailId.CODEC).networkSynchronized(MailId.STREAM_CODEC));
-
         public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender",
             arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient",
             arg -> arg.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<MailStatus> MAIL_STATUS = Register.dataComponentType("mail_status",
-            arg -> arg.persistent(MailStatus.CODEC).networkSynchronized(MailStatus.STREAM_CODEC));
-        public static final DataComponentType<Integer> MAIL_TRAVEL_DURATION = Register.dataComponentType("mail_travel_duration",
-            arg -> arg.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
-        public static final DataComponentType<MailDeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log",
-            arg -> arg.persistent(MailDeliveryLog.CODEC).networkSynchronized(MailDeliveryLog.STREAM_CODEC));
 
         public static final DataComponentType<String> LETTER_SUBJECT = Register.dataComponentType("letter_subject",
             arg -> arg.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.stringUtf8(512)));

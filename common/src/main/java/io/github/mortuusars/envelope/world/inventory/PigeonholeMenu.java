@@ -1,13 +1,11 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.StoredMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
-import io.github.mortuusars.envelope.world.item.component.MailId;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -43,11 +41,11 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     protected final Address.Pigeonhole address;
     protected final PigeonholeBlockEntity blockEntity;
 
-    protected List<ItemStack> mail;
+    protected List<StoredMail> mail;
     protected boolean hasNewMail;
 
     protected PigeonholeMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
-                             BlockPos pigeonholePos, List<ItemStack> mail, Address.Pigeonhole address) {
+                             BlockPos pigeonholePos, List<StoredMail> mail, Address.Pigeonhole address) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -78,16 +76,16 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         updateIsDefault();
     }
 
-    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<ItemStack> mail, Address.Pigeonhole address) {
+    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<StoredMail> mail, Address.Pigeonhole address) {
         this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pigeonholePos, mail, address);
     }
 
     public static PigeonholeMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
-        List<ItemStack> mail = new ArrayList<>();
+        List<StoredMail> mail = new ArrayList<>();
         int mailCount = buffer.readVarInt();
         for (int i = 0; i < mailCount; i++) {
-            mail.add(ItemStack.STREAM_CODEC.decode(buffer));
+            mail.add(StoredMail.STREAM_CODEC.decode(buffer));
         }
         Address.Pigeonhole address = Address.Pigeonhole.STREAM_CODEC.decode(buffer);
         return new PigeonholeMenu(id, inventory, mailboxPos, mail, address);
@@ -143,11 +141,11 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         }
     }
 
-    public List<ItemStack> getMail() {
+    public List<StoredMail> getMail() {
         return mail;
     }
 
-    public void setMail(List<ItemStack> mail) {
+    public void setMail(List<StoredMail> mail) {
         this.mail = new ArrayList<>(mail.reversed());
         setHasNewMail(false);
     }
@@ -228,7 +226,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     }
 
     protected boolean moveMailToInventory(Player player, int index) {
-        ItemStack mail = Mail.stripInboxData(getMail().get(index).copy());
+        ItemStack mail = getMail().get(index).getItemCopy();
 
         if (!PlayerInventoryUtil.canAddWholeStack(player, mail)) {
             return false;
@@ -256,18 +254,8 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     }
 
     protected ItemStack extractMail(ServerLevel level, int index) {
-        return MailId.of(getMail().get(index))
-              .map(id -> {
-                  ItemStack extractedMail = getBlockEntity().extractMail(id);
-                  if (!extractedMail.isEmpty()) {
-                      playersWithMenu(level, address).forEach(player -> {
-                          ((PigeonholeMenu) player.containerMenu).getMail().removeIf(id::matches);
-                          Packets.sendToClient(new PigeonholeMenuMailRemovedS2CP(id), player);
-                      });
-                  }
-                  return extractedMail;
-              })
-              .orElse(ItemStack.EMPTY);
+        StoredMail mail = getMail().get(index);
+        return getBlockEntity().extractMail(mail.getId());
     }
 
     protected boolean rejectMail(Player player, int index) {
@@ -286,7 +274,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         }
 
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            List<ItemStack> mail = getBlockEntity().getData().map(PigeonholeData::getMail).orElse(Collections.emptyList());
+            List<StoredMail> mail = getBlockEntity().getData().map(PigeonholeData::getMail).orElse(Collections.emptyList());
             setMail(mail);
             Packets.sendToClient(new PigeonholeMenuMailS2CP(mail), serverPlayer);
             return true;

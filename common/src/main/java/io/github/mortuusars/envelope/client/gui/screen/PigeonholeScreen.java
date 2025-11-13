@@ -2,10 +2,12 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.mail.StoredMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
-import io.github.mortuusars.envelope.world.item.component.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
@@ -14,7 +16,6 @@ import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.world.item.component.MailStatus;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
@@ -38,7 +39,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -85,7 +85,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     ));
 
     @Nullable
-    protected ItemStack hoveredMail;
+    protected StoredMail hoveredMail;
 
     protected ImageButton addressButton;
     protected ImageButton addressAttentionButton;
@@ -265,14 +265,14 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         // Right
         guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos, 303, imageHeight, 5, 15, 512, 256);
 
-        List<ItemStack> mail = getMenu().getMail();
+        List<StoredMail> mail = getMenu().getMail();
         hoveredMail = null;
         scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
 
         for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
             int index = i + scroll;
 
-            ItemStack item = mail.get(index);
+            StoredMail item = mail.get(index);
             int x = 8;
             int y = 33 + 18 * i;
             boolean isHovering = isHovering(x + 1, y + 1, 115, 16, mouseX, mouseY);
@@ -342,12 +342,12 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
 
-    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, ItemStack mail, int x, int y) {
+    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, StoredMail mail, int x, int y) {
         boolean isHovered = hoveredMail == mail;
 
         guiGraphics.blitSprite(REGULAR_MAIL_BUTTON_SPRITES.get(true, isHovered), x, y, 0, 117, 18);
 
-        guiGraphics.renderItem(mail, x + 2, y + 1);
+        guiGraphics.renderItem(mail.getItemForReading(), x + 2, y + 1);
 
         WidgetSprites iconSprites = getMailIconSprites(mail);
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
@@ -410,9 +410,10 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         }
     }
 
-    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, ItemStack hoveredMail) {
+    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, StoredMail hoveredMail) {
         if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail), hoveredMail.getTooltipImage(), x, y);
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail.getItemForReading()),
+                  hoveredMail.getItemForReading().getTooltipImage(), x, y);
             return;
         }
 
@@ -425,28 +426,29 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
             tooltip.add(address);
         }
 
-        MailDeliveryLog deliveryLog = MailDeliveryLog.of(hoveredMail);
+        DeliveryLog deliveryLog = hoveredMail.getDeliveryLog();
 
         if (!Screen.hasShiftDown() || deliveryLog.isEmpty()) {
-            MailStatus.of(hoveredMail).ifPresent(status -> {
-                int color = switch (status) {
+            deliveryLog.getLastExceptionRecord().ifPresent(record -> {
+                int color = switch (record.status()) {
                     case RETURNED -> 0xFFD47F46;
                     case REJECTED -> 0xFFD7503E;
                     case UNCLAIMED -> 0xFFDDC649;
+                    default -> throw new IllegalStateException("Unexpected value: " + record.status());
                 };
-                tooltip.add(status.translate().withStyle(Style.EMPTY.withColor(color)));
+                tooltip.add(record.status().translate().withStyle(Style.EMPTY.withColor(color)));
             });
 
-            deliveryLog.getLastRecordOfType(MailDeliveryLog.Record.Type.ARRIVED)
-                  .flatMap(MailDeliveryLog.Record::timestamp)
+            deliveryLog.getLastRecordOfType(DeliveryRecord.Status.ARRIVED)
+                  .flatMap(DeliveryRecord::timestamp)
                   .ifPresent(arrivedAt -> {
                       long ageTicks = Minecrft.level().getGameTime() - arrivedAt;
                       tooltip.add(Component.translatable("gui.envelope.time.elapsed", PrettyGameTime.durationLargest(ageTicks)));
                   });
         } else {
             if (!deliveryLog.isEmpty()) {
-                tooltip.add(Component.translatable("gui.envelope.mail.log"));
-                for (MailDeliveryLog.Record record : deliveryLog.records()) {
+                tooltip.add(Component.translatable("gui.envelope.delivery.log"));
+                for (DeliveryRecord record : deliveryLog.records()) {
                     tooltip.add(record.translate(Minecrft.level().getGameTime()));
                 }
             }
@@ -607,22 +609,19 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     // --
 
-    protected Address getDisplayedSender(ItemStack mail) {
-        return MailStatus.of(mail)
-              .map(status -> switch (status) {
-                  case RETURNED -> Address.MAIL_SERVICE;
-                  case REJECTED, UNCLAIMED -> mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT,
-                        mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
-              })
-              .orElse(mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN));
+    protected Address getDisplayedSender(StoredMail mail) {
+        return mail.getDeliveryLog().getLastExceptionRecord()
+              .map(DeliveryRecord::address)
+              .orElse(mail.getSenderOrElse(Address.UNKNOWN));
     }
 
-    protected WidgetSprites getMailIconSprites(ItemStack mail) {
-        return MailStatus.of(mail)
-              .map(status -> switch (status) {
+    protected WidgetSprites getMailIconSprites(StoredMail mail) {
+        return mail.getDeliveryLog().getLastExceptionRecord()
+              .map(record -> switch (record.status()) {
                   case RETURNED -> ICON_RETURNED_SPRITES;
                   case REJECTED -> ICON_REJECTED_SPRITES;
                   case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
+                  default -> throw new IllegalStateException("Unexpected value: " + record.status());
               })
               .orElseGet(() -> {
                   Address sender = mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);

@@ -1,8 +1,9 @@
 package io.github.mortuusars.envelope.world.delivery;
 
 import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.server.level.ServerLevel;
 
 public interface DeliveryHandler {
@@ -11,7 +12,7 @@ public interface DeliveryHandler {
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT
               && !level.getEnvelopeContext().addresses().getAll().isKnown(delivery.getRecipient())) {
-            delivery.updateMail(Mail::returnedRecipientNotFound);
+            delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
@@ -30,7 +31,8 @@ public interface DeliveryHandler {
 
     default void phaseStarted(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         if (phase == DeliveryPhase.STARTED) {
-            delivery.updateMail(item -> Mail.sent(item, level));
+            delivery.updateMail(mail -> mail.writeToLog(log ->
+                  log.append(DeliveryRecord.sentFrom(mail.getSenderOrElse(Address.UNKNOWN)).atTime(level.getGameTime()))));
         }
     }
 

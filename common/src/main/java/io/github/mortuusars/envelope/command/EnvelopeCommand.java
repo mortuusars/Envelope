@@ -47,11 +47,8 @@ public class EnvelopeCommand {
         try {
             Courier courier = level.getEnvelopeContext().startDelivery(mail);
             Component message = courier.getDelivery()
-                  .map(delivery -> {
-                      Component recipient = AddressDisplay.create(delivery.getRecipient(),
-                            AddressDisplay.RECIPIENT_ICON_STYLE, AddressDisplay.RECIPIENT_ICON_STYLE);
-                      return Component.literal("Mail sent to ").append(recipient);
-                  })
+                  .map(delivery -> Component.literal("Mail sent to ")
+                        .append(AddressDisplay.createGeneric(delivery.getRecipient())))
                   .orElse(Component.literal("Mail sent"));
             context.getSource().sendSuccess(() -> message, true);
         } catch (Exception e) {

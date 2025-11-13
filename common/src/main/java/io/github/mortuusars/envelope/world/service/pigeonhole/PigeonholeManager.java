@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -96,7 +95,7 @@ public class PigeonholeManager {
 
         level.getEnvelopeContext().getDefaultAddresses().update(data.getAddress(), newAddress);
 
-        PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail().stream().map(ItemStack::copy).toList());
+        PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail());
 
         data.invalidate(); // Force users to re-query
 

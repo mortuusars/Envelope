@@ -4,9 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
-import io.github.mortuusars.envelope.world.mail.EntityMailReceiver;
-import io.github.mortuusars.envelope.world.mail.PigeonholeMailReceiver;
-import io.github.mortuusars.envelope.world.mail.PlayerMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
+import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -16,7 +17,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -83,9 +83,9 @@ public interface Address {
         };
     }
 
-    default ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new)
-              .receiveMail(level, mail);
+    default Mail receiveMail(ServerLevel level, Mail mail) {
+        if (mail.isEmpty()) return Mail.EMPTY;
+        return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }
 
     record Pigeonhole(String id) implements Address {

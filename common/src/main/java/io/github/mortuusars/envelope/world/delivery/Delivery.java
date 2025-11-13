@@ -1,16 +1,15 @@
 package io.github.mortuusars.envelope.world.delivery;
 
-import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
@@ -23,14 +22,14 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class Delivery {
     public static final Codec<Delivery> CODEC = RecordCodecBuilder.create(i -> i.group(
           Address.CODEC.fieldOf("sender").forGetter(Delivery::getSender),
           Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
           Codec.intRange(0, Integer.MAX_VALUE).fieldOf("travel_duration").forGetter(Delivery::getTravelDuration),
-          ItemStack.OPTIONAL_CODEC.fieldOf("mail").forGetter(Delivery::getMail),
+          Mail.CODEC.fieldOf("mail").forGetter(Delivery::getMail),
           DeliveryRoute.CODEC.fieldOf("route").forGetter(Delivery::getRoute),
           DeliveryProgress.CODEC.fieldOf("progress").forGetter(Delivery::getProgress)
     ).apply(i, Delivery::new));
@@ -42,9 +41,9 @@ public class Delivery {
     private final int travelDuration;
     private final DeliveryRoute route;
     private final DeliveryProgress progress;
-    private ItemStack mail;
+    private Mail mail;
 
-    public Delivery(Address sender, Address recipient, int travelDuration, ItemStack mail, DeliveryRoute route, DeliveryProgress progress) {
+    public Delivery(Address sender, Address recipient, int travelDuration, Mail mail, DeliveryRoute route, DeliveryProgress progress) {
         this.sender = sender;
         this.recipient = recipient;
         this.travelDuration = travelDuration;
@@ -53,17 +52,15 @@ public class Delivery {
         this.progress = progress;
     }
 
-    public static Delivery create(ServerLevel level, ItemStack mail) {
-        @Nullable Address sender = mail.get(Envelope.DataComponents.MAIL_SENDER);
-        Preconditions.checkNotNull(sender, "Mail '" + mail + "' does not have 'envelope:mail_sender' defined.");
-        @Nullable Address recipient = mail.get(Envelope.DataComponents.MAIL_RECIPIENT);
-        Preconditions.checkNotNull(recipient, "Mail '" + mail + "' does not have 'envelope:mail_recipient' defined.");
+    public static Delivery create(ServerLevel level, ItemStack mailStack) {
+        Mail mail = new Mail(mailStack);
+
+        Address sender = mail.getSenderOrThrow();
+        Address recipient = mail.getRecipientOrThrow();
 
         DeliveryRoute route = DeliveryRoute.create(level, sender, recipient, 10);
 
-        int travelDuration = mail.getOrDefault(
-              Envelope.DataComponents.MAIL_TRAVEL_DURATION,
-              calculateTravelDuration(level, sender, recipient));
+        int travelDuration = calculateTravelDuration(level, sender, recipient);
 
         return new Delivery(sender, recipient, travelDuration, mail, route, DeliveryProgress.start());
     }
@@ -99,18 +96,16 @@ public class Delivery {
         return travelDuration;
     }
 
-    public ItemStack getMail() {
+    public Mail getMail() {
         return mail;
     }
 
-    public void setMail(ItemStack mail) {
+    public void setMail(Mail mail) {
         this.mail = mail;
     }
 
-    public void updateMail(Function<ItemStack, ItemStack> updater) {
-        if (!getMail().isEmpty()) {
-            setMail(updater.apply(getMail()));
-        }
+    public void updateMail(UnaryOperator<Mail> updater) {
+        setMail(updater.apply(getMail()));
     }
 
     public DeliveryRoute getRoute() {

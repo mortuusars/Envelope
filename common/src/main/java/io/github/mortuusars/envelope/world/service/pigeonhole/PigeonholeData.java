@@ -2,31 +2,28 @@ package io.github.mortuusars.envelope.world.service.pigeonhole;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.MailId;
+import io.github.mortuusars.envelope.world.mail.MailId;
+import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.StoredMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class PigeonholeData {
     public static final Codec<PigeonholeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           Address.Pigeonhole.STRING_CODEC.fieldOf("address").forGetter(PigeonholeData::getAddress),
           BlockPos.CODEC.fieldOf("pos").forGetter(PigeonholeData::getPos),
-          Codec.list(ItemStack.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
+          Codec.list(StoredMail.CODEC).fieldOf("mail").forGetter(PigeonholeData::getMail)
     ).apply(instance, PigeonholeData::new));
 
     private final Address.Pigeonhole address;
     private final BlockPos pos;
-    private final List<ItemStack> mail;
+    private final List<StoredMail> mail;
     private boolean valid = true;
     private boolean dirty = true;
 
-    public PigeonholeData(Address.Pigeonhole address, BlockPos pos, List<ItemStack> mail) {
+    public PigeonholeData(Address.Pigeonhole address, BlockPos pos, List<StoredMail> mail) {
         this.address = address;
         this.pos = pos;
         this.mail = new ArrayList<>(mail); // Make sure it's mutable
@@ -48,7 +45,7 @@ public class PigeonholeData {
      * This method is not suitable for outside modification (at least without calling {@link PigeonholeData#setDirty()})
      * Use dedicated methods to add/remove mail.
      */
-    public List<ItemStack> getMail() {
+    public List<StoredMail> getMail() {
         return mail;
     }
 
@@ -56,39 +53,34 @@ public class PigeonholeData {
         return !getMail().isEmpty();
     }
 
-    public void insertMail(ItemStack mail) {
+    public void insertMail(Mail mail) {
         if (!mail.isEmpty()) {
-            if (!mail.has(Envelope.DataComponents.MAIL_ID)) {
-                mail.set(Envelope.DataComponents.MAIL_ID, MailId.createRandom());
-            }
-            getMail().add(mail);
+            StoredMail storedMail = new StoredMail(mail.getItemCopy(), mail.getDeliveryLog(), MailId.createRandom());
+            getMail().add(storedMail);
             setDirty();
         }
     }
 
-    public ItemStack extractMail(MailId id) {
-        ItemStack result = ItemStack.EMPTY;
-
-        ListIterator<ItemStack> iterator = getMail().listIterator();
+    public Optional<StoredMail> extractMail(MailId id) {
+        ListIterator<StoredMail> iterator = getMail().listIterator();
         while (iterator.hasNext()) {
-            ItemStack mail = iterator.next();
-            if (id.matches(mail)) {
+            StoredMail mail = iterator.next();
+            if (id.matches(mail.getId())) {
                 iterator.remove();
                 setDirty();
-                result = mail;
-                break;
+                return Optional.of(mail);
             }
         }
 
-        return result;
+        return Optional.empty();
     }
 
-    public List<ItemStack> extractAllMail() {
+    public List<Mail> extractAllMail() {
         if (!hasMail()) {
             return Collections.emptyList();
         }
 
-        List<ItemStack> mail = new ArrayList<>(getMail());
+        List<Mail> mail = new ArrayList<>(getMail());
         getMail().clear();
         setDirty();
         return mail;

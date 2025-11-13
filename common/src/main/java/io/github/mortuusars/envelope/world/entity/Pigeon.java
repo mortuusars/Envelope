@@ -12,8 +12,6 @@ import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -235,7 +233,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         String message = damageSource.getLocalizedDeathMessage(this).getString();
         String carriedItem = !delivery.getMail().isEmpty()
-              ? " a " + delivery.getMail().getHoverName().getString()
+              ? " a " + delivery.getMail().getItemForReading().getHoverName().getString()
               : "";
         String addresses = delivery.getSender().getName() + " to " + delivery.getRecipient().getName();
 
@@ -257,8 +255,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         if (!delivery.getMail().isEmpty()) {
             //TODO: COD mail should not drop probably
-            spawnAtLocation(Mail.stripInboxData(delivery.getMail()));
-            delivery.setMail(ItemStack.EMPTY);
+            spawnAtLocation(delivery.getMail().getItemCopy());
+            delivery.setMail(Mail.EMPTY);
         }
     }
 

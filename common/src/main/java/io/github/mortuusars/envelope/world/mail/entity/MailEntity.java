@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.entity;
 
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.MailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.MailReceiver;
 
 public abstract class MailEntity implements MailReceiver {
     private final Address.Entity address;

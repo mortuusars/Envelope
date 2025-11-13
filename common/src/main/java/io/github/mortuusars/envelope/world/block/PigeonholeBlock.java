@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.block;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.validation.PigeonholeAddressValidator;
@@ -238,13 +239,13 @@ public class PigeonholeBlock extends BaseEntityBlock {
               && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
               && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
             if (level instanceof ServerLevel serverLevel) {
-                ItemStack result = blockEntity.getAddress().orElseThrow().receiveMail(serverLevel, stack);
-
                 if (!stack.has(Envelope.DataComponents.MAIL_SENDER)) {
                     stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
                 }
 
-                player.setItemInHand(hand, result);
+                Mail result = blockEntity.getAddress().orElseThrow().receiveMail(serverLevel, new Mail(stack));
+
+                player.setItemInHand(hand, result.getItemCopy());
             }
             return ItemInteractionResult.SUCCESS;
         }
@@ -256,10 +257,10 @@ public class PigeonholeBlock extends BaseEntityBlock {
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
                                                         Player player, BlockHitResult hitResult) {
         if (state.getValue(HAS_ADDRESS)) {
-            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                if (!blockEntity.openMenu(serverPlayer)) {
-                    return InteractionResult.FAIL;
-                }
+            if (player instanceof ServerPlayer serverPlayer
+                  && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+                  && !blockEntity.openMenu(serverPlayer)) {
+                return InteractionResult.FAIL;
             }
 
             return InteractionResult.SUCCESS;

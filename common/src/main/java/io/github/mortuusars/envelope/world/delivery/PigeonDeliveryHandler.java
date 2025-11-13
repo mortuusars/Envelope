@@ -1,13 +1,11 @@
 package io.github.mortuusars.envelope.world.delivery;
 
 import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.Address;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 
 public class PigeonDeliveryHandler implements DeliveryHandler {
     private final Pigeon pigeon;
@@ -40,9 +38,7 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            delivery.updateMail(mail -> Mail.returned(mail, Address.MAIL_SERVICE,
-                      Component.translatable("gui.envelope.mail.log.returned.unable_to_reach")));
-
+            delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_unableToReach())));
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
@@ -52,8 +48,8 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
         if (!delivery.getMail().isEmpty()) {
-            pigeon().spawnAtLocation(delivery.getMail().copy());
-            delivery.setMail(ItemStack.EMPTY);
+            pigeon().spawnAtLocation(delivery.getMail().getItemCopy());
+            delivery.setMail(Mail.EMPTY);
             Pigeon.LOGGER.info("{} has dropped undelivered mail on the ground because it cannot be delivered to sender Pigeonhole.",
                   pigeon().getName().getString());
         }

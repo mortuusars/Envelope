@@ -50,9 +50,8 @@ public class AddressTagItem extends Item {
 
         slot.getItem().set(Envelope.DataComponents.MAIL_RECIPIENT, address);
 
-        // Having old info with new recipient address would make no sense (and may confuse someone)
+        // Having old sender with new recipient address may confuse someone
         slot.getItem().remove(Envelope.DataComponents.MAIL_SENDER);
-        slot.getItem().remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
 
         stack.shrink(1);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);

@@ -54,6 +54,7 @@
 
   "gui.envelope.time.elapsed": "%s ago",
 
+  "gui.envelope.mail.status.regular": "Regular",
   "gui.envelope.mail.status.returned": "Returned",
   "gui.envelope.mail.status.rejected": "Rejected",
   "gui.envelope.mail.status.unclaimed": "Unclaimed",
@@ -69,19 +70,25 @@
   "gui.envelope.mail.sender": "§7Sender: %s",
   "gui.envelope.mail.recipient": "§7Recipient: %s",
 
-  "gui.envelope.mail.log": "§7Delivery Log",
-  "gui.envelope.mail.log.show_tooltip": "§8Delivery Log",
-  "gui.envelope.mail.log.record.sent": " §7Sent from %s§7",
-  "gui.envelope.mail.log.record.returned": " §7Returned",
-  "gui.envelope.mail.log.record.rejected": " §7Rejected at %s§7",
-  "gui.envelope.mail.log.record.unclaimed": " §7Unclaimed at %s§7",
-  "gui.envelope.mail.log.record.traveling": " §7Traveling to %s§7",
-  "gui.envelope.mail.log.record.arrived": " §7Arrived to %s§7",
-  "gui.envelope.mail.log.record.received": " §7Received at %s§7",
-  "gui.envelope.mail.log.record.message.by": "§7by %s§7",
+  "gui.envelope.delivery.log": "§7Delivery Log",
 
-  "gui.envelope.mail.log.returned.recipient_not_found": "§7- (Recipient Not Found)",
-  "gui.envelope.mail.log.returned.unable_to_reach": "§7- (Unable To Reach)",
+  "gui.envelope.delivery.log.status.sent": "Sent",
+  "gui.envelope.delivery.log.status.arrived": "Arrived",
+  "gui.envelope.delivery.log.status.returned": "Returned",
+  "gui.envelope.delivery.log.status.rejected": "Rejected",
+  "gui.envelope.delivery.log.status.unclaimed": "Unclaimed",
+  "gui.envelope.delivery.log.status.received": "Received",
+
+  "gui.envelope.delivery.log.record.sent": " §7Sent from",
+  "gui.envelope.delivery.log.record.arrived": " §7Arrived to",
+  "gui.envelope.delivery.log.record.returned": " §7Returned by",
+  "gui.envelope.delivery.log.record.rejected": " §7Rejected at",
+  "gui.envelope.delivery.log.record.unclaimed": " §7Unclaimed at",
+  "gui.envelope.delivery.log.record.received": " §7Received at",
+  "gui.envelope.delivery.log.record.message.by": "§7by %s",
+
+  "gui.envelope.delivery.log.message.recipient_not_found": "§7[Recipient Not Found]",
+  "gui.envelope.delivery.log.message.unable_to_reach": "§7[Unable To Reach]",
 
   "gui.envelope.letter.subject": "§7Subject: %s",
 
