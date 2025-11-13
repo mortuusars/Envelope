@@ -310,7 +310,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
               .add(Attributes.MAX_HEALTH, 8.0)
-              .add(Attributes.FLYING_SPEED, 1F)
+              .add(Attributes.FLYING_SPEED, 2F)
               .add(Attributes.MOVEMENT_SPEED, 0.3F)
               .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
@@ -369,7 +369,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         if (closerThan(pos, distance)) {
             return true;
         } else {
-            Path path = Pigeon.this.navigation.getPath();
+            Path path = getNavigation().getPath();
             return path != null && path.getTarget().equals(pos) && path.canReach() && path.isDone();
         }
     }

@@ -26,6 +26,7 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -123,8 +124,10 @@ public class EnvelopeContext {
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
         tag.putInt("background_finished_pigeons", getBackgroundDelivery().getFinishedCouriers().size());
 
-        ListTag deliveries = Stream.concat(pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
+        ListTag deliveries = Stream.concat(
+                    pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
                     backgroundCouriers.stream().map(BackgroundCourier::delivery))
+              .sorted(Comparator.comparingInt(Delivery::hashCode))
               .map(delivery -> StringTag.valueOf(
                     ChatFormatting.AQUA + delivery.getSender().getString() + ChatFormatting.RESET +
                           " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +

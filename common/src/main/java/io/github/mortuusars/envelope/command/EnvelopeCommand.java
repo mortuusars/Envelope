@@ -46,11 +46,14 @@ public class EnvelopeCommand {
 
         try {
             Courier courier = level.getEnvelopeContext().startDelivery(mail);
-            Component senderName = courier.getDelivery()
-                  .map(d -> d.getSender().getDisplayName().withStyle(Style.EMPTY.withColor(AddressDisplay.SENDER_COLOR)))
-                  .orElse(Component.empty());
-            context.getSource().sendSuccess(() ->
-                  Component.literal("Mail sent to ").append(senderName), true);
+            Component message = courier.getDelivery()
+                  .map(delivery -> {
+                      Component recipient = AddressDisplay.create(delivery.getRecipient(),
+                            AddressDisplay.RECIPIENT_ICON_STYLE, AddressDisplay.RECIPIENT_ICON_STYLE);
+                      return Component.literal("Mail sent to ").append(recipient);
+                  })
+                  .orElse(Component.literal("Mail sent"));
+            context.getSource().sendSuccess(() -> message, true);
         } catch (Exception e) {
             context.getSource().sendFailure(Component.literal("Cannot send: " + e.getMessage()));
         }
