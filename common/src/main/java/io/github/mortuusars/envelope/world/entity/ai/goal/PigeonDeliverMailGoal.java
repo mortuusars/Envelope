@@ -46,7 +46,7 @@ public class PigeonDeliverMailGoal extends Goal {
                       if ((delivery.getCurrentPhase().isAscending() || delivery.getCurrentPhase().isDescending())
                             && pigeon.hasReachedTarget(pos)) {
                           delivery.getProgress().complete();
-                      } else if (!pigeon.getNavigation().isInProgress()) {
+                      } else if (!pigeon.getNavigation().isInProgress() || !pos.equals(pigeon.getNavigation().getTargetPos())) {
                           if (!pigeon.pathfindDirectlyTowards(pos)) {
                               pigeon.pathfindRandomlyTowards(pos);
                           }
