@@ -43,8 +43,8 @@ public final class DeliveryRoute {
     public DeliveryRoute update(ServerLevel level, Address sender, Address recipient, int ascendDistance) {
         senderPos = Position.ofAddress(level, sender);
         recipientPos = Position.ofAddress(level, recipient);
-        senderAscendPos = Position.ascendTowards(level, senderPos, recipientPos, ascendDistance);
-        recipientAscendPos = Position.ascendTowards(level, recipientPos, senderPos, ascendDistance);
+        senderAscendPos = Position.ascendTowards(level, senderPos, recipientPos, ascendDistance, recipient.hashCode());
+        recipientAscendPos = Position.ascendTowards(level, recipientPos, senderPos, ascendDistance, sender.hashCode());
         this.ascendDistance = ascendDistance;
         return this;
     }

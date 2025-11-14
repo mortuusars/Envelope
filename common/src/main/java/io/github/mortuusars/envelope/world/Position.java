@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world;
 
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.core.BlockPos;
@@ -10,12 +11,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class Position {
@@ -46,27 +49,25 @@ public class Position {
         return towardsDirection(origin, target.atY(origin.getY()), distance);
     }
 
-    public static BlockPos towardsRandomHorizontalDirection(BlockPos origin, RandomSource random, int distance) {
-        return origin.relative(Direction.Plane.HORIZONTAL.getRandomDirection(random), distance);
+    public static BlockPos towardsRandomHorizontalDirection(BlockPos origin, int distance, int seed) {
+        Random random = new Random(seed);
+        random.nextLong(); // For some reason this fixes similar values returned for similar seeds. I'm not going to pretend I know why.
+        double angle = random.nextDouble() * 2 * Math.PI;
+        return origin.offset((int) (Math.cos(angle) * distance), 0, (int) (Math.sin(angle) * distance));
     }
 
-    public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance) {
+    public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance, int seed) {
         BlockPos pos = target
               .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
-              .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, level.getRandom(), distance))
+              .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, distance, seed))
               .above(distance);
 
-        int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ()) + 5;
-
-        if (surface > pos.getY()) {
-            pos = pos.atY(surface);
-        }
-
-        return pos;
+        return aboveGround(level, pos, 5);
     }
 
-    public static Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> origin, Optional<BlockPos> target, int distance) {
-        return origin.map(pos -> ascendTowards(level, pos, target, distance));
+    public static Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> origin,
+                                                   Optional<BlockPos> target, int distance, int seed) {
+        return origin.map(pos -> ascendTowards(level, pos, target, distance, seed));
     }
 
     @Deprecated
@@ -127,6 +128,6 @@ public class Position {
     public static BlockPos aboveGround(Level level, BlockPos pos, int altitude) {
         int heightmapY = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY();
         int y = Math.max(pos.getY(), heightmapY + altitude);
-        return pos.atY(y);
+        return pos.getY() == y ? pos : pos.atY(y);
     }
 }

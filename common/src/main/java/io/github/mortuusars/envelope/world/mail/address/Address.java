@@ -118,7 +118,7 @@ public interface Address {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode("p" + id.toLowerCase(Locale.ROOT));
+            return ("p" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
     }
 
@@ -154,7 +154,7 @@ public interface Address {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode("pl" + id.toLowerCase(Locale.ROOT));
+            return ("pl" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
     }
 
@@ -204,7 +204,7 @@ public interface Address {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode("npc" + id.toLowerCase(Locale.ROOT));
+            return ("n" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
     }
 
