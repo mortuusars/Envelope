@@ -13,6 +13,7 @@ public class EnvelopeSymbols {
     public static final String ADDRESS_PLAYER = "\uEE01";
     public static final String ADDRESS_NPC = "\uEE02";
     public static final String ADDRESS_UNKNOWN = "\uEE03";
+    public static final String ADDRESS_MAIL_SERVICE = "\uEE04";
     public static final String LETTER = "\uEE10";
     public static final String SMALL_FILLED_ARROW_LEFT = "\uEE20";
     public static final String SMALL_FILLED_ARROW_RIGHT = "\uEE21";

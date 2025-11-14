@@ -57,6 +57,7 @@ public abstract class AddressDisplay {
 
     public static @NotNull String getIcon(Address address) {
         if (address.equals(Address.UNKNOWN)) return EnvelopeSymbols.ADDRESS_UNKNOWN;
+        if (address.equals(Address.MAIL_SERVICE)) return EnvelopeSymbols.ADDRESS_MAIL_SERVICE;
         return switch (address.type()) {
             case PIGEONHOLE -> EnvelopeSymbols.ADDRESS_PIGEONHOLE;
             case PLAYER -> EnvelopeSymbols.ADDRESS_PLAYER;
