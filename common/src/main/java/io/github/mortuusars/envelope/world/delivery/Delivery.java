@@ -52,6 +52,14 @@ public class Delivery {
         this.progress = progress;
     }
 
+    public static @Nullable Delivery parse(CompoundTag tag, RegistryAccess registryAccess) {
+        if (tag.isEmpty()) return null;
+        return CODEC.parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), tag)
+              .ifError(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag, e))
+              .result()
+              .orElse(null);
+    }
+
     public static Delivery create(ServerLevel level, ItemStack mailStack) {
         Mail mail = new Mail(mailStack);
 
@@ -65,16 +73,9 @@ public class Delivery {
         return new Delivery(sender, recipient, travelDuration, mail, route, DeliveryProgress.start());
     }
 
-    public static @Nullable Delivery parse(CompoundTag tag, RegistryAccess registryAccess) {
-        if (tag.isEmpty()) return null;
-        return CODEC.parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag, e))
-              .result()
-              .orElse(null);
-    }
-
     public static int calculateTravelDuration(ServerLevel level, Address sender, Address recipient) {
-        int distance = level.getEnvelopeContext().addresses().getDistanceTo(sender, recipient).orElse(1000);
+        int distance = level.getEnvelopeContext().addresses().getDistanceTo(sender, recipient)
+              .orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
         return calculateTravelDuration(distance);
     }
 
