@@ -57,8 +57,8 @@ public class BackgroundCourier implements Courier, DeliveryHandler {
     }
 
     @Override
-    public void continueDelivery(ServerLevel level, Delivery delivery) {
-        delivery.adjust(level, this);
+    public DeliveryHandler getDeliveryHandler() {
+        return this;
     }
 
     @Override

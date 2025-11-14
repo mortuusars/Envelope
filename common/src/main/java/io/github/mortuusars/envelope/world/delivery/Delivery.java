@@ -141,24 +141,16 @@ public class Delivery {
 
             if (getCurrentPhase() == DeliveryPhase.FINISHED) {
                 if (Bugger.isEnabled()) {
-                    LOGGER.info("Delivery '{} > {}' is finished.",
-                          getSender().getDisplayName().getString(), getRecipient().getDisplayName().getString());
+                    LOGGER.info("Delivery '{} > {}' is finished.", getSender().getName(), getRecipient().getName());
                 }
                 handler.endDelivery(level, this);
             } else {
                 DeliveryPhase nextPhase = handler.advancePhase(level, this, getCurrentPhase());
-                int duration = Math.max(0, handler.getPhaseDuration(level, this, nextPhase));
-                getProgress().advance(nextPhase, duration);
-                getRoute().update(level, sender, recipient);
-                handler.phaseStarted(level, this, getCurrentPhase());
+                getProgress().advance(nextPhase, Math.max(1, handler.getPhaseDuration(level, this, nextPhase)));
             }
         } else {
             handler.phaseTicked(level, this, getCurrentPhase());
         }
-    }
-
-    public void adjust(ServerLevel level, DeliveryHandler handler) {
-        getProgress().adjustForChangedDuration(handler.getPhaseDuration(level, this, getCurrentPhase()));
     }
 
     public Optional<BlockPos> estimateCurrentPos() {

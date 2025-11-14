@@ -6,6 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
@@ -67,6 +69,7 @@ public class Position {
         return origin.map(pos -> ascendTowards(level, pos, target, distance));
     }
 
+    @Deprecated
     public static boolean isInSafeSimulationDistance(ServerLevel level, BlockPos pos) {
         if (!level.isLoaded(pos)) {
             return false;
@@ -80,6 +83,18 @@ public class Position {
         });
     }
 
+    public static boolean isInSimulationDistance(ServerLevel level, ChunkPos chunkPos) {
+        return level.getChunkSource().chunkMap.getDistanceManager().inEntityTickingRange(chunkPos.toLong());
+    }
+
+    public static boolean isInSimulationDistance(ServerLevel level, BlockPos pos) {
+        return isInSimulationDistance(level, new ChunkPos(pos));
+    }
+
+    public static boolean isInSimulationDistance(ServerLevel level, Entity entity) {
+        return isInSimulationDistance(level, entity.chunkPosition());
+    }
+
     public static @Nullable BlockPos findNearbyHeightmapSpawnPosition(ServerLevel level, BlockPos pos, int altitude) {
         double lowestDistance = Double.MAX_VALUE;
         @Nullable BlockPos closestRandomPos = null;
@@ -87,7 +102,7 @@ public class Position {
         for (int i = 0; i < 5; i++) {
             BlockPos randomPos = aboveGround(level, level.getBlockRandomPos(pos.getX(), pos.getY(), pos.getZ(), 15), altitude);
 
-            if (Position.isInSafeSimulationDistance(level, randomPos)) {
+            if (Position.isInSimulationDistance(level, randomPos)) {
                 double distance = randomPos.distSqr(pos);
 
                 if (distance < lowestDistance) {
@@ -102,7 +117,7 @@ public class Position {
         }
 
         BlockPos blockPos = aboveGround(level, pos, altitude);
-        if (Position.isInSafeSimulationDistance(level, blockPos)) {
+        if (Position.isInSimulationDistance(level, blockPos)) {
             return blockPos;
         }
 

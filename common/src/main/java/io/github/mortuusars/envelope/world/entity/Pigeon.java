@@ -58,7 +58,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.IntFunction;
 
-public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, TransitionableCourier {
+public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, TransitionableCourier<Pigeon> {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -187,11 +187,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public void checkDespawn() {
-        // This method seems to be properly called when entity about to be unloaded (when chunk unloads)
-        // We need to switch to background for the entity to not freeze in unloaded chunk.
-        if (level() instanceof ServerLevel level
-              && isDelivering()
-              && !Position.isInSafeSimulationDistance(level, blockPosition())) {
+        // This method seems to be called every tick, even if entity is not in ticking range
+        // It's a good place to check if courier should be transitioned to background
+        if (level() instanceof ServerLevel level && isDelivering() && !Position.isInSimulationDistance(level, this)) {
             transitionToBackground(level);
         } else {
             super.checkDespawn();
@@ -489,6 +487,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     // -- Courier
 
+    @Override
     public PigeonDeliveryHandler getDeliveryHandler() {
         return deliveryHandler;
     }
@@ -496,7 +495,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public void continueDelivery(ServerLevel level, Delivery delivery) {
         setDelivery(delivery);
-        delivery.adjust(level, getDeliveryHandler());
+        TransitionableCourier.super.continueDelivery(level, delivery);
     }
 
     public void startDelivery(Delivery delivery) {
@@ -525,20 +524,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
             Bugger.PIGEON_DELIVERY.send(getId(), Optional.ofNullable(delivery));
         }
-    }
-
-    @Override
-    public void onAppeared(ServerLevel level) {
-        level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
-        level.playSound(null, position().x, position().y, position().z,
-              SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
-    }
-
-    @Override
-    public void onVanished(ServerLevel level) {
-        level.sendParticles(ParticleTypes.CLOUD, position().x, position().y, position().z, 16, 0.1, 0.1, 0.1, 0.05);
-        level.playSound(null, position().x, position().y, position().z,
-              SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.NEUTRAL, 1, 1);
     }
 
     public void transitionToBackground(ServerLevel level) {

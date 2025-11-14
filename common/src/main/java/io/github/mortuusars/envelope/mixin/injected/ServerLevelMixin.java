@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -51,12 +50,11 @@ public abstract class ServerLevelMixin extends Level implements EnvelopeContextH
         return envelope$envelopeContext;
     }
 
-    @Inject(method = "tick", at = @At("RETURN"))
+    @Inject(method = "tick", at = @At(value = "RETURN"))
     private void onTick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         if (envelope$envelopeContext != null) {
-            getProfiler().push("envelope");
+            getProfiler().popPush("envelope");
             envelope$envelopeContext.tick();
-            getProfiler().pop();
         }
     }
 }

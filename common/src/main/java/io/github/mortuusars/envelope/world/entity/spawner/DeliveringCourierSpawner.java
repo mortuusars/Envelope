@@ -43,8 +43,9 @@ public class DeliveringCourierSpawner implements CustomSpawner {
         Delivery delivery = backgroundCourier.delivery();
 
         @Nullable BlockPos spawnPos = delivery.estimateCurrentPos()
+              .filter(level::isLoaded)
               .map(pos -> Position.aboveGround(level, pos, 2))
-              .filter(pos -> Position.isInSafeSimulationDistance(level, pos))
+              .filter(pos -> Position.isInSimulationDistance(level, pos))
               .orElse(null);
 
         if (spawnPos == null) {
@@ -52,7 +53,7 @@ public class DeliveringCourierSpawner implements CustomSpawner {
         }
 
         @Nullable Entity entity = backgroundCourier.getEntityData().createEntity(level);
-        if (entity instanceof TransitionableCourier courier) {
+        if (entity instanceof TransitionableCourier<?> courier) {
             entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
             if (backgroundCourier.getEntityData().isNew() && entity instanceof Mob mob) {
                 mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.SPAWN_EGG, null);

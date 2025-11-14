@@ -7,11 +7,16 @@ import java.util.Optional;
 
 public interface Courier {
     Component getName();
+
     boolean isService();
 
     Optional<Delivery> getDelivery();
 
-    void continueDelivery(ServerLevel level, Delivery delivery);
+    DeliveryHandler getDeliveryHandler();
+
+    default void continueDelivery(ServerLevel level, Delivery delivery) {
+        delivery.getProgress().update(getDeliveryHandler().getPhaseDuration(level, delivery, delivery.getCurrentPhase()));
+    }
 
     default boolean isDelivering() {
         return getDelivery().isPresent();
