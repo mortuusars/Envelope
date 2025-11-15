@@ -130,4 +130,9 @@ public class Position {
         int y = Math.max(pos.getY(), heightmapY + altitude);
         return pos.getY() == y ? pos : pos.atY(y);
     }
+
+    public static Optional<Integer> getDistanceBetween(Optional<BlockPos> a, Optional<BlockPos> b) {
+        if (a.isEmpty() || b.isEmpty()) return Optional.empty();
+        return Optional.of((int) Math.sqrt(a.get().distSqr(b.get())));
+    }
 }

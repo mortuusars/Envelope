@@ -67,6 +67,7 @@ public class DeliveryProgress {
     }
 
     public void update(int duration) {
+        duration = Math.max(1, duration);
         if (this.duration != duration) {
             this.duration = duration;
             if (this.ticks > 0) {

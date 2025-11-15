@@ -39,8 +39,8 @@ public class Delivery {
     private final Address sender;
     private final Address recipient;
     private final int travelDuration;
-    private final DeliveryRoute route;
     private final DeliveryProgress progress;
+    private DeliveryRoute route;
     private Mail mail;
 
     public Delivery(Address sender, Address recipient, int travelDuration, Mail mail, DeliveryRoute route, DeliveryProgress progress) {
@@ -66,9 +66,14 @@ public class Delivery {
         Address sender = mail.getSenderOrThrow();
         Address recipient = mail.getRecipientOrThrow();
 
-        DeliveryRoute route = DeliveryRoute.create(level, sender, recipient, 10);
+        DeliveryRoute route = DeliveryRoute.build(level, sender, recipient);
 
         int travelDuration = calculateTravelDuration(level, sender, recipient);
+
+        if (Bugger.isEnabled()) {
+            LOGGER.info("Delivery of '{}' - '{} > {}' is created.",
+                  mailStack.getHoverName().getString(), sender.getName(), recipient.getName());
+        }
 
         return new Delivery(sender, recipient, travelDuration, mail, route, DeliveryProgress.start());
     }
@@ -113,6 +118,10 @@ public class Delivery {
         return route;
     }
 
+    public void setRoute(DeliveryRoute route) {
+        this.route = route;
+    }
+
     public DeliveryProgress getProgress() {
         return progress;
     }
@@ -131,7 +140,7 @@ public class Delivery {
         if (isFinished()) return;
 
         if (getProgress().getTicks() == 0) {
-            getRoute().update(level, sender, recipient);
+            setRoute(DeliveryRoute.build(level, sender, recipient));
             handler.phaseStarted(level, this, getCurrentPhase());
         }
 
@@ -147,7 +156,8 @@ public class Delivery {
                 handler.endDelivery(level, this);
             } else {
                 DeliveryPhase nextPhase = handler.advancePhase(level, this, getCurrentPhase());
-                getProgress().advance(nextPhase, Math.max(1, handler.getPhaseDuration(level, this, nextPhase)));
+                int nextPhaseDuration = handler.getPhaseDuration(level, this, nextPhase);
+                getProgress().advance(nextPhase, nextPhaseDuration);
             }
         } else {
             handler.phaseTicked(level, this, getCurrentPhase());

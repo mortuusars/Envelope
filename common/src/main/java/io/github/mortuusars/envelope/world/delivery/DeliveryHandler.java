@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.delivery;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
+import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.server.level.ServerLevel;
 
@@ -16,7 +17,13 @@ public interface DeliveryHandler {
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
-        return currentPhase.hasNext() ? currentPhase.next(delivery.getRoute().canSkipTraveling()) : currentPhase;
+        return currentPhase.hasNext() ? currentPhase.next(canSkipTraveling(level, delivery)) : currentPhase;
+    }
+
+    default boolean canSkipTraveling(ServerLevel level, Delivery delivery) {
+        return delivery.getRoute().getDistance()
+              .map(distance -> distance < DeliveryRoute.DEFAULT_ASCEND_DISTANCE * 2)
+              .orElse(false);
     }
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
