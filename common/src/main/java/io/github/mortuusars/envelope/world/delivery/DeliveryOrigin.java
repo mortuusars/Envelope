@@ -12,6 +12,11 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
+/**
+ * Service deliveries have no position defined, and thus courier will be despawned after delivery ends.<br>
+ * Real entities will have it set to spawn there after delivery (if delivery is finished in background).
+ * @param pos Basically the starting position of a delivery.
+ */
 public record DeliveryOrigin(Optional<BlockPos> pos) {
     public static final Codec<DeliveryOrigin> CODEC = BlockPos.CODEC.optionalFieldOf("pos")
           .xmap(DeliveryOrigin::new, DeliveryOrigin::pos)

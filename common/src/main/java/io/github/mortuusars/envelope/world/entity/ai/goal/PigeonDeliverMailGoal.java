@@ -89,6 +89,11 @@ public class PigeonDeliverMailGoal extends Goal implements DeliveryHandler {
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
+        if (currentPhase == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
+            delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_unableToReach())));
+            return DeliveryPhase.DEPARTING_RECIPIENT;
+        }
+
         return DeliveryHandler.super.advancePhase(level, delivery, currentPhase);
     }
 
