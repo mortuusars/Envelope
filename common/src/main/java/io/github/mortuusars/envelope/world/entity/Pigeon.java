@@ -7,22 +7,18 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.*;
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.Mth;
@@ -95,7 +91,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
 
     public float flap;
@@ -108,8 +103,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected PigeonholeHandler pigeonholeHandler;
     protected PigeonDeliverMailGoal deliverMailGoal;
 
-    protected @Nullable Delivery delivery = null;
-    protected boolean service;
+    protected @Nullable Delivery delivery;
 
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
@@ -130,7 +124,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+                                        MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         setVariant(Variant.getRandom(random));
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
@@ -290,14 +285,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         entityData.set(DATA_HAS_MAIL, hasMail);
     }
 
-    public boolean isService() {
-        return entityData.get(DATA_SERVICE);
-    }
-
-    public void setService(boolean service) {
-        entityData.set(DATA_SERVICE, service);
-    }
-
     public boolean hasFancyHat() {
         //TODO: supporters
         // return getOwnerUUID()
@@ -318,7 +305,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         builder.define(DATA_VARIANT_ID, 0);
         builder.define(DATA_SITTING, false);
         builder.define(DATA_DELIVERING, false);
-        builder.define(DATA_SERVICE, false);
         builder.define(DATA_HAS_MAIL, false);
     }
 
@@ -501,8 +487,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public void startDelivery(Delivery delivery) {
         if (this.delivery != null && this.delivery != delivery) {
-            LOGGER.warn("Starting new delivery when pigeon is already delivering. This is not might be an error.");
+            LOGGER.warn("Starting new delivery when pigeon is already delivering. This might be an error.");
         }
+        stopRiding();
         setDelivery(delivery);
     }
 
@@ -527,25 +514,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
     }
 
-    public void transitionToBackground(ServerLevel level) {
-        if (level.getServer().isStopped() || isRemoved() || !isDelivering()) return;
-        if (Envelope.debug()) LOGGER.info("Transitioning delivering Pigeon to background...");
-        BackgroundCourier backgroundCourier = toBackgroundCourier();
-        level.getEnvelopeContext().getBackgroundDelivery().addCourier(backgroundCourier);
-        backgroundCourier.continueDelivery(level, backgroundCourier.delivery());
-        onVanished(level);
-        discard();
-    }
-
     @Override
-    public BackgroundCourier toBackgroundCourier() {
-        stopRiding();
-        return new BackgroundCourier(
-              SpawnableEntityData.of(this, IGNORED_TAGS),
-              isService()
-                    ? CourierOrigin.service()
-                    : CourierOrigin.real(Optional.ofNullable(getPigeonholeHandler().getLastReleasePos()).orElse(blockPosition())),
-              getDelivery().orElseThrow());
+    public SpawnableEntityData toSpawnableData() {
+        return SpawnableEntityData.of(this, IGNORED_TAGS);
     }
 
     // -- Save / Load
@@ -558,13 +529,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         tag.putBoolean("Sitting", isSitting());
 
         if (delivery != null) {
-            Tag deliveryTag = Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
-                  .getOrThrow();
-            tag.put("Delivery", deliveryTag);
-        }
-
-        if (service) {
-            tag.putBoolean("Service", true);
+            tag.put("Delivery", delivery.encode(registryAccess()));
         }
     }
 
@@ -575,7 +540,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         setVariant(Variant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
         setDelivery(Delivery.parse(tag.getCompound("Delivery"), registryAccess()));
-        setService(tag.getBoolean("Service"));
 
         setDelivering(delivery != null);
         setHasMail(delivery != null && !delivery.getMail().isEmpty());

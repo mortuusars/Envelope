@@ -101,11 +101,12 @@ public class PigeonDeliverMailGoal extends Goal implements DeliveryHandler {
                   pigeon().getName().getString());
         }
 
-        if (pigeon().isService()) {
+        pigeon().setDelivery(null);
+
+        if (delivery.getOrigin().isService()) {
             pigeon().onVanished(level);
             pigeon().discard();
         } else {
-            pigeon().setDelivery(null);
             pigeon().getPigeonholeHandler().setCurrentPos(pigeon().getPigeonholeHandler().getLastReleasePos());
             // Prevent Pigeon entering Pigeonhole immediately:
             pigeon().getPigeonholeHandler().setWantCooldown(40);

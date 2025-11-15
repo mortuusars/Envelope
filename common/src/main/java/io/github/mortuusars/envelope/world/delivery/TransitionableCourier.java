@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.delivery;
 
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
+import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -9,9 +10,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public interface TransitionableCourier<T extends Entity> extends Courier {
-    void setService(boolean service);
+    SpawnableEntityData toSpawnableData();
 
-    BackgroundCourier toBackgroundCourier();
+    default BackgroundCourier transitionToBackground(ServerLevel level) {
+        return getDelivery()
+              .map(delivery -> {
+                  BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableData(), delivery);
+                  level.getEnvelopeContext().getBackgroundDelivery().addCourier(backgroundCourier);
+                  backgroundCourier.continueDelivery(level, backgroundCourier.delivery());
+                  onVanished(level);
+                  ((Entity) this).discard();
+                  return backgroundCourier;
+              })
+              .orElseThrow(() -> new IllegalStateException("Cannot transition: courier is not delivering."));
+    }
 
     default void onAppeared(ServerLevel level) {
         Vec3 pos = ((Entity) this).position();

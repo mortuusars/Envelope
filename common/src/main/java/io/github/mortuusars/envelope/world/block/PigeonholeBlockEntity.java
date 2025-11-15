@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNew
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.delivery.Courier;
+import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.StoredMail;
@@ -398,7 +399,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
                 if (!mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
                     mail.set(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
                 }
-                pigeon.startDelivery(Delivery.create(serverLevel, mail));
+
+                pigeon.startDelivery(Delivery.create(serverLevel, mail, DeliveryOrigin.regular(getBlockPos())));
 
                 getItem(SLOT_FOOD).shrink(1);
                 if (getItem(SLOT_FOOD).isEmpty()) {

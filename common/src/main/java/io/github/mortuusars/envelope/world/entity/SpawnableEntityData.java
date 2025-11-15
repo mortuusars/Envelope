@@ -1,11 +1,9 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.google.common.base.Preconditions;
-import com.mojang.datafixers.util.Either;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
@@ -18,24 +16,22 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.function.Function;
 
-public record SpawnableEntityData(Either<CustomData, EntityType<?>> dataOrType) {
-    public static final Codec<SpawnableEntityData> CODEC = Codec.either(
+public record SpawnableEntityData(CustomData data) {
+    public static final Codec<SpawnableEntityData> CODEC =
                 CustomData.CODEC.validate(data -> {
                     if (data.isEmpty()) return DataResult.error(() -> "Entity data cannot be empty.");
                     return DataResult.success(data);
-                }),
-                BuiltInRegistries.ENTITY_TYPE.byNameCodec())
-          .xmap(SpawnableEntityData::new, SpawnableEntityData::dataOrType);
+                })
+          .xmap(SpawnableEntityData::new, SpawnableEntityData::data);
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public SpawnableEntityData(CustomData data) {
-        this(Either.left(data));
+    @SuppressWarnings("deprecation")
+    public SpawnableEntityData {
         Preconditions.checkArgument(!data.isEmpty(), "Entity data cannot be empty.");
-    }
-
-    public SpawnableEntityData(EntityType<?> type) {
-        this(Either.right(type));
+        Preconditions.checkState(!data.getUnsafe().isEmpty(), "Entity tag cannot be empty.");
+        Preconditions.checkState(data.getUnsafe().contains("id", Tag.TAG_STRING),
+              "Entity tag does not contain an 'id': " + data.getClass());
     }
 
     public static SpawnableEntityData of(Entity entity, List<String> ignoredTags) {
@@ -50,24 +46,13 @@ public record SpawnableEntityData(Either<CustomData, EntityType<?>> dataOrType) 
         }
 
         ignoredTags.forEach(tag::remove);
-
-        Preconditions.checkState(!tag.isEmpty(), "Entity tag cannot be empty.");
-        Preconditions.checkState(tag.contains("id", Tag.TAG_STRING), "Entity tag does not contain an 'id': " + tag);
-
         return new SpawnableEntityData(CustomData.of(tag));
     }
 
     // --
 
-    public boolean isNew() {
-        return dataOrType().right().isPresent();
-    }
-
-    @SuppressWarnings("deprecation") // We do not modify the tag returned by CustomData#getUnsafe
+    @SuppressWarnings("deprecation")
     public @Nullable Entity createEntity(ServerLevel level) {
-        return dataOrType.map(
-              data -> EntityType.loadEntityRecursive(data.getUnsafe(), level, Function.identity()),
-              type -> type.create(level)
-        );
+        return EntityType.loadEntityRecursive(data.getUnsafe(), level, Function.identity());
     }
 }

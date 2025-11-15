@@ -4,22 +4,26 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.delivery.Courier;
+import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
@@ -28,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,14 +100,32 @@ public class EnvelopeContext {
 
     // --
 
-    public BackgroundCourier startDelivery(ItemStack mail) {
-        BackgroundCourier courier = new BackgroundCourier(
-              new SpawnableEntityData(Envelope.EntityTypes.PIGEON.get()),
-              CourierOrigin.service(),
-              Delivery.create(level, mail)
-        );
-        getBackgroundDelivery().addCourier(courier);
-        return courier;
+    public Courier startDelivery(ItemStack mail) {
+        Delivery delivery = Delivery.create(level, mail, DeliveryOrigin.service());
+
+        @Nullable Pigeon deliveringPigeon = Envelope.EntityTypes.PIGEON.get().create(level);
+        Preconditions.checkNotNull(deliveringPigeon, "Failed to create an entity. This should not happen.");
+
+        Optional<BlockPos> spawnPos = delivery.getRoute().senderPos().map(p -> Position.aboveGround(level, p, 1));
+
+        deliveringPigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos.orElse(BlockPos.ZERO)),
+              MobSpawnType.EVENT, null);
+        deliveringPigeon.startDelivery(delivery);
+
+        return spawnPos
+              .filter(pos -> Position.isInSimulationDistance(level, pos))
+              .map(pos -> {
+                  deliveringPigeon.moveTo(
+                        (double) pos.getX() + 0.5,
+                        (double) pos.getY() + 0.5,
+                        (double) pos.getZ() + 0.5,
+                        Mth.wrapDegrees(level.random.nextFloat() * 360.0F),
+                        0.0F);
+                  level.addFreshEntity(deliveringPigeon);
+                  deliveringPigeon.onAppeared(level);
+                  return (Courier) deliveringPigeon;
+              })
+              .orElseGet(() -> deliveringPigeon.transitionToBackground(level));
     }
 
     // --
@@ -134,9 +157,10 @@ public class EnvelopeContext {
                           ChatFormatting.GREEN + delivery.getRecipient().getString() + ChatFormatting.RESET +
 
                           ChatFormatting.GRAY +
-                          (!delivery.getMail().isEmpty() ? " ✉" : "") +
-                          addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " ↔" + d).orElse("") +
-                          " ⌚" + delivery.getTravelDuration() / 20 + "s" +
+                          (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
+                          addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
+                          " | ⌚" + delivery.getTravelDuration() / 20 + "s" +
+                          (delivery.getOrigin().isService() ? " | Service" : "") +
                           ChatFormatting.RESET +
 
                           " // " + delivery.getCurrentPhase().toPrettyString() +

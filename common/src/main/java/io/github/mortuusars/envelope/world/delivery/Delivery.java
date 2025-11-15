@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -29,6 +30,7 @@ public class Delivery {
           Address.CODEC.fieldOf("sender").forGetter(Delivery::getSender),
           Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
           Codec.intRange(0, Integer.MAX_VALUE).fieldOf("travel_duration").forGetter(Delivery::getTravelDuration),
+          DeliveryOrigin.CODEC.optionalFieldOf("origin", DeliveryOrigin.service()).forGetter(Delivery::getOrigin),
           Mail.CODEC.fieldOf("mail").forGetter(Delivery::getMail),
           DeliveryRoute.CODEC.fieldOf("route").forGetter(Delivery::getRoute),
           DeliveryProgress.CODEC.fieldOf("progress").forGetter(Delivery::getProgress)
@@ -39,14 +41,16 @@ public class Delivery {
     private final Address sender;
     private final Address recipient;
     private final int travelDuration;
+    private final DeliveryOrigin origin;
     private final DeliveryProgress progress;
     private DeliveryRoute route;
     private Mail mail;
 
-    public Delivery(Address sender, Address recipient, int travelDuration, Mail mail, DeliveryRoute route, DeliveryProgress progress) {
+    public Delivery(Address sender, Address recipient, int travelDuration, DeliveryOrigin origin, Mail mail, DeliveryRoute route, DeliveryProgress progress) {
         this.sender = sender;
         this.recipient = recipient;
         this.travelDuration = travelDuration;
+        this.origin = origin;
         this.mail = mail;
         this.route = route;
         this.progress = progress;
@@ -60,7 +64,11 @@ public class Delivery {
               .orElse(null);
     }
 
-    public static Delivery create(ServerLevel level, ItemStack mailStack) {
+    public Tag encode(RegistryAccess registryAccess) throws IllegalStateException {
+        return Delivery.CODEC.encodeStart(registryAccess.createSerializationContext(NbtOps.INSTANCE), this).getOrThrow();
+    }
+
+    public static Delivery create(ServerLevel level, ItemStack mailStack, DeliveryOrigin origin) {
         Mail mail = new Mail(mailStack);
 
         Address sender = mail.getSenderOrThrow();
@@ -75,7 +83,7 @@ public class Delivery {
                   mailStack.getHoverName().getString(), sender.getName(), recipient.getName());
         }
 
-        return new Delivery(sender, recipient, travelDuration, mail, route, DeliveryProgress.start());
+        return new Delivery(sender, recipient, travelDuration, origin, mail, route, DeliveryProgress.start());
     }
 
     public static int calculateTravelDuration(ServerLevel level, Address sender, Address recipient) {
@@ -100,6 +108,10 @@ public class Delivery {
 
     public int getTravelDuration() {
         return travelDuration;
+    }
+
+    public DeliveryOrigin getOrigin() {
+        return origin;
     }
 
     public Mail getMail() {
