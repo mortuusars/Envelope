@@ -106,7 +106,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected float nextFlap = 1.0F;
 
     protected PigeonholeHandler pigeonholeHandler;
-    protected PigeonDeliveryHandler deliveryHandler = new PigeonDeliveryHandler(this);
+    protected PigeonDeliverMailGoal deliverMailGoal;
 
     protected @Nullable Delivery delivery = null;
     protected boolean service;
@@ -149,7 +149,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(0, new PigeonDeliverMailGoal(this));
+        deliverMailGoal = new PigeonDeliverMailGoal(this);
+        goalSelector.addGoal(0, deliverMailGoal);
         goalSelector.addGoal(1, new PigeonEnterPigeonholeGoal(this));
         goalSelector.addGoal(2, new BreedGoal(this, 1.0));
         goalSelector.addGoal(3, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
@@ -488,8 +489,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     // -- Courier
 
     @Override
-    public PigeonDeliveryHandler getDeliveryHandler() {
-        return deliveryHandler;
+    public DeliveryHandler getDeliveryHandler() {
+        return deliverMailGoal;
     }
 
     @Override
