@@ -17,7 +17,7 @@ public interface DeliveryHandler {
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
-        return currentPhase.hasNext() ? currentPhase.next(canSkipTraveling(level, delivery)) : currentPhase;
+        return currentPhase.next(canSkipTraveling(level, delivery));
     }
 
     default boolean canSkipTraveling(ServerLevel level, Delivery delivery) {

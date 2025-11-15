@@ -9,19 +9,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.CustomSpawner;
-import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class FinishedCourierSpawner implements CustomSpawner {
+public class FinishedBackgroundCourierSpawner implements CustomSpawner {
     protected static final int SPAWN_ATTEMPT_DELAY = 10;
     protected int nextAttemptDelay;
 
     @Override
     public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
-        if (!spawnFriendlies || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) return 0;
-
         nextAttemptDelay--;
         if (nextAttemptDelay > 0) {
             return 0;

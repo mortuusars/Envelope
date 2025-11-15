@@ -2,8 +2,8 @@ package io.github.mortuusars.envelope.mixin.pigeon_spawner;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import io.github.mortuusars.envelope.world.entity.spawner.DeliveringCourierSpawner;
-import io.github.mortuusars.envelope.world.entity.spawner.FinishedCourierSpawner;
+import io.github.mortuusars.envelope.world.entity.spawner.BackgroundCourierSpawner;
+import io.github.mortuusars.envelope.world.entity.spawner.FinishedBackgroundCourierSpawner;
 import io.github.mortuusars.envelope.world.entity.spawner.PigeonSpawner;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
@@ -25,8 +25,8 @@ public class MinecraftServerMixin {
     private void addToSpawnersList(ChunkProgressListener listener, CallbackInfo ci, @Local LocalRef<List<CustomSpawner>> spawners) {
         List<CustomSpawner> modifiedSpawnersList = new ArrayList<>(spawners.get());
         modifiedSpawnersList.add(new PigeonSpawner());
-        modifiedSpawnersList.add(new DeliveringCourierSpawner());
-        modifiedSpawnersList.add(new FinishedCourierSpawner());
+        modifiedSpawnersList.add(new BackgroundCourierSpawner());
+        modifiedSpawnersList.add(new FinishedBackgroundCourierSpawner());
         spawners.set(modifiedSpawnersList);
     }
 }

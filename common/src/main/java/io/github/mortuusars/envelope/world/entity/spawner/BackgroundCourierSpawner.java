@@ -10,18 +10,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.CustomSpawner;
-import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class DeliveringCourierSpawner implements CustomSpawner {
+public class BackgroundCourierSpawner implements CustomSpawner {
     @Override
     public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
-        if (!spawnFriendlies || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
-            return 0;
-        }
-
         BackgroundDelivery backgroundDelivery = level.getEnvelopeContext().getBackgroundDelivery();
 
         List<BackgroundCourier> spawnableCouriers = backgroundDelivery.getCouriers()
@@ -54,13 +49,13 @@ public class DeliveringCourierSpawner implements CustomSpawner {
 
         @Nullable Entity entity = backgroundCourier.getEntityData().createEntity(level);
         if (entity instanceof TransitionableCourier<?> courier) {
+            if (backgroundCourier.isService()) {
+                courier.setService(true);
+            }
+
             entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
             if (backgroundCourier.getEntityData().isNew() && entity instanceof Mob mob) {
                 mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.SPAWN_EGG, null);
-            }
-
-            if (backgroundCourier.isService()) {
-                courier.setService(true);
             }
 
             level.addFreshEntityWithPassengers(entity);
