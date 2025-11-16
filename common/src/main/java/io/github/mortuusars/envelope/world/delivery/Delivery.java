@@ -163,7 +163,7 @@ public class Delivery {
 
             if (getCurrentPhase() == DeliveryPhase.FINISHED) {
                 if (Bugger.isEnabled()) {
-                    LOGGER.info("Delivery '{} > {}' is finished.", getSender().getName(), getRecipient().getName());
+                    LOGGER.info("Delivery '{} > {}' is finished.", getSender(), getRecipient());
                 }
                 handler.endDelivery(level, this);
             } else {

@@ -4,14 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
@@ -86,7 +85,11 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
     public MutableComponent translate(long gameTime) {
         MutableComponent component = Component.translatable("gui.envelope.delivery.log.record." + status().getSerializedName())
               .append(" ")
-              .append(AddressDisplay.create(address, AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.applyFormat(ChatFormatting.WHITE)));
+              .append(address.format()
+                    .withIcon()
+                    .withIconColor(AddressFormatter.NEUTRAL_COLOR)
+                    .withColor(ChatFormatting.WHITE)
+                    .toComponent());
 
         message.ifPresent(msg -> {
             component.append(" ");

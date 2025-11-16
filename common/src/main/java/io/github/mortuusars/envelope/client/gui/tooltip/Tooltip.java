@@ -1,9 +1,8 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,9 +15,10 @@ public class Tooltip {
                 return;
             }
 
-            @Nullable MutableComponent senderToRecipient = AddressDisplay.createSenderToRecipient(
-                    stack.get(Envelope.DataComponents.MAIL_SENDER),
-                    stack.get(Envelope.DataComponents.MAIL_RECIPIENT));
+            @Nullable Component senderToRecipient = AddressFormatter.senderToRecipient(
+                  stack.get(Envelope.DataComponents.MAIL_SENDER),
+                  stack.get(Envelope.DataComponents.MAIL_RECIPIENT));
+
             if (senderToRecipient != null) {
                 consumer.accept(senderToRecipient);
             }

@@ -139,6 +139,8 @@ public class EnvelopeContext {
         }
     }
 
+    // --
+
     private void collectDebugInfo(CompoundTag tag) {
         List<? extends Pigeon> pigeons = level.getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
         List<BackgroundCourier> backgroundCouriers = getBackgroundDelivery().getCouriers();
@@ -152,25 +154,28 @@ public class EnvelopeContext {
                     pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
                     backgroundCouriers.stream().map(BackgroundCourier::delivery))
               .sorted(Comparator.comparingInt(Delivery::hashCode))
-              .map(delivery -> StringTag.valueOf(
-                    ChatFormatting.AQUA + delivery.getSender().toStringWithIcon() + ChatFormatting.RESET +
-                          " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
-                          ChatFormatting.GREEN + delivery.getRecipient().toStringWithIcon() + ChatFormatting.RESET +
-
-                          ChatFormatting.GRAY +
-                          (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
-                          addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
-                          " | ⌚" + delivery.getTravelDuration() / 20 + "s" +
-                          (delivery.getOrigin().isService() ? " | Service" : "") +
-                          ChatFormatting.RESET +
-
-                          " // " + delivery.getCurrentPhase().toPrettyString() +
-
-                          ChatFormatting.GRAY +
-                          " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
-                          ChatFormatting.RESET))
+              .map(delivery -> StringTag.valueOf(formDeliveryString(delivery)))
               .collect(Collectors.toCollection(ListTag::new));
 
         tag.put("deliveries", deliveries);
+    }
+
+    private @NotNull String formDeliveryString(Delivery delivery) {
+        return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
+              " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
+              ChatFormatting.GREEN + delivery.getRecipient().format().withIcon() + ChatFormatting.RESET +
+
+              ChatFormatting.GRAY +
+              (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
+              addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
+              " | ⌚" + delivery.getTravelDuration() / 20 + "s" +
+              (delivery.getOrigin().isService() ? " | Service" : "") +
+              ChatFormatting.RESET +
+
+              " // " + delivery.getCurrentPhase().toPrettyString() +
+
+              ChatFormatting.GRAY +
+              " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
+              ChatFormatting.RESET;
     }
 }

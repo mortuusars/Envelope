@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.StoredMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
@@ -16,6 +15,7 @@ import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
@@ -29,7 +29,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -420,10 +419,12 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         List<Component> tooltip = new ArrayList<>();
 
         Address sender = getDisplayedSender(hoveredMail);
-        if (font.width(sender.getName().getString()) > 76) {
-            MutableComponent address = AddressDisplay.create(sender,
-                  AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.withColor(ChatFormatting.WHITE));
-            tooltip.add(address);
+        if (font.width(sender.toString()) > 76) {
+            tooltip.add(AddressFormatter.of(sender)
+                  .withIcon()
+                  .withIconColor(AddressFormatter.NEUTRAL_COLOR)
+                  .withColor(ChatFormatting.WHITE)
+                  .toComponent());
         }
 
         DeliveryLog deliveryLog = hoveredMail.getDeliveryLog();

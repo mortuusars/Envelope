@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
@@ -36,27 +35,6 @@ public interface Address {
     String id();
 
     /**
-     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
-     * Entity address returns its translation, if present.
-     */
-    default MutableComponent getName() {
-        return Component.literal(id());
-    }
-
-    /**
-     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
-     * Entity address returns its translation, if present.
-     */
-    String toString();
-
-    /**
-     * @return "Display" name of an address with a corresponding icon in front.
-     */
-    default String toStringWithIcon() {
-        return AddressDisplay.getIcon(this) + EnvelopeSymbols.SMALL_SPACE + this;
-    }
-
-    /**
      * Compares "display" name of a current address to the given string (ignoring the case).<br>
      * Nothing special for Pigeonhole and Player addresses, but Entity address will be compared by its translation, if present.
      * @return {@code  true} if names look the same (ignoring the case).
@@ -70,6 +48,26 @@ public interface Address {
      */
     default boolean matches(Address address) {
         return matches(address.toString());
+    }
+
+    // --
+
+    /**
+     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * Entity address returns its translation, if present.
+     */
+    default MutableComponent getName() {
+        return Component.literal(id());
+    }
+
+    /**
+     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * Entity address returns its translation, if present.
+     */
+    String toString();
+
+    default AddressFormatter format() {
+        return AddressFormatter.of(this);
     }
 
     default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Entity, R> ifEntity) {

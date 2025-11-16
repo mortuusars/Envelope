@@ -1,0 +1,161 @@
+package io.github.mortuusars.envelope.world.mail.address;
+
+import com.mojang.datafixers.util.Either;
+import io.github.mortuusars.envelope.util.EnvelopeSymbols;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
+
+public class AddressFormatter {
+    public static final int NEUTRAL_COLOR = 0xFFD2BCA4;
+    public static final int SENDER_COLOR = 0xFFA3A7D4;
+    public static final int RECIPIENT_COLOR = 0xFF93C48F;
+
+    protected final Address address;
+    protected boolean icon = false;
+    protected String iconSeparator = EnvelopeSymbols.SMALL_SPACE;
+    protected Either<ChatFormatting, Style> iconStyle = Either.right(Style.EMPTY);
+    protected Either<ChatFormatting, Style> textStyle = Either.right(Style.EMPTY);
+    protected int maxLength = Integer.MAX_VALUE;
+
+    protected AddressFormatter(Address address) {
+        this.address = address;
+    }
+
+    public static AddressFormatter of(Address address) {
+        return new AddressFormatter(address);
+    }
+
+    // --
+
+    public AddressFormatter asSender() {
+        return this
+              .withIcon()
+              .withIconColor(SENDER_COLOR)
+              .withColor(SENDER_COLOR);
+    }
+
+    public AddressFormatter asRecipient() {
+        return this
+              .withIcon()
+              .withIconColor(RECIPIENT_COLOR)
+              .withColor(RECIPIENT_COLOR);
+    }
+
+    // --
+
+    public AddressFormatter withIcon() {
+        this.icon = true;
+        return this;
+    }
+
+    public AddressFormatter withIconSeparator(String separator) {
+        this.iconSeparator = separator;
+        return this;
+    }
+
+    public AddressFormatter withIconColor(ChatFormatting formatting) {
+        this.iconStyle = Either.left(formatting);
+        return this;
+    }
+
+    public AddressFormatter withIconStyle(Style style) {
+        this.iconStyle = Either.right(style);
+        return this;
+    }
+
+    public AddressFormatter withIconColor(int color) {
+        this.iconStyle = Either.right(Style.EMPTY.withColor(color));
+        return this;
+    }
+
+    public AddressFormatter withColor(ChatFormatting formatting) {
+        this.textStyle = Either.left(formatting);
+        return this;
+    }
+
+    public AddressFormatter withStyle(Style style) {
+        this.textStyle = Either.right(style);
+        return this;
+    }
+
+    public AddressFormatter withColor(int color) {
+        this.textStyle = Either.right(Style.EMPTY.withColor(color));
+        return this;
+    }
+
+    public AddressFormatter withMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+        return this;
+    }
+
+    // --
+
+    public MutableComponent toComponent() {
+        MutableComponent addressComponent = address.getName().withStyle(createStyle(textStyle));
+
+        if (icon) {
+            return Component.empty()
+                  .append(Component.literal(getIcon(address)).withStyle(createStyle(iconStyle)))
+                  .append(iconSeparator)
+                  .append(addressComponent);
+        }
+
+        return addressComponent;
+    }
+
+    @Override
+    public String toString() {
+        String addressText = textStyle.left()
+              .map(formatting -> formatting + address.toString() + ChatFormatting.RESET)
+              .orElse(address.toString());
+
+        if (icon) {
+            String icon = iconStyle.left()
+                  .map(formatting -> formatting + getIcon(address) + ChatFormatting.RESET)
+                  .orElse(getIcon(address));
+            return icon + iconSeparator + addressText;
+        }
+
+        return addressText;
+    }
+
+    protected Style createStyle(Either<ChatFormatting, Style> style) {
+        return style.map(Style.EMPTY::applyFormat, Function.identity());
+    }
+
+    // --
+
+    public static @NotNull String getIcon(Address address) {
+        if (address.equals(Address.UNKNOWN)) return EnvelopeSymbols.ADDRESS_UNKNOWN;
+        if (address.equals(Address.MAIL_SERVICE)) return EnvelopeSymbols.ADDRESS_MAIL_SERVICE;
+        return switch (address.type()) {
+            case PIGEONHOLE -> EnvelopeSymbols.ADDRESS_PIGEONHOLE;
+            case PLAYER -> EnvelopeSymbols.ADDRESS_PLAYER;
+            case ENTITY -> EnvelopeSymbols.ADDRESS_NPC;
+        };
+    }
+
+    public static @Nullable MutableComponent senderToRecipient(@Nullable Address sender, @Nullable Address recipient) {
+        if (sender == null && recipient == null) return null;
+
+        if (sender != null) {
+            if (recipient == null) {
+                recipient = Address.UNKNOWN;
+            }
+
+            return sender.format().asSender().withColor(ChatFormatting.GRAY).toComponent()
+                  .append(Component.literal(" " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " ").withStyle(ChatFormatting.GRAY))
+                  .append(recipient.format().asRecipient().toComponent());
+        }
+
+        return Component.empty()
+              .append(Component.literal(" " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT).withStyle(ChatFormatting.GRAY))
+              .append(recipient.format().asRecipient().withColor(ChatFormatting.GRAY).toComponent());
+    }
+}

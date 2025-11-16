@@ -6,8 +6,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.world.delivery.Courier;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -46,10 +47,9 @@ public class EnvelopeCommand {
 
         try {
             Courier courier = level.getEnvelopeContext().startDelivery(mail);
-            Component message = courier.getDelivery()
-                  .map(delivery -> Component.literal("Mail sent to ")
-                        .append(AddressDisplay.createGeneric(delivery.getRecipient())))
-                  .orElse(Component.literal("Mail sent"));
+            Delivery delivery = courier.getDelivery().orElseThrow();
+            Component message = Component.literal("Mail sent to ")
+                  .append(delivery.getRecipient().format().asRecipient().toComponent());
             context.getSource().sendSuccess(() -> message, true);
         } catch (Exception e) {
             context.getSource().sendFailure(Component.literal("Cannot send: " + e.getMessage()));
@@ -99,7 +99,7 @@ public class EnvelopeCommand {
 
         return address.getName()
               .withStyle(Style.EMPTY
-                    .withColor(AddressDisplay.GENERIC_COLOR)
+                    .withColor(AddressFormatter.NEUTRAL_COLOR)
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Address")
                           .append("\n")
                           .append(Component.literal(addressId).withStyle(ChatFormatting.GRAY))))

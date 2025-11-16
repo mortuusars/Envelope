@@ -3,10 +3,11 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -36,7 +37,11 @@ public class AddressTagItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
         if (address != null) {
-            tooltipComponents.add(AddressDisplay.createGeneric(address));
+            tooltipComponents.add(address.format()
+                  .withIcon()
+                  .withIconColor(AddressFormatter.NEUTRAL_COLOR)
+                  .withColor(ChatFormatting.GRAY)
+                  .toComponent());
         }
     }
 

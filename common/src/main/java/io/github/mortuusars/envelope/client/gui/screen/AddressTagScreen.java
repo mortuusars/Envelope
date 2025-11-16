@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressDisplay;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
@@ -210,9 +210,9 @@ public class AddressTagScreen extends Screen {
     protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Address address = getMatchedKnownAddress().orElse(Address.UNKNOWN);
 
-        int color = address == Address.UNKNOWN ? 0xFFB89B76 : 0xFF7B593D;
-        guiGraphics.drawString(font, AddressDisplay.getIcon(address),
-                leftPos + 12, topPos + 18, color, false);
+        int color = address.equals(Address.UNKNOWN) ? 0xFFB89B76 : 0xFF7B593D;
+        guiGraphics.drawString(font, AddressFormatter.getIcon(address), leftPos + 12, topPos + 18, color, false);
+
         if (address != Address.UNKNOWN && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
             guiGraphics.renderTooltip(font, address.type().translate(), mouseX, mouseY);
         }
