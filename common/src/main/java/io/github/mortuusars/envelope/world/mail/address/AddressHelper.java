@@ -1,9 +1,8 @@
-package io.github.mortuusars.envelope.world.service;
+package io.github.mortuusars.envelope.world.mail.address;
 
 import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
+import io.github.mortuusars.envelope.world.service.EnvelopeContext;
 import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,8 +35,8 @@ public class AddressHelper {
     }
 
     public Optional<Integer> getDistanceTo(Address from, Address to) {
-        if (to instanceof Address.Entity entityAddress) {
-            return context.getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
+        if (to instanceof Address.Entity entity) {
+            return context.getMailEntities().byAddress(entity).map(MailEntity::getDistance);
         }
 
         Optional<BlockPos> fromPos = Position.ofAddress(context.getLevel(), from);

@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressHelper;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
@@ -152,9 +153,9 @@ public class EnvelopeContext {
                     backgroundCouriers.stream().map(BackgroundCourier::delivery))
               .sorted(Comparator.comparingInt(Delivery::hashCode))
               .map(delivery -> StringTag.valueOf(
-                    ChatFormatting.AQUA + delivery.getSender().getString() + ChatFormatting.RESET +
+                    ChatFormatting.AQUA + delivery.getSender().toStringWithIcon() + ChatFormatting.RESET +
                           " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
-                          ChatFormatting.GREEN + delivery.getRecipient().getString() + ChatFormatting.RESET +
+                          ChatFormatting.GREEN + delivery.getRecipient().toStringWithIcon() + ChatFormatting.RESET +
 
                           ChatFormatting.GRAY +
                           (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +

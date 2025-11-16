@@ -512,7 +512,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Override
     protected @NotNull Component getDefaultName() {
-        return getAddress().map(Address::getDisplayName).orElse(Component.translatable("container.envelope.pigeonhole"));
+        return getAddress().map(Address::getName).orElse(Component.translatable("container.envelope.pigeonhole"));
     }
 
     public @NotNull Level getLevelOrThrow() {

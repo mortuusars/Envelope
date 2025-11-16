@@ -112,7 +112,7 @@ public class AddressTagScreen extends Screen {
     protected String getInitialAddressValue() {
         @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
         if (address != null) {
-            return address.id();
+            return address.toString();
         }
         return "";
     }
@@ -172,7 +172,7 @@ public class AddressTagScreen extends Screen {
 
     protected @Nullable FormattedString getAutocompleteSuggestion(String addressId) {
         return knownAddresses.stream()
-            .map(a -> a.getDisplayName().getString())
+            .map(a -> a.getName().getString())
             .sorted(String.CASE_INSENSITIVE_ORDER)
             .filter(a -> a.toLowerCase().startsWith(addressId.toLowerCase()))
             .findFirst()

@@ -80,24 +80,24 @@ public class EnvelopeCommand {
     private static int pigeonholePosition(CommandContext<CommandSourceStack> context, Address.Pigeonhole address) {
         ServerLevel level = context.getSource().getLevel();
         if (!level.getEnvelopeContext().getPigeonholeManager().exists(address)) {
-            context.getSource().sendFailure(address.getDisplayName().append(" does not exist."));
+            context.getSource().sendFailure(address.getName().append(" does not exist."));
             return 1;
         }
 
         level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address)
               .ifPresentOrElse(
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
-                    () -> context.getSource().sendFailure(address.getDisplayName()
+                    () -> context.getSource().sendFailure(address.getName()
                           .append(" does not have a position associated with it.")));
         return 0;
     }
 
     private static MutableComponent copyableAddressAndPos(Address address, Optional<BlockPos> pos) {
-        String addressId = address.getDisplayName().getString();
+        String addressId = address.getName().getString();
         String posStr = pos.map(BlockPos::toShortString).orElse("");
         String posToCopy = posStr.replace(",", "");
 
-        return address.getDisplayName()
+        return address.getName()
               .withStyle(Style.EMPTY
                     .withColor(AddressDisplay.GENERIC_COLOR)
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Address")

@@ -353,7 +353,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
 
-        String sender = getDisplayedSender(mail).getDisplayName().getString();
+        String sender = getDisplayedSender(mail).getName().getString();
         if (font.width(sender) > 76) {
             sender = font.plainSubstrByWidth(sender, 72) + "...";
         }
@@ -420,7 +420,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         List<Component> tooltip = new ArrayList<>();
 
         Address sender = getDisplayedSender(hoveredMail);
-        if (font.width(sender.getDisplayName().getString()) > 76) {
+        if (font.width(sender.getName().getString()) > 76) {
             MutableComponent address = AddressDisplay.create(sender,
                   AddressDisplay.GENERIC_ICON_STYLE, Style.EMPTY.withColor(ChatFormatting.WHITE));
             tooltip.add(address);

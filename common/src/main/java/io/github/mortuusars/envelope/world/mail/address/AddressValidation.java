@@ -16,7 +16,7 @@ public abstract class AddressValidation {
     public static Issue TAKEN = () -> "address.taken";
     public static Issue NOT_ENOUGH_XP = () -> "address.not_enough_xp_levels";
 
-    private static final int MAX_LENGTH = 22;
+    public static final int MAX_LENGTH = 22;
 
     private static final Validator<String> FORMAT = Validator.of(
           Rule.when(String::isBlank, CANNOT_BE_EMPTY),
@@ -24,12 +24,12 @@ public abstract class AddressValidation {
           Rule.when(id -> !StringUtil.filterText(id).equals(id), CONTAINS_INVALID_CHARS)
     );
 
-    public static Validator<String> checkFormat() {
+    public static Validator<String> format() {
         return FORMAT;
     }
 
     public static Validator<String> forPigeonhole(Supplier<AllAddresses> addresses, Supplier<Player> player) {
-        return checkFormat()
+        return format()
               .and(isNotTaken(addresses))
               .and(hasEnoughXp(player, Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get()));
     }

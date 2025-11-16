@@ -6,8 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.github.mortuusars.envelope.util.validation.Issue;
-import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
+import io.github.mortuusars.envelope.world.mail.address.*;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -38,21 +37,24 @@ public class AddressArgument implements ArgumentType<Address> {
     }
 
     public static Address.Pigeonhole getPigeonhole(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
-        Address argument = context.getArgument(name, Address.class);
-        if (argument instanceof Address.Pigeonhole pigeonhole) return pigeonhole;
-        throw new SimpleCommandExceptionType(Component.literal("Address has wrong type: Expected: "
+        Address address = context.getArgument(name, Address.class);
+        if (address instanceof Address.Pigeonhole pigeonhole) {
+            return pigeonhole;
+        }
+        Component message = Component.literal("Address has wrong type: Expected: "
               + Address.Type.PIGEONHOLE.getSerializedName() + ", Got: "
-              + argument.type().getSerializedName())).create();
+              + address.type().getSerializedName());
+        throw new SimpleCommandExceptionType(message).create();
     }
 
     @Override
     public Address parse(StringReader reader) throws CommandSyntaxException {
         String id = reader.readString();
 
-        List<Issue> issues = AddressValidation.checkFormat().validate(id);
+        List<Issue> issues = AddressValidation.format().validate(id);
         if (!issues.isEmpty()) {
-            throw new SimpleCommandExceptionType(Component.literal("Invalid address: "
-                  + issues.getFirst().getMessage().getString())).create();
+            Component message = Component.literal("Invalid address: " + issues.getFirst().getMessage().getString());
+            throw new SimpleCommandExceptionType(message).create();
         }
 
         return switch (type) {

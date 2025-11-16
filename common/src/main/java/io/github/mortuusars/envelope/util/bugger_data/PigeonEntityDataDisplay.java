@@ -6,7 +6,6 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 
@@ -18,9 +17,9 @@ public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataD
         if (pigeon.getDelivery().isPresent()) {
             Delivery delivery = pigeon.getDelivery().get();
             lines.add(Component.empty()
-                  .append(delivery.getSender().getDisplayName())
+                  .append(delivery.getSender().getName())
                   .append(" → ")
-                  .append(delivery.getRecipient().getDisplayName()));
+                  .append(delivery.getRecipient().getName()));
             lines.add(line(delivery.getCurrentPhase().toPrettyString()));
         } else {
             PigeonholeHandler handler = pigeon.getPigeonholeHandler();

@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -33,51 +32,51 @@ public interface Address {
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
 
     Type type();
+
     String id();
-    MutableComponent getDisplayName();
 
-    default String getName() {
-        return getDisplayName().getString();
+    /**
+     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * Entity address returns its translation, if present.
+     */
+    default MutableComponent getName() {
+        return Component.literal(id());
     }
 
-    default String getString() {
-        return AddressDisplay.getIcon(this) + EnvelopeSymbols.SMALL_SPACE + getName();
+    /**
+     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * Entity address returns its translation, if present.
+     */
+    String toString();
+
+    /**
+     * @return "Display" name of an address with a corresponding icon in front.
+     */
+    default String toStringWithIcon() {
+        return AddressDisplay.getIcon(this) + EnvelopeSymbols.SMALL_SPACE + this;
     }
 
-    default boolean matches(Address address) {
-        return matches(address.getDisplayName().getString());
-    }
-
+    /**
+     * Compares "display" name of a current address to the given string (ignoring the case).<br>
+     * Nothing special for Pigeonhole and Player addresses, but Entity address will be compared by its translation, if present.
+     * @return {@code  true} if names look the same (ignoring the case).
+     */
     default boolean matches(String name) {
-        return id().equalsIgnoreCase(name);
+        return toString().equalsIgnoreCase(name);
     }
 
-    default Address ifPigeonhole(Consumer<Pigeonhole> consumer) {
-        if (this instanceof Pigeonhole pigeonhole) {
-            consumer.accept(pigeonhole);
-        }
-        return this;
+    /**
+     * Shortcut for {@link Address#matches(String)}
+     */
+    default boolean matches(Address address) {
+        return matches(address.toString());
     }
 
-    default Address ifPlayer(Consumer<Player> consumer) {
-        if (this instanceof Player player) {
-            consumer.accept(player);
-        }
-        return this;
-    }
-
-    default Address ifNpc(Consumer<Entity> consumer) {
-        if (this instanceof Entity entity) {
-            consumer.accept(entity);
-        }
-        return this;
-    }
-
-    default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Entity, R> ifNpc) {
+    default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Entity, R> ifEntity) {
         return switch (this) {
             case Pigeonhole pigeonhole -> ifPigeonhole.apply(pigeonhole);
             case Player player -> ifPlayer.apply(player);
-            case Entity entity -> ifNpc.apply(entity);
+            case Entity entity -> ifEntity.apply(entity);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
         };
     }
@@ -85,139 +84,6 @@ public interface Address {
     default Mail receiveMail(ServerLevel level, Mail mail) {
         if (mail.isEmpty()) return Mail.EMPTY;
         return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
-    }
-
-    record Pigeonhole(String id) implements Address {
-        public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
-        ).apply(instance, Pigeonhole::new));
-
-        public static final Codec<Pigeonhole> STRING_CODEC = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
-                ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();
-
-        public Pigeonhole(String id) {
-            this.id = id.trim();
-        }
-
-        @Override
-        public Type type() {
-            return Type.PIGEONHOLE;
-        }
-
-        @Override
-        public MutableComponent getDisplayName() {
-            return Component.literal(id);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Pigeonhole that = (Pigeonhole) o;
-            return this.id.equalsIgnoreCase(that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return ("p" + id.toLowerCase(Locale.ROOT)).hashCode();
-        }
-    }
-
-    record Player(String id) implements Address {
-        public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Player::id)
-        ).apply(instance, Player::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, Player> STREAM_CODEC =
-                ByteBufCodecs.STRING_UTF8.map(Player::new, Player::id).cast();
-
-        public Player(String id) {
-            this.id = id.trim();
-        }
-
-        public Player(net.minecraft.world.entity.player.Player player) {
-            this(player.getScoreboardName());
-        }
-
-        @Override
-        public Type type() {
-            return Type.PLAYER;
-        }
-
-        @Override
-        public MutableComponent getDisplayName() {
-            return Component.literal(id);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Player that = (Player) o;
-            return this.id.equalsIgnoreCase(that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return ("pl" + id.toLowerCase(Locale.ROOT)).hashCode();
-        }
-    }
-
-    record Entity(String id, Optional<Component> displayName) implements Address {
-        public static final MapCodec<Entity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("id").forGetter(Entity::id),
-                ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Entity::displayName)
-        ).apply(instance, Entity::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, Entity> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, Entity::id,
-                ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Entity::displayName,
-                Entity::new
-        );
-
-        public Entity(String id, Optional<Component> displayName) {
-            this.id = id.trim();
-            this.displayName = displayName;
-        }
-
-        public Entity(String id, Component displayName) {
-            this(id, Optional.ofNullable(displayName));
-        }
-
-        public Entity(String id) {
-            this(id, Optional.empty());
-        }
-
-        @Override
-        public Type type() {
-            return Type.ENTITY;
-        }
-
-        @Override
-        public boolean matches(String name) {
-            return Address.super.matches(name) || getDisplayName().getString().equalsIgnoreCase(name);
-        }
-
-        @Override
-        public MutableComponent getDisplayName() {
-            return displayName.map(component -> Component.empty().append(component))
-                    .orElseGet(() -> Component.literal(id));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Entity that = (Entity) o;
-            return this.id.equalsIgnoreCase(that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return ("n" + id.toLowerCase(Locale.ROOT)).hashCode();
-        }
     }
 
     enum Type implements StringRepresentable {
@@ -260,6 +126,142 @@ public interface Address {
 
         public MutableComponent translate() {
             return Component.translatable("address.envelope.type." + getSerializedName());
+        }
+    }
+
+    record Pigeonhole(String id) implements Address {
+        public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+              Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
+        ).apply(instance, Pigeonhole::new));
+
+        public static final Codec<Pigeonhole> STRING_CODEC = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
+              ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();
+
+        public Pigeonhole(String id) {
+            this.id = id.trim();
+        }
+
+        @Override
+        public Type type() {
+            return Type.PIGEONHOLE;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pigeonhole that = (Pigeonhole) o;
+            return this.id.equalsIgnoreCase(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return ("p" + id.toLowerCase(Locale.ROOT)).hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
+    }
+
+    record Player(String id) implements Address {
+        public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+              Codec.STRING.fieldOf("id").forGetter(Player::id)
+        ).apply(instance, Player::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Player> STREAM_CODEC =
+              ByteBufCodecs.STRING_UTF8.map(Player::new, Player::id).cast();
+
+        public Player(String id) {
+            this.id = id.trim();
+        }
+
+        public Player(net.minecraft.world.entity.player.Player player) {
+            this(player.getScoreboardName());
+        }
+
+        @Override
+        public Type type() {
+            return Type.PLAYER;
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Player that = (Player) o;
+            return this.id.equalsIgnoreCase(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return ("pl" + id.toLowerCase(Locale.ROOT)).hashCode();
+        }
+    }
+
+    /**
+     * Due to how address matching is implemented (by display name), and how choosing address in GUIs, etc, works -<br>
+     * using translations in Entity addresses works as it should.<br>
+     */
+    record Entity(String id, Optional<Component> displayName) implements Address {
+        public static final MapCodec<Entity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+              Codec.STRING.fieldOf("id").forGetter(Entity::id),
+              ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Entity::displayName)
+        ).apply(instance, Entity::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Entity> STREAM_CODEC = StreamCodec.composite(
+              ByteBufCodecs.STRING_UTF8, Entity::id,
+              ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Entity::displayName,
+              Entity::new
+        );
+
+        public Entity(String id, Optional<Component> displayName) {
+            this.id = id.trim();
+            this.displayName = displayName;
+        }
+
+        public Entity(String id, @NotNull Component displayName) {
+            this(id, Optional.of(displayName));
+        }
+
+        public Entity(String id) {
+            this(id, Optional.empty());
+        }
+
+        @Override
+        public Type type() {
+            return Type.ENTITY;
+        }
+
+        @Override
+        public MutableComponent getName() {
+            return displayName.map(Component::plainCopy).orElseGet(Address.super::getName);
+        }
+
+        @Override
+        public String toString() {
+            return getName().getString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Entity that = (Entity) o;
+            return this.id.equalsIgnoreCase(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return ("n" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
     }
 }

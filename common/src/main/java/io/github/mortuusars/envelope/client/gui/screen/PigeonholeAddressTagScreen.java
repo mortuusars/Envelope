@@ -58,7 +58,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
         return existingAddress
               .map(Address::id)
               .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
-                    .map(Address::getDisplayName)
+                    .map(Address::getName)
                     .map(Component::getString)
                     .orElse(""));
     }

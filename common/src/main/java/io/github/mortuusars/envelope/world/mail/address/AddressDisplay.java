@@ -25,7 +25,7 @@ public abstract class AddressDisplay {
     public static MutableComponent create(Address address, Style iconStyle, Style textStyle) {
         return Component.literal(getIcon(address)).withStyle(iconStyle)
                 .append(EnvelopeSymbols.SMALL_SPACE)
-                .append(address.getDisplayName().withStyle(textStyle));
+                .append(address.getName().withStyle(textStyle));
     }
 
     public static MutableComponent createGeneric(Address address) {

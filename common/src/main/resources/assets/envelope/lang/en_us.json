@@ -37,8 +37,6 @@
   "gui.envelope.pigeonhole.send": "Send",
   "gui.envelope.pigeonhole.empty": "Empty",
 
-  "gui.envelope.pigeonhole_address": "Pigeonhole Address",
-  "gui.envelope.validation.issue.invalid": "Invalid",
   "gui.envelope.validation.issue.address.empty": "Address cannot be empty",
   "gui.envelope.validation.issue.address.too_long": "Address is too long",
   "gui.envelope.validation.issue.address.contains_invalid_chars": "Address contains invalid characters",
