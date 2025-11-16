@@ -14,7 +14,6 @@ import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -51,8 +50,8 @@ public class AddressTagScreen extends Screen {
 
     protected Optional<Address> matchedKnownAddress = Optional.empty();
 
-    public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses) {
-        super(Component.translatable("gui.envelope.address_tag.title"));
+    public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses, Component title) {
+        super(title);
         this.hand = hand;
         this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.knownAddresses = knownAddresses;

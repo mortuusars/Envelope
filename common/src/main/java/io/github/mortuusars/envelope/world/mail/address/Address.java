@@ -20,7 +20,6 @@ import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -98,6 +97,10 @@ public interface Address {
         public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
                 ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();
 
+        public Pigeonhole(String id) {
+            this.id = id.trim();
+        }
+
         @Override
         public Type type() {
             return Type.PIGEONHOLE;
@@ -129,6 +132,10 @@ public interface Address {
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Player> STREAM_CODEC =
                 ByteBufCodecs.STRING_UTF8.map(Player::new, Player::id).cast();
+
+        public Player(String id) {
+            this.id = id.trim();
+        }
 
         public Player(net.minecraft.world.entity.player.Player player) {
             this(player.getScoreboardName());
@@ -169,6 +176,11 @@ public interface Address {
                 ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Entity::displayName,
                 Entity::new
         );
+
+        public Entity(String id, Optional<Component> displayName) {
+            this.id = id.trim();
+            this.displayName = displayName;
+        }
 
         public Entity(String id, Component displayName) {
             this(id, Optional.ofNullable(displayName));

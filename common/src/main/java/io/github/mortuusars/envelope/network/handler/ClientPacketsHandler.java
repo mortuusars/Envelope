@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditSc
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 public class ClientPacketsHandler {
@@ -21,14 +22,14 @@ public class ClientPacketsHandler {
 
     public static void openAddressTagScreen(OpenAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
-            Minecrft.get().setScreen(new AddressTagScreen(packet.hand(), packet.knownAddresses()));
+            Minecrft.get().setScreen(new AddressTagScreen(packet.hand(), packet.knownAddresses(), Component.translatable("gui.envelope.address_tag.title")));
         }
     }
 
     public static void openPigeonholeAddressTagScreen(OpenPigeonholeAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
             Minecrft.get().setScreen(new PigeonholeAddressTagScreen(packet.hand(),
-                    packet.knownAddresses(), packet.pos(), packet.currentAddress()));
+                    packet.knownAddresses(), packet.pos(), packet.currentAddress(), Component.translatable("gui.envelope.pigeonhole_address_tag.title")));
         }
     }
 }

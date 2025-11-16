@@ -3,11 +3,11 @@ package io.github.mortuusars.envelope.world.block;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.validation.Issue;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.world.mail.address.validation.PigeonholeAddressValidator;
-import io.github.mortuusars.envelope.world.mail.address.validation.Validator;
+import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
@@ -57,7 +57,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,10 +73,10 @@ public class PigeonholeBlock extends BaseEntityBlock {
     public PigeonholeBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
-                .setValue(FACING, Direction.NORTH)
-                .setValue(WASTE_LEVEL, 0)
-                .setValue(HAS_ADDRESS, false)
-                .setValue(HAS_MAIL, false));
+              .setValue(FACING, Direction.NORTH)
+              .setValue(WASTE_LEVEL, 0)
+              .setValue(HAS_ADDRESS, false)
+              .setValue(HAS_MAIL, false));
     }
 
     @Override
@@ -130,7 +129,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.getBlock().equals(newState.getBlock())
-                && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+              && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             blockEntity.onBlockRemoved();
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
@@ -151,10 +150,10 @@ public class PigeonholeBlock extends BaseEntityBlock {
     protected @NotNull List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         Entity entity = params.getOptionalParameter(LootContextParams.THIS_ENTITY);
         if (entity instanceof PrimedTnt
-                || entity instanceof Creeper
-                || entity instanceof WitherSkull
-                || entity instanceof WitherBoss
-                || entity instanceof MinecartTNT) {
+              || entity instanceof Creeper
+              || entity instanceof WitherSkull
+              || entity instanceof WitherBoss
+              || entity instanceof MinecartTNT) {
             if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof PigeonholeBlockEntity be) {
                 be.releaseAllOccupants(be.getLevelOrThrow(), be.getBlockPos(), state, Occupiable.ReleaseReason.EMERGENCY);
             }
@@ -280,12 +279,17 @@ public class PigeonholeBlock extends BaseEntityBlock {
         if (level instanceof ServerLevel serverLevel && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             Optional<Address.Pigeonhole> currentAddress = blockEntity.getAddress();
 
-            PigeonholeAddressValidator validator = new PigeonholeAddressValidator(player, currentAddress.map(Address.class::cast));
-            ArrayList<Validator.Issue> issues = validator.validate(addressId);
-            if (!issues.isEmpty()) {
-                player.displayClientMessage(issues.getFirst().translate(), true);
-                level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
-                return;
+            if (currentAddress.isPresent() && !currentAddress.get().matches(addressId)) {
+                List<Issue> issues = AddressValidation.forPigeonhole(
+                            () -> serverLevel.getEnvelopeContext().addresses().getAll(),
+                            () -> player)
+                      .validate(addressId);
+
+                if (!issues.isEmpty()) {
+                    player.displayClientMessage(issues.getFirst().getMessage(), true);
+                    level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                    return;
+                }
             }
 
             Address.Pigeonhole address = new Address.Pigeonhole(addressId);
@@ -322,7 +326,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
-                ? null
-                : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(), PigeonholeBlockEntity::serverTick);
+              ? null
+              : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(), PigeonholeBlockEntity::serverTick);
     }
 }

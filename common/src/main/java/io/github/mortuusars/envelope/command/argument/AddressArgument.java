@@ -5,9 +5,9 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import io.github.mortuusars.envelope.util.validation.Issue;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.validation.AddressValidator;
-import io.github.mortuusars.envelope.world.mail.address.validation.Validator;
+import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -48,10 +48,11 @@ public class AddressArgument implements ArgumentType<Address> {
     @Override
     public Address parse(StringReader reader) throws CommandSyntaxException {
         String id = reader.readString();
-        List<Validator.Issue> validate = new AddressValidator().validate(id);
-        if (!validate.isEmpty()) {
+
+        List<Issue> issues = AddressValidation.checkFormat().validate(id);
+        if (!issues.isEmpty()) {
             throw new SimpleCommandExceptionType(Component.literal("Invalid address: "
-                  + validate.getFirst().translate().getString())).create();
+                  + issues.getFirst().getMessage().getString())).create();
         }
 
         return switch (type) {
