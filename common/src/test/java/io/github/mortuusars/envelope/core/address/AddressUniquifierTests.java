@@ -26,10 +26,8 @@ public class AddressUniquifierTests {
 
     @Test
     void returnsProperLengthIfOverLimit() {
-        assertEquals("Addr-too-long-of-an--1", uniquify("Addr-too-long-of-an-address-over"));
-        assertEquals("Addr-too-long-of-an--1", uniquify("Addr-too-long-of-an-A"));
-        assertEquals("Addr-too-long-of-an--1", uniquify("Addr-too-long-of-an-A"));
-        assertEquals("Addr-too-long-of-an-10", uniquify("Addr-too-long-of-an--9"));
+        assertEquals("Addr-too-long-of-an-address-asdasdaasd-1", uniquify("Addr-too-long-of-an-address-asdasdaasdas"));
+        assertEquals("Addr-too-long-of-an-address-asdasdaasd-5", uniquify("Addr-too-long-of-an-address-asdasdaasd-4"));
     }
 
     // --
@@ -39,11 +37,10 @@ public class AddressUniquifierTests {
     }
 
     public static AddressUniquifier createDefaultUniquifier() {
-        ;
         AllAddresses addresses = new AllAddresses(
             Set.of("Addr", "Addr-1", "Addr-2", "Addr-5", "Addr-", "Addr----").stream().map(Address.Pigeonhole::new).collect(Collectors.toSet()),
-            Set.of("Addr-too-long-of-an-A", "Addr-too-long-of-an--9", "Addr-too-long-of-an-address-over").stream().map(Address.Player::new).collect(Collectors.toSet()),
+            Set.of("Addr-too-long-of-an-A", "Addr-too-long-of-an--9", "Addr-too-long-of-an-address-asdasdaasdas", "Addr-too-long-of-an-address-asdasdaasd-4").stream().map(Address.Player::new).collect(Collectors.toSet()),
             Set.of());
-        return new AddressUniquifier(addresses, 22);
+        return new AddressUniquifier(addresses);
     }
 }

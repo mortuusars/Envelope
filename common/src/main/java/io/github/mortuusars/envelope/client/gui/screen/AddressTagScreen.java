@@ -3,17 +3,15 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -34,7 +32,7 @@ public class AddressTagScreen extends Screen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
 
     public static final WidgetSprites CONFIRM_BUTTON_SPRITES =
-            Sprites.threeStates(Envelope.resource("address_tag/confirm_button"));
+          Sprites.threeStates(Envelope.resource("address_tag/confirm_button"));
 
     protected final InteractionHand hand;
     protected final ItemStack tag;
@@ -45,10 +43,11 @@ public class AddressTagScreen extends Screen {
     protected int leftPos, topPos;
     protected int titleLabelX, titleLabelY;
 
-    protected TextBox addressBox;
+    protected EditBox addressBox;
     protected ImageButton confirmButton;
 
     protected Optional<Address> matchedKnownAddress = Optional.empty();
+    protected @Nullable String currentSuggestion;
 
     public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses, Component title) {
         super(title);
@@ -60,53 +59,40 @@ public class AddressTagScreen extends Screen {
 
     @Override
     protected void init() {
-        imageWidth = 183;
-        imageHeight = 33;
+        imageWidth = 186;
+        imageHeight = 40;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
         titleLabelX = leftPos + 12;
-        titleLabelY = topPos + 7;
+        titleLabelY = topPos + 6;
 
-        addressBox = new TextBox(font, leftPos + 20, topPos + 18, 140, 9)
-                .setTextValidator(text -> text.length() <= 22 && !text.contains("\n"))
-                .setFormattingEnabled(false)
-                .setFontColor(0xFF7B593D)
-                .setFontUnfocusedColor(0xFF7B593D)
-                .setSelectionColor(0xFF664488)
-                .setSelectionUnfocusedColor(0xFF696170)
-                .setAutocompleteSuggestionColor(0xFFB89B76)
-                .setOnTextChanged(this::addressTextChanged);
-        addressBox.setTextAndUpdate(FormattedString.parse(getInitialAddressValue()));
-        addressBox.getEditor().setCursorToEnd(false);
+        addressBox = new EditBox(font, leftPos + 26, topPos + 21, 125, 9, Component.empty());
+        addressBox.setResponder(this::addressTextChanged);
+        addressBox.setMaxLength(Address.MAX_LENGTH);
+        addressBox.setTextColor(0xFFFFFFFF);
+        addressBox.setValue(getInitialAddressValue());
+        addressBox.setBordered(false);
+        addressBox.setSuggestion(null); // Clear suggestion at start
         addRenderableWidget(addressBox);
 
-//        EditBox editBox = new EditBox(font, leftPos + 20, topPos - 18, 140, 9, Component.empty());
-//        editBox.setResponder();
-//        editBox.setSuggestion();
-//        editBox.setMaxLength(50);
-
-        confirmButton = new ImageButton(leftPos + 162, topPos + 16, 11, 11, CONFIRM_BUTTON_SPRITES,
-                button -> confirm(), Component.translatable("gui.envelope.confirm"));
+        confirmButton = new ImageButton(leftPos + 158, topPos + 17, 16, 16, CONFIRM_BUTTON_SPRITES,
+              button -> confirm(), Component.translatable("gui.envelope.confirm"));
         confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
         addRenderableWidget(confirmButton);
 
         setInitialFocus(addressBox);
     }
 
-    @Override
-    public void resize(Minecraft minecraft, int width, int height) {
-        // Prevent contents reset when window is resized
-        FormattedString address = addressBox.getEditor().getText();
-        int cursorPos = addressBox.getEditor().getCursorPos();
-        super.resize(minecraft, width, height);
-        addressBox.getEditor().setText(address);
-        addressBox.getEditor().setCursorPos(cursorPos, false);
+    // --
+
+    protected ItemStack getTarget() {
+        return tag;
     }
 
     // -- Address
 
     protected String getCurrentAddressId() {
-        return addressBox.getEditor().getText().toStringWithoutFormatting();
+        return addressBox.getValue().trim();
     }
 
     protected String getInitialAddressValue() {
@@ -139,52 +125,54 @@ public class AddressTagScreen extends Screen {
         return existingAddress.map(address -> address.matches(currentAddressId)).orElse(false);
     }
 
-    protected void updateAddressTagAddress() {
+    protected void updateItem() {
         getOrCreateAddressFromCurrentValue().ifPresentOrElse(
-                value -> tag.set(Envelope.DataComponents.ADDRESS, value),
-                () -> tag.remove(Envelope.DataComponents.ADDRESS));
-    }
-
-    protected void fillLastAddress() {
-        //TODO: fill last address
-        String lastAddress = ChatFormatting.stripFormatting("Last address goes here");
-        addressBox.setTextAndUpdate(FormattedString.parse(lastAddress));
-        //TODO: move focus to addressBox, but it's not that simple,
-        // it should be deferred somehow, as it's set to the button after handling click
-    }
-
-    // --
-
-    protected ItemStack getTarget() {
-        return tag;
+              value -> tag.set(Envelope.DataComponents.ADDRESS, value),
+              () -> tag.remove(Envelope.DataComponents.ADDRESS));
     }
 
     // -- Events
 
-    protected void addressTextChanged(FormattedString text) {
-        String addressId = text.toString().trim();
-
-        addressBox.setAutocompleteSuggestion(getAutocompleteSuggestion(addressId));
-
+    protected void addressTextChanged(String text) {
+        String addressId = text.trim();
         matchedKnownAddress = knownAddresses.byName(addressId);
-        updateAddressTagAddress();
+        updateItem();
+
+        boolean showSuggestion = matchedKnownAddress.isPresent() || text.isBlank();
+        @Nullable String suggestion = !showSuggestion ? getAutocompleteSuggestion(text) : null;
+        currentSuggestion = suggestion;
+        if (suggestion != null && !suggestion.equalsIgnoreCase(addressBox.getValue())) {
+            addressBox.setSuggestion(suggestion.substring(addressBox.getValue().length()));
+        } else {
+            addressBox.setSuggestion(suggestion);
+        }
     }
 
-    protected @Nullable FormattedString getAutocompleteSuggestion(String addressId) {
+    protected @Nullable String getAutocompleteSuggestion(String addressId) {
         return knownAddresses.stream()
-            .map(a -> a.getName().getString())
-            .sorted(String.CASE_INSENSITIVE_ORDER)
-            .filter(a -> a.toLowerCase().startsWith(addressId.toLowerCase()))
-            .findFirst()
-            .map(FormattedString::parse)
-            .orElse(null);
+              .map(a -> a.getName().getString())
+              .filter(a -> a.toLowerCase().startsWith(addressId.toLowerCase()) && !addressId.equalsIgnoreCase(a))
+              .min(String.CASE_INSENSITIVE_ORDER)
+              .orElse(null);
     }
 
     protected void confirm() {
-        Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
-        int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new AddressTagApplyC2SP(slot, getOrCreateAddressFromCurrentValue()));
+        if (!isCurrentIdSameAsExistingAddress()) {
+            Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
+            int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
+            Packets.sendToServer(new AddressTagApplyC2SP(slot, getOrCreateAddressFromCurrentValue()));
+        }
         close();
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        // Prevent contents reset when window is resized
+        String text = addressBox.getValue();
+        int cursorPosition = addressBox.getCursorPosition();
+        super.resize(minecraft, width, height);
+        addressBox.setValue(text);
+        addressBox.setCursorPosition(cursorPosition);
     }
 
     protected void close() {
@@ -196,8 +184,8 @@ public class AddressTagScreen extends Screen {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFFB89B76, false);
-        renderAddressType(guiGraphics, mouseX, mouseY, partialTick);
+        renderLabels(guiGraphics);
+        renderAddressIcon(guiGraphics, mouseX, mouseY, partialTick);
         renderTargetPreview(guiGraphics, mouseX, mouseY);
     }
 
@@ -207,13 +195,17 @@ public class AddressTagScreen extends Screen {
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
-    protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderLabels(@NotNull GuiGraphics guiGraphics) {
+        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFF3C3C3C, false);
+    }
+
+    protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Address address = getMatchedKnownAddress().orElse(Address.UNKNOWN);
 
-        int color = address.equals(Address.UNKNOWN) ? 0xFFB89B76 : 0xFF7B593D;
-        guiGraphics.drawString(font, AddressFormatter.getIcon(address), leftPos + 12, topPos + 18, color, false);
+        int color = !address.equals(Address.UNKNOWN) ? 0xFFFFEAC2 : 0x88FFEAC2;
+        guiGraphics.drawString(font, AddressFormatter.getIcon(address), leftPos + 17, topPos + 21, color, true);
 
-        if (address != Address.UNKNOWN && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
+        if (address != Address.UNKNOWN && isHovering(15, 20, 9, 9, mouseX, mouseY)) {
             guiGraphics.renderTooltip(font, address.type().translate(), mouseX, mouseY);
         }
     }
@@ -225,7 +217,7 @@ public class AddressTagScreen extends Screen {
         }
 
         float scale = 2f;
-        int size = (int)(16 * scale);
+        int size = (int) (16 * scale);
 
         int x = leftPos - size - 4;
         int y = topPos + (imageHeight - size) / 2;
@@ -251,8 +243,14 @@ public class AddressTagScreen extends Screen {
             return true;
         }
 
-        if (keyCode == InputConstants.KEY_RETURN) {
+        if (keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER) {
+            Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
             confirm();
+            return true;
+        }
+
+        if (keyCode == InputConstants.KEY_TAB && currentSuggestion != null) {
+            addressBox.setValue(currentSuggestion);
             return true;
         }
 
@@ -262,7 +260,9 @@ public class AddressTagScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == InputConstants.MOUSE_BUTTON_RIGHT && addressBox.isMouseOver(mouseX, mouseY)) {
-            addressBox.setTextAndUpdate(FormattedString.parse(""));
+            if (!addressBox.getValue().isEmpty()) {
+                addressBox.setValue("");
+            }
             return true;
         }
 
@@ -276,8 +276,15 @@ public class AddressTagScreen extends Screen {
         return false;
     }
 
+    /**
+     * Used by mixin to change EditBox suggestion color.
+     */
+    public int getSuggestionTextColor() {
+        return 0x88FFFFFF;
+    }
+
     protected boolean isHovering(int x, int y, int width, int height, int mouseX, int mouseY) {
         return mouseX >= leftPos + x && mouseX < leftPos + x + width
-                && mouseY >= topPos + y && mouseY < topPos + y + height;
+              && mouseY >= topPos + y && mouseY < topPos + y + height;
     }
 }

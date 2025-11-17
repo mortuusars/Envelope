@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;

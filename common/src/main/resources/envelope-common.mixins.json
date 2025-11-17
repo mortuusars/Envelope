@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
+    "EditBoxMixin",
     "bugger.EntityRendererMixin",
     "bugger.KeyboardHandlerMixin",
     "bugger.MouseHandlerMixin",

@@ -83,12 +83,18 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
     // --
 
     public MutableComponent translate(long gameTime) {
+        int addressColor = switch (status()) {
+            case SENT -> AddressFormatter.SENDER_COLOR;
+            case ARRIVED -> AddressFormatter.RECIPIENT_COLOR;
+            case RETURNED, REJECTED, UNCLAIMED -> AddressFormatter.NEUTRAL_COLOR;
+        };
         MutableComponent component = Component.translatable("gui.envelope.delivery.log.record." + status().getSerializedName())
               .append(" ")
               .append(address.format()
                     .withIcon()
-                    .withIconColor(AddressFormatter.NEUTRAL_COLOR)
-                    .withColor(ChatFormatting.WHITE)
+                    .withIconColor(addressColor)
+                    .withColor(addressColor)
+                    .withMaxLength(25)
                     .toComponent());
 
         message.ifPresent(msg -> {

@@ -2,6 +2,7 @@
 
 ## 0.2.0.2
 [Existing blocks and other stuff might (or will) break/reset when updating to this version] 
+- Increased address length limit from 22 to 40 characters
 - Rewritten delivery system to fix some bugs and introduce new ones
 - Added ability to reach check for `approaching_recipient` phase, in addition to `departing_sender`
 - Delivery travel duration is now based on distance between addresses

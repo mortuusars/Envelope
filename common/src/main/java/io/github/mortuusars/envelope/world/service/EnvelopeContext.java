@@ -163,7 +163,7 @@ public class EnvelopeContext {
     private @NotNull String formDeliveryString(Delivery delivery) {
         return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
               " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
-              ChatFormatting.GREEN + delivery.getRecipient().format().withIcon() + ChatFormatting.RESET +
+              ChatFormatting.GREEN + delivery.getRecipient().format().withIcon().toString() + ChatFormatting.RESET +
 
               ChatFormatting.GRAY +
               (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +

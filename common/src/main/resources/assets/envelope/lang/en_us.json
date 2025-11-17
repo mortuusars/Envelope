@@ -67,8 +67,8 @@
   "gui.envelope.pigeonhole.mail.tooltip.new_mail": "New Mail Arrived",
   "gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
 
-  "gui.envelope.mail.sender": "§7Sender: %s",
-  "gui.envelope.mail.recipient": "§7Recipient: %s",
+  "gui.envelope.mail.sender": "Sender",
+  "gui.envelope.mail.recipient": "Recipient",
 
   "gui.envelope.delivery.log": "§7Delivery Log",
 

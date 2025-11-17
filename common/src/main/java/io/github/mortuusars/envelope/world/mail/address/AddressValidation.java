@@ -16,11 +16,10 @@ public abstract class AddressValidation {
     public static Issue TAKEN = () -> "address.taken";
     public static Issue NOT_ENOUGH_XP = () -> "address.not_enough_xp_levels";
 
-    public static final int MAX_LENGTH = 22;
-
+    // Address#validate logic is duplicated here, I haven't found a good way to merge them. Validation shouldn't change much anyway.
     private static final Validator<String> FORMAT = Validator.of(
-          Rule.when(String::isBlank, CANNOT_BE_EMPTY),
-          Rule.when(id -> id.length() > MAX_LENGTH, TOO_LONG),
+          Rule.when(StringUtil::isBlank, CANNOT_BE_EMPTY),
+          Rule.when(id -> id.length() > Address.MAX_LENGTH, TOO_LONG),
           Rule.when(id -> !StringUtil.filterText(id).equals(id), CONTAINS_INVALID_CHARS)
     );
 

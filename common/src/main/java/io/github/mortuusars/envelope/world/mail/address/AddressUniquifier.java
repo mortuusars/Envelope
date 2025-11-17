@@ -1,7 +1,5 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
-import com.google.common.base.Preconditions;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,12 +7,9 @@ public class AddressUniquifier {
     private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+)$");
 
     protected final AllAddresses knownAddresses;
-    protected final int maxLength;
 
-    public AddressUniquifier(AllAddresses knownAddresses, int maxLength) {
-        Preconditions.checkArgument(maxLength > 2);
+    public AddressUniquifier(AllAddresses knownAddresses) {
         this.knownAddresses = knownAddresses;
-        this.maxLength = maxLength;
     }
 
     public String uniquify(String address) {
@@ -37,9 +32,9 @@ public class AddressUniquifier {
             candidate = address + "-" + number;
         }
 
-        if (candidate.length() > maxLength) {
+        if (candidate.length() > Address.MAX_LENGTH) {
             String suffix = "-" + number;
-            candidate = address.substring(0, maxLength - suffix.length()) + suffix;
+            candidate = address.substring(0, Address.MAX_LENGTH - suffix.length()) + suffix;
         }
 
         return candidate;

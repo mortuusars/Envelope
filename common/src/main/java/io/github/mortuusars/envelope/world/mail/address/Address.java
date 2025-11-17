@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
@@ -16,6 +17,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -24,20 +26,40 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public interface Address {
-    Address MAIL_SERVICE = new Entity("Mail Service", Component.translatable("address.envelope.mail_service"));
-    Address UNKNOWN = new Entity("Unknown", Component.translatable("address.envelope.unknown"));
+    int MAX_LENGTH = 40;
 
+    Codec<String> ID_CODEC = Codec.STRING.xmap(String::trim, String::trim).validate(Address::validate);
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::type, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
+
+    Address MAIL_SERVICE = new Entity("Mail Service", Component.translatable("address.envelope.mail_service"));
+    Address UNKNOWN = new Entity("Unknown", Component.translatable("address.envelope.unknown"));
 
     Type type();
 
     String id();
 
     /**
+     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * Entity address returns its translation, if present.
+     */
+    String toString();
+
+    /**
+     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * Entity address returns its translation, if present.
+     */
+    default MutableComponent getName() {
+        return Component.literal(id());
+    }
+
+    // --
+
+    /**
      * Compares "display" name of a current address to the given string (ignoring the case).<br>
      * Nothing special for Pigeonhole and Player addresses, but Entity address will be compared by its translation, if present.
-     * @return {@code  true} if names look the same (ignoring the case).
+     *
+     * @return {@code true} if names look the same (ignoring the case).
      */
     default boolean matches(String name) {
         return toString().equalsIgnoreCase(name);
@@ -51,20 +73,6 @@ public interface Address {
     }
 
     // --
-
-    /**
-     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
-     * Entity address returns its translation, if present.
-     */
-    default MutableComponent getName() {
-        return Component.literal(id());
-    }
-
-    /**
-     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
-     * Entity address returns its translation, if present.
-     */
-    String toString();
 
     default AddressFormatter format() {
         return AddressFormatter.of(this);
@@ -83,6 +91,17 @@ public interface Address {
         if (mail.isEmpty()) return Mail.EMPTY;
         return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }
+
+    // --
+
+    static @NotNull DataResult<String> validate(String str) {
+        if (StringUtil.isBlank(str)) return DataResult.error(() -> "id cannot be empty");
+        if (str.length() > MAX_LENGTH) return DataResult.error(() -> "id cannot be longer than " + MAX_LENGTH);
+        if (!StringUtil.filterText(str).equals(str)) return DataResult.error(() -> "id contains invalid characters");
+        return DataResult.success(str);
+    }
+
+    // --
 
     enum Type implements StringRepresentable {
         PIGEONHOLE(0, "pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC),
@@ -129,7 +148,7 @@ public interface Address {
 
     record Pigeonhole(String id) implements Address {
         public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              Codec.STRING.fieldOf("id").forGetter(Pigeonhole::id)
+              ID_CODEC.fieldOf("id").forGetter(Pigeonhole::id)
         ).apply(instance, Pigeonhole::new));
 
         public static final Codec<Pigeonhole> STRING_CODEC = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
@@ -137,8 +156,8 @@ public interface Address {
         public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
               ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();
 
-        public Pigeonhole(String id) {
-            this.id = id.trim();
+        public Pigeonhole {
+            validate(id).getOrThrow();
         }
 
         @Override
@@ -167,14 +186,14 @@ public interface Address {
 
     record Player(String id) implements Address {
         public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              Codec.STRING.fieldOf("id").forGetter(Player::id)
+              ID_CODEC.fieldOf("id").forGetter(Player::id)
         ).apply(instance, Player::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Player> STREAM_CODEC =
               ByteBufCodecs.STRING_UTF8.map(Player::new, Player::id).cast();
 
-        public Player(String id) {
-            this.id = id.trim();
+        public Player {
+            validate(id).getOrThrow();
         }
 
         public Player(net.minecraft.world.entity.player.Player player) {
@@ -211,7 +230,7 @@ public interface Address {
      */
     record Entity(String id, Optional<Component> displayName) implements Address {
         public static final MapCodec<Entity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              Codec.STRING.fieldOf("id").forGetter(Entity::id),
+              ID_CODEC.fieldOf("id").forGetter(Entity::id),
               ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Entity::displayName)
         ).apply(instance, Entity::new));
 
@@ -221,9 +240,8 @@ public interface Address {
               Entity::new
         );
 
-        public Entity(String id, Optional<Component> displayName) {
-            this.id = id.trim();
-            this.displayName = displayName;
+        public Entity {
+            validate(id).getOrThrow();
         }
 
         public Entity(String id, @NotNull Component displayName) {

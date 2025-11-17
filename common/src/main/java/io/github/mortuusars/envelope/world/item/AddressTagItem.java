@@ -7,7 +7,6 @@ import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -40,7 +39,7 @@ public class AddressTagItem extends Item {
             tooltipComponents.add(address.format()
                   .withIcon()
                   .withIconColor(AddressFormatter.NEUTRAL_COLOR)
-                  .withColor(ChatFormatting.GRAY)
+                  .withColor(AddressFormatter.NEUTRAL_COLOR)
                   .toComponent());
         }
     }

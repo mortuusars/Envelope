@@ -9,6 +9,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AddressTests {
     @Test
+    void addressesAreValid() {
+        assertThrows(IllegalStateException.class, () -> new Address.Pigeonhole(""));
+        assertThrows(IllegalStateException.class, () -> new Address.Pigeonhole(" "));
+        assertThrows(IllegalStateException.class, () -> new Address.Pigeonhole("too-long".repeat(30)));
+
+        assertThrows(IllegalStateException.class, () -> new Address.Player(""));
+        assertThrows(IllegalStateException.class, () -> new Address.Player(" "));
+        assertThrows(IllegalStateException.class, () -> new Address.Player("too-long".repeat(30)));
+
+        assertThrows(IllegalStateException.class, () -> new Address.Entity(""));
+        assertThrows(IllegalStateException.class, () -> new Address.Entity(" "));
+        assertThrows(IllegalStateException.class, () -> new Address.Entity("too-long".repeat(30)));
+    }
+
+    @Test
     void equality() {
         assertEquals(new Address.Pigeonhole("Id"), new Address.Pigeonhole("Id"));
         assertEquals(new Address.Pigeonhole("Case Insensitive"), new Address.Pigeonhole("caSE iNSeNSitiVe"));

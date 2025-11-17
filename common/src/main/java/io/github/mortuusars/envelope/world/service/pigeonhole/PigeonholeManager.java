@@ -162,7 +162,7 @@ public class PigeonholeManager {
         if (!knownAddresses.isKnown(address)) {
             return address;
         }
-        AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses, 22);
+        AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses);
         String uniqueId = uniquifier.uniquify(address.id());
         return new Address.Pigeonhole(uniqueId);
     }

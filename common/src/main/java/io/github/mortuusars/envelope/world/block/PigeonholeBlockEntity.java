@@ -34,6 +34,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -492,7 +493,9 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.loadAllItems(tag, items, registries);
-        address = tag.contains("address", Tag.TAG_STRING) ? new Address.Pigeonhole(tag.getString("address")) : null;
+        address = tag.contains("address", Tag.TAG_STRING)
+              ? new Address.Pigeonhole(tag.getString("address"))
+              : null;
         data = null; // Force re-query
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         loadOccupiable(tag, registries);

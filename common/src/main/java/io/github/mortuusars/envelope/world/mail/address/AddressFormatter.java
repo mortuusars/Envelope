@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,7 +98,8 @@ public class AddressFormatter {
     // --
 
     public MutableComponent toComponent() {
-        MutableComponent addressComponent = address.getName().withStyle(createStyle(textStyle));
+        String string = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
+        MutableComponent addressComponent = Component.literal(string).withStyle(createStyle(textStyle));
 
         if (icon) {
             return Component.empty()
@@ -111,9 +113,11 @@ public class AddressFormatter {
 
     @Override
     public String toString() {
+        String addressString = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
+
         String addressText = textStyle.left()
-              .map(formatting -> formatting + address.toString() + ChatFormatting.RESET)
-              .orElse(address.toString());
+              .map(formatting -> formatting + addressString + ChatFormatting.RESET)
+              .orElse(addressString);
 
         if (icon) {
             String icon = iconStyle.left()
@@ -149,13 +153,13 @@ public class AddressFormatter {
                 recipient = Address.UNKNOWN;
             }
 
-            return sender.format().asSender().withColor(ChatFormatting.GRAY).toComponent()
+            return sender.format().asSender().withMaxLength(25).toComponent()
                   .append(Component.literal(" " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " ").withStyle(ChatFormatting.GRAY))
-                  .append(recipient.format().asRecipient().toComponent());
+                  .append(recipient.format().asRecipient().withMaxLength(25).toComponent());
         }
 
         return Component.empty()
-              .append(Component.literal(" " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT).withStyle(ChatFormatting.GRAY))
+              .append(Component.literal(EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " ").withStyle(ChatFormatting.GRAY))
               .append(recipient.format().asRecipient().withColor(ChatFormatting.GRAY).toComponent());
     }
 }

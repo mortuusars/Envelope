@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.validation.CachedValidator;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -64,7 +63,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     }
 
     @Override
-    protected @Nullable FormattedString getAutocompleteSuggestion(String addressId) {
+    protected @Nullable String getAutocompleteSuggestion(String addressId) {
         return null; // Don't suggest anything
     }
 
@@ -105,7 +104,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     // -- Events
 
     @Override
-    protected void addressTextChanged(FormattedString text) {
+    protected void addressTextChanged(String text) {
         super.addressTextChanged(text);
         getAddressValidator().validate(getCurrentAddressId());
     }
@@ -116,9 +115,11 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
             return;
         }
 
-        Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
-        int slot = this.hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new PigeonholeAddressTagApplyC2SP(slot, getCurrentAddressId().trim(), pos));
+        if (!isCurrentIdSameAsExistingAddress()) {
+            Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
+            int slot = this.hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
+            Packets.sendToServer(new PigeonholeAddressTagApplyC2SP(slot, getCurrentAddressId().trim(), pos));
+        }
         close();
     }
 
@@ -137,14 +138,8 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     }
 
     @Override
-    protected void renderAddressType(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-//        boolean isValid = getMenu().getValidationState() != PigeonholeAddressTagMenu.AddressValidation.ERR_TAKEN;
-        int color = /*isValid ?*/ 0xFF7B593D/* : 0xFFFA5951*/;
-        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE,
-              leftPos + 12, topPos + 18, color, false);
-//        if (!isValid && isHovering(9, 17, 9, 9, mouseX, mouseY)) {
-//            guiGraphics.renderTooltip(font, getMenu().getValidationState().translate(), mouseX, mouseY);
-//        }
+    protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE, leftPos + 17, topPos + 21, 0xFFFFFFFF, true);
     }
 
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -156,7 +151,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
         boolean hasEnough = player.experienceLevel >= cost;
         ResourceLocation sprite = Envelope.resource("address_tag/experience" + (hasEnough ? "" : "_disabled"));
 
-        int x = 150;
+        int x = 159;
         int y = 4;
 
         guiGraphics.blitSprite(sprite, leftPos + x, topPos + y, 11, 11);
