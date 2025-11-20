@@ -15,6 +15,8 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
             AllAddresses::new
     );
 
+    public static final AllAddresses EMPTY = new AllAddresses(Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
+
     public static AllAddresses pigeonholes(Set<Address.Pigeonhole> addresses) {
         return new AllAddresses(addresses, Collections.emptySet(), Collections.emptySet());
     }

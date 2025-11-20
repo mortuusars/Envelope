@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
+import com.mojang.datafixers.TypeRewriteRule;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
@@ -63,8 +64,8 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     }
 
     @Override
-    protected @Nullable String getAutocompleteSuggestion(String addressId) {
-        return null; // Don't suggest anything
+    protected AllAddresses getAddressesForSuggestions() {
+        return AllAddresses.EMPTY; // Don't suggest anything
     }
 
     // --
@@ -110,9 +111,9 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     }
 
     @Override
-    protected void confirm() {
+    protected boolean confirm() {
         if (!canConfirm()) {
-            return;
+            return false;
         }
 
         if (!isCurrentIdSameAsExistingAddress()) {
@@ -121,6 +122,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
             Packets.sendToServer(new PigeonholeAddressTagApplyC2SP(slot, getCurrentAddressId().trim(), pos));
         }
         close();
+        return true;
     }
 
     // -- Render
@@ -139,7 +141,8 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
 
     @Override
     protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE, leftPos + 17, topPos + 21, 0xFFFFFFFF, true);
+        int color = getAddressValidator().getIssues().isEmpty() ? 0xFFFFFFFF : 0xAAFFFFFF;
+        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE, leftPos + 17, topPos + 21, color, true);
     }
 
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {

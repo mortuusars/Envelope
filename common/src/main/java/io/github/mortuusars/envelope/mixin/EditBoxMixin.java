@@ -34,7 +34,7 @@ public abstract class EditBoxMixin extends AbstractWidget {
     @Inject(method = "renderWidget", at = @At("HEAD"))
     private void onRenderWidgetHead(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (Minecrft.get().screen instanceof AddressTagScreen) {
-            guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+            guiGraphics.enableScissor(getX() - 1, getY(), getX() + getWidth() + 1, getY() + getHeight());
         }
     }
 
