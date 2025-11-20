@@ -20,8 +20,7 @@ import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class EnvelopeCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
@@ -32,7 +31,9 @@ public class EnvelopeCommand {
                           .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail")))))
               .then(Commands.literal("pigeonhole")
                     .then(Commands.literal("list")
-                          .executes(EnvelopeCommand::listAllPigeonholes))
+                          .executes(EnvelopeCommand::listAllPigeonholes)
+                          .then(Commands.literal("default")
+                                .executes(EnvelopeCommand::listDefaultPigeonholes)))
                     .then(Commands.literal("position")
                           .then(Commands.argument("address", AddressArgument.pigeonhole())
                                 .suggests(AddressSuggestions.pigeonhole())
@@ -65,15 +66,42 @@ public class EnvelopeCommand {
         Set<Address.Pigeonhole> addresses = level.getEnvelopeContext().getPigeonholeManager().getAllAddresses();
 
         if (!addresses.isEmpty()) {
-            context.getSource().sendSuccess(() -> Component.literal("All pigeonholes in this dimension:"), true);
+            context.getSource().sendSuccess(() -> Component.literal("All pigeonholes:"), true);
             for (Address.Pigeonhole address : addresses) {
                 context.getSource().sendSuccess(() -> copyableAddressAndPos(address,
                       level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address)), true);
             }
         } else {
             context.getSource().sendSuccess(() ->
-                  Component.literal("There are no pigeonholes in this dimension."), true);
+                  Component.literal("There are no addressed pigeonholes."), true);
         }
+        return 0;
+    }
+
+    private static int listDefaultPigeonholes(CommandContext<CommandSourceStack> context) {
+        ServerLevel level = context.getSource().getLevel();
+
+        Map<String, Address.Pigeonhole> defaultAddresses = new HashMap<>();
+
+        for (Map.Entry<String, UUID> player : level.getEnvelopeContext().getKnownPlayers().get().entrySet()) {
+            level.getEnvelopeContext().getDefaultAddresses().of(player.getValue())
+                  .ifPresent(address -> defaultAddresses.put(player.getKey(), address));
+        }
+
+        if (!defaultAddresses.isEmpty()) {
+            context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
+
+            defaultAddresses.forEach((name, address) -> {
+                Optional<BlockPos> position = level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address);
+                context.getSource().sendSuccess(() -> Component.literal(name)
+                      .append(" - ")
+                      .append(copyableAddressAndPos(address, position)), true);
+            });
+        } else {
+            context.getSource().sendSuccess(() ->
+                  Component.literal("There are no default pigeonholes."), true);
+        }
+
         return 0;
     }
 
