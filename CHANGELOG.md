@@ -2,6 +2,8 @@
 
 ## 0.2.0.2
 [Existing blocks and other stuff might (or will) break/reset when updating to this version] 
+- Changed address tag GUI
+  - Added proper autocomplete suggestions popup
 - Increased address length limit from 22 to 40 characters
 - Rewritten delivery system to fix some bugs and introduce new ones
 - Added ability to reach check for `approaching_recipient` phase, in addition to `departing_sender`
@@ -13,7 +15,7 @@
   - These things are now handled internally. Not much has changed for the player, they were for internal use anyway
 - Pigeon movement should be smoother in some cases
 - Changed command `/mail send [item]` to `/envelope send [item]`
-- Added `/envelope pigeonhole [list|position]` command
+- Added `/envelope pigeonhole` commands
 - Improvements to Bugger (Debug utility enabled with `debug.debug_mode` server config option. Adds more info to F3 screen, more log messages, etc).
 - Pigeons released from Pigeonhole for emergency reasons will no longer start delivering mail as usual 
 
