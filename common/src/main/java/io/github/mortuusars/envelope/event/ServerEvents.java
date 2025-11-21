@@ -11,6 +11,6 @@ public class ServerEvents {
     }
 
     public static void playerLogin(ServerPlayer player) {
-        player.serverLevel().getEnvelopeContext().getKnownPlayers().add(player);
+        player.serverLevel().getEnvelopeContext().getPlayers().add(player);
     }
 }

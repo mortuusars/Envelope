@@ -79,8 +79,7 @@ public class Delivery {
         int travelDuration = calculateTravelDuration(level, sender, recipient);
 
         if (Bugger.isEnabled()) {
-            LOGGER.info("Delivery of '{}' - '{} > {}' is created.",
-                  mailStack.getHoverName().getString(), sender.getName(), recipient.getName());
+            LOGGER.info("Delivery of {} - '{} > {}' is created.", mailStack.getHoverName().getString(), sender, recipient);
         }
 
         return new Delivery(sender, recipient, travelDuration, origin, mail, route, DeliveryProgress.start());

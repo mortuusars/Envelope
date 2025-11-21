@@ -15,6 +15,7 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
+import io.github.mortuusars.envelope.world.mail.address.AddressHelper;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
@@ -309,10 +310,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     public boolean isSendable(ItemStack stack) {
-        return address != null
-              && !stack.isEmpty()
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address recipient
-              && !recipient.equals(address);
+        return !stack.isEmpty() && stack.has(Envelope.DataComponents.MAIL_RECIPIENT);
     }
 
     public boolean isExtractable(Mail stack) {
@@ -392,27 +390,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         if (entity instanceof Pigeon pigeon) {
             pigeon.releasedFromPigeonhole(getBlockPos(), getBlockState(), reason); // Calling before mail sending to set home pos etc
-
-            ItemStack mail = getItem(SLOT_MAIL);
-            if (isSendable(mail) && !getItem(SLOT_FOOD).isEmpty() && !pigeon.isDelivering()) {
-                mail = mail.copyWithCount(1);
-                mail.set(Envelope.DataComponents.MAIL_SENDER, address);
-                if (!mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
-                    mail.set(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
-                }
-
-                pigeon.startDelivery(Delivery.create(serverLevel, mail, DeliveryOrigin.regular(getBlockPos())));
-
-                getItem(SLOT_FOOD).shrink(1);
-                if (getItem(SLOT_FOOD).isEmpty()) {
-                    setItem(SLOT_FOOD, ItemStack.EMPTY);
-                }
-
-                getItem(SLOT_MAIL).shrink(1);
-                if (getItem(SLOT_MAIL).isEmpty()) {
-                    setItem(SLOT_MAIL, ItemStack.EMPTY);
-                }
-            }
+            tryStartDelivery(serverLevel, pigeon);
         }
 
         float wasteChance = getWasteIncreaseChanceOnRelease(entity);
@@ -420,6 +398,33 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             block.addWaste(level, getBlockPos(), getBlockState());
             setChanged();
         }
+    }
+
+    protected void tryStartDelivery(ServerLevel level, Pigeon pigeon) {
+        if (this.address == null || pigeon.isDelivering() || getItem(SLOT_FOOD).isEmpty()) {
+            return;
+        }
+
+        ItemStack mail = getItem(SLOT_MAIL);
+        if (!isSendable(mail)) return;
+
+        mail = mail.copyWithCount(1);
+
+        if (!mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
+            mail.set(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
+        }
+        mail.set(Envelope.DataComponents.MAIL_SENDER, address);
+
+        @NotNull Address recipient = Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_RECIPIENT));
+
+        if (level.getEnvelopeContext().addresses().resolve(recipient).matches(this.address)) {
+            return;
+        }
+
+        pigeon.startDelivery(Delivery.create(level, mail, DeliveryOrigin.regular(getBlockPos())));
+
+        removeItem(SLOT_MAIL, 1);
+        removeItem(SLOT_FOOD, 1);
     }
 
     @Override

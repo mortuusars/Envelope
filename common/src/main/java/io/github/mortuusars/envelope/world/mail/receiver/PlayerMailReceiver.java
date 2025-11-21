@@ -14,8 +14,7 @@ public class PlayerMailReceiver implements MailReceiver {
 
     @Override
     public Mail receiveMail(ServerLevel level, Mail mail) {
-        return level.getEnvelopeContext().getKnownPlayers().getUuid(address)
-              .flatMap(uuid -> level.getEnvelopeContext().getDefaultAddresses().of(uuid))
+        return level.getEnvelopeContext().getPlayers().getDefaultAddressOf(address)
               .map(PigeonholeMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
               .orElseGet(() -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));

@@ -12,12 +12,7 @@ public interface DeliveryHandler {
 
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT
-              && !level.getEnvelopeContext().addresses().getAll().isKnown(delivery.getRecipient())) {
-
-            //TODO: check if can deliver to player address
-//            boolean canBeDelivered = level.getEnvelopeContext().addresses().getAll().isKnown(delivery.getRecipient())
-//                  && (delivery.getRecipient() instanceof Address.Player && level.getEnvelopeContext().getDefaultAddresses().)
-
+              && !level.getEnvelopeContext().addresses().canDeliverMailTo(delivery.getRecipient())) {
             delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
             return DeliveryPhase.APPROACHING_SENDER;
         }

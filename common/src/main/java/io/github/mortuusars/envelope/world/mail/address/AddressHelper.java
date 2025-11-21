@@ -18,7 +18,7 @@ public class AddressHelper {
     public AllAddresses getAll() {
         return new AllAddresses(
               context.getPigeonholeManager().getAllAddresses(),
-              context.getKnownPlayers().getAllAddresses(),
+              context.getPlayers().getDefaultAddresses().keySet(),
               context.getMailEntities().getAllAddresses()
         );
     }
@@ -29,9 +29,31 @@ public class AddressHelper {
         }
         return switch (type) {
             case PIGEONHOLE -> AllAddresses.pigeonholes(context.getPigeonholeManager().getAllAddresses());
-            case PLAYER -> AllAddresses.players(context.getKnownPlayers().getAllAddresses());
+            case PLAYER -> AllAddresses.players(context.getPlayers().getDefaultAddresses().keySet());
             case ENTITY -> AllAddresses.entities(context.getMailEntities().getAllAddresses());
         };
+    }
+
+    public Optional<Address.Pigeonhole> getPlayerDefaultAddress(Address.Player playerAddress) {
+        return Optional.ofNullable(context.getPlayers().getDefaultAddresses().get(playerAddress));
+    }
+
+    /**
+     * @return "final" address. Mostly for getting default pigeonhole address of a player.
+     */
+    public Address resolve(Address address) {
+        if (address instanceof Address.Player playerAddress) {
+            return getPlayerDefaultAddress(playerAddress).map(Address.class::cast).orElse(address);
+        }
+        return address;
+    }
+
+    /**
+     * @return {@code true} if address can receive mail.
+     */
+    public boolean canDeliverMailTo(Address address) {
+        address = resolve(address);
+        return getAll().isKnown(address);
     }
 
     public Optional<Integer> getDistanceTo(Address from, Address to) {

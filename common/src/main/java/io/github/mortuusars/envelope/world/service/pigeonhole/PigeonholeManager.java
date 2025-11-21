@@ -83,7 +83,7 @@ public class PigeonholeManager {
         @Nullable PigeonholeData removed = getPigeonholes().remove(address);
         if (removed != null) {
             removed.invalidate();
-            level.getEnvelopeContext().getDefaultAddresses().remove(address);
+            level.getEnvelopeContext().getPlayers().removeDefaultAddress(address);
             setDirty();
             if (Envelope.debug()) LOGGER.info("Removed Pigeonhole '{}'@[{}]",
                   removed.getAddress().id(), removed.getPos().toShortString());
@@ -93,7 +93,7 @@ public class PigeonholeManager {
     public @NotNull PigeonholeData rename(PigeonholeData data, Address.Pigeonhole suggestedAddress) {
         Address.Pigeonhole newAddress = uniquifyIfKnown(suggestedAddress);
 
-        level.getEnvelopeContext().getDefaultAddresses().update(data.getAddress(), newAddress);
+        level.getEnvelopeContext().getPlayers().renameDefaultAddress(data.getAddress(), newAddress);
 
         PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail());
 

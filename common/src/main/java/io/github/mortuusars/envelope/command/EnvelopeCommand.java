@@ -81,19 +81,14 @@ public class EnvelopeCommand {
     private static int listDefaultPigeonholes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
 
-        Map<String, Address.Pigeonhole> defaultAddresses = new HashMap<>();
-
-        for (Map.Entry<String, UUID> player : level.getEnvelopeContext().getKnownPlayers().get().entrySet()) {
-            level.getEnvelopeContext().getDefaultAddresses().of(player.getValue())
-                  .ifPresent(address -> defaultAddresses.put(player.getKey(), address));
-        }
+        Map<Address.Player, Address.Pigeonhole> defaultAddresses = level.getEnvelopeContext().getPlayers().getDefaultAddresses();
 
         if (!defaultAddresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
 
-            defaultAddresses.forEach((name, address) -> {
+            defaultAddresses.forEach((playerAddress, address) -> {
                 Optional<BlockPos> position = level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address);
-                context.getSource().sendSuccess(() -> Component.literal(name)
+                context.getSource().sendSuccess(() -> Component.literal(playerAddress.toString())
                       .append(" - ")
                       .append(copyableAddressAndPos(address, position)), true);
             });

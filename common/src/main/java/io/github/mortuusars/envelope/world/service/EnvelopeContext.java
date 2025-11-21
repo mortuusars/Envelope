@@ -42,8 +42,7 @@ public class EnvelopeContext {
     protected final PigeonholeManager pigeonholeManager;
     protected final MailEntities mailEntities;
 
-    protected @Nullable KnownPlayers knownPlayers;
-    protected @Nullable DefaultAddresses defaultAddresses;
+    protected @Nullable Players players;
     protected @Nullable BackgroundDelivery backgroundDelivery;
     protected AddressHelper addressHelper;
 
@@ -77,16 +76,10 @@ public class EnvelopeContext {
         return mailEntities;
     }
 
-    public @NotNull KnownPlayers getKnownPlayers() {
-        return knownPlayers == null
-              ? knownPlayers = KnownPlayers.get(level, "envelope_known_players")
-              : knownPlayers;
-    }
-
-    public @NotNull DefaultAddresses getDefaultAddresses() {
-        return defaultAddresses == null
-              ? defaultAddresses = DefaultAddresses.get(level, "envelope_default_addresses")
-              : defaultAddresses;
+    public @NotNull Players getPlayers() {
+        return players == null
+              ? players = Players.get(level, "envelope_players")
+              : players;
     }
 
     public @NotNull BackgroundDelivery getBackgroundDelivery() {
