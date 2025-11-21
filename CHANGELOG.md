@@ -1,23 +1,28 @@
 # Changelog
 
 ## 0.2.0.2
-[Existing blocks and other stuff might (or will) break/reset when updating to this version] 
+[Existing blocks and other stuff might (or will) break/reset when updating to this version]
+
+Delivery:
+- Rewritten delivery system to fix some bugs and introduce new ones
+- Added 'ability to reach' check for `approaching_recipient` phase, in addition to `departing_sender`
+- Delivery travel duration is now based on distance between addresses
+  - Added config options for delivery duration
+  - Removed `envelope:mail_travel_duration` item data component
+- Improved transition points (where pigeon appears/disappears)
+
+
 - Changed address tag GUI
   - Added proper autocomplete suggestions popup
 - Increased address length limit from 22 to 40 characters
-- Rewritten delivery system to fix some bugs and introduce new ones
-- Added ability to reach check for `approaching_recipient` phase, in addition to `departing_sender`
-- Delivery travel duration is now based on distance between addresses
-  - Added config options for delivery duration
-  - Removed `envelope:mail_travel_duration` item data component 
-- Restricted all operations to overworld only
 - Removed `envelope:mail_id`, `envelope:mail_delivery_log`, `envelope:mail_status` item data components
   - These things are now handled internally. Not much has changed for the player, they were for internal use anyway
 - Pigeon movement should be smoother in some cases
-- Changed command `/mail send [item]` to `/envelope send [item]`
 - Added `/envelope pigeonhole` commands
-- Improvements to Bugger (Debug utility enabled with `debug.debug_mode` server config option. Adds more info to F3 screen, more log messages, etc).
+- Changed command `/mail send [item]` to `/envelope send [item]`
 - Pigeons released from Pigeonhole for emergency reasons will no longer start delivering mail as usual 
+- Restricted all mail operations to overworld only
+- Improvements to Bugger (Debug utility enabled with `debug.debug_mode` server config option. Adds more info to F3 screen, more log messages, etc).
 
 ## 0.2.0.1
 - Added restrictions for items that can be placed inside a Package:
