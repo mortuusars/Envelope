@@ -5,8 +5,10 @@ import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.world.block.PaperBoxBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -46,10 +48,10 @@ public class ModelsDatagen extends BlockStateProvider {
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
               .model(customModel(Envelope.resource("letter_and_quill_content")))
               .end();
-        withUnfoldedLetterOverrides(itemModels().basicItem(Envelope.Items.LETTER.get()), "letter");
-        itemModels().basicItem(Envelope.Items.SEALED_LETTER.get());
-        withUnfoldedLetterOverrides(itemModels().basicItem(Envelope.Items.OPENED_SEALED_LETTER.get()), "opened_sealed_letter");
-        withUnfoldedLetterOverrides(itemModels().basicItem(Envelope.Items.TATTERED_LETTER.get()), "tattered_letter");
+        letterTatteredUnfoldedContent(Envelope.Items.LETTER.get());
+        letterTattered(Envelope.Items.SEALED_LETTER.get());
+        letterTatteredUnfoldedContent(Envelope.Items.OPENED_SEALED_LETTER.get());
+
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());
 
@@ -57,17 +59,48 @@ public class ModelsDatagen extends BlockStateProvider {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    protected ItemModelBuilder withUnfoldedLetterOverrides(ItemModelBuilder builder, String itemName) {
-        return builder
+    protected ItemModelBuilder letterTatteredUnfoldedContent(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        return itemModels().basicItem(id)
               .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 0)
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 0)
-              .model(customModel(Envelope.resource(itemName + "_unfolded")))
+              .model(customModel(id.withSuffix("_unfolded")))
               .end()
               .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 0)
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
-              .model(customModel(Envelope.resource(itemName + "_unfolded_content")))
+              .model(customModel(id.withSuffix("_unfolded_content")))
+              .end()
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 0)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 0)
+              .model(customModel(id.withSuffix("_tattered")))
+              .end()
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 0)
+              .model(customModel(id.withSuffix("_tattered_unfolded")))
+              .end()
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
+              .model(customModel(id.withSuffix("_tattered_unfolded_content")))
+              .end();
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    protected ItemModelBuilder letterTattered(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        return itemModels().basicItem(id)
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
+              .model(customModel(id.withSuffix("_tattered")))
               .end();
     }
 

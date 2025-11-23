@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.*;
@@ -20,10 +19,12 @@ import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -165,8 +166,6 @@ public class Envelope {
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
               () -> new LetterItem(new Item.Properties().stacksTo(1)));
-        public static final Supplier<LetterItem> TATTERED_LETTER = Register.item("tattered_letter",
-              () -> new LetterItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
               () -> new SealedLetterItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<OpenedSealedLetterItem> OPENED_SEALED_LETTER = Register.item("opened_sealed_letter",
@@ -174,7 +173,6 @@ public class Envelope {
 
         public static final Supplier<BlockItem> PAPER_BOX = Register.item("paper_box",
               () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
-
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
 
@@ -207,6 +205,9 @@ public class Envelope {
         public static final DataComponentType<LetterContent> LETTER_CONTENT =
               Register.dataComponentType("letter_content", b ->
                     b.persistent(LetterContent.CODEC).networkSynchronized(LetterContent.STREAM_CODEC));
+        public static final DataComponentType<Unit> LETTER_TATTERED =
+              Register.dataComponentType("letter_tattered", b ->
+                    b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
 
         public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = Register.dataComponentType("package_contents",
               b -> b.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));

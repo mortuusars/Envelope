@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "envelope:item/tattered_letter_unfolded"
+    "layer0": "envelope:item/letter_tattered_unfolded_content"
   }
 }

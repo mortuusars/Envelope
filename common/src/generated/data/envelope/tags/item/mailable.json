@@ -3,7 +3,6 @@
     "envelope:letter",
     "envelope:sealed_letter",
     "envelope:opened_sealed_letter",
-    "envelope:tattered_letter",
     "envelope:package"
   ]
 }

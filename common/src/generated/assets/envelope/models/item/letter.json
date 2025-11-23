@@ -5,6 +5,7 @@
       "model": "envelope:item/letter_unfolded",
       "predicate": {
         "envelope:letter_content": 0.0,
+        "envelope:letter_tattered": 0.0,
         "envelope:letter_unfolded": 1.0
       }
     },
@@ -12,6 +13,31 @@
       "model": "envelope:item/letter_unfolded_content",
       "predicate": {
         "envelope:letter_content": 1.0,
+        "envelope:letter_tattered": 0.0,
+        "envelope:letter_unfolded": 1.0
+      }
+    },
+    {
+      "model": "envelope:item/letter_tattered",
+      "predicate": {
+        "envelope:letter_content": 0.0,
+        "envelope:letter_tattered": 1.0,
+        "envelope:letter_unfolded": 0.0
+      }
+    },
+    {
+      "model": "envelope:item/letter_tattered_unfolded",
+      "predicate": {
+        "envelope:letter_content": 0.0,
+        "envelope:letter_tattered": 1.0,
+        "envelope:letter_unfolded": 1.0
+      }
+    },
+    {
+      "model": "envelope:item/letter_tattered_unfolded_content",
+      "predicate": {
+        "envelope:letter_content": 1.0,
+        "envelope:letter_tattered": 1.0,
         "envelope:letter_unfolded": 1.0
       }
     }

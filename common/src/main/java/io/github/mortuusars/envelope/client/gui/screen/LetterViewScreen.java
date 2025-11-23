@@ -19,7 +19,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +27,10 @@ public class LetterViewScreen extends Screen {
     public static final ResourceLocation REGULAR_TEXTURE = Envelope.resource("textures/gui/letter.png");
     public static final ResourceLocation TATTERED_TEXTURE = Envelope.resource("textures/gui/tattered_letter.png");
     public static final ResourceLocation TATTERED_OVERLAY = Envelope.resource("textures/gui/tattered_letter_overlay.png");
-    public static final ResourceLocation SEALED_TEXTURE = Envelope.resource("textures/gui/sealed_letter.png");
 
     protected final ItemAndStack<LetterItem> letter;
     protected final InteractionHand hand;
-
-    protected final Style style;
+    protected final boolean isTattered;
 
     protected int maxLines = 19;
     protected int imageWidth, imageHeight, leftPos, topPos;
@@ -43,7 +40,7 @@ public class LetterViewScreen extends Screen {
         super(Component.empty());
         this.letter = new ItemAndStack<>(letter);
         this.hand = hand;
-        this.style = Style.of(letter);
+        this.isTattered = letter.has(Envelope.DataComponents.LETTER_TATTERED);
     }
 
     @Override
@@ -81,12 +78,11 @@ public class LetterViewScreen extends Screen {
             guiGraphics.drawString(font, lines.get(i), leftPos + 18, topPos + 22 + i * font.lineHeight, 0xFF7B593D, false);
         }
 
-        @Nullable ResourceLocation overlay = style.getOverlay();
-        if (overlay != null) {
+        if (isTattered) {
             RenderSystem.enableBlend();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0, 0, 200);
-            guiGraphics.blit(overlay, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+            guiGraphics.blit(TATTERED_OVERLAY, leftPos, topPos, 0, 0, imageWidth, imageHeight);
             guiGraphics.pose().popPose();
             RenderSystem.disableBlend();
         }
@@ -102,7 +98,8 @@ public class LetterViewScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
-        guiGraphics.blit(style.getTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        ResourceLocation texture = isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
+        guiGraphics.blit(texture, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
     @Override
@@ -121,33 +118,5 @@ public class LetterViewScreen extends Screen {
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    public enum Style {
-        REGULAR(REGULAR_TEXTURE, null),
-        TATTERED(TATTERED_TEXTURE, TATTERED_OVERLAY),
-        SEALED(SEALED_TEXTURE, null);
-
-        private final ResourceLocation texture;
-        private final @Nullable ResourceLocation overlay;
-
-        Style(ResourceLocation texture, @Nullable ResourceLocation overlay) {
-            this.texture = texture;
-            this.overlay = overlay;
-        }
-
-        public ResourceLocation getTexture() {
-            return texture;
-        }
-
-        public @Nullable ResourceLocation getOverlay() {
-            return overlay;
-        }
-
-        public static Style of(ItemStack stack) {
-            if (stack.is(Envelope.Items.TATTERED_LETTER.get())) return TATTERED;
-            if (stack.is(Envelope.Items.SEALED_LETTER.get())) return SEALED;
-            return REGULAR;
-        }
     }
 }

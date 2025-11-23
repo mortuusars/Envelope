@@ -24,28 +24,26 @@ public class ItemTagsDatagen extends ItemTagsProvider {
         copy(Envelope.Tags.Blocks.PIGEONHOLES, Envelope.Tags.Items.PIGEONHOLES);
 
         tag(Envelope.Tags.Items.PIGEON_FOOD)
-                .addTag(Tags.Items.SEEDS);
+              .addTag(Tags.Items.SEEDS);
 
         tag(Envelope.Tags.Items.WASTE_SCOOPABLE)
-                .addTag(ItemTags.SHOVELS);
+              .addTag(ItemTags.SHOVELS);
 
         tag(Envelope.Tags.Items.CANNOT_BE_PACKAGED)
-                .add(Envelope.Items.PACKAGE.get())
-                .add(Items.BUNDLE);
+              .add(Envelope.Items.PACKAGE.get())
+              .add(Items.BUNDLE);
 
         tag(Envelope.Tags.Items.LETTERS)
-                .add(Envelope.Items.LETTER.get())
-                .add(Envelope.Items.SEALED_LETTER.get())
-                .add(Envelope.Items.OPENED_SEALED_LETTER.get())
-                .add(Envelope.Items.TATTERED_LETTER.get());
+              .add(Envelope.Items.LETTER.get())
+              .add(Envelope.Items.SEALED_LETTER.get())
+              .add(Envelope.Items.OPENED_SEALED_LETTER.get());
         tag(Envelope.Tags.Items.PACKAGES)
-                .add(Envelope.Items.PACKAGE.get());
+              .add(Envelope.Items.PACKAGE.get());
 
         tag(Envelope.Tags.Items.MAILABLE)
               .add(Envelope.Items.LETTER.get())
               .add(Envelope.Items.SEALED_LETTER.get())
               .add(Envelope.Items.OPENED_SEALED_LETTER.get())
-              .add(Envelope.Items.TATTERED_LETTER.get())
               .add(Envelope.Items.PACKAGE.get());
 
         tag(Envelope.Tags.Items.CUTTERS)

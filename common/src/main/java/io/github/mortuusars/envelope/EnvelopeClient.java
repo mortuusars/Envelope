@@ -21,20 +21,26 @@ public class EnvelopeClient {
     }
 
     public static class ItemModelOverrides {
+        public static final ResourceLocation LETTER_TATTERED = Envelope.resource("letter_tattered");
         public static final ResourceLocation LETTER_UNFOLDED = Envelope.resource("letter_unfolded");
         public static final ResourceLocation LETTER_CONTENT = Envelope.resource("letter_content");
 
         public static void register() {
             ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
 
+            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isTattered);
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
 
+            ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isTattered);
+
+            ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isTattered);
             ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
             ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
+        }
 
-            ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
-            ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
+        public static float isTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
+            return stack.has(Envelope.DataComponents.LETTER_TATTERED) ? 1 : 0;
         }
 
         public static float isUnfolded(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
