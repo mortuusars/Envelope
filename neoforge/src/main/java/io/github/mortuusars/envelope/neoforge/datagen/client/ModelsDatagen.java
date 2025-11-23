@@ -43,7 +43,7 @@ public class ModelsDatagen extends BlockStateProvider {
 
         itemModels().basicItem(Envelope.Items.LETTER_AND_QUILL.get())
               .override()
-              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_HAS_CONTENT, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
               .model(customModel(Envelope.resource("letter_and_quill_content")))
               .end();
         withUnfoldedLetterOverrides(itemModels().basicItem(Envelope.Items.LETTER.get()), "letter");
@@ -60,13 +60,13 @@ public class ModelsDatagen extends BlockStateProvider {
     protected ItemModelBuilder withUnfoldedLetterOverrides(ItemModelBuilder builder, String itemName) {
         return builder
               .override()
-              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_UNFOLDED, 1)
-              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_HAS_CONTENT, 0)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 0)
               .model(customModel(Envelope.resource(itemName + "_unfolded")))
               .end()
               .override()
-              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_UNFOLDED, 1)
-              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_HAS_CONTENT, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
               .model(customModel(Envelope.resource(itemName + "_unfolded_content")))
               .end();
     }

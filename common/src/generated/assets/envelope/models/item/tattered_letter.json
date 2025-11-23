@@ -4,14 +4,14 @@
     {
       "model": "envelope:item/tattered_letter_unfolded",
       "predicate": {
-        "envelope:letter_has_content": 0.0,
+        "envelope:letter_content": 0.0,
         "envelope:letter_unfolded": 1.0
       }
     },
     {
       "model": "envelope:item/tattered_letter_unfolded_content",
       "predicate": {
-        "envelope:letter_has_content": 1.0,
+        "envelope:letter_content": 1.0,
         "envelope:letter_unfolded": 1.0
       }
     }

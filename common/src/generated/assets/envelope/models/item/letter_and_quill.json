@@ -4,7 +4,7 @@
     {
       "model": "envelope:item/letter_and_quill_content",
       "predicate": {
-        "envelope:letter_has_content": 1.0
+        "envelope:letter_content": 1.0
       }
     }
   ],

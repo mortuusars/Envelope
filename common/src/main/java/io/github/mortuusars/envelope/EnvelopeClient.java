@@ -14,40 +14,42 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class EnvelopeClient {
-    public static final ResourceLocation ITEM_PROPERTY_LETTER_UNFOLDED = Envelope.resource("letter_unfolded");
-    public static final ResourceLocation ITEM_PROPERTY_LETTER_HAS_CONTENT = Envelope.resource("letter_has_content");
-
     public static void init() {
         BuggerDebugScreen.addPage(new EnvelopeBuggerPage());
         BuggerEntityOverhead.addData(new PigeonEntityDataDisplay());
-        registerItemModelProperties();
+        ItemModelOverrides.register();
     }
 
-    private static void registerItemModelProperties() {
-        ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), ITEM_PROPERTY_LETTER_HAS_CONTENT, EnvelopeClient::hasContent);
+    public static class ItemModelOverrides {
+        public static final ResourceLocation LETTER_UNFOLDED = Envelope.resource("letter_unfolded");
+        public static final ResourceLocation LETTER_CONTENT = Envelope.resource("letter_content");
 
-        ItemProperties.register(Envelope.Items.LETTER.get(), ITEM_PROPERTY_LETTER_UNFOLDED, EnvelopeClient::isUnfolded);
-        ItemProperties.register(Envelope.Items.LETTER.get(), ITEM_PROPERTY_LETTER_HAS_CONTENT, EnvelopeClient::hasContent);
+        public static void register() {
+            ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
 
-        ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), ITEM_PROPERTY_LETTER_UNFOLDED, EnvelopeClient::isUnfolded);
-        ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), ITEM_PROPERTY_LETTER_HAS_CONTENT, EnvelopeClient::hasContent);
+            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
+            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
 
-        ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), ITEM_PROPERTY_LETTER_UNFOLDED, EnvelopeClient::isUnfolded);
-        ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), ITEM_PROPERTY_LETTER_HAS_CONTENT, EnvelopeClient::hasContent);
-    }
+            ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
+            ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
 
-    public static float isUnfolded(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-        LetterContent content = stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY);
-        return content.unfolded() ? 1 : 0;
-    }
-
-    public static float hasContent(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-        if (!stack.getOrDefault(Envelope.DataComponents.LETTER_AND_QUILL_CONTENT, LetterAndQuillContent.EMPTY).isEmpty()) {
-            return 1;
+            ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
+            ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
         }
-        if (!stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).isEmpty()) {
-            return 1;
+
+        public static float isUnfolded(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
+            LetterContent content = stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY);
+            return content.unfolded() ? 1 : 0;
         }
-        return 0;
+
+        public static float hasContent(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
+            if (!stack.getOrDefault(Envelope.DataComponents.LETTER_AND_QUILL_CONTENT, LetterAndQuillContent.EMPTY).isEmpty()) {
+                return 1;
+            }
+            if (!stack.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).isEmpty()) {
+                return 1;
+            }
+            return 0;
+        }
     }
 }
