@@ -15,6 +15,7 @@
   "mixins": [
     "dispenser_waste_scooping.DispenserBlockMixin",
     "event.ServerLevelMixin",
+    "fox_tatter.FoxMixin",
     "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
     "mail_tooltip.ItemStackMixin",
