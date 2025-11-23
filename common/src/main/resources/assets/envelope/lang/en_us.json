@@ -10,17 +10,28 @@
   "item.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
   "item.envelope.birch_pigeonhole": "Birch Pigeonhole",
 
+  "item.envelope.address_tag": "Address Tag",
+  "item.envelope.seal_stamp": "Seal Stamp",
+
+  "item.envelope.letter_and_quill": "Letter and Quill",
   "item.envelope.letter": "Letter",
+  "item.envelope.tattered_letter": "Tattered Letter",
+  "item.envelope.sealed_letter": "Sealed Letter",
+  "item.envelope.opened_sealed_letter": "Opened Sealed Letter",
+
   "item.envelope.paper_box": "Paper Box",
   "item.envelope.package": "Package",
   "item.envelope.package.empty": "Empty Package",
-  "item.envelope.address_tag": "Address Tag",
+
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
   "container.envelope.pigeonhole": "Pigeonhole",
 
   "gui.envelope.pigeonhole_address.rename_warning.inbox": "§6• Mail in inbox will be dropped on the ground.",
   "gui.envelope.pigeonhole_address.rename_warning.traveling": "§6• Mail traveling to previous address will be returned.",
+
+  "envelope.letter_and_quill.fold_button": "Fold",
+  "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
 
   "gui.envelope.package.pack": "Pack",
   "gui.envelope.package.pack.tooltip.packs_remaining": "§7Remaining: %s",
@@ -90,7 +101,7 @@
   "gui.envelope.delivery.log.message.recipient_not_found": "§7[Recipient Not Found]",
   "gui.envelope.delivery.log.message.unable_to_reach": "§7[Unable To Reach]",
 
-  "gui.envelope.letter.subject": "§7Subject: %s",
+  "gui.envelope.letter.subject": "Subject: ",
 
   "gui.envelope.time.years": "%sy",
   "gui.envelope.time.months": "%smo",
@@ -135,6 +146,9 @@
   "address.envelope.type.pigeonhole": "Pigeonhole",
   "address.envelope.type.player": "Personal",
   "address.envelope.type.entity": "Entity",
+
+  "subtitle.envelope.paper.crackle": "Paper crackles",
+  "subtitle.envelope.paper.tear": "Paper tears",
 
   "subtitles.envelope.entity.pigeon.ambient": "Pigeon coos",
   "subtitles.envelope.entity.pigeon.death": "Pigeon dies",

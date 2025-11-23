@@ -1,4 +1,29 @@
 {
+  "item.paper.crackle": {
+    "sounds": [
+      "item/book/open_flip1",
+      "item/book/open_flip2",
+      "item/book/open_flip3",
+      {
+        "name": "envelope:item/paper",
+        "pitch": 0.85,
+        "volume": 0.3
+      },
+      {
+        "name": "envelope:item/paper",
+        "pitch": 1.25,
+        "volume": 0.3
+      }
+    ],
+    "subtitle": "subtitle.envelope.paper.crackle"
+  },
+  "item.paper.tear": {
+    "sounds": [
+      "envelope:item/paper_tear1",
+      "envelope:item/paper_tear2"
+    ],
+    "subtitle": "subtitle.envelope.paper.tear"
+  },
   "block.paper.break": {
     "sounds": [
       {

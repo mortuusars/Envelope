@@ -2,25 +2,28 @@ package io.github.mortuusars.envelope.network.packet.serverbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.world.item.LetterItem;
+import io.github.mortuusars.envelope.world.item.LetterAndQuillItem;
+import io.github.mortuusars.envelope.world.item.component.LetterAndQuillContent;
+import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public record LetterEditC2SP(int slot, String subject, String message) implements Packet {
+public record LetterEditC2SP(int slot, String text, boolean fold) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("letter_edit");
     public static final Type<LetterEditC2SP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, LetterEditC2SP> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, LetterEditC2SP::slot,
-            ByteBufCodecs.stringUtf8(512), LetterEditC2SP::subject,
-            ByteBufCodecs.stringUtf8(4096), LetterEditC2SP::message,
+            ByteBufCodecs.stringUtf8(LetterAndQuillContent.MAX_LENGTH), LetterEditC2SP::text,
+            ByteBufCodecs.BOOL, LetterEditC2SP::fold,
             LetterEditC2SP::new
     );
 
@@ -37,22 +40,28 @@ public record LetterEditC2SP(int slot, String subject, String message) implement
             return false;
         }
 
-        ItemStack letter = player.getInventory().getItem(slot);
-        if (!(letter.getItem() instanceof LetterItem)) {
-            Envelope.LOGGER.error("Cannot handle {} packet: item in slot {} is not a LetterItem.", ID, slot);
+        ItemStack letterAndQuill = player.getInventory().getItem(slot);
+        if (!(letterAndQuill.getItem() instanceof LetterAndQuillItem)) {
+            Envelope.LOGGER.error("Cannot handle {} packet: item in slot {} is not a LetterAndQuillItem.", ID, slot);
             return false;
         }
 
-        if (!subject.isBlank()) {
-            letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);
-        } else {
-            letter.remove(Envelope.DataComponents.LETTER_SUBJECT);
-        }
+        LetterAndQuillContent content = new LetterAndQuillContent(text);
 
-        if (!message.isBlank()) {
-            letter.set(Envelope.DataComponents.LETTER_MESSAGE, message);
+        if (fold) {
+            ItemStack letter = new ItemStack(Envelope.Items.LETTER.get());
+            if (!content.isEmpty()) {
+                letter.set(Envelope.DataComponents.LETTER_CONTENT, content.toWritten());
+            }
+
+            player.level().playSound(null, player, Envelope.SoundEvents.PAPER_CRACKLE.get(), SoundSource.PLAYERS, 1, 1);
+            player.getInventory().setItem(slot, letter);
         } else {
-            letter.remove(Envelope.DataComponents.LETTER_MESSAGE);
+            if (!content.isEmpty()) {
+                letterAndQuill.set(Envelope.DataComponents.LETTER_AND_QUILL_CONTENT, content);
+            } else {
+                letterAndQuill.remove(Envelope.DataComponents.LETTER_AND_QUILL_CONTENT);
+            }
         }
 
         return true;

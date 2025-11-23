@@ -80,8 +80,13 @@ public class NeoForgeCommonEvents {
                 event.accept(Envelope.Items.PACKAGE.get());
             }
             if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
+                event.accept(Envelope.Items.LETTER_AND_QUILL.get());
                 event.accept(Envelope.Items.LETTER.get());
+                event.accept(Envelope.Items.SEALED_LETTER.get());
+                event.accept(Envelope.Items.OPENED_SEALED_LETTER.get());
+                event.accept(Envelope.Items.TATTERED_LETTER.get());
                 event.accept(Envelope.Items.ADDRESS_TAG.get());
+                event.accept(Envelope.Items.SEAL_STAMP.get());
             }
             if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
                 event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());

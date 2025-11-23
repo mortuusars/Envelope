@@ -23,10 +23,6 @@ public class ItemTagsDatagen extends ItemTagsProvider {
     protected void addTags(HolderLookup.@NotNull Provider provider) {
         copy(Envelope.Tags.Blocks.PIGEONHOLES, Envelope.Tags.Items.PIGEONHOLES);
 
-        tag(Envelope.Tags.Items.MAILABLE)
-                .add(Envelope.Items.LETTER.get())
-                .add(Envelope.Items.PACKAGE.get());
-
         tag(Envelope.Tags.Items.PIGEON_FOOD)
                 .addTag(Tags.Items.SEEDS);
 
@@ -41,5 +37,15 @@ public class ItemTagsDatagen extends ItemTagsProvider {
                 .add(Envelope.Items.LETTER.get());
         tag(Envelope.Tags.Items.PACKAGES)
                 .add(Envelope.Items.PACKAGE.get());
+
+        tag(Envelope.Tags.Items.MAILABLE)
+              .add(Envelope.Items.LETTER.get())
+              .add(Envelope.Items.SEALED_LETTER.get())
+              .add(Envelope.Items.OPENED_SEALED_LETTER.get())
+              .add(Envelope.Items.TATTERED_LETTER.get())
+              .add(Envelope.Items.PACKAGE.get());
+
+        tag(Envelope.Tags.Items.CUTTERS)
+              .addTag(Tags.Items.TOOLS_SHEAR);
     }
 }

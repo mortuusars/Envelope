@@ -7,6 +7,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -51,6 +52,15 @@ public class RecipesDatagen extends RecipeProvider {
                 .pattern("   ")
                 .unlockedBy("has_pigeonhole", has(Envelope.Tags.Items.PIGEONHOLES))
                 .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Envelope.Items.SEAL_STAMP.get(), 1)
+              .define('S', ItemTags.WOODEN_SLABS)
+              .define('I', Tags.Items.INGOTS_IRON)
+              .pattern(" S ")
+              .pattern(" S ")
+              .pattern(" I ")
+              .unlockedBy("has_mailable", has(Envelope.Tags.Items.MAILABLE))
+              .save(output);
     }
 
     protected void pigeonhole(RecipeOutput output, ItemLike result, ItemLike planks) {

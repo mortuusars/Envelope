@@ -36,19 +36,24 @@ public class EnvelopeFabric implements ModInitializer {
 
         CommonEvents.commonSetup();
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
-            Envelope.Items.PIGEONHOLES.forEach(item -> content.accept(item.get()));
-            content.accept(Envelope.Items.PAPER_BOX.get());
-            content.accept(Envelope.Items.PACKAGE.get());
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(event -> {
+            Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
+            event.accept(Envelope.Items.PAPER_BOX.get());
+            event.accept(Envelope.Items.PACKAGE.get());
         });
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(content -> {
-            content.accept(Envelope.Items.LETTER.get());
-            content.accept(Envelope.Items.ADDRESS_TAG.get());
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(event -> {
+            event.accept(Envelope.Items.LETTER_AND_QUILL.get());
+            event.accept(Envelope.Items.LETTER.get());
+            event.accept(Envelope.Items.SEALED_LETTER.get());
+            event.accept(Envelope.Items.OPENED_SEALED_LETTER.get());
+            event.accept(Envelope.Items.TATTERED_LETTER.get());
+            event.accept(Envelope.Items.ADDRESS_TAG.get());
+            event.accept(Envelope.Items.SEAL_STAMP.get());
         });
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(content -> {
-            content.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(event -> {
+            event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
         });
 
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());

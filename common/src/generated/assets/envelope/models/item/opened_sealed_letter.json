@@ -1,0 +1,20 @@
+{
+  "parent": "minecraft:item/generated",
+  "overrides": [
+    {
+      "model": "envelope:item/unfolded_opened_sealed_letter",
+      "predicate": {
+        "envelope:letter_state": 0.1
+      }
+    },
+    {
+      "model": "envelope:item/blank_unfolded_opened_sealed_letter",
+      "predicate": {
+        "envelope:letter_state": 0.2
+      }
+    }
+  ],
+  "textures": {
+    "layer0": "envelope:item/opened_sealed_letter"
+  }
+}

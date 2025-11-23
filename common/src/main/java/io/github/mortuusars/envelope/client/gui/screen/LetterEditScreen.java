@@ -2,17 +2,24 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.display.HorizontalAlignment;
+import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.compat.jei.JeiCompatibleScreen;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.LetterEditC2SP;
+import io.github.mortuusars.envelope.util.ItemAndStack;
+import io.github.mortuusars.envelope.world.item.LetterAndQuillItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -20,19 +27,22 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/letter.png");
+import javax.tools.Tool;
 
-    protected final ItemStack letter;
+public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/letter_and_quill.png");
+    public static final WidgetSprites FOLD_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("letter_and_quill/fold_button"));
+
+    protected final ItemAndStack<LetterAndQuillItem> letter;
     protected final InteractionHand hand;
 
     protected int imageWidth, imageHeight, leftPos, topPos;
-    protected TextBox subjectBox;
-    protected TextBox messageBox;
+    protected TextBox textBox;
+    protected ImageButton foldButton;
 
     public LetterEditScreen(ItemStack letter, InteractionHand hand) {
         super(Component.empty());
-        this.letter = letter;
+        this.letter = new ItemAndStack<>(letter);
         this.hand = hand;
     }
 
@@ -48,49 +58,41 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
-        subjectBox = new TextBox(font, leftPos + 18, topPos + 22, 160, 19)
-            .setFontColor(0xFF7B593D)
-            .setFontUnfocusedColor(0xFF7B593D)
-            .setSelectionColor(0xFF664488)
-            .setSelectionUnfocusedColor(0xFF696170)
-            .setHintColor(0xFFC2A57F)
-            .setHorizontalAlignment(HorizontalAlignment.CENTER)
-            .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_SUBJECT, "")));
-        addRenderableWidget(subjectBox);
+        textBox = addRenderableWidget(new TextBox(font, leftPos + 18, topPos + 22, 160, 192)
+              .setFontColor(0xFF7B593D)
+              .setFontUnfocusedColor(0xFF7B593D)
+              .setSelectionColor(0xFF664488)
+              .setSelectionUnfocusedColor(0xFF696170)
+              .setHintColor(0xFFC2A57F)
+              .setText(FormattedString.parse(letter.map(LetterAndQuillItem::getContent).text())));
 
-        messageBox = new TextBox(font, leftPos + 18, topPos + 52, 160, 144)
-            .setFontColor(0xFF7B593D)
-            .setFontUnfocusedColor(0xFF7B593D)
-            .setSelectionColor(0xFF664488)
-            .setSelectionUnfocusedColor(0xFF696170)
-            .setHintColor(0xFFC2A57F)
-            .setText(FormattedString.parse(letter.getOrDefault(Envelope.DataComponents.LETTER_MESSAGE, "")));
-        addRenderableWidget(messageBox);
+        foldButton = addRenderableWidget(new ImageButton(
+              leftPos + imageWidth + 5, topPos + 178,
+              18, 18,
+              FOLD_BUTTON_SPRITES,
+              btn -> {
+                  saveChanges(true);
+                  Minecrft.get().setScreen(null);
+              },
+              Component.translatable("envelope.letter_and_quill.fold_button")));
+        foldButton.setTooltip(Tooltip.create(Component.translatable("envelope.letter_and_quill.fold_button")
+              .append(CommonComponents.NEW_LINE)
+              .append(Component.translatable("envelope.letter_and_quill.fold_warning").withStyle(ChatFormatting.GRAY))));
 
-        setInitialFocus(subjectBox);
+        setInitialFocus(textBox);
     }
 
     @Override
     public void resize(Minecraft minecraft, int width, int height) {
         // Prevent contents reset when window is resized
-        FormattedString subject = subjectBox.getEditor().getText();
-        int subjectCursorPos = subjectBox.getEditor().getCursorPos();
-        FormattedString message = messageBox.getEditor().getText();
-        int messageCursorPos = messageBox.getEditor().getCursorPos();
+        FormattedString message = textBox.getEditor().getText();
+        int messageCursorPos = textBox.getEditor().getCursorPos();
         super.resize(minecraft, width, height);
-        subjectBox.getEditor().setText(subject);
-        subjectBox.getEditor().setCursorPos(subjectCursorPos, false);
-        messageBox.getEditor().setText(message);
-        messageBox.getEditor().setCursorPos(messageCursorPos, false);
+        textBox.getEditor().setText(message);
+        textBox.getEditor().setCursorPos(messageCursorPos, false);
     }
 
     // -- Render
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-    }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -104,7 +106,7 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Special handling for toolbar, without this clicks will go to another element under the cursor,
         // if toolbar is over that element.
-        if (getFocused() instanceof TextBox textBox && textBox.formattingToolbarMouseClicked(mouseX, mouseY, button)) {
+        if (getFocused() instanceof TextBox box && box.formattingToolbarMouseClicked(mouseX, mouseY, button)) {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -127,9 +129,9 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
         @Nullable GuiEventListener lastFocused = getFocused();
         super.setFocused(focused);
         // Clear selection if focus changes:
-        if (lastFocused != null && !lastFocused.equals(getFocused()) && lastFocused instanceof TextBox textBox) {
-            textBox.getEditor().clearSelection();
-            textBox.getDisplayCache().scheduleUpdate();
+        if (lastFocused != null && !lastFocused.equals(getFocused()) && lastFocused instanceof TextBox box) {
+            box.getEditor().clearSelection();
+            box.getDisplayCache().scheduleUpdate();
         }
     }
 
@@ -138,26 +140,14 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
     @Override
     public void onClose() {
         super.onClose();
-        saveChanges();
+        saveChanges(false);
     }
 
-    protected void saveChanges() {
-        String subject = subjectBox.getEditor().getText().toString();
-        if (!subject.isBlank()) {
-            letter.set(Envelope.DataComponents.LETTER_SUBJECT, subject);
-        } else {
-            letter.remove(Envelope.DataComponents.LETTER_SUBJECT);
-        }
-
-        String message = messageBox.getEditor().getText().toString();
-        if (!message.isBlank()) {
-            letter.set(Envelope.DataComponents.LETTER_MESSAGE, message);
-        } else {
-            letter.remove(Envelope.DataComponents.LETTER_MESSAGE);
-        }
+    protected void saveChanges(boolean fold) {
+        String text = textBox.getEditor().getText().toString();
 
         int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new LetterEditC2SP(slot, subject, message));
+        Packets.sendToServer(new LetterEditC2SP(slot, text, fold));
     }
 
     // --

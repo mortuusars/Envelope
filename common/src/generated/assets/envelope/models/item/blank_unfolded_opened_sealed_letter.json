@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "envelope:item/blank_unfolded_opened_sealed_letter"
+  }
+}

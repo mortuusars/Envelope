@@ -1,7 +1,8 @@
-// 1.21.1	2025-10-23T12:36:08.3992784	Tags for minecraft:item mod id envelope
+// 1.21.1	2025-11-22T21:20:29.8340835	Tags for minecraft:item mod id envelope
 ef22f20de3b2c49f15c5f950738a5dc50d0d4997 data/envelope/tags/item/cannot_be_packaged.json
+06c10c0bf30184ff1fcfbf3b5f75bf9590edbfb8 data/envelope/tags/item/cutters.json
 64ce53c88b56988dcba505f1391216d6e11f8197 data/envelope/tags/item/letters.json
-9ac0586fe35e278ba0a157b03d8c1edfa39239a0 data/envelope/tags/item/mailable.json
+e811ff1249ac141c0f5c8e0f24b749766660aad8 data/envelope/tags/item/mailable.json
 d5f26cab7592557a8dfbb8285630a60c2f8673f6 data/envelope/tags/item/packages.json
 f4f266bec70a783884af07be3b507ba2a0063746 data/envelope/tags/item/pigeonholes.json
 788e6e34a201c014ae3783bc128afbd75443273b data/envelope/tags/item/pigeon_food.json
