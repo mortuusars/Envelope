@@ -2,15 +2,17 @@
   "parent": "minecraft:item/generated",
   "overrides": [
     {
-      "model": "envelope:item/unfolded_opened_sealed_letter",
+      "model": "envelope:item/opened_sealed_letter_unfolded",
       "predicate": {
-        "envelope:letter_state": 0.1
+        "envelope:letter_has_content": 0.0,
+        "envelope:letter_unfolded": 1.0
       }
     },
     {
-      "model": "envelope:item/blank_unfolded_opened_sealed_letter",
+      "model": "envelope:item/opened_sealed_letter_unfolded_content",
       "predicate": {
-        "envelope:letter_state": 0.2
+        "envelope:letter_has_content": 1.0,
+        "envelope:letter_unfolded": 1.0
       }
     }
   ],

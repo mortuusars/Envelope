@@ -28,7 +28,7 @@ public record LetterContent(Component text, boolean unfolded) {
     }
 
     public boolean isEmpty() {
-        return this.equals(EMPTY) || (text().getString().isEmpty() && !unfolded);
+        return this.equals(EMPTY) || text().getString().isEmpty();
     }
 
     public LetterContent withUnfolded(boolean unfolded) {

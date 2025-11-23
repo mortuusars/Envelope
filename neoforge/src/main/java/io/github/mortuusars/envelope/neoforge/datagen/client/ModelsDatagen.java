@@ -41,7 +41,11 @@ public class ModelsDatagen extends BlockStateProvider {
         itemModels().basicItem(Envelope.Items.ADDRESS_TAG.get());
         itemModels().basicItem(Envelope.Items.SEAL_STAMP.get());
 
-        itemModels().basicItem(Envelope.Items.LETTER_AND_QUILL.get());
+        itemModels().basicItem(Envelope.Items.LETTER_AND_QUILL.get())
+              .override()
+              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_HAS_CONTENT, 1)
+              .model(customModel(Envelope.resource("letter_and_quill_content")))
+              .end();
         withUnfoldedLetterOverrides(itemModels().basicItem(Envelope.Items.LETTER.get()), "letter");
         itemModels().basicItem(Envelope.Items.SEALED_LETTER.get());
         withUnfoldedLetterOverrides(itemModels().basicItem(Envelope.Items.OPENED_SEALED_LETTER.get()), "opened_sealed_letter");
@@ -56,12 +60,14 @@ public class ModelsDatagen extends BlockStateProvider {
     protected ItemModelBuilder withUnfoldedLetterOverrides(ItemModelBuilder builder, String itemName) {
         return builder
               .override()
-              .predicate(EnvelopeClient.MODEL_PROPERTY_LETTER_STATE, 0.1f)
-              .model(customModel(Envelope.resource("unfolded_" + itemName)))
+              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_HAS_CONTENT, 0)
+              .model(customModel(Envelope.resource(itemName + "_unfolded")))
               .end()
               .override()
-              .predicate(EnvelopeClient.MODEL_PROPERTY_LETTER_STATE, 0.2f)
-              .model(customModel(Envelope.resource("blank_unfolded_" + itemName)))
+              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ITEM_PROPERTY_LETTER_HAS_CONTENT, 1)
+              .model(customModel(Envelope.resource(itemName + "_unfolded_content")))
               .end();
     }
 
