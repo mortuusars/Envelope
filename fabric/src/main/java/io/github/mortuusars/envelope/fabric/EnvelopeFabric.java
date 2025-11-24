@@ -46,7 +46,6 @@ public class EnvelopeFabric implements ModInitializer {
             event.accept(Envelope.Items.LETTER_AND_QUILL.get());
             event.accept(Envelope.Items.LETTER.get());
             event.accept(Envelope.Items.SEALED_LETTER.get());
-            event.accept(Envelope.Items.OPENED_SEALED_LETTER.get());
             event.accept(Envelope.Items.ADDRESS_TAG.get());
             event.accept(Envelope.Items.SEAL_STAMP.get());
         });

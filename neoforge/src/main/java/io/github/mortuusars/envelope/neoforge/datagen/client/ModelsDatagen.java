@@ -50,7 +50,6 @@ public class ModelsDatagen extends BlockStateProvider {
               .end();
         letterTatteredUnfoldedContent(Envelope.Items.LETTER.get());
         letterTattered(Envelope.Items.SEALED_LETTER.get());
-        letterTatteredUnfoldedContent(Envelope.Items.OPENED_SEALED_LETTER.get());
 
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());

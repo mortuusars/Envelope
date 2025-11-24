@@ -33,10 +33,6 @@ public class EnvelopeClient {
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
 
             ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isTattered);
-
-            ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isTattered);
-            ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isUnfolded);
-            ItemProperties.register(Envelope.Items.OPENED_SEALED_LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasContent);
         }
 
         public static float isTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {

@@ -35,15 +35,13 @@ public class ItemTagsDatagen extends ItemTagsProvider {
 
         tag(Envelope.Tags.Items.LETTERS)
               .add(Envelope.Items.LETTER.get())
-              .add(Envelope.Items.SEALED_LETTER.get())
-              .add(Envelope.Items.OPENED_SEALED_LETTER.get());
+              .add(Envelope.Items.SEALED_LETTER.get());
         tag(Envelope.Tags.Items.PACKAGES)
               .add(Envelope.Items.PACKAGE.get());
 
         tag(Envelope.Tags.Items.MAILABLE)
               .add(Envelope.Items.LETTER.get())
               .add(Envelope.Items.SEALED_LETTER.get())
-              .add(Envelope.Items.OPENED_SEALED_LETTER.get())
               .add(Envelope.Items.PACKAGE.get());
 
         tag(Envelope.Tags.Items.CUTTERS)

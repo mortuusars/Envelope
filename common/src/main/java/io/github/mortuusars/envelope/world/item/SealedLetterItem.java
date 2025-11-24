@@ -46,7 +46,7 @@ public class SealedLetterItem extends Item {
 
     @Override
     public @NotNull ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        stack = stack.transmuteCopy(Envelope.Items.OPENED_SEALED_LETTER.get());
+        stack = stack.transmuteCopy(Envelope.Items.LETTER.get());
 
         if (entity instanceof Player player) {
             level.playSound(player, entity, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS,

@@ -168,8 +168,6 @@ public class Envelope {
               () -> new LetterItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
               () -> new SealedLetterItem(new Item.Properties().stacksTo(1)));
-        public static final Supplier<OpenedSealedLetterItem> OPENED_SEALED_LETTER = Register.item("opened_sealed_letter",
-              () -> new OpenedSealedLetterItem(new Item.Properties().stacksTo(1)));
 
         public static final Supplier<BlockItem> PAPER_BOX = Register.item("paper_box",
               () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
