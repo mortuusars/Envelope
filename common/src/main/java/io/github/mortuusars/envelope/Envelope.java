@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.*;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;

@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope;
 
+import io.github.mortuusars.envelope.client.renderer.SealRenderer;
 import io.github.mortuusars.envelope.util.bugger.BuggerDebugScreen;
 import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
@@ -14,11 +15,19 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class EnvelopeClient {
+    private static final SealRenderer sealRenderer = new SealRenderer();
+
     public static void init() {
         BuggerDebugScreen.addPage(new EnvelopeBuggerPage());
         BuggerEntityOverhead.addData(new PigeonEntityDataDisplay());
         ItemModelOverrides.register();
     }
+
+    public static SealRenderer getSealRenderer() {
+        return sealRenderer;
+    }
+
+    // --
 
     public static class ItemModelOverrides {
         public static final ResourceLocation LETTER_TATTERED = Envelope.resource("letter_tattered");

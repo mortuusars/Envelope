@@ -8,15 +8,23 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 public class SealedLetterItem extends Item {
     public SealedLetterItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL));
     }
 
     @Override
@@ -26,7 +34,7 @@ public class SealedLetterItem extends Item {
 
     @Override
     public @NotNull SoundEvent getEatingSound() {
-        return Envelope.SoundEvents.PAPER_CRACKLE.get();
+        return Envelope.SoundEvents.PAPER_TEAR.get();
     }
 
     @Override
@@ -47,6 +55,7 @@ public class SealedLetterItem extends Item {
     @Override
     public @NotNull ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         stack = stack.transmuteCopy(Envelope.Items.LETTER.get());
+        stack.remove(Envelope.DataComponents.SEAL);
 
         if (entity instanceof Player player) {
             level.playSound(player, entity, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS,
