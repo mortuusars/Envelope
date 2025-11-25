@@ -1,7 +1,5 @@
 package io.github.mortuusars.envelope.client.renderer;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,19 +18,19 @@ public class SealRenderer {
 
         // Side
         colors.side().setShaderColor();
-        guiGraphics.blit(impressionTexture, x, y - 2, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x - 1, y - 1, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x, y - 1, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x + 1, y - 1, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x - 1, y, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x, y, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x + 1, y, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x - 1, y + 1, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x, y + 1, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x + 1, y + 1, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x - 1, y + 2, 0, 0, 30, 30, 30, 30);
-        guiGraphics.blit(impressionTexture, x, y + 2, 0, 0, 30, 30, 30, 30);
         guiGraphics.blit(impressionTexture, x + 1, y + 2, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x, y + 2, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x - 1, y + 2, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x + 1, y + 1, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x, y + 1, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x - 1, y + 1, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x + 1, y, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x, y, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x - 1, y, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x + 1, y - 1, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x, y - 1, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x - 1, y - 1, 0, 0, 30, 30, 30, 30);
+        guiGraphics.blit(impressionTexture, x, y - 2, 0, 0, 30, 30, 30, 30);
 
         // Shadow
         colors.shadow().setShaderColor();

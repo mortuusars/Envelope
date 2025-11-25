@@ -13,12 +13,12 @@ public class SealMaterials {
     public static final SealMaterial RED_WAX = register(new SealMaterial(
           Envelope.resource("red_wax"),
           0xFFCC4E47,
-          new SealMaterial.Colors(0xFFA3453E, 0xFFEA8F7C, 0xFF6D1E1B, 0xFF8C312E)));
+          new SealMaterial.Colors(0xFFA73A34, 0xFFF18E78, 0xFF660C0A, 0xFF8A2622)));
 
     public static final SealMaterial GOLD = register(new SealMaterial(
           Envelope.resource("gold"),
           0xFFFFB347,
-          new SealMaterial.Colors(0xFFE38D39, 0xFFFFEE9C, 0xFF8E3E18, 0xFFC46D2F)));
+          new SealMaterial.Colors(0xFFD98F2E, 0xFFFFECA1, 0xFF77340F, 0xFFB36725)));
 
     // --
 

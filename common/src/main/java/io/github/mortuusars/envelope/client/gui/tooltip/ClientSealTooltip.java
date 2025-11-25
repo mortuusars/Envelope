@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
 
 public class ClientSealTooltip implements ClientTooltipComponent {
@@ -37,18 +36,20 @@ public class ClientSealTooltip implements ClientTooltipComponent {
     public void renderText(Font font, int x, int y, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource) {
         // Signature:
         seal.material().getColors().side().setShaderColor();
-        int color = seal.material().getItemTintColor();
-        int outlineColor = FastColor.ARGB32.multiply(color, 0xFF7f7f7f);
-        font.drawInBatch(seal.signature(), x + 33 - 1, y + 11, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33 - 1, y + 11 - 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33, y + 11 - 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33 + 1, y + 11 - 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33 + 1, y + 11, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33 + 1, y + 11 + 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33, y + 11 + 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
-        font.drawInBatch(seal.signature(), x + 33 - 1, y + 11 + 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        x += 34;
+        y += 11;
+        int color = seal.material().getColors().highlight().tint();
+        int outlineColor = seal.material().getColors().shadow().tint();
+        font.drawInBatch(seal.signature(), x - 1, y, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x - 1, y - 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x, y - 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x + 1, y - 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x + 1, y, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x + 1, y + 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x, y + 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x - 1, y + 1, outlineColor, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
         seal.material().getColors().highlight().setShaderColor();
-        font.drawInBatch(seal.signature(), x + 33, y + 11, color, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(seal.signature(), x, y, color, false, matrix, bufferSource, Font.DisplayMode.NORMAL, 0x00000000, LightTexture.FULL_BRIGHT);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
