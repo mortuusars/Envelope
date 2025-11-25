@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class AddressTagItem extends Item {
+public class AddressTagItem extends Item implements ApplicatorItem {
     public AddressTagItem(Properties properties) {
         super(properties);
     }
@@ -81,5 +81,10 @@ public class AddressTagItem extends Item {
         }
 
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+    }
+
+    @Override
+    public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.mixin.pigeon_spawner;
+package io.github.mortuusars.envelope.mixin.spawners;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;

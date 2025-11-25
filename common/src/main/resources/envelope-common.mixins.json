@@ -10,8 +10,8 @@
     "bugger.MouseHandlerMixin",
     "bugger.ScreenOverlayMixin",
     "bugger.ScreenRenderLinesInvoker",
-    "package_tooltip.ClientTooltipComponentMixin",
-    "seal_stamp_tooltip.AbstractContainerScreenMixin"
+    "tooltip.ClientTooltipComponentMixin",
+    "applicator_carrying_tooltip.AbstractContainerScreenMixin"
   ],
   "mixins": [
     "dispenser_waste_scooping.DispenserBlockMixin",
@@ -19,8 +19,8 @@
     "fox_tatter.FoxMixin",
     "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
-    "mail_tooltip.ItemStackMixin",
-    "pigeon_spawner.MinecraftServerMixin"
+    "tooltip.ItemStackMixin",
+    "spawners.MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

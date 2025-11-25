@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -216,6 +217,8 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = Register.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC));
+        public static final DataComponentType<SealImpression> SEAL_IMPRESSION = Register.dataComponentType("seal_impression",
+              b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC));
 
         public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType("pigeons", b ->
               b.persistent(Occupant.LIST_CODEC).networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());

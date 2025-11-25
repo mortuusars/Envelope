@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.item.component.seal;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import io.github.mortuusars.envelope.util.HardLightColor;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -27,18 +26,18 @@ public class SealMaterial {
     private final ResourceLocation id;
     private final ResourceLocation texture;
     private final int itemTintColor;
-    private final Colors colors;
+    private final SealImpressionTheme impressionTheme;
 
     /**
      * @param id Used to identify this material and its texture in 'textures/gui/seal' folder.
      * @param itemTintColor Used to tint parts of the item model.
-     * @param colors Used to tint the impression.
+     * @param impressionTheme Used to tint the impression.
      */
-    public SealMaterial(ResourceLocation id, int itemTintColor, Colors colors) {
+    public SealMaterial(ResourceLocation id, int itemTintColor, SealImpressionTheme impressionTheme) {
         this.id = id;
-        this.texture = id.withPath(path -> "textures/gui/seal/" + path + ".png");
+        this.texture = id.withPath(path -> "textures/gui/seal/material/" + path + ".png");
         this.itemTintColor = itemTintColor;
-        this.colors = colors;
+        this.impressionTheme = impressionTheme;
     }
 
     public ResourceLocation getId() {
@@ -53,13 +52,7 @@ public class SealMaterial {
         return itemTintColor;
     }
 
-    public Colors getColors() {
-        return colors;
-    }
-
-    public record Colors(HardLightColor base, HardLightColor highlight, HardLightColor shadow, HardLightColor side) {
-        public Colors(int base, int highlight, int shadow, int side) {
-            this(HardLightColor.of(base), HardLightColor.of(highlight), HardLightColor.of(shadow), HardLightColor.of(side));
-        }
+    public SealImpressionTheme getImpressionTheme() {
+        return impressionTheme;
     }
 }

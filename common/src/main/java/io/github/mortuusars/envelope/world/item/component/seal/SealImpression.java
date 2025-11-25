@@ -28,7 +28,7 @@ public class SealImpression {
 
     public SealImpression(ResourceLocation id) {
         this.id = id;
-        this.texture = id.withPath(path -> "textures/gui/seal_impression/" + path + ".png");
+        this.texture = id.withPath(path -> "textures/gui/seal/impression/" + path + ".png");
     }
 
     public ResourceLocation getId() {

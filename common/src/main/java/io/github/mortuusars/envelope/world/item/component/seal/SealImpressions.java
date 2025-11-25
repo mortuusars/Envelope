@@ -6,7 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class SealImpressions {
@@ -51,7 +50,7 @@ public class SealImpressions {
         return REGISTRY.getOrDefault(id, DEFAULT);
     }
 
-    public static SealImpression firstLetterOf(String string) {
+    public static SealImpression firstCharOrDefault(String string) {
         //TODO: numbers
 
         for (int i = 0; i < string.length(); i++) {

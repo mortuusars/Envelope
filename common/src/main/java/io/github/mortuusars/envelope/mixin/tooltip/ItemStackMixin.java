@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.mixin.mail_tooltip;
+package io.github.mortuusars.envelope.mixin.tooltip;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.mortuusars.envelope.client.gui.tooltip.Tooltip;
