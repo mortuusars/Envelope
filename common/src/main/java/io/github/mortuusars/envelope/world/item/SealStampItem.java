@@ -1,10 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpressions;
-import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
-import io.github.mortuusars.envelope.world.item.component.seal.SealMaterials;
+import io.github.mortuusars.envelope.world.item.component.seal.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -20,10 +17,11 @@ public class SealStampItem extends Item {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
-        ItemStack target = slot.getItem();
         if (action != ClickAction.SECONDARY) {
             return false;
         }
+
+        ItemStack target = slot.getItem();
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
         if (existingSeal != null && canApplyGold(stack, player)) {
@@ -37,12 +35,13 @@ public class SealStampItem extends Item {
         }
 
         if (!(target.getItem() instanceof Sealable sealable)) {
-            return false;
+            player.playSound(SoundEvents.COMPARATOR_CLICK);
+            return true;
         }
 
         if (!sealable.canSeal(player.level(), target)) {
-            player.playSound(SoundEvents.NOTE_BLOCK_BASS.value());
-            return true; // Do nothing
+            player.playSound(SoundEvents.COMPARATOR_CLICK);
+            return true;
         }
 
         ItemStack sealResult = sealable.seal(player.level(), target, createSeal(stack, player));
@@ -54,10 +53,14 @@ public class SealStampItem extends Item {
 
     public Seal createSeal(ItemStack stack, Player player) {
         return new Seal(SealMaterials.RED_WAX, SealImpressions.firstLetterOf(player.getScoreboardName()), player.getName());
+
+//        List<SealImpression> impressions = SealImpressions.REGISTRY.values().stream().toList();
+//        SealImpression impression = Util.getRandom(impressions, player.getRandom());
+//        return new Seal(SealMaterials.RED_WAX, impression, player.getName());
     }
 
     protected boolean canApplyGold(ItemStack stack, Player player) {
         //TODO: patreon supporters
-        return true;
+        return false;
     }
 }

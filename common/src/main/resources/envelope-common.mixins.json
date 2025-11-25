@@ -10,7 +10,8 @@
     "bugger.MouseHandlerMixin",
     "bugger.ScreenOverlayMixin",
     "bugger.ScreenRenderLinesInvoker",
-    "package_tooltip.ClientTooltipComponentMixin"
+    "package_tooltip.ClientTooltipComponentMixin",
+    "seal_stamp_tooltip.AbstractContainerScreenMixin"
   ],
   "mixins": [
     "dispenser_waste_scooping.DispenserBlockMixin",

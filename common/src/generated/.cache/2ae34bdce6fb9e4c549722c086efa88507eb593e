@@ -1,4 +1,4 @@
-// 1.21.1	2025-11-23T23:45:49.5064121	Block States: envelope
+// 1.21.1	2025-11-25T20:16:37.7660111	Block States: envelope
 4395cbbf53e39bf0f1813433f98d33fbe4e72b29 assets/envelope/blockstates/oak_pigeonhole.json
 b23843de3b5faa9851524890cf48a8e74e2c9872 assets/envelope/blockstates/package.json
 2edeec08f84e99e329a540acc27758c11b070a94 assets/envelope/blockstates/paper_box.json
@@ -18,12 +18,6 @@ b9113bcf8fcfca91251fe43178275d73b5b8d42b assets/envelope/models/item/letter_tatt
 6a5b2efd8a205dc9a36e38511dc97298dc555a33 assets/envelope/models/item/letter_unfolded.json
 2da24d29660b7574690fda6fd55ff1bb3b161362 assets/envelope/models/item/letter_unfolded_content.json
 ad2a0e20629d12e639432cedebb873df7f485b58 assets/envelope/models/item/oak_pigeonhole.json
-29e4bc569732cbeda63dc8d9604ba4cfc6874263 assets/envelope/models/item/opened_sealed_letter.json
-dabca65380781af29a1fe114b4dfe87a9ad43718 assets/envelope/models/item/opened_sealed_letter_tattered.json
-0c307940bfbd2a8e401af83f1a643c3f51d03fa7 assets/envelope/models/item/opened_sealed_letter_tattered_unfolded.json
-51b7b86f0e4a6189d01787eb34342b200603c4e7 assets/envelope/models/item/opened_sealed_letter_tattered_unfolded_content.json
-d077a2301393a779cdbe8785b9cdeae932d1011a assets/envelope/models/item/opened_sealed_letter_unfolded.json
-aacc0ebf6a5a7c79b96668c2592bbaeadef55c9b assets/envelope/models/item/opened_sealed_letter_unfolded_content.json
 131ae31e873cf751e0f298a8cadb0345faae2790 assets/envelope/models/item/package.json
 84bf88cc02bd62a10f3f742af3b02500a8f7c8eb assets/envelope/models/item/paper_box.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/envelope/models/item/pigeon_spawn_egg.json
