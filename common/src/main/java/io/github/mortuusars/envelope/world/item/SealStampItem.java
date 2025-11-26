@@ -94,6 +94,6 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     protected boolean canApplyGold(ItemStack stack, Player player) {
         //TODO: patreon supporters
-        return true;
+        return false;
     }
 }

@@ -8,7 +8,7 @@ public record ShadingPalette(TintColor base, TintColor highlight, TintColor shad
     }
 
     public static final ShadingPalette RED_WAX = new ShadingPalette(0xFFA73A34, 0xFFF18E78, 0xFF660C0A, 0xFF8A2622);
-    public static final ShadingPalette GOLD = new ShadingPalette(0xFFD98F2E, 0xFFFFECA1, 0xFF77340F, 0xFFB36725);
+    public static final ShadingPalette GOLD = new ShadingPalette(0xFFD79736, 0xFFFFEAAD, 0xFF75340B, 0xFFB56D24);
 
     public static final ShadingPalette IRON_DIE = new ShadingPalette(0xFF9A9CA1, 0xFFDFE0E3, 0xFF5D6068, 0xFFC4C5C8);
 }
