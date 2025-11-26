@@ -34,6 +34,7 @@ public class ItemTagsDatagen extends ItemTagsProvider {
               .add(Items.BUNDLE);
 
         tag(Envelope.Tags.Items.LETTERS)
+              .add(Envelope.Items.LETTER_AND_QUILL.get())
               .add(Envelope.Items.LETTER.get())
               .add(Envelope.Items.SEALED_LETTER.get());
         tag(Envelope.Tags.Items.PACKAGES)

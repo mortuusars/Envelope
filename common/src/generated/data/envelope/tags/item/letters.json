@@ -1,5 +1,6 @@
 {
   "values": [
+    "envelope:letter_and_quill",
     "envelope:letter",
     "envelope:sealed_letter"
   ]
