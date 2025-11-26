@@ -5,17 +5,18 @@ import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 /**
- * Approximate simulation of hard-light blend mode to calculate tint for seals.<br><br>
+ * Approximation of hard-light blend mode to calculate tint.<br>
+ * Color brighter than 50% will produce brighter image, lower than 50% - darker.<br><br>
  * It's not 1:1, but I don't know of a closer solution.
  * setShaderColor seems to behave slightly differently than anything that I can do in photoshop.
  */
-public record HardLightColor(float r, float g, float b, float a) {
-    public static HardLightColor of(int argb) {
+public record TintColor(float r, float g, float b, float a) {
+    public static TintColor of(int argb) {
         float a = (float) (FastColor.ARGB32.alpha(argb) - 127) / 127 + 1;
         float r = (float) (FastColor.ARGB32.red(argb) - 127) / 127 + 1;
         float g = (float) (FastColor.ARGB32.green(argb) - 127) / 127 + 1;
         float b = (float) (FastColor.ARGB32.blue(argb) - 127) / 127 + 1;
-        return new HardLightColor(r, g, b, a);
+        return new TintColor(r, g, b, a);
     }
 
     public void setShaderColor() {

@@ -3,8 +3,7 @@ package io.github.mortuusars.envelope.client.gui.tooltip;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpressionTheme;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpressions;
+import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -16,7 +15,7 @@ public class SealDieTooltip implements ClientTooltipComponent {
 
     public SealDieTooltip(Optional<SealImpression> impression) {
         this.impression = impression.orElseGet(() ->
-              SealImpressions.firstCharOrDefault(Minecrft.player().getScoreboardName()));
+              SealImpression.firstCharOrDefault(Minecrft.player().getScoreboardName()));
     }
 
     @Override
@@ -31,6 +30,6 @@ public class SealDieTooltip implements ClientTooltipComponent {
 
     @Override
     public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-        EnvelopeClient.getSealRenderer().renderDie(impression, SealImpressionTheme.IRON_DIE, guiGraphics, x - 1, y - 1);
+        EnvelopeClient.getSealRenderer().renderDie(impression, ShadingPalette.IRON_DIE, guiGraphics, x - 1, y - 1);
     }
 }

@@ -11,8 +11,8 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 public record Seal(SealMaterial material, SealImpression impression, Component signature) implements TooltipComponent {
     public static final Codec<Seal> CODEC = RecordCodecBuilder.create(i -> i.group(
-          SealMaterial.CODEC.optionalFieldOf("material", SealMaterials.RED_WAX).forGetter(Seal::material),
-          SealImpression.CODEC.optionalFieldOf("impression", SealImpressions.DEFAULT).forGetter(Seal::impression),
+          SealMaterial.CODEC.optionalFieldOf("material", SealMaterial.RED_WAX).forGetter(Seal::material),
+          SealImpression.CODEC.optionalFieldOf("impression", SealImpression.DEFAULT).forGetter(Seal::impression),
           ComponentSerialization.CODEC.optionalFieldOf("signature", CommonComponents.EMPTY).forGetter(Seal::signature)
     ).apply(i, Seal::new));
 

@@ -57,9 +57,9 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
         if (existingSeal != null && canApplyGold(stack, player)) {
-            SealMaterial newMaterial = existingSeal.material().equals(SealMaterials.GOLD)
-                  ? SealMaterials.RED_WAX
-                  : SealMaterials.GOLD;
+            SealMaterial newMaterial = existingSeal.material().equals(SealMaterial.GOLD)
+                  ? SealMaterial.RED_WAX
+                  : SealMaterial.GOLD;
             target.set(Envelope.DataComponents.SEAL, new Seal(newMaterial, existingSeal.impression(), existingSeal.signature()));
             slot.set(target);
             player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
@@ -80,7 +80,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     public Seal createSeal(ItemStack stack, Player player) {
-        return new Seal(SealMaterials.RED_WAX, getImpression(stack, player), player.getName());
+        return new Seal(SealMaterial.RED_WAX, getImpression(stack, player), player.getName());
 
 //        List<SealImpression> impressions = SealImpressions.REGISTRY.values().stream().toList();
 //        SealImpression impression = Util.getRandom(impressions, player.getRandom());
@@ -89,7 +89,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     public SealImpression getImpression(ItemStack stack, @Nullable Player player) {
         return stack.getOrDefault(Envelope.DataComponents.SEAL_IMPRESSION,
-              SealImpressions.firstCharOrDefault(player != null ? player.getScoreboardName() : ""));
+              SealImpression.firstCharOrDefault(player != null ? player.getScoreboardName() : ""));
     }
 
     protected boolean canApplyGold(ItemStack stack, Player player) {

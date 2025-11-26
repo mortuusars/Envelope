@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -18,6 +19,7 @@ import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -139,7 +141,7 @@ public class Envelope {
 
     public static class PoiTypes {
         public static final ResourceKey<PoiType> PIGEONHOLE =
-              ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, resource("pigeonhole"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.POINT_OF_INTEREST_TYPE, resource("pigeonhole"));
 
         static void init() {
             Register.poiType(PIGEONHOLE, 0, 1, PoiTypes::getPigeonholePoiBlockStates);
@@ -313,44 +315,44 @@ public class Envelope {
     public static class Tags {
         public static class Blocks {
             public static final TagKey<Block> PIGEON_SPAWNABLE_ON =
-                  TagKey.create(Registries.BLOCK, resource("pigeon_spawnable_on"));
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeon_spawnable_on"));
             public static final TagKey<Block> PIGEONHOLES =
-                  TagKey.create(Registries.BLOCK, resource("pigeonholes"));
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes"));
         }
 
         public static class Items {
             public static final TagKey<Item> PIGEONHOLES =
-                  TagKey.create(Registries.ITEM, resource("pigeonholes"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeonholes"));
             public static final TagKey<Item> PIGEON_FOOD =
-                  TagKey.create(Registries.ITEM, resource("pigeon_food"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeon_food"));
             public static final TagKey<Item> WASTE_SCOOPABLE =
-                  TagKey.create(Registries.ITEM, resource("waste_scoopable"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("waste_scoopable"));
             public static final TagKey<Item> MAILABLE =
-                  TagKey.create(Registries.ITEM, resource("mailable"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("mailable"));
             public static final TagKey<Item> CANNOT_BE_PACKAGED =
-                  TagKey.create(Registries.ITEM, resource("cannot_be_packaged"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cannot_be_packaged"));
             public static final TagKey<Item> LETTERS =
-                  TagKey.create(Registries.ITEM, resource("letters"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("letters"));
             public static final TagKey<Item> PACKAGES =
-                  TagKey.create(Registries.ITEM, resource("packages"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("packages"));
             public static final TagKey<Item> CUTTERS =
-                  TagKey.create(Registries.ITEM, resource("cutters"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cutters"));
         }
 
         public static class EntityTypes {
             public static final TagKey<EntityType<?>> PIGEONHOLE_INHABITORS =
-                  TagKey.create(Registries.ENTITY_TYPE, resource("pigeonhole_inhabitors"));
+                  TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, resource("pigeonhole_inhabitors"));
         }
 
         public static class Biomes {
             public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
-                  TagKey.create(Registries.BIOME, resource("allows_pigeon_spawns"));
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_pigeon_spawns"));
 
         }
 
         public static class Structures {
             public static final TagKey<Structure> PIGEONS_SPAWN_IN =
-                  TagKey.create(Registries.STRUCTURE, resource("pigeons_spawn_in"));
+                  TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, resource("pigeons_spawn_in"));
         }
     }
 
@@ -360,5 +362,10 @@ public class Envelope {
 
         public static void init() {
         }
+    }
+
+    public static class Registries {
+        public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIALS =
+              ResourceKey.createRegistryKey(resource("seal_materials"));
     }
 }

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpressionTheme;
+import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +14,7 @@ public class SealRenderer {
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
         SealMaterial material = seal.material();
-        SealImpressionTheme colors = material.getImpressionTheme();
+        ShadingPalette colors = material.getImpressionPalette();
 
         ResourceLocation materialTexture = material.getTexture();
         ResourceLocation impressionTexture = seal.impression().getTexture();
@@ -53,7 +53,7 @@ public class SealRenderer {
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
-    public void renderDie(SealImpression impression, SealImpressionTheme colors, GuiGraphics guiGraphics, int x, int y) {
+    public void renderDie(SealImpression impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {
         ResourceLocation impressionTexture = impression.getTexture();
 
         // Background
