@@ -3,6 +3,7 @@
 ## 0.3.0.1
 - Letter
   - Added **Sealed Letter** 
+  - Added letter copying recipe
   - Added `envelope:letter_tattered` data component for Letter and Sealed Letter 
     - Letters become tattered when a Fox spits it out from its mouth
     - Tattered letters differ only in appearance, functionality is the same
@@ -10,8 +11,8 @@
 
 - Seal
   - Added **Seal Stamp**
-    - Right click with a stamp on a sealable item in inventory to add a Seal.
-  - Seals can have impressions of letters, numbers or various other symbols on them.
+    - Right click with a stamp on a sealable item in inventory to add a Seal
+  - Seals can have impressions of letters, numbers or various other symbols on them
   - Using a regular seal stamp will produce an impression with the first character of sealer's signature (name)
   - Seals are shown in tooltips of sealed items along with the sealer signature
 
