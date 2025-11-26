@@ -13,12 +13,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SealImpression {
+public record SealImpression(ResourceLocation id, ResourceLocation texture) {
+    public SealImpression(ResourceLocation id) {
+        this(id, id.withPath(path -> "textures/gui/seal/impression/" + path + ".png"));
+    }
+
+    // --
+
     public static final Map<ResourceLocation, SealImpression> REGISTRY = new HashMap<>();
 
     public static final Map<String, SealImpression> LETTERS = Util.make(new HashMap<>(), map -> {
         for (char c = 'a'; c <= 'z'; c++) {
             String str = String.valueOf(c);
+            map.put(str, register(new SealImpression(Envelope.resource(str))));
+        }
+    });
+    public static final Map<String, SealImpression> NUMBERS = Util.make(new HashMap<>(), map -> {
+        for (int i = 0; i <= 9; i++) {
+            String str = String.valueOf(i);
             map.put(str, register(new SealImpression(Envelope.resource(str))));
         }
     });
@@ -50,22 +62,16 @@ public class SealImpression {
                     ? DataResult.success(impression)
                     : DataResult.error(() -> "SealImpression '" + id + "' is not registered.");
           },
-          SealImpression::getId);
+          SealImpression::id);
 
     public static final StreamCodec<ByteBuf, SealImpression> STREAM_CODEC = ResourceLocation.STREAM_CODEC.map(
           id -> Objects.requireNonNullElse(get(id), DEFAULT),
-          SealImpression::getId);
+          SealImpression::id);
 
-    private final ResourceLocation id;
-    private final ResourceLocation texture;
-
-    public SealImpression(ResourceLocation id) {
-        this.id = id;
-        this.texture = id.withPath(path -> "textures/gui/seal/impression/" + path + ".png");
-    }
+    // --
 
     public static SealImpression register(SealImpression material) {
-        REGISTRY.put(material.getId(), material);
+        REGISTRY.put(material.id(), material);
         return material;
     }
 
@@ -78,23 +84,18 @@ public class SealImpression {
     }
 
     public static SealImpression firstCharOrDefault(String string) {
-        //TODO: numbers
-
         for (int i = 0; i < string.length(); i++) {
             char c = Character.toLowerCase(string.charAt(i));
+
             if (c >= 'a' && c <= 'z') {
                 return LETTERS.getOrDefault(String.valueOf(c), DEFAULT);
+            }
+
+            if (c >= '0' && c <= '9') {
+                return NUMBERS.getOrDefault(String.valueOf(c), DEFAULT);
             }
         }
 
         return DEFAULT;
-    }
-
-    public ResourceLocation getId() {
-        return id;
-    }
-
-    public ResourceLocation getTexture() {
-        return texture;
     }
 }

@@ -12,7 +12,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SealMaterial {
+/**
+ * @param id Used to identify this material and its texture in 'textures/gui/seal' folder.
+ * @param itemTintColor Used to tint parts of the item model.
+ * @param impressionPalette Used to tint the impression.
+ */
+public record SealMaterial(ResourceLocation id, ResourceLocation texture, int itemTintColor, ShadingPalette impressionPalette) {
+    public SealMaterial(ResourceLocation id, int itemTintColor, ShadingPalette impressionPalette) {
+        this(id, id.withPath(path -> "textures/gui/seal/material/" + path + ".png"), itemTintColor, impressionPalette);
+    }
+
+    // --
+
     public static final Map<ResourceLocation, SealMaterial> REGISTRY = new HashMap<>();
 
     public static final SealMaterial RED_WAX = register(
@@ -29,51 +40,20 @@ public class SealMaterial {
                     ? DataResult.success(material)
                     : DataResult.error(() -> "SealMaterial '" + id + "' is not registered.");
           },
-          SealMaterial::getId);
+          SealMaterial::id);
 
     public static final StreamCodec<ByteBuf, SealMaterial> STREAM_CODEC = ResourceLocation.STREAM_CODEC.map(
           id -> Objects.requireNonNullElse(get(id), RED_WAX),
-          SealMaterial::getId);
+          SealMaterial::id);
 
-    private final ResourceLocation id;
-    private final ResourceLocation texture;
-    private final int itemTintColor;
-    private final ShadingPalette impressionPalette;
-
-    /**
-     * @param id Used to identify this material and its texture in 'textures/gui/seal' folder.
-     * @param itemTintColor Used to tint parts of the item model.
-     * @param impressionPalette Used to tint the impression.
-     */
-    public SealMaterial(ResourceLocation id, int itemTintColor, ShadingPalette impressionPalette) {
-        this.id = id;
-        this.texture = id.withPath(path -> "textures/gui/seal/material/" + path + ".png");
-        this.itemTintColor = itemTintColor;
-        this.impressionPalette = impressionPalette;
-    }
+    // --
 
     public static SealMaterial register(SealMaterial material) {
-        REGISTRY.put(material.getId(), material);
+        REGISTRY.put(material.id(), material);
         return material;
     }
 
     public static @Nullable SealMaterial get(ResourceLocation id) {
         return REGISTRY.get(id);
-    }
-
-    public ResourceLocation getId() {
-        return id;
-    }
-
-    public ResourceLocation getTexture() {
-        return texture;
-    }
-
-    public int getItemTintColor() {
-        return itemTintColor;
-    }
-
-    public ShadingPalette getImpressionPalette() {
-        return impressionPalette;
     }
 }

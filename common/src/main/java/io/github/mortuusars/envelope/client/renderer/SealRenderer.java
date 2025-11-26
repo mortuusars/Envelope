@@ -14,10 +14,10 @@ public class SealRenderer {
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
         SealMaterial material = seal.material();
-        ShadingPalette colors = material.getImpressionPalette();
+        ShadingPalette colors = material.impressionPalette();
 
-        ResourceLocation materialTexture = material.getTexture();
-        ResourceLocation impressionTexture = seal.impression().getTexture();
+        ResourceLocation materialTexture = material.texture();
+        ResourceLocation impressionTexture = seal.impression().texture();
 
         // Background
         guiGraphics.blit(materialTexture, x, y, 0, 0, 30, 30, 30, 30);
@@ -54,7 +54,7 @@ public class SealRenderer {
     }
 
     public void renderDie(SealImpression impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {
-        ResourceLocation impressionTexture = impression.getTexture();
+        ResourceLocation impressionTexture = impression.texture();
 
         // Background
         guiGraphics.blit(IRON_DIE_TEXTURE, x, y, 0, 0, 30, 30, 30, 30);

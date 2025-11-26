@@ -37,8 +37,8 @@ public class SealTooltip implements ClientTooltipComponent {
         // Signature:
         x += 34;
         y += 11;
-        int color = seal.material().getImpressionPalette().highlight().tint();
-        int outlineColor = seal.material().getImpressionPalette().shadow().tint();
+        int color = seal.material().impressionPalette().highlight().tint();
+        int outlineColor = seal.material().impressionPalette().shadow().tint();
         text(seal.signature(), font, x - 1, y, outlineColor, matrix, buffer);
         text(seal.signature(), font, x - 1, y - 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x, y - 1, outlineColor, matrix, buffer);

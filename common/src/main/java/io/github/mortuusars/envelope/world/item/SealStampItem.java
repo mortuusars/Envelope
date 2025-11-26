@@ -32,7 +32,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
         if (tooltipFlag.isAdvanced()) {
             tooltipComponents.add(Component.literal("Impression:").withStyle(ChatFormatting.DARK_GRAY)
                   .append(CommonComponents.SPACE)
-                  .append(Component.literal(getImpression(stack, Minecrft.player()).getId().toString()).withStyle(ChatFormatting.GRAY)));
+                  .append(Component.literal(getImpression(stack, Minecrft.player()).id().toString()).withStyle(ChatFormatting.GRAY)));
         }
     }
 
