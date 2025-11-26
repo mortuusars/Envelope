@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "envelope:item/sealed_letter_tattered"
+    "layer0": "envelope:item/letter_tattered",
+    "layer1": "envelope:item/letter_seal_overlay"
   }
 }

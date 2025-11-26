@@ -2,6 +2,8 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -14,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -74,5 +77,20 @@ public class SealedLetterItem extends Item {
         }
 
         return stack;
+    }
+
+    // --
+
+    public static int getSealOverlayColor(ItemStack stack, int layer) {
+        if (layer != 1) {
+            return -1;
+        }
+
+        @Nullable Seal seal = stack.get(Envelope.DataComponents.SEAL);
+        if (seal != null) {
+            return seal.material().itemTintColor();
+        }
+
+        return SealMaterial.RED_WAX.itemTintColor();
     }
 }

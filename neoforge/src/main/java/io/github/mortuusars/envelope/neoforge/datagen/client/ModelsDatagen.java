@@ -49,7 +49,18 @@ public class ModelsDatagen extends BlockStateProvider {
               .model(customModel(Envelope.resource("letter_and_quill_content")))
               .end();
         letterTatteredUnfoldedContent(Envelope.Items.LETTER.get());
-        letterTattered(Envelope.Items.SEALED_LETTER.get());
+
+        itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
+              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+              .texture("layer0", Envelope.resource("item/letter"))
+              .texture("layer1", Envelope.resource("item/letter_seal_overlay"))
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
+              .model(itemModels().getBuilder(Envelope.resource("sealed_letter_tattered").toString())
+                    .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                    .texture("layer0", Envelope.resource("item/letter_tattered"))
+                    .texture("layer1", Envelope.resource("item/letter_seal_overlay")))
+              .end();
 
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());
@@ -93,17 +104,7 @@ public class ModelsDatagen extends BlockStateProvider {
               .end();
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    protected ItemModelBuilder letterTattered(Item item) {
-        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
-        return itemModels().basicItem(id)
-              .override()
-              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
-              .model(customModel(id.withSuffix("_tattered")))
-              .end();
-    }
-
-    protected ModelFile customModel(ResourceLocation path) {
+    protected ItemModelBuilder customModel(ResourceLocation path) {
         return itemModels().getBuilder(path.toString())
               .parent(new ModelFile.UncheckedModelFile("item/generated"))
               .texture("layer0", ResourceLocation.fromNamespaceAndPath(path.getNamespace(), "item/" + path.getPath()));

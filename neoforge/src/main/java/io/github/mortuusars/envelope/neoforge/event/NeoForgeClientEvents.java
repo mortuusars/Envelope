@@ -11,11 +11,13 @@ import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
+import io.github.mortuusars.envelope.world.item.SealedLetterItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 public class NeoForgeClientEvents {
@@ -43,6 +45,11 @@ public class NeoForgeClientEvents {
             event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_LEG_BAND, PigeonLegBandModel::createLayerDefinition);
             event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_BACKPACK, PigeonBackpackModel::createLayerDefinition);
             event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
+        }
+
+        @SubscribeEvent
+        public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+            event.register(SealedLetterItem::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
         }
     }
 

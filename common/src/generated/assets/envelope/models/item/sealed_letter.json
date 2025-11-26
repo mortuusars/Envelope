@@ -9,6 +9,7 @@
     }
   ],
   "textures": {
-    "layer0": "envelope:item/sealed_letter"
+    "layer0": "envelope:item/letter",
+    "layer1": "envelope:item/letter_seal_overlay"
   }
 }
