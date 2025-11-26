@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.mixin.fox_tatter;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.LetterItem;
+import io.github.mortuusars.envelope.world.item.SealedLetterItem;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.item.ItemStack;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class FoxMixin {
     @ModifyVariable(method = "spitOutItem", at = @At("HEAD"), argsOnly = true)
     private ItemStack onSpitOutItem(ItemStack stack) {
-        if (stack.getItem() instanceof LetterItem) {
+        if (stack.getItem() instanceof LetterItem || stack.getItem() instanceof SealedLetterItem) {
             stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
         }
         return stack;
