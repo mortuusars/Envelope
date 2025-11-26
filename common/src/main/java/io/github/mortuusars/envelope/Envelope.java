@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -21,7 +22,6 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -36,6 +36,9 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.crafting.BookCloningRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -169,9 +172,9 @@ public class Envelope {
         public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = Register.item("letter_and_quill",
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
-              () -> new LetterItem(new Item.Properties().stacksTo(1)));
+              () -> new LetterItem(new Item.Properties()));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
-              () -> new SealedLetterItem(new Item.Properties().stacksTo(1)));
+              () -> new SealedLetterItem(new Item.Properties()));
 
         public static final Supplier<BlockItem> PAPER_BOX = Register.item("paper_box",
               () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
@@ -253,6 +256,9 @@ public class Envelope {
     }
 
     public static class RecipeSerializers {
+        public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
+              "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
+
         static void init() {
         }
     }

@@ -23,7 +23,7 @@ public class RecipesDatagen extends RecipeProvider {
 //        pigeonhole(output, Envelope.Items.SPRUCE_PIGEONHOLE.get(), Items.SPRUCE_PLANKS);
 //        pigeonhole(output, Envelope.Items.BIRCH_PIGEONHOLE.get(), Items.BIRCH_PLANKS);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.LETTER.get())
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.LETTER_AND_QUILL.get())
                 .requires(Items.PAPER)
                 .requires(Items.FEATHER)
                 .requires(Items.INK_SAC)

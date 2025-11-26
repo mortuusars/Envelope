@@ -330,7 +330,6 @@ public class BuggerDebugScreen {
     }
 
     private static void test() {
-        Envelope.LOGGER.warn("test warn");
-        Envelope.LOGGER.error("test error | test error | test error | test error | test error | test error | test error | test error | test error | test error | test error | test error | ");
+        boolean a = true;
     }
 }

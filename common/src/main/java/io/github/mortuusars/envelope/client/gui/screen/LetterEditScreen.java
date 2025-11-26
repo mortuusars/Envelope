@@ -65,7 +65,7 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
               .setText(FormattedString.parse(letter.map(LetterAndQuillItem::getContent).text())));
 
         foldButton = addRenderableWidget(new ImageButton(
-              leftPos + imageWidth + 5, topPos + 160,
+              leftPos + imageWidth + 5, topPos + 144,
               18, 18,
               FOLD_BUTTON_SPRITES,
               btn -> {

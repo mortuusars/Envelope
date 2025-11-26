@@ -6,7 +6,7 @@
   - Added `envelope:letter_tattered` data component for Letter and Sealed Letter 
     - Letters become tattered when a Fox spits it out from its mouth
     - Tattered letters differ only in appearance, functionality is the same
-  - Changed how existing letters work (closer to books)
+  - Updated how existing letters work and look
 
 - Seal
   - Added **Seal Stamp**
