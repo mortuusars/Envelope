@@ -27,8 +27,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import javax.tools.Tool;
-
 public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/letter_and_quill.png");
     public static final WidgetSprites FOLD_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("letter_and_quill/fold_button"));
@@ -53,12 +51,12 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
 
     @Override
     protected void init() {
-        imageWidth = 196;
-        imageHeight = 244;
+        imageWidth = 176;
+        imageHeight = 192;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
 
-        textBox = addRenderableWidget(new TextBox(font, leftPos + 18, topPos + 22, 160, 192)
+        textBox = addRenderableWidget(new TextBox(font, leftPos + 17, topPos + 21, 142, 144)
               .setFontColor(0xFF7B593D)
               .setFontUnfocusedColor(0xFF7B593D)
               .setSelectionColor(0xFF664488)
@@ -67,7 +65,7 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
               .setText(FormattedString.parse(letter.map(LetterAndQuillItem::getContent).text())));
 
         foldButton = addRenderableWidget(new ImageButton(
-              leftPos + imageWidth + 5, topPos + 178,
+              leftPos + imageWidth + 5, topPos + 160,
               18, 18,
               FOLD_BUTTON_SPRITES,
               btn -> {

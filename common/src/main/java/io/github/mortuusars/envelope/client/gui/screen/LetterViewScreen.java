@@ -25,15 +25,18 @@ import java.util.List;
 
 public class LetterViewScreen extends Screen {
     public static final ResourceLocation REGULAR_TEXTURE = Envelope.resource("textures/gui/letter.png");
-    public static final ResourceLocation TATTERED_TEXTURE = Envelope.resource("textures/gui/tattered_letter.png");
-    public static final ResourceLocation TATTERED_OVERLAY = Envelope.resource("textures/gui/tattered_letter_overlay.png");
+    public static final ResourceLocation TATTERED_TEXTURE = Envelope.resource("textures/gui/letter_tattered.png");
+    public static final ResourceLocation TATTERED_OVERLAY = Envelope.resource("textures/gui/letter_tattered_overlay.png");
 
     protected final ItemAndStack<LetterItem> letter;
     protected final InteractionHand hand;
     protected final boolean isTattered;
 
-    protected int maxLines = 19;
     protected int imageWidth, imageHeight, leftPos, topPos;
+    protected int maxTextWidth;
+    protected int maxTextHeight;
+    protected int maxTextLines;
+
     protected List<FormattedCharSequence> lines;
 
     public LetterViewScreen(ItemStack letter, InteractionHand hand) {
@@ -50,18 +53,21 @@ public class LetterViewScreen extends Screen {
 
     @Override
     protected void init() {
-        imageWidth = 196;
-        imageHeight = 244;
+        imageWidth = 176;
+        imageHeight = 192;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
+        maxTextWidth = 142;
+        maxTextHeight = 144;
+        maxTextLines = maxTextHeight / font.lineHeight;
         createLines(letter.getOrDefault(Envelope.DataComponents.LETTER_CONTENT, LetterContent.EMPTY).text());
     }
 
     protected void createLines(Component text) {
-        lines = font.split(text, 160);
-        if (lines.size() > maxLines) {
-            lines = new ArrayList<>(lines); // Modifiable
-            int lastLineIndex = maxLines - 1;
+        lines = font.split(text, maxTextWidth);
+        if (lines.size() > maxTextLines) {
+            lines = new ArrayList<>(lines);
+            int lastLineIndex = maxTextLines - 1;
             FormattedCharSequence ellipsis = CommonComponents.ELLIPSIS.getVisualOrderText();
             lines.set(lastLineIndex, FormattedCharSequence.composite(lines.get(lastLineIndex), ellipsis));
             lines.set(lastLineIndex + 1, FormattedCharSequence.composite(ellipsis, lines.get(lastLineIndex + 1)));
@@ -74,8 +80,12 @@ public class LetterViewScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        for (int i = 0; i < Math.min(lines.size(), maxLines); i++) {
-            guiGraphics.drawString(font, lines.get(i), leftPos + 18, topPos + 22 + i * font.lineHeight, 0xFF7B593D, false);
+        final int x = leftPos + 17;
+        final int y = topPos + 21;
+        int textColor = 0xFF7B593D;
+
+        for (int i = 0; i < Math.min(lines.size(), maxTextLines); i++) {
+            guiGraphics.drawString(font, lines.get(i), x, y + i * font.lineHeight, textColor, false);
         }
 
         if (isTattered) {
@@ -87,10 +97,10 @@ public class LetterViewScreen extends Screen {
             RenderSystem.disableBlend();
         }
 
-        if (lines.size() > maxLines
-              && mouseX >= leftPos + 18 && mouseX < leftPos + 18 + 160
-              && mouseY >= topPos + 22 && mouseY < topPos + 22 + 192) {
-            List<FormattedCharSequence> leftovers = lines.stream().skip(maxLines).toList();
+        if (lines.size() > maxTextLines
+              && mouseX >= x && mouseX < x + maxTextWidth
+              && mouseY >= y && mouseY < y + maxTextHeight) {
+            List<FormattedCharSequence> leftovers = lines.stream().skip(maxTextLines).toList();
             guiGraphics.renderTooltip(font, leftovers, mouseX, mouseY);
         }
     }
