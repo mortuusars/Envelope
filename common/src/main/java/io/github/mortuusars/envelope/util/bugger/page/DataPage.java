@@ -90,7 +90,7 @@ public class DataPage implements BuggerPage {
     @Override
     public List<String> getRightLines() {
         @Nullable HitResult hitResult = Minecrft.get().hitResult;
-        if (hitResult instanceof BlockHitResult blockHitResult) {
+        if (hitResult instanceof BlockHitResult blockHitResult && blockHitResult.getType() != HitResult.Type.MISS) {
             return Minecrft.level().getBlockState(blockHitResult.getBlockPos()).getTags().map(key -> "#" + key.location()).toList();
         } else if (hitResult instanceof EntityHitResult entityHitResult) {
             //noinspection deprecation
