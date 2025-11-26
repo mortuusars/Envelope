@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "envelope:letter"
+        "recipe": "envelope:letter_and_quill"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "envelope:letter"
+      "envelope:letter_and_quill"
     ]
   }
 }
