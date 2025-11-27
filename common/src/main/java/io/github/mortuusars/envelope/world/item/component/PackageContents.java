@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.item.component;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Envelope;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class PackageContents implements TooltipComponent {
     public static final int SLOTS = 6;
@@ -28,7 +30,10 @@ public final class PackageContents implements TooltipComponent {
     private final List<ItemStack> items;
 
     public PackageContents(List<ItemStack> items) {
-        this.items = items.stream().limit(SLOTS).toList();
+        this.items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
+        for (int i = 0; i < Math.min(items.size(), SLOTS); i++) {
+            this.items.set(i, items.get(i));
+        }
     }
 
     public static PackageContents of(Container container) {
@@ -54,16 +59,12 @@ public final class PackageContents implements TooltipComponent {
     }
 
     public ItemStack getItemForReading(int index) {
-        return items.get(index);
+        return index < size() ? items.get(index) : ItemStack.EMPTY;
     }
 
     public List<ItemStack> copyItems() {
         return Lists.transform(this.items, ItemStack::copy);
     }
-
-//    public ItemStack[] copyItemsToArray() {
-//        return copyItems().toArray(ItemStack[]::new);
-//    }
 
     // --
 
