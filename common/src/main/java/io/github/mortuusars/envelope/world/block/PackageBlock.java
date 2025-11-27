@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.world.block;
 
-import io.github.mortuusars.envelope.util.ItemAndStack;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -79,7 +78,6 @@ public class PackageBlock extends Block implements EntityBlock {
 
     // --
 
-
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
@@ -105,10 +103,13 @@ public class PackageBlock extends Block implements EntityBlock {
         }
 
         if (blockEntity.shouldDestroy()) {
-            ItemAndStack<PackageItem> pkg = blockEntity.getPackage();
-            pkg.map(PackageItem::unpack).forEach(item -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), item));
+            ItemStack item = blockEntity.getPackage();
+            if (item.getItem() instanceof PackageItem packageItem) {
+                packageItem.unpack(item).forEach(stored ->
+                      Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
+            }
         } else {
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), blockEntity.getPackage().getItemStack());
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), blockEntity.getPackage());
         }
 
         super.onRemove(state, level, pos, newState, isMoving);

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "envelope:item/package",
+    "layer1": "envelope:item/package_seal_overlay"
+  }
+}

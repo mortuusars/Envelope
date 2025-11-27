@@ -78,6 +78,7 @@ public class NeoForgeCommonEvents {
                 Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
                 event.accept(Envelope.Items.PAPER_BOX.get());
                 event.accept(Envelope.Items.PACKAGE.get());
+                event.accept(Envelope.Items.SEALED_PACKAGE.get());
             }
             if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
                 event.accept(Envelope.Items.LETTER_AND_QUILL.get());

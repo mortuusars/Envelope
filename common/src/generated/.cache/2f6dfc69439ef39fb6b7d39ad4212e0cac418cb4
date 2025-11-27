@@ -1,9 +1,9 @@
-// 1.21.1	2025-11-26T04:45:09.3379766	Tags for minecraft:item mod id envelope
-ef22f20de3b2c49f15c5f950738a5dc50d0d4997 data/envelope/tags/item/cannot_be_packaged.json
+// 1.21.1	2025-11-27T20:30:12.0154925	Tags for minecraft:item mod id envelope
+1b1cd84c54f29e73ca86f557d2e7cdb05641602c data/envelope/tags/item/cannot_be_packaged.json
 06c10c0bf30184ff1fcfbf3b5f75bf9590edbfb8 data/envelope/tags/item/cutters.json
 47819b841f6527f048095901f51fda14a6fc2837 data/envelope/tags/item/letters.json
-e811ff1249ac141c0f5c8e0f24b749766660aad8 data/envelope/tags/item/mailable.json
-d5f26cab7592557a8dfbb8285630a60c2f8673f6 data/envelope/tags/item/packages.json
+f68e2a7d282034d4d5114dea9f86df9c431fcd8c data/envelope/tags/item/mailable.json
+981dc8ce018cf7fbc7d1ed8909d82a8df8808862 data/envelope/tags/item/packages.json
 f4f266bec70a783884af07be3b507ba2a0063746 data/envelope/tags/item/pigeonholes.json
 788e6e34a201c014ae3783bc128afbd75443273b data/envelope/tags/item/pigeon_food.json
 5e7c760621586934c47d721d06be94fdb2693f4e data/envelope/tags/item/waste_scoopable.json

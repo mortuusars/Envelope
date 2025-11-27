@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.neoforge.event;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.PackageScreen;
-import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
 import io.github.mortuusars.envelope.client.model.PigeonBackpackModel;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
@@ -11,7 +10,7 @@ import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
-import io.github.mortuusars.envelope.world.item.SealedLetterItem;
+import io.github.mortuusars.envelope.world.item.Sealable;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -49,7 +48,13 @@ public class NeoForgeClientEvents {
 
         @SubscribeEvent
         public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-            event.register(SealedLetterItem::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+            event.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+            event.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
+        }
+
+        @SubscribeEvent
+        public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
+            event.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
         }
     }
 

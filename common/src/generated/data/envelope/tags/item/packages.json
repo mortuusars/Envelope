@@ -1,5 +1,6 @@
 {
   "values": [
-    "envelope:package"
+    "envelope:package",
+    "envelope:sealed_package"
   ]
 }

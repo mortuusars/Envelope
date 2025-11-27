@@ -1,9 +1,6 @@
 package io.github.mortuusars.envelope.world.block;
 
-import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.ItemAndStack;
-import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -13,7 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class PackageBlockEntity extends BlockEntity {
-    protected ItemStack item = new ItemStack(Envelope.Items.PACKAGE.get());
+    protected ItemStack item = ItemStack.EMPTY;
     protected boolean shouldDestroy = true;
 
     protected PackageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -26,12 +23,11 @@ public class PackageBlockEntity extends BlockEntity {
 
     // --
 
-    public ItemAndStack<PackageItem> getPackage() {
-        return new ItemAndStack<>(item);
+    public ItemStack getPackage() {
+        return !item.isEmpty() ? item : new ItemStack(getBlockState().getBlock().asItem());
     }
 
     public void setPackage(ItemStack item) {
-        Preconditions.checkState(item.getItem() instanceof PackageItem);
         this.item = item;
     }
 
@@ -47,14 +43,15 @@ public class PackageBlockEntity extends BlockEntity {
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        CompoundTag itemTag = new CompoundTag();
-        item.save(registries, itemTag);
-        tag.put("Package", itemTag);
+        if (!item.isEmpty()) {
+            tag.put("Package", item.save(registries, new CompoundTag()));
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        item = ItemStack.parse(registries, tag.getCompound("Package"))
-                .orElseGet(() -> new ItemStack(Envelope.Items.PACKAGE.get()));
+        if (tag.contains("Package", CompoundTag.TAG_COMPOUND)) {
+            item = ItemStack.parse(registries, tag.getCompound("Package")).orElse(ItemStack.EMPTY);
+        }
     }
 }

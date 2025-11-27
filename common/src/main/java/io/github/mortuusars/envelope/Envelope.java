@@ -36,7 +36,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.crafting.BookCloningRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.biome.Biome;
@@ -111,6 +110,15 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
 
+        public static final Supplier<PackageBlock> SEALED_PACKAGE = Register.block("sealed_package",
+              () -> new PackageBlock(BlockBehaviour.Properties.of()
+                    .pushReaction(PushReaction.DESTROY)
+                    .ignitedByLava()
+                    .strength(0.5f)
+                    .sound(SoundTypes.PAPER)
+                    .mapColor(MapColor.SAND)
+                    .noOcclusion()));
+
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
@@ -132,7 +140,7 @@ public class Envelope {
 
         public static final Supplier<BlockEntityType<PackageBlockEntity>> PACKAGE =
               Register.blockEntityType("package", () -> Register.newBlockEntityType(
-                    PackageBlockEntity::new, Blocks.PACKAGE.get()));
+                    PackageBlockEntity::new, Blocks.PACKAGE.get(), Blocks.SEALED_PACKAGE.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
             return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
@@ -180,7 +188,8 @@ public class Envelope {
               () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
-
+        public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
+              () -> new SealedPackageItem(Blocks.SEALED_PACKAGE.get(), new Item.Properties().stacksTo(1)));
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));

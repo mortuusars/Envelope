@@ -14,10 +14,10 @@ import java.util.Objects;
 
 /**
  * @param id Used to identify this material and its texture in 'textures/gui/seal' folder.
- * @param itemTintColor Used to tint parts of the item model.
+ * @param modelTintColor Used to tint parts of the model.
  * @param impressionPalette Used to tint the impression.
  */
-public record SealMaterial(ResourceLocation id, ResourceLocation texture, int itemTintColor, ShadingPalette impressionPalette) {
+public record SealMaterial(ResourceLocation id, ResourceLocation texture, int modelTintColor, ShadingPalette impressionPalette) {
     public SealMaterial(ResourceLocation id, int itemTintColor, ShadingPalette impressionPalette) {
         this(id, id.withPath(path -> "textures/gui/seal/material/" + path + ".png"), itemTintColor, impressionPalette);
     }

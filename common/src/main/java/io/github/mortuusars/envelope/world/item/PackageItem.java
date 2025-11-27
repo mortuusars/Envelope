@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -20,11 +21,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class PackageItem extends BlockItem {
+public class PackageItem extends BlockItem implements Sealable {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
     }
@@ -88,19 +88,22 @@ public class PackageItem extends BlockItem {
     }
 
     public List<ItemStack> unpack(ItemStack stack) {
-        List<ItemStack> items = new ArrayList<>();
-
         PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
-        if (!contents.isEmpty()) {
-            items.addAll(contents.copyItems());
-            stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
-        }
-
-        return items;
+        stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+        return contents.copyItems();
     }
 
     public boolean canInsert(ItemStack stack) {
-        return !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED)
-              && stack.getItem().canFitInsideContainerItems();
+        return stack.getItem().canFitInsideContainerItems()
+              && !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED);
+    }
+
+    // --
+
+    @Override
+    public ItemStack seal(Level level, ItemStack stack, Seal seal) {
+        ItemStack sealedLetter = stack.transmuteCopy(Envelope.Items.SEALED_PACKAGE.get());
+        sealedLetter.set(Envelope.DataComponents.SEAL, seal);
+        return sealedLetter;
     }
 }

@@ -2,11 +2,14 @@ package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.VoxelShapeUtils;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +39,7 @@ public class PaperBoxBlock extends Block {
 
     static {
         // Axis X
-        SHAPES[0] = Block.box(4, 0, 4, 10, 6, 13);
+        SHAPES[0] = Block.box(5, 0, 4, 11, 6, 12);
         SHAPES[1] = Shapes.or(Block.box(1, 0, 4, 7, 6, 13), Block.box(7, 0, 5, 15, 6, 12));
         SHAPES[2] = Shapes.or(Block.box(8, 0, 1, 14, 6, 8), Block.box(1, 0, 5, 8, 6, 14), Block.box(8, 0, 8, 15, 6, 15));
         SHAPES[3] = Shapes.or(SHAPES[2], Block.box(5, 6, 5, 11, 12, 12));
@@ -88,22 +91,28 @@ public class PaperBoxBlock extends Block {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        if (!level.isClientSide) {
-            return ItemInteractionResult.SUCCESS;
-        }
-
         int boxes = state.getValue(BOXES) - 1;
 
-        if (boxes <= 0) {
-            level.removeBlock(pos, false);
-        } else {
-            level.setBlock(pos, state.setValue(BOXES, boxes), Block.UPDATE_ALL);
+        if (!level.isClientSide()) {
+            if (boxes <= 0) {
+                level.removeBlock(pos, false);
+            } else {
+                level.setBlock(pos, state.setValue(BOXES, boxes), Block.UPDATE_ALL);
+            }
+
+            if (!player.isCreative()) {
+                player.addItem(new ItemStack(this.asItem()));
+            }
+
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
+                      pos.getX() + 0.5f, pos.getY() + 0.3f, pos.getZ() + 0.5f, 3, 0.1, 0.1, 0.1, 0);
+            }
         }
 
-        level.playSound(null, pos, Envelope.SoundEvents.PAPER_HIT.get(), SoundSource.BLOCKS,
-            0.9f, level.getRandom().nextFloat() * 0.1f + 0.95f);
+        level.playSound(player, pos, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.BLOCKS,
+            0.9f, level.getRandom().nextFloat() * 0.1f + 0.85f + (boxes * 0.2f));
 
-        player.addItem(new ItemStack(this.asItem()));
         return ItemInteractionResult.SUCCESS;
     }
 

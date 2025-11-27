@@ -1,6 +1,6 @@
 {
   "values": [
-    "envelope:package",
+    "#envelope:packages",
     "minecraft:bundle"
   ]
 }

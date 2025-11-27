@@ -29,6 +29,7 @@ public class ModelsDatagen extends BlockStateProvider {
         });
 
         horizontalBlock(Envelope.Blocks.PACKAGE.get(), models().getExistingFile(modLoc("block/package")));
+        horizontalBlock(Envelope.Blocks.SEALED_PACKAGE.get(), models().getExistingFile(modLoc("block/sealed_package")));
 
         getVariantBuilder(Envelope.Blocks.PAPER_BOX.get()).forAllStates(state -> {
             String[] boxes = {"one", "two", "three", "four"};
@@ -61,6 +62,11 @@ public class ModelsDatagen extends BlockStateProvider {
                     .texture("layer0", Envelope.resource("item/letter_tattered"))
                     .texture("layer1", Envelope.resource("item/letter_seal_overlay")))
               .end();
+
+        itemModels().getBuilder(Envelope.resource("sealed_package").toString())
+              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+              .texture("layer0", Envelope.resource("item/package"))
+              .texture("layer1", Envelope.resource("item/package_seal_overlay"));
 
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());

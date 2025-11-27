@@ -2,6 +2,7 @@
   "values": [
     "envelope:letter",
     "envelope:sealed_letter",
-    "envelope:package"
+    "envelope:package",
+    "envelope:sealed_package"
   ]
 }

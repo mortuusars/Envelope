@@ -30,20 +30,23 @@ public class ItemTagsDatagen extends ItemTagsProvider {
               .addTag(ItemTags.SHOVELS);
 
         tag(Envelope.Tags.Items.CANNOT_BE_PACKAGED)
-              .add(Envelope.Items.PACKAGE.get())
+              .addTag(Envelope.Tags.Items.PACKAGES)
               .add(Items.BUNDLE);
 
         tag(Envelope.Tags.Items.LETTERS)
               .add(Envelope.Items.LETTER_AND_QUILL.get())
               .add(Envelope.Items.LETTER.get())
               .add(Envelope.Items.SEALED_LETTER.get());
+
         tag(Envelope.Tags.Items.PACKAGES)
-              .add(Envelope.Items.PACKAGE.get());
+              .add(Envelope.Items.PACKAGE.get())
+              .add(Envelope.Items.SEALED_PACKAGE.get());
 
         tag(Envelope.Tags.Items.MAILABLE)
               .add(Envelope.Items.LETTER.get())
               .add(Envelope.Items.SEALED_LETTER.get())
-              .add(Envelope.Items.PACKAGE.get());
+              .add(Envelope.Items.PACKAGE.get())
+              .add(Envelope.Items.SEALED_PACKAGE.get());
 
         tag(Envelope.Tags.Items.CUTTERS)
               .addTag(Tags.Items.TOOLS_SHEAR);
