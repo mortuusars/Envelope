@@ -105,7 +105,7 @@ public class Envelope {
               () -> new PackageBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
                     .ignitedByLava()
-                    .strength(0.5f)
+                    .strength(0.4f)
                     .sound(SoundTypes.PAPER)
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
@@ -114,7 +114,7 @@ public class Envelope {
               () -> new PackageBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
                     .ignitedByLava()
-                    .strength(0.5f)
+                    .strength(0.4f)
                     .sound(SoundTypes.PAPER)
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
@@ -225,7 +225,6 @@ public class Envelope {
 
         public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = Register.dataComponentType("package_contents",
               b -> b.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));
-        @Deprecated() // Put into PackageContents or choose better name
         public static final DataComponentType<Integer> PACKAGE_TIMES_PACKED = Register.dataComponentType("package_times_packed",
               b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
@@ -350,8 +349,6 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("letters"));
             public static final TagKey<Item> PACKAGES =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("packages"));
-            public static final TagKey<Item> CUTTERS =
-                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cutters"));
         }
 
         public static class EntityTypes {

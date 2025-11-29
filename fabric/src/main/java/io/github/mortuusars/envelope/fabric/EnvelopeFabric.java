@@ -39,14 +39,14 @@ public class EnvelopeFabric implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(event -> {
             Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
             event.accept(Envelope.Items.PAPER_BOX.get());
-            event.accept(Envelope.Items.PACKAGE.get());
-            event.accept(Envelope.Items.SEALED_PACKAGE.get());
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(event -> {
             event.accept(Envelope.Items.LETTER_AND_QUILL.get());
             event.accept(Envelope.Items.LETTER.get());
             event.accept(Envelope.Items.SEALED_LETTER.get());
+            event.accept(Envelope.Items.PACKAGE.get());
+            event.accept(Envelope.Items.SEALED_PACKAGE.get());
             event.accept(Envelope.Items.ADDRESS_TAG.get());
             event.accept(Envelope.Items.SEAL_STAMP.get());
         });

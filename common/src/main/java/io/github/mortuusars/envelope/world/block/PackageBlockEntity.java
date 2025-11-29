@@ -1,17 +1,20 @@
 package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class PackageBlockEntity extends BlockEntity {
     protected ItemStack item = ItemStack.EMPTY;
-    protected boolean shouldDestroy = true;
+    protected boolean unpackWhenBroken = true;
 
     protected PackageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -31,12 +34,22 @@ public class PackageBlockEntity extends BlockEntity {
         this.item = item;
     }
 
-    public boolean shouldDestroy() {
-        return shouldDestroy;
+    public boolean unpackWhenBroken() {
+        return unpackWhenBroken;
     }
 
-    public void setShouldDestroy(boolean shouldDestroy) {
-        this.shouldDestroy = shouldDestroy;
+    public void setUnpackWhenBroken(boolean unpackWhenBroken) {
+        this.unpackWhenBroken = unpackWhenBroken;
+    }
+
+    public void dropContents(Level level, BlockPos pos) {
+        ItemStack packageStack = getPackage();
+        if (unpackWhenBroken() && packageStack.getItem() instanceof PackageItem packageItem) {
+            packageItem.unpack(packageStack).forEach(stored ->
+                  Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
+        } else {
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), packageStack);
+        }
     }
 
     // --

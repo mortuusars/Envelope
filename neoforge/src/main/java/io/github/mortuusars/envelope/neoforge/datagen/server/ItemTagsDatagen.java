@@ -47,8 +47,5 @@ public class ItemTagsDatagen extends ItemTagsProvider {
               .add(Envelope.Items.SEALED_LETTER.get())
               .add(Envelope.Items.PACKAGE.get())
               .add(Envelope.Items.SEALED_PACKAGE.get());
-
-        tag(Envelope.Tags.Items.CUTTERS)
-              .addTag(Tags.Items.TOOLS_SHEAR);
     }
 }

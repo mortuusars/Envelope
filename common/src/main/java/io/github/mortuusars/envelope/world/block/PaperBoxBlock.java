@@ -40,9 +40,9 @@ public class PaperBoxBlock extends Block {
     static {
         // Axis X
         SHAPES[0] = Block.box(5, 0, 4, 11, 6, 12);
-        SHAPES[1] = Shapes.or(Block.box(1, 0, 4, 7, 6, 13), Block.box(7, 0, 5, 15, 6, 12));
-        SHAPES[2] = Shapes.or(Block.box(8, 0, 1, 14, 6, 8), Block.box(1, 0, 5, 8, 6, 14), Block.box(8, 0, 8, 15, 6, 15));
-        SHAPES[3] = Shapes.or(SHAPES[2], Block.box(5, 6, 5, 11, 12, 12));
+        SHAPES[1] = Shapes.or(Block.box(1, 0, 4, 7, 6, 13), Block.box(8, 0, 5, 15, 6, 12));
+        SHAPES[2] = Shapes.or(Block.box(1, 0, 5, 7, 6, 14), Block.box(8, 0, 8, 15, 6, 15), Block.box(8, 0, 1, 14, 6, 7));
+        SHAPES[3] = Shapes.or(SHAPES[2], Block.box(5, 6, 4, 11, 12, 13));
         // Axis Z
         SHAPES[4] = VoxelShapeUtils.rotate(SHAPES[0], Rotation.CLOCKWISE_90);
         SHAPES[5] = VoxelShapeUtils.rotate(SHAPES[1], Rotation.CLOCKWISE_90);
@@ -93,7 +93,7 @@ public class PaperBoxBlock extends Block {
 
         int boxes = state.getValue(BOXES) - 1;
 
-        if (!level.isClientSide()) {
+        if (level instanceof ServerLevel serverLevel) {
             if (boxes <= 0) {
                 level.removeBlock(pos, false);
             } else {
@@ -104,10 +104,8 @@ public class PaperBoxBlock extends Block {
                 player.addItem(new ItemStack(this.asItem()));
             }
 
-            if (level instanceof ServerLevel serverLevel) {
-                serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
-                      pos.getX() + 0.5f, pos.getY() + 0.3f, pos.getZ() + 0.5f, 3, 0.1, 0.1, 0.1, 0);
-            }
+            serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
+                  pos.getX() + 0.5f, pos.getY() + 0.3f, pos.getZ() + 0.5f, 3, 0.2, 0.2, 0.2, 0);
         }
 
         level.playSound(player, pos, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.BLOCKS,

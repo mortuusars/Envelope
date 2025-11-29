@@ -6,7 +6,6 @@ import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -28,14 +27,6 @@ import java.util.Optional;
 public class PackageItem extends BlockItem implements Sealable {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
-    }
-
-    @Override
-    public @NotNull Component getName(ItemStack stack) {
-        if (!stack.has(Envelope.DataComponents.PACKAGE_CONTENTS)) {
-            return Component.translatable("item.envelope.package.empty");
-        }
-        return super.getName(stack);
     }
 
     @Override

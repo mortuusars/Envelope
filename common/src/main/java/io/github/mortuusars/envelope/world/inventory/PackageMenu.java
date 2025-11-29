@@ -207,7 +207,7 @@ public class PackageMenu extends AbstractContainerMenu {
                 ItemStack stack = getPackage().getItemStack();
                 packageItem.unpack(stack).forEach(itemStack -> serverPlayer.drop(itemStack, false));
                 stack.setCount(0);
-                serverPlayer.serverLevel().playSound(null, serverPlayer, SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
+                serverPlayer.serverLevel().playSound(null, serverPlayer, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 1, 1);
             }
         }
 

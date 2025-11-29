@@ -23,10 +23,7 @@ public interface Unsealable {
     }
 
     default int getUnsealingDuration(ItemStack stack, LivingEntity entity) {
-        if (entity instanceof Player player && player.getInventory().contains(Envelope.Tags.Items.CUTTERS)) {
-            return 5;
-        }
-        return 25;
+        return 20;
     }
 
     default ItemStack unseal(ItemStack stack, Level level, @Nullable LivingEntity entity) {

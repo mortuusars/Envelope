@@ -1,10 +1,9 @@
 package io.github.mortuusars.envelope.world.block;
 
-import io.github.mortuusars.envelope.world.item.PackageItem;
+import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,7 +34,7 @@ public class PackageBlock extends Block implements EntityBlock {
     public PackageBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(getStateDefinition().any()
-                .setValue(FACING, Direction.NORTH));
+              .setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -87,31 +86,18 @@ public class PackageBlock extends Block implements EntityBlock {
 
     @Override
     public @NotNull BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
-            blockEntity.setShouldDestroy(false);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity && player.isSecondaryUseActive()) {
+            blockEntity.setUnpackWhenBroken(false);
         }
         return super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override
     public void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() == newState.getBlock()
-                || !(level instanceof ServerLevel)
-                || !(level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity)) {
-            super.onRemove(state, level, pos, newState, isMoving);
-            return;
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
+            blockEntity.dropContents(level, pos);
+            level.playSound(null, pos, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.BLOCKS, 0.8f, 1);
         }
-
-        if (blockEntity.shouldDestroy()) {
-            ItemStack item = blockEntity.getPackage();
-            if (item.getItem() instanceof PackageItem packageItem) {
-                packageItem.unpack(item).forEach(stored ->
-                      Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
-            }
-        } else {
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), blockEntity.getPackage());
-        }
-
         super.onRemove(state, level, pos, newState, isMoving);
     }
 }
