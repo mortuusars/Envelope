@@ -1,0 +1,10 @@
+{
+  "texture": "envelope:/gui/seal/material/red_wax",
+  "model_tint_color": "#FFCC4E47",
+  "impression_palette": {
+    "base": "#FFA73A34",
+    "highlight": "#FFF18E78",
+    "shadow": "#FF660C0A",
+    "side": "#FF8A2622"
+  }
+}

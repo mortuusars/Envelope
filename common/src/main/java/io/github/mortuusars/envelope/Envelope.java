@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import io.github.mortuusars.envelope.world.item.component.seal.SealMaterialNew;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
@@ -377,7 +378,7 @@ public class Envelope {
     }
 
     public static class Registries {
-        public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIALS =
+        public static final ResourceKey<Registry<SealMaterialNew>> SEAL_MATERIALS =
               ResourceKey.createRegistryKey(resource("seal_materials"));
     }
 }

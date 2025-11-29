@@ -11,6 +11,7 @@ import io.github.mortuusars.envelope.network.packet.CommonPackets;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.network.packet.S2CPackets;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.item.component.seal.SealMaterialNew;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -35,6 +36,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.Map;
 
@@ -101,6 +103,11 @@ public class NeoForgeCommonEvents {
         public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
             event.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
                     Pigeon::checkPigeonSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        }
+
+        @SubscribeEvent
+        public static void addDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+            event.dataPackRegistry(Envelope.Registries.SEAL_MATERIALS, SealMaterialNew.DIRECT_CODEC, SealMaterialNew.DIRECT_CODEC);
         }
     }
 

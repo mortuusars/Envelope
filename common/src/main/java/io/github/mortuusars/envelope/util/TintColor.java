@@ -1,6 +1,10 @@
 package io.github.mortuusars.envelope.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
@@ -11,6 +15,9 @@ import net.minecraft.util.Mth;
  * setShaderColor seems to behave slightly differently than anything that I can do in photoshop.
  */
 public record TintColor(float r, float g, float b, float a) {
+    public static final Codec<TintColor> CODEC = EnvelopeCodecs.HEX_COLOR.xmap(TintColor::of, TintColor::tint);
+    public static final StreamCodec<ByteBuf, TintColor> STREAM_CODEC = ByteBufCodecs.INT.map(TintColor::of, TintColor::tint);
+
     public static TintColor of(int argb) {
         float a = (float) (FastColor.ARGB32.alpha(argb) - 127) / 127 + 1;
         float r = (float) (FastColor.ARGB32.red(argb) - 127) / 127 + 1;

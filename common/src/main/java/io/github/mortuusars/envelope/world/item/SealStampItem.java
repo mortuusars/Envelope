@@ -80,6 +80,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     public Seal createSeal(ItemStack stack, Player player) {
+        stack
         return new Seal(SealMaterial.RED_WAX, getImpression(stack, player), player.getName());
 
 //        List<SealImpression> impressions = SealImpressions.REGISTRY.values().stream().toList();
