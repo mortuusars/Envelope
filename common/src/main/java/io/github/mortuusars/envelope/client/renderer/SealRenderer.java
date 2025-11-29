@@ -2,10 +2,7 @@ package io.github.mortuusars.envelope.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
-import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
-import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import io.github.mortuusars.envelope.world.item.component.seal.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
@@ -13,7 +10,7 @@ public class SealRenderer {
     public static final ResourceLocation IRON_DIE_TEXTURE = Envelope.resource("textures/gui/seal/die/iron.png");
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
-        SealMaterial material = seal.material();
+        SealMaterial material = seal.material().value();
         ShadingPalette colors = material.impressionPalette();
 
         ResourceLocation materialTexture = material.texture();

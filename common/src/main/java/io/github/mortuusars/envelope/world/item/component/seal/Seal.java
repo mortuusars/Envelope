@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item.component.seal;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -9,9 +10,9 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
-public record Seal(SealMaterial material, SealImpression impression, Component signature) implements TooltipComponent {
+public record Seal(Holder<SealMaterial> material, SealImpression impression, Component signature) implements TooltipComponent {
     public static final Codec<Seal> CODEC = RecordCodecBuilder.create(i -> i.group(
-          SealMaterial.CODEC.optionalFieldOf("material", SealMaterial.RED_WAX).forGetter(Seal::material),
+          SealMaterial.CODEC.fieldOf("material").forGetter(Seal::material),
           SealImpression.CODEC.optionalFieldOf("impression", SealImpression.DEFAULT).forGetter(Seal::impression),
           ComponentSerialization.CODEC.optionalFieldOf("signature", CommonComponents.EMPTY).forGetter(Seal::signature)
     ).apply(i, Seal::new));

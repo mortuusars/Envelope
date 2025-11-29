@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -27,20 +26,24 @@ public interface Sealable {
 
         @Nullable Seal seal = stack.get(Envelope.DataComponents.SEAL);
         if (seal != null) {
-            return seal.material().modelTintColor();
+            return seal.material().value().modelTintColor();
         }
 
-        return SealMaterial.RED_WAX.modelTintColor();
+        return 0xFFCC4E47; // Default red color
     }
 
     static int getSealOverlayColor(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int index) {
+        if (index != 0) {
+            return -1;
+        }
+
         if (level != null && pos != null && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
             @Nullable Seal seal = blockEntity.getPackage().get(Envelope.DataComponents.SEAL);
             if (seal != null) {
-                return seal.material().modelTintColor();
+                return seal.material().value().modelTintColor();
             }
         }
 
-        return SealMaterial.RED_WAX.modelTintColor();
+        return 0xFFCC4E47; // Default red color
     }
 }

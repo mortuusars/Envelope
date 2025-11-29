@@ -1,5 +1,5 @@
 {
-  "texture": "envelope:/gui/seal/material/red_wax",
+  "texture": "envelope:gui/seal/material/red_wax",
   "model_tint_color": "#FFCC4E47",
   "impression_palette": {
     "base": "#FFA73A34",

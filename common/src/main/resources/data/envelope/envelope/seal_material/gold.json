@@ -1,5 +1,5 @@
 {
-  "texture": "envelope:/gui/seal/material/gold",
+  "texture": "envelope:gui/seal/material/gold",
   "model_tint_color": "#FFFFB347",
   "impression_palette": {
     "base": "#FFD79736",

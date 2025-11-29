@@ -5,8 +5,10 @@ import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -57,10 +59,12 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
         if (existingSeal != null && canApplyGold(stack, player)) {
-            SealMaterial newMaterial = existingSeal.material().equals(SealMaterial.GOLD)
-                  ? SealMaterial.RED_WAX
-                  : SealMaterial.GOLD;
-            target.set(Envelope.DataComponents.SEAL, new Seal(newMaterial, existingSeal.impression(), existingSeal.signature()));
+            ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.RED_WAX);
+            ResourceKey<SealMaterial> newMaterial = currentMaterial == SealMaterial.RED_WAX ? SealMaterial.GOLD : SealMaterial.RED_WAX;
+
+            Holder<SealMaterial> material = SealMaterial.getHolder(player.registryAccess(), newMaterial);
+
+            target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(), existingSeal.signature()));
             slot.set(target);
             player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
             return true;
@@ -80,8 +84,10 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     public Seal createSeal(ItemStack stack, Player player) {
-        stack
-        return new Seal(SealMaterial.RED_WAX, getImpression(stack, player), player.getName());
+        return new Seal(
+              SealMaterial.getHolder(player.registryAccess(), SealMaterial.RED_WAX),
+              getImpression(stack, player),
+              player.getName());
 
 //        List<SealImpression> impressions = SealImpressions.REGISTRY.values().stream().toList();
 //        SealImpression impression = Util.getRandom(impressions, player.getRandom());
