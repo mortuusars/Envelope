@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0.2
+- Package
+  - Added **Sealed Package**
+  - Updated textures
+  - Small changes to Package block behavior and other mechanics
+
 ## 0.3.0.1
 - Letter
   - Added **Sealed Letter** 
@@ -8,6 +14,7 @@
     - Letters become tattered when a Fox spits it out from its mouth
     - Tattered letters differ only in appearance, functionality is the same
   - Updated how existing letters work and look
+
 
 - Seal
   - Added **Seal Stamp**
