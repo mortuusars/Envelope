@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,6 +15,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public final class SealMaterial {
     public static final Codec<SealMaterial> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -23,7 +25,7 @@ public final class SealMaterial {
     ).apply(i, SealMaterial::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealMaterial> DIRECT_STREAM_CODEC = StreamCodec.composite(
-          ResourceLocation.STREAM_CODEC, SealMaterial::texture,
+          ResourceLocation.STREAM_CODEC, SealMaterial::textureId,
           ByteBufCodecs.INT, SealMaterial::modelTintColor,
           ShadingPalette.STREAM_CODEC, SealMaterial::impressionPalette,
           SealMaterial::new
@@ -96,5 +98,19 @@ public final class SealMaterial {
 
     public static Holder<SealMaterial> getHolder(RegistryAccess access, ResourceKey<SealMaterial> key) {
         return access.registryOrThrow(Envelope.Registries.SEAL_MATERIAL).getHolderOrThrow(key);
+    }
+
+    public static void bootstrap(BootstrapContext<SealMaterial> context) {
+        Function<ResourceKey<SealMaterial>, ResourceLocation> keyToTexture = key ->
+              key.location().withPath(path -> "gui/seal/material/" + path);
+
+        context.register(RED_WAX, new SealMaterial(
+              keyToTexture.apply(RED_WAX),
+              0xFFCC4E47,
+              new ShadingPalette(0xFFA73A34, 0xFFF18E78, 0xFF660C0A, 0xFF8A2622)));
+        context.register(GOLD, new SealMaterial(
+              keyToTexture.apply(GOLD),
+              0xFFFFB347,
+              new ShadingPalette(0xFFD79736, 0xFFFFEAAD, 0xFF75340B, 0xFFB56D24)));
     }
 }

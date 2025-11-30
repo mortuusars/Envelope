@@ -20,6 +20,7 @@ import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -230,7 +231,7 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = Register.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC));
-        public static final DataComponentType<SealImpression> SEAL_IMPRESSION = Register.dataComponentType("seal_impression",
+        public static final DataComponentType<Holder<SealImpression>> SEAL_IMPRESSION = Register.dataComponentType("seal_impression",
               b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC));
 
         public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType("pigeons", b ->
@@ -366,6 +367,13 @@ public class Envelope {
             public static final TagKey<Structure> PIGEONS_SPAWN_IN =
                   TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, resource("pigeons_spawn_in"));
         }
+
+        public static class SealImpressions {
+            public static final TagKey<SealImpression> SPECIAL =
+                  TagKey.create(Registries.SEAL_IMPRESSION, resource("special"));
+            public static final TagKey<SealImpression> TOOLS =
+                  TagKey.create(Registries.SEAL_IMPRESSION, resource("tools"));
+        }
     }
 
     public static class ArgumentTypes {
@@ -379,5 +387,7 @@ public class Envelope {
     public static class Registries {
         public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIAL =
               ResourceKey.createRegistryKey(resource("seal_material"));
+        public static final ResourceKey<Registry<SealImpression>> SEAL_IMPRESSION =
+              ResourceKey.createRegistryKey(resource("seal_impression"));
     }
 }

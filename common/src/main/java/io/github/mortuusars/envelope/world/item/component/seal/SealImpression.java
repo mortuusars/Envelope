@@ -1,101 +1,139 @@
 package io.github.mortuusars.envelope.world.item.component.seal;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryFileCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.function.Function;
 
-public record SealImpression(ResourceLocation id, ResourceLocation texture) {
-    public SealImpression(ResourceLocation id) {
-        this(id, id.withPath(path -> "textures/gui/seal/impression/" + path + ".png"));
-    }
+public final class SealImpression {
+    public static final Codec<SealImpression> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
+          ResourceLocation.CODEC.fieldOf("texture").forGetter(SealImpression::textureId)
+    ).apply(i, SealImpression::new));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, SealImpression> DIRECT_STREAM_CODEC = StreamCodec.composite(
+          ResourceLocation.STREAM_CODEC, SealImpression::textureId,
+          SealImpression::new
+    );
+
+    public static final Codec<Holder<SealImpression>> CODEC =
+          RegistryFileCodec.create(Envelope.Registries.SEAL_IMPRESSION, DIRECT_CODEC);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<SealImpression>> STREAM_CODEC =
+          ByteBufCodecs.holder(Envelope.Registries.SEAL_IMPRESSION, DIRECT_STREAM_CODEC);
 
     // --
 
-    public static final Map<ResourceLocation, SealImpression> REGISTRY = new HashMap<>();
-
-    public static final Map<String, SealImpression> LETTERS = Util.make(new HashMap<>(), map -> {
+    public static final Map<Character, ResourceKey<SealImpression>> LETTERS = Util.make(new HashMap<>(), map -> {
         for (char c = 'a'; c <= 'z'; c++) {
-            String str = String.valueOf(c);
-            map.put(str, register(new SealImpression(Envelope.resource(str))));
+            map.put(c, key(String.valueOf(c)));
         }
     });
-    public static final Map<String, SealImpression> NUMBERS = Util.make(new HashMap<>(), map -> {
-        for (int i = 0; i <= 9; i++) {
-            String str = String.valueOf(i);
-            map.put(str, register(new SealImpression(Envelope.resource(str))));
+    public static final Map<Character, ResourceKey<SealImpression>> NUMBERS = Util.make(new HashMap<>(), map -> {
+        for (char c = '0'; c <= '9'; c++) {
+            map.put(c, key(String.valueOf(c)));
         }
     });
-    public static final SealImpression APPLE = register(new SealImpression(Envelope.resource("apple")));
-    public static final SealImpression AXE = register(new SealImpression(Envelope.resource("axe")));
-    public static final SealImpression BLOCK = register(new SealImpression(Envelope.resource("block")));
-    public static final SealImpression BOOK = register(new SealImpression(Envelope.resource("book")));
-    public static final SealImpression CREEPER = register(new SealImpression(Envelope.resource("creeper")));
-    public static final SealImpression EMERALD = register(new SealImpression(Envelope.resource("emerald")));
-    public static final SealImpression HEART = register(new SealImpression(Envelope.resource("heart")));
-    public static final SealImpression HOE = register(new SealImpression(Envelope.resource("hoe")));
-    public static final SealImpression LETTER = register(new SealImpression(Envelope.resource("letter"))); // Do not confuse with LETTERS
-    public static final SealImpression PICKAXE = register(new SealImpression(Envelope.resource("pickaxe")));
-    public static final SealImpression SHOVEL = register(new SealImpression(Envelope.resource("shovel")));
-    public static final SealImpression SKELETON = register(new SealImpression(Envelope.resource("skeleton")));
-    public static final SealImpression SKELETON_SMIRK = register(new SealImpression(Envelope.resource("skeleton_smirk")));
-    public static final SealImpression SWORD = register(new SealImpression(Envelope.resource("sword")));
-    public static final SealImpression SWORDS = register(new SealImpression(Envelope.resource("swords")));
-    public static final SealImpression VILLAGER = register(new SealImpression(Envelope.resource("villager")));
+    public static final Map<String, ResourceKey<SealImpression>> SYMBOLS = new HashMap<>();
 
-    public static final SealImpression DEFAULT = CREEPER;
+    public static final ResourceKey<SealImpression> APPLE = symbolKey("apple");
+    public static final ResourceKey<SealImpression> AXE = symbolKey("axe");
+    public static final ResourceKey<SealImpression> BLOCK = symbolKey("block");
+    public static final ResourceKey<SealImpression> BOOK = symbolKey("book");
+    public static final ResourceKey<SealImpression> CREEPER = symbolKey("creeper");
+    public static final ResourceKey<SealImpression> EMERALD = symbolKey("emerald");
+    public static final ResourceKey<SealImpression> HEART = symbolKey("heart");
+    public static final ResourceKey<SealImpression> HOE = symbolKey("hoe");
+    public static final ResourceKey<SealImpression> LETTER = symbolKey("letter"); // Do not confuse with LETTERS
+    public static final ResourceKey<SealImpression> PICKAXE = symbolKey("pickaxe");
+    public static final ResourceKey<SealImpression> SHOVEL = symbolKey("shovel");
+    public static final ResourceKey<SealImpression> SKELETON = symbolKey("skeleton");
+    public static final ResourceKey<SealImpression> SKELETON_SMIRK = symbolKey("skeleton_smirk");
+    public static final ResourceKey<SealImpression> SWORD = symbolKey("sword");
+    public static final ResourceKey<SealImpression> SWORDS = symbolKey("swords");
+    public static final ResourceKey<SealImpression> VILLAGER = symbolKey("villager");
+
+    public static final ResourceKey<SealImpression> DEFAULT = CREEPER;
 
     // --
 
-    public static final Codec<SealImpression> CODEC = ResourceLocation.CODEC.comapFlatMap(
-          id -> {
-              @Nullable SealImpression impression = get(id);
-              return impression != null
-                    ? DataResult.success(impression)
-                    : DataResult.error(() -> "SealImpression '" + id + "' is not registered.");
-          },
-          SealImpression::id);
+    private final ResourceLocation texture;
+    private final ResourceLocation textureFull;
 
-    public static final StreamCodec<ByteBuf, SealImpression> STREAM_CODEC = ResourceLocation.STREAM_CODEC.map(
-          id -> Objects.requireNonNullElse(get(id), DEFAULT),
-          SealImpression::id);
-
-    // --
-
-    public static SealImpression register(SealImpression material) {
-        REGISTRY.put(material.id(), material);
-        return material;
+    public SealImpression(ResourceLocation texture) {
+        this.texture = texture;
+        this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
     }
 
-    public static @Nullable SealImpression get(ResourceLocation id) {
-        return REGISTRY.get(id);
+    public ResourceLocation textureId() {
+        return texture;
     }
 
-    public static SealImpression getOrDefault(ResourceLocation id) {
-        return REGISTRY.getOrDefault(id, DEFAULT);
+    public ResourceLocation texture() {
+        return textureFull;
     }
 
-    public static SealImpression firstCharOrDefault(String string) {
+    public static ResourceKey<SealImpression> firstCharOrDefault(String string) {
         for (int i = 0; i < string.length(); i++) {
             char c = Character.toLowerCase(string.charAt(i));
 
             if (c >= 'a' && c <= 'z') {
-                return LETTERS.getOrDefault(String.valueOf(c), DEFAULT);
+                return LETTERS.getOrDefault(c, DEFAULT);
             }
 
             if (c >= '0' && c <= '9') {
-                return NUMBERS.getOrDefault(String.valueOf(c), DEFAULT);
+                return NUMBERS.getOrDefault(c, DEFAULT);
             }
         }
 
         return DEFAULT;
+    }
+
+    public static ResourceKey<SealImpression> firstCharOrDefault(@Nullable Player player) {
+        if (player == null) {
+            return DEFAULT;
+        }
+        return firstCharOrDefault(player.getScoreboardName());
+    }
+
+    // --
+
+    public static Holder<SealImpression> getHolder(RegistryAccess access, ResourceKey<SealImpression> key) {
+        return access.registryOrThrow(Envelope.Registries.SEAL_IMPRESSION).getHolderOrThrow(key);
+    }
+
+    // --
+
+    private static ResourceKey<SealImpression> key(String path) {
+        return ResourceKey.create(Envelope.Registries.SEAL_IMPRESSION, Envelope.resource(path));
+    }
+
+    private static ResourceKey<SealImpression> symbolKey(String path) {
+        ResourceKey<SealImpression> key = ResourceKey.create(Envelope.Registries.SEAL_IMPRESSION, Envelope.resource(path));
+        SYMBOLS.put(path, key);
+        return key;
+    }
+
+    public static void bootstrap(BootstrapContext<SealImpression> context) {
+        Function<ResourceKey<SealImpression>, ResourceLocation> keyToTexture = key ->
+              key.location().withPath(path -> "gui/seal/impression/" + path);
+
+        NUMBERS.values().forEach(key -> context.register(key, new SealImpression(keyToTexture.apply(key))));
+        LETTERS.values().forEach(key -> context.register(key, new SealImpression(keyToTexture.apply(key))));
+        SYMBOLS.values().forEach(key -> context.register(key, new SealImpression(keyToTexture.apply(key))));
     }
 }

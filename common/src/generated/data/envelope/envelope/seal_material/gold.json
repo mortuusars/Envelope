@@ -1,0 +1,10 @@
+{
+  "impression_palette": {
+    "base": "#FFD79735",
+    "highlight": "#FFFFEAAD",
+    "shadow": "#FF75330B",
+    "side": "#FFB56D23"
+  },
+  "model_tint_color": "#FFFFB347",
+  "texture": "envelope:gui/seal/material/gold"
+}

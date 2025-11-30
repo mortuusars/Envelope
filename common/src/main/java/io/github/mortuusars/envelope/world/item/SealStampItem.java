@@ -6,9 +6,11 @@ import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipCompo
 import io.github.mortuusars.envelope.world.item.component.seal.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -32,9 +34,10 @@ public class SealStampItem extends Item implements ApplicatorItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (tooltipFlag.isAdvanced()) {
+            ResourceLocation texture = getImpressionOrDefault(stack, Minecrft.registryAccess(), Minecrft.player()).value().textureId();
             tooltipComponents.add(Component.literal("Impression:").withStyle(ChatFormatting.DARK_GRAY)
                   .append(CommonComponents.SPACE)
-                  .append(Component.literal(getImpression(stack, Minecrft.player()).id().toString()).withStyle(ChatFormatting.GRAY)));
+                  .append(Component.literal(texture.toString()).withStyle(ChatFormatting.GRAY)));
         }
     }
 
@@ -86,17 +89,17 @@ public class SealStampItem extends Item implements ApplicatorItem {
     public Seal createSeal(ItemStack stack, Player player) {
         return new Seal(
               SealMaterial.getHolder(player.registryAccess(), SealMaterial.RED_WAX),
-              getImpression(stack, player),
+              getImpressionOrDefault(stack, player.registryAccess(), player),
               player.getName());
-
-//        List<SealImpression> impressions = SealImpressions.REGISTRY.values().stream().toList();
-//        SealImpression impression = Util.getRandom(impressions, player.getRandom());
-//        return new Seal(SealMaterials.RED_WAX, impression, player.getName());
     }
 
-    public SealImpression getImpression(ItemStack stack, @Nullable Player player) {
-        return stack.getOrDefault(Envelope.DataComponents.SEAL_IMPRESSION,
-              SealImpression.firstCharOrDefault(player != null ? player.getScoreboardName() : ""));
+    public Optional<Holder<SealImpression>> getImpression(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_IMPRESSION));
+    }
+
+    public Holder<SealImpression> getImpressionOrDefault(ItemStack stack, RegistryAccess registryAccess, @Nullable Player player) {
+        return getImpression(stack).orElseGet(() ->
+              SealImpression.getHolder(registryAccess, SealImpression.firstCharOrDefault(player)));
     }
 
     protected boolean canApplyGold(ItemStack stack, Player player) {

@@ -14,7 +14,7 @@ public class SealRenderer {
         ShadingPalette colors = material.impressionPalette();
 
         ResourceLocation materialTexture = material.texture();
-        ResourceLocation impressionTexture = seal.impression().texture();
+        ResourceLocation impressionTexture = seal.impression().value().texture();
 
         // Background
         guiGraphics.blit(materialTexture, x, y, 0, 0, 30, 30, 30, 30);

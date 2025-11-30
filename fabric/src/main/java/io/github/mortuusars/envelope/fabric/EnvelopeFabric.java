@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -39,6 +40,7 @@ public class EnvelopeFabric implements ModInitializer {
         CommonEvents.commonSetup();
 
         DynamicRegistries.registerSynced(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
+        DynamicRegistries.registerSynced(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(event -> {
             Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
