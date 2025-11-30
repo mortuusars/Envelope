@@ -7,7 +7,7 @@
   - Small changes to Package block behavior and other mechanics
 
 
-- Seal materials are now data-driven
+- Seal materials and impressions are now data-driven
 
 ## 0.3.0.1
 - Letter
