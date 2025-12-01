@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AddressTagItem extends Item implements ApplicatorItem {
     public AddressTagItem(Properties properties) {
@@ -49,15 +50,18 @@ public class AddressTagItem extends Item implements ApplicatorItem {
         if (action != ClickAction.SECONDARY) return false;
         if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
-        if (address == null) return false;
-        if (address.equals(slot.getItem().get(Envelope.DataComponents.MAIL_RECIPIENT))) return true; // Do not swap stacks, just do nothing
+        if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.MAIL_RECIPIENT))) return true; // Do nothing
 
-        slot.getItem().set(Envelope.DataComponents.MAIL_RECIPIENT, address);
+        if (address == null) {
+            slot.getItem().remove(Envelope.DataComponents.MAIL_RECIPIENT);
+        } else {
+            slot.getItem().set(Envelope.DataComponents.MAIL_RECIPIENT, address);
+            stack.shrink(1);
+        }
 
         // Having old sender with new recipient address may confuse someone
         slot.getItem().remove(Envelope.DataComponents.MAIL_SENDER);
 
-        stack.shrink(1);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
         return true;
     }
@@ -66,7 +70,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     public @NotNull InteractionResult useOn(UseOnContext context) {
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if (state.getBlock() instanceof PigeonholeBlock) {
-            return InteractionResult.FAIL;
+            return InteractionResult.FAIL; // Let pigeonhole handle the interaction
         }
 
         return super.useOn(context);

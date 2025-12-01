@@ -160,6 +160,6 @@ public class AddressFormatter {
 
         return Component.empty()
               .append(Component.literal(EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " ").withStyle(ChatFormatting.GRAY))
-              .append(recipient.format().asRecipient().withColor(ChatFormatting.GRAY).toComponent());
+              .append(recipient.format().asRecipient().toComponent());
     }
 }

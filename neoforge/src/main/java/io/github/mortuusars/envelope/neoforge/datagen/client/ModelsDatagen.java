@@ -75,6 +75,9 @@ public class ModelsDatagen extends BlockStateProvider {
               .model(model(Envelope.resource("package_empty")))
               .end();
 
+        itemModels().basicItem(Envelope.Items.PAYBACK_TAG.get());
+//        itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get());
+
         itemModels().spawnEggItem(Envelope.Items.PIGEON_SPAWN_EGG.get());
     }
 

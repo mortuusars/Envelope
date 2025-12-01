@@ -12,6 +12,7 @@
   "item.envelope.birch_pigeonhole": "Birch Pigeonhole",
 
   "item.envelope.address_tag": "Address Tag",
+  "item.envelope.payback_tag": "Payback Tag",
   "item.envelope.seal_stamp": "Seal Stamp",
 
   "item.envelope.letter_and_quill": "Letter and Quill",
@@ -26,6 +27,7 @@
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
   "container.envelope.pigeonhole": "Pigeonhole",
+  "container.envelope.payback_tag": "Payback",
 
   "gui.envelope.pigeonhole_address.rename_warning.inbox": "§6• Mail in inbox will be dropped on the ground.",
   "gui.envelope.pigeonhole_address.rename_warning.traveling": "§6• Mail traveling to previous address will be returned.",

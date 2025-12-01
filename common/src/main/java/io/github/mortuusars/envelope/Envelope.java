@@ -5,6 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
@@ -173,11 +174,6 @@ public class Envelope {
 
         public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
 
-        public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
-              () -> new AddressTagItem(new Item.Properties()));
-        public static final Supplier<SealStampItem> SEAL_STAMP = Register.item("seal_stamp",
-              () -> new SealStampItem(new Item.Properties().stacksTo(1)));
-
         public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = Register.item("letter_and_quill",
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
@@ -191,6 +187,13 @@ public class Envelope {
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
         public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
               () -> new SealedPackageItem(Blocks.SEALED_PACKAGE.get(), new Item.Properties().stacksTo(1)));
+
+        public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
+              () -> new AddressTagItem(new Item.Properties()));
+        public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
+              () -> new PaybackTagItem(new Item.Properties()));
+        public static final Supplier<SealStampItem> SEAL_STAMP = Register.item("seal_stamp",
+              () -> new SealStampItem(new Item.Properties().stacksTo(1)));
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
@@ -234,6 +237,9 @@ public class Envelope {
         public static final DataComponentType<Holder<SealImpression>> SEAL_IMPRESSION = Register.dataComponentType("seal_impression",
               b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC));
 
+        public static final DataComponentType<Payback> PAYBACK = Register.dataComponentType("payback",
+              b -> b.persistent(Payback.CODEC).networkSynchronized(Payback.STREAM_CODEC));
+
         public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType("pigeons", b ->
               b.persistent(Occupant.LIST_CODEC).networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());
 
@@ -259,6 +265,9 @@ public class Envelope {
 
         public static final Supplier<MenuType<PackageMenu>> PACKAGE =
               Register.menuType("package", PackageMenu::fromNetwork);
+
+        public static final Supplier<MenuType<PaybackTagMenu>> PAYBACK_TAG =
+              Register.menuType("payback_tag", PaybackTagMenu::fromNetwork);
 
         static void init() {
         }

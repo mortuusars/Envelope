@@ -97,8 +97,10 @@ public class PackageBlock extends Block implements EntityBlock {
     @Override
     public void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
+            if (blockEntity.unpackWhenBroken()) {
+                level.playSound(null, pos, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.BLOCKS, 0.8f, 1);
+            }
             blockEntity.dropContents(level, pos);
-            level.playSound(null, pos, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.BLOCKS, 0.8f, 1);
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
