@@ -78,6 +78,11 @@ subprojects {
             name = "Fuzs Mod Resources"
             url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
         }
+
+        // CarryOn
+        maven {
+            url "https://maven.blamejared.com/"
+        }
     }
 
     loom {

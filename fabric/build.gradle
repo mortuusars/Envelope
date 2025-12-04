@@ -37,6 +37,8 @@ dependencies {
     modRuntimeOnly("maven.modrinth:sodium:mc1.21.1-0.6.13-fabric")
     // modRuntimeOnly("maven.modrinth:iris:1.8.8+1.21.1-fabric")
 
+    modRuntimeOnly("tschipp.carryon:carryon-fabric-${minecraft_version}:${carry_on_version}") { transitive false }
+
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
 }

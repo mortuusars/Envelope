@@ -4,7 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Pos2i;
 import io.github.mortuusars.envelope.util.ItemAndStack;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -32,9 +32,9 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
     public static final int COUNT_START_BUTTON_ID = 100;
     public static final int INCREASE_COUNT_START_BUTTON_ID = COUNT_START_BUTTON_ID;
-    public static final int INCREASE_COUNT_FAST_START_BUTTON_ID = INCREASE_COUNT_START_BUTTON_ID + Payback.SLOTS;
-    public static final int DECREASE_COUNT_START_BUTTON_ID = INCREASE_COUNT_FAST_START_BUTTON_ID + Payback.SLOTS;
-    public static final int DECREASE_COUNT_FAST_START_BUTTON_ID = DECREASE_COUNT_START_BUTTON_ID + Payback.SLOTS;
+    public static final int INCREASE_COUNT_FAST_START_BUTTON_ID = INCREASE_COUNT_START_BUTTON_ID + PaybackTagContents.SLOTS;
+    public static final int DECREASE_COUNT_START_BUTTON_ID = INCREASE_COUNT_FAST_START_BUTTON_ID + PaybackTagContents.SLOTS;
+    public static final int DECREASE_COUNT_FAST_START_BUTTON_ID = DECREASE_COUNT_START_BUTTON_ID + PaybackTagContents.SLOTS;
 
     private final Player player;
     private final InteractionHand hand;
@@ -68,21 +68,18 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     protected SimpleContainer createPaybackContainer() {
         List<ItemStack> items = new ArrayList<>();
 
-        @Nullable Payback payback = tagStack.get(Envelope.DataComponents.PAYBACK);
-        if (payback != null) {
-            for (int i = 0; i < Math.min(payback.ingredients().size(), Payback.SLOTS); i++) {
-                ItemStack[] ingredientItems = payback.ingredients().get(i).getItems();
-                if (ingredientItems.length > 0) {
-                    items.add(ingredientItems[0]);
-                }
+        @Nullable PaybackTagContents paybackTagContents = tagStack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+        if (paybackTagContents != null) {
+            for (int i = 0; i < Math.min(paybackTagContents.size(), PaybackTagContents.SLOTS); i++) {
+                items.add(paybackTagContents.getItemForReading(i));
             }
         }
 
-        while (items.size() < Payback.SLOTS) {
+        while (items.size() < PaybackTagContents.SLOTS) {
             items.add(ItemStack.EMPTY);
         }
 
-        return new SimpleContainer(items.toArray(ItemStack[]::new));
+        return new SimpleContainer(PaybackTagContents.SLOTS);
     }
 
     protected void addPaybackSlots() {
@@ -176,7 +173,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
             paybackContainer.setChanged();
         }
         else if (index < slots.size()) {
-            for (int i = 0; i < Payback.SLOTS; i++) {
+            for (int i = 0; i < PaybackTagContents.SLOTS; i++) {
                 Slot paybackSlot = slots.get(i);
                 if (paybackSlot.getItem().isEmpty() && paybackSlot.mayPlace(clickedStack)) {
                     paybackSlot.set(clickedStack.copy());
@@ -193,7 +190,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(@NotNull Player player, int buttonId) {
         if (buttonId == CONFIRM_BUTTON_ID) {
             if (!(player instanceof ServerPlayer serverPlayer)) return true;
-            getTag().set(Envelope.DataComponents.PAYBACK, Payback.of(paybackContainer));
+            getTag().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.of(paybackContainer));
             player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
                   1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
             return true;
@@ -201,10 +198,10 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
         if (buttonId >= COUNT_START_BUTTON_ID) {
             int id = buttonId - COUNT_START_BUTTON_ID;
-            int slotIndex = id % Payback.SLOTS;
+            int slotIndex = id % PaybackTagContents.SLOTS;
 
-            boolean decrease = id >= Payback.SLOTS * 2;
-            boolean fast = id % (Payback.SLOTS * 2) >= Payback.SLOTS;
+            boolean decrease = id >= PaybackTagContents.SLOTS * 2;
+            boolean fast = id % (PaybackTagContents.SLOTS * 2) >= PaybackTagContents.SLOTS;
 
             int change = (fast ? 5 : 1);
             if (decrease) {
@@ -221,7 +218,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
-        if (slotId < 0 || slotId >= Payback.SLOTS) {
+        if (slotId < 0 || slotId >= PaybackTagContents.SLOTS) {
             super.clicked(slotId, button, clickType, player);
             return;
         }

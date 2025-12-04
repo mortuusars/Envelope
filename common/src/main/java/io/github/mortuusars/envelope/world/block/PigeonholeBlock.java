@@ -3,7 +3,9 @@ package io.github.mortuusars.envelope.world.block;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.util.validation.Issue;
+import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.*;
 import io.github.mortuusars.envelope.network.Packets;
@@ -11,9 +13,12 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAd
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
+import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +26,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -55,8 +61,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PigeonholeBlock extends BaseEntityBlock {
     public static final MapCodec<BeehiveBlock> CODEC = simpleCodec(BeehiveBlock::new);
@@ -126,10 +134,29 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.getBlock().equals(newState.getBlock())
-              && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-            blockEntity.onBlockRemoved();
+        if (!state.getBlock().equals(newState.getBlock())) {
+            if (level instanceof ServerLevel serverLevel) {
+                PigeonholeManager pigeonholeManager = serverLevel.getEnvelopeContext().getPigeonholeManager();
+                @Nullable PigeonholeData data = pigeonholeManager.getDataAt(pos);
+                if (data != null) {
+                    NonNullList<ItemStack> itemsToDrop = data.extractAllMail().stream()
+                          .map(Mail::getItemCopy)
+                          .collect(Collectors.toCollection(NonNullList::create));
+
+                    Containers.dropContents(level, pos, itemsToDrop);
+
+                    PigeonholeMenu.playersWithMenu(serverLevel, data.getAddress()).forEach(player ->
+                          Packets.sendToClient(new PigeonholeMenuMailS2CP(Collections.emptyList()), player));
+
+                    pigeonholeManager.remove(data.getAddress());
+                }
+            }
+
+            if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+                blockEntity.onBlockRemoved();
+            }
         }
+
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 

@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.delivery;
 
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
@@ -21,6 +22,10 @@ public interface DeliveryHandler {
     }
 
     default boolean canSkipTraveling(ServerLevel level, Delivery delivery) {
+        if (delivery.getMail().has(Envelope.DataComponents.PAYBACK)) {
+            return false;
+        }
+
         return delivery.getRoute().getDistance()
               .map(distance -> distance < DeliveryRoute.DEFAULT_ASCEND_DISTANCE * 2)
               .orElse(false);

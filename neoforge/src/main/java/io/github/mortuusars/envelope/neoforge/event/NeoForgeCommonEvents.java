@@ -87,6 +87,7 @@ public class NeoForgeCommonEvents {
                 event.accept(Envelope.Items.SEALED_LETTER.get());
                 event.accept(Envelope.Items.PACKAGE.get());
                 event.accept(Envelope.Items.SEALED_PACKAGE.get());
+                event.accept(Envelope.Items.PAYBACK_PACKAGE.get());
                 event.accept(Envelope.Items.ADDRESS_TAG.get());
                 event.accept(Envelope.Items.PAYBACK_TAG.get());
                 event.accept(Envelope.Items.SEAL_STAMP.get());

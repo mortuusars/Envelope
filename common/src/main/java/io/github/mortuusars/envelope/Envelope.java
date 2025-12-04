@@ -5,6 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -188,6 +189,9 @@ public class Envelope {
         public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
               () -> new SealedPackageItem(Blocks.SEALED_PACKAGE.get(), new Item.Properties().stacksTo(1)));
 
+        public static final Supplier<PaybackPackageItem> PAYBACK_PACKAGE = Register.item("payback_package",
+              () -> new PaybackPackageItem(new Item.Properties().stacksTo(1)));
+
         public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
               () -> new AddressTagItem(new Item.Properties()));
         public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
@@ -237,8 +241,12 @@ public class Envelope {
         public static final DataComponentType<Holder<SealImpression>> SEAL_IMPRESSION = Register.dataComponentType("seal_impression",
               b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC));
 
+        public static final DataComponentType<PaybackTagContents> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
+              b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
         public static final DataComponentType<Payback> PAYBACK = Register.dataComponentType("payback",
               b -> b.persistent(Payback.CODEC).networkSynchronized(Payback.STREAM_CODEC));
+        public static final DataComponentType<StoredItemStack> PAYBACK_ITEM = Register.dataComponentType("payback_item",
+              b -> b.persistent(StoredItemStack.CODEC).networkSynchronized(StoredItemStack.STREAM_CODEC));
 
         public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType("pigeons", b ->
               b.persistent(Occupant.LIST_CODEC).networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());
@@ -265,6 +273,8 @@ public class Envelope {
 
         public static final Supplier<MenuType<PackageMenu>> PACKAGE =
               Register.menuType("package", PackageMenu::fromNetwork);
+        public static final Supplier<MenuType<PaybackPackageMenu>> PAYBACK_PACKAGE =
+              Register.menuType("payback_package", PaybackPackageMenu::fromNetwork);
 
         public static final Supplier<MenuType<PaybackTagMenu>> PAYBACK_TAG =
               Register.menuType("payback_tag", PaybackTagMenu::fromNetwork);

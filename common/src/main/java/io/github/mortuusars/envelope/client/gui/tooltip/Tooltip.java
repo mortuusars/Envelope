@@ -5,10 +5,8 @@ import io.github.mortuusars.envelope.world.item.component.Payback;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,17 +43,8 @@ public class Tooltip {
             @Nullable Payback payback = stack.get(Envelope.DataComponents.PAYBACK);
             if (payback != null) {
                 consumer.accept(Component.literal("Payback:").withStyle(ChatFormatting.RED));
-                payback.ingredients().forEach(i -> {
-                    ItemStack[] items = i.getItems();
-                    if (items.length > 0) {
-                        int index = (int) (Util.getMillis() / 1000) % items.length;
-                        ItemStack item = items[index];
-                        MutableComponent name = Component.literal(" ").append(item.getHoverName());
-                        if (item.getCount() > 1) {
-                            name.append(" " + item.getCount() + "x");
-                        }
-                        consumer.accept(name.withStyle(ChatFormatting.DARK_RED));
-                    }
+                payback.items().forEach(i -> {
+                    consumer.accept(Component.literal(i.toString()).withStyle(ChatFormatting.DARK_RED));
                 });
             }
         }

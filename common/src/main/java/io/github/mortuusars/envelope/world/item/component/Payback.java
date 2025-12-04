@@ -1,37 +1,61 @@
 package io.github.mortuusars.envelope.world.item.component;
 
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.world.inventory.RequestedItem;
+import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record Payback(List<Ingredient> ingredients) {
+public record Payback(List<RequestedItem> items) {
     public static final Codec<Payback> CODEC =
-          Codec.list(Ingredient.CODEC, 0, 6).xmap(Payback::new, Payback::ingredients);
+          Codec.list(RequestedItem.CODEC, 0, 6).xmap(Payback::new, Payback::items);
     public static final StreamCodec<RegistryFriendlyByteBuf, Payback> STREAM_CODEC =
-          Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(Payback::new, Payback::ingredients);
+          RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(Payback::new, Payback::items);
 
     public static final int SLOTS = 6;
 
     public static Payback of(Container container) {
-        List<Ingredient> ingredients = new ArrayList<>();
+        SimpleContainer collapsedContainer = new SimpleContainer(SLOTS);
+        for (int slot = 0; slot < Math.min(SLOTS, container.getContainerSize()); slot++) {
+            ItemStack stack = container.getItem(slot);
+            collapsedContainer.addItem(stack);
+        }
+        container = collapsedContainer;
 
-        //TODO: maybe use another container (using .add() method) to collapse same items into stacks?
-        //TODO: extended ingredients?
+        List<RequestedItem> items = new ArrayList<>();
 
         for (int slot = 0; slot < Math.min(SLOTS, container.getContainerSize()); slot++) {
             ItemStack stack = container.getItem(slot);
             if (!stack.isEmpty()) {
-                ingredients.add(Ingredient.of(stack));
+                RequestedItem requestedItem = new RequestedItem(stack.getItem(), stack.getCount(),
+                      DataComponentPredicate.allOf(stack.getComponents()));
+                items.add(requestedItem);
             }
         }
 
-        return new Payback(ingredients);
+        return new Payback(items);
+    }
+
+    public boolean matches(Container container) {
+        if (container.getContainerSize() != items().size()) {
+            return false;
+        }
+
+        for (int slot = 0; slot < items().size(); slot++) {
+            RequestedItem requestedItem = items().get(slot);
+            ItemStack stack = container.getItem(slot);
+            if (!requestedItem.matches(stack)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

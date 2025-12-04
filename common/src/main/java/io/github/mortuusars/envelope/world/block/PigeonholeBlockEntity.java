@@ -204,16 +204,23 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     public void onBlockRemoved() {
-        items.stream().skip(1).forEach(stack -> {
-            Containers.dropItemStack(getLevelOrThrow(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), stack);
-        });
+        Containers.dropItemStack(getLevelOrThrow(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), getItem(SLOT_FOOD));
+        Containers.dropItemStack(getLevelOrThrow(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), getItem(SLOT_MAIL));
 
-        ifAddressed((level, address, data) -> {
-            dropOrReturnAllMail();
-            level.getEnvelopeContext().getPigeonholeManager().remove(address);
-            this.data = null;
-            this.address = null;
-        });
+        if (data != null) {
+            data.invalidate();
+            data = null;
+        }
+
+        address = null;
+
+//        ifAddressed((level, address, data) -> {
+//            dropOrReturnAllMail();
+//            level.getEnvelopeContext().getPigeonholeManager().remove(address);
+//            data.invalidate();
+//            this.data = null;
+//            this.address = null;
+//        });
     }
 
     @Override

@@ -129,7 +129,7 @@ public class PigeonholeManager {
         return Optional.ofNullable(value);
     }
 
-    protected @Nullable PigeonholeData getDataAt(BlockPos pos) {
+    public @Nullable PigeonholeData getDataAt(BlockPos pos) {
         for (PigeonholeData pigeonhole : getPigeonholes().values()) {
             if (pigeonhole.getPos().equals(pos)) {
                 return pigeonhole;

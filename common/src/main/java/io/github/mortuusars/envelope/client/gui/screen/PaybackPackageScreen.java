@@ -1,0 +1,65 @@
+package io.github.mortuusars.envelope.client.gui.screen;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.client.gui.Sprites;
+import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.client.util.Pos2i;
+import io.github.mortuusars.envelope.world.inventory.PackageMenu;
+import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+
+public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackageMenu> {
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/payback_package.png");
+    public static final WidgetSprites PACK_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("package/pack_button"));
+
+    protected ImageButton packButton;
+
+    public PaybackPackageScreen(PaybackPackageMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+    }
+
+    @Override
+    protected void init() {
+        imageWidth = 176;
+        imageHeight = 178;
+        super.init();
+        inventoryLabelY = imageHeight - 94;
+
+        packButton = new ImageButton(leftPos + 126, topPos + 40, 26, 20, PACK_BUTTON_SPRITES, button -> pack(), Component.translatable("gui.envelope.package.pack"));
+        packButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.package.pack")));
+        addRenderableWidget(packButton);
+    }
+
+    protected void pack() {
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PackageMenu.PACK_BUTTON_ID);
+        onClose();
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderTooltip(guiGraphics, mouseX, mouseY);
+        Pos2i packageSlotPos = getMenu().getPackageSlotPos();
+        guiGraphics.renderItem(getMenu().getPackage().getItemStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0, 0, 300);
+        RenderSystem.enableBlend();
+        guiGraphics.blit(TEXTURE, leftPos + packageSlotPos.x - 1, topPos + packageSlotPos.y - 1, 176, 0, 18, 18);
+        RenderSystem.disableBlend();
+        guiGraphics.pose().popPose();
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        packButton.active = getMenu().canPack() && getMenu().canPack();
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+    }
+}
