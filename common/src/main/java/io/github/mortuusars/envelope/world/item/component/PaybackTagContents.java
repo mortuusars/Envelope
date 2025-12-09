@@ -71,6 +71,7 @@ public final class PaybackTagContents implements TooltipComponent {
         //TODO: collapse stacks?
         return new Payback(getItemsForReading().stream()
               .limit(SLOTS)
+              .filter(item -> !item.isEmpty())
               .map(item -> new RequestedItem(item.getItem(), item.getCount(), DataComponentPredicate.EMPTY))
               .toList());
     }

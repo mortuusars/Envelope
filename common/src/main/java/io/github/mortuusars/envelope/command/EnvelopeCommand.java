@@ -5,6 +5,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
+import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
+import io.github.mortuusars.envelope.util.bugger.test.TestResults;
+import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -37,7 +40,10 @@ public class EnvelopeCommand {
                     .then(Commands.literal("position")
                           .then(Commands.argument("address", AddressArgument.pigeonhole())
                                 .suggests(AddressSuggestions.pigeonhole())
-                                .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address")))))));
+                                .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address"))))))
+              .then(Commands.literal("debug")
+                    .then(Commands.literal("tests")
+                          .executes(c -> runBuggerTests(c)))));
     }
 
     // -- Mail
@@ -133,5 +139,32 @@ public class EnvelopeCommand {
                           .append("\n")
                           .append(Component.literal(posToCopy).withStyle(ChatFormatting.GRAY))))
                     .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, posToCopy))));
+    }
+
+    // --
+
+    private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
+        TestResults testResults = new BuggerTests()
+              .add(new RequestedItemTests(context.getSource().getServer()))
+              .run(count -> context.getSource().sendSuccess(() ->
+                    Component.literal("Running " + count + " bugger tests."), true));
+
+        context.getSource().sendSuccess(() -> Component.literal("Bugger tests finished:"), true);
+
+        if (testResults.failed().isEmpty()) {
+            context.getSource().sendSuccess(() -> Component.literal("All tests are passed!")
+                  .withStyle(ChatFormatting.GREEN), true);
+        } else {
+            context.getSource().sendSuccess(() -> Component.literal("Passed: " + testResults.passed().size() + "\n"), true);
+            context.getSource().sendSuccess(() -> Component.literal("Failed: " + testResults.failed().size() + ":")
+                  .withStyle(ChatFormatting.RED), true);
+
+            testResults.failed().forEach(failedTest -> {
+                context.getSource().sendSuccess(() -> Component.literal(" " + failedTest.name() + ": " + failedTest.error())
+                      .withStyle(ChatFormatting.RED), true);
+            });
+        }
+
+        return 0;
     }
 }

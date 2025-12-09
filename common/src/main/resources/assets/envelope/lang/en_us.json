@@ -13,6 +13,7 @@
 
   "item.envelope.address_tag": "Address Tag",
   "item.envelope.payback_tag": "Payback Tag",
+  "item.envelope.payback_package": "Payback Package",
   "item.envelope.seal_stamp": "Seal Stamp",
 
   "item.envelope.letter_and_quill": "Letter and Quill",

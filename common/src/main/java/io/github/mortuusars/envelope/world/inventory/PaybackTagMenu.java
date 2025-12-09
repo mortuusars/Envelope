@@ -79,7 +79,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
             items.add(ItemStack.EMPTY);
         }
 
-        return new SimpleContainer(PaybackTagContents.SLOTS);
+        return new SimpleContainer(items.toArray(ItemStack[]::new));
     }
 
     protected void addPaybackSlots() {

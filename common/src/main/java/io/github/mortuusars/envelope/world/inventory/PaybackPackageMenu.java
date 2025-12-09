@@ -168,7 +168,7 @@ public class PaybackPackageMenu extends AbstractContainerMenu {
     }
 
     public int getPackageSlotMaxStackSize(int slot) {
-        return getPayback().items().get(slot).getCount();
+        return getPayback().items().get(slot).count();
     }
 
     // --
