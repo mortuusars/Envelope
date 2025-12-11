@@ -3,6 +3,7 @@
     "envelope:letter",
     "envelope:sealed_letter",
     "envelope:package",
-    "envelope:sealed_package"
+    "envelope:sealed_package",
+    "envelope:payback_package"
   ]
 }

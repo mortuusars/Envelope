@@ -1,5 +1,13 @@
 {
   "parent": "minecraft:item/generated",
+  "overrides": [
+    {
+      "model": "envelope:item/payback_package_empty",
+      "predicate": {
+        "envelope:package_empty": 1.0
+      }
+    }
+  ],
   "textures": {
     "layer0": "envelope:item/payback_package"
   }

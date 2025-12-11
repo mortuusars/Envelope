@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
@@ -10,6 +11,11 @@ import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.inventory.RequestedItem;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.ChatFormatting;
@@ -21,7 +27,10 @@ import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.*;
 
@@ -43,7 +52,9 @@ public class EnvelopeCommand {
                                 .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address"))))))
               .then(Commands.literal("debug")
                     .then(Commands.literal("tests")
-                          .executes(c -> runBuggerTests(c)))));
+                          .executes(EnvelopeCommand::runBuggerTests)))
+              .then(Commands.literal("test")
+                    .executes(EnvelopeCommand::test)));
     }
 
     // -- Mail
@@ -53,7 +64,7 @@ public class EnvelopeCommand {
         ItemStack mail = item.createItemStack(1, false);
 
         try {
-            Courier courier = level.getEnvelopeContext().startDelivery(mail);
+            Courier courier = level.getEnvelopeContext().startServiceDelivery(mail);
             Delivery delivery = courier.getDelivery().orElseThrow();
             Component message = Component.literal("Mail sent to ")
                   .append(delivery.getRecipient().format().asRecipient().toComponent());
@@ -164,6 +175,30 @@ public class EnvelopeCommand {
                       .withStyle(ChatFormatting.RED), true);
             });
         }
+
+        return 0;
+    }
+
+    // --
+
+    private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+
+        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
+        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
+        pkg.set(Envelope.DataComponents.MAIL_SENDER, new Address.Pigeonhole("Original-Sender"));
+        pkg.set(Envelope.DataComponents.MAIL_RECIPIENT, new Address.Pigeonhole("Me"));
+        pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
+              new RequestedItem(Items.EMERALD, 3), new RequestedItem(Items.BARREL, 35))));
+
+        Mail mail = new Mail(pkg);
+
+        ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKAGE.get());
+        paybackPackage.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, new StoredItemStack(mail.getItemCopy()));
+        paybackPackage.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
+        paybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, mail.getRecipientOrElse(Address.UNKNOWN));
+
+        Containers.dropItemStack(context.getSource().getLevel(), player.getX(), player.getY(), player.getZ(), paybackPackage);
 
         return 0;
     }

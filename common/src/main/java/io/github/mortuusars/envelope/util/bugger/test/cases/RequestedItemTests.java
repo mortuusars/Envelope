@@ -29,12 +29,12 @@ public class RequestedItemTests extends BuggerTests {
     }
 
     private void itemMatching() {
-        RequestedItem requestedItem = new RequestedItem(Items.FEATHER, 3, DataComponentPredicate.EMPTY);
+        RequestedItem requestedItem = new RequestedItem(Items.FEATHER, 3);
 
         add("RequestedItem_simpleMatching", Test.isTrue(() -> requestedItem.matches(new ItemStack(Items.FEATHER, 3))));
         add("RequestedItem_simpleMatching_failsWhenItemIsDifferent", Test.isFalse(() -> requestedItem.matches(new ItemStack(Items.WRITTEN_BOOK, 3))));
         add("RequestedItem_simpleMatching_failsWhenCountIsLesser", Test.isFalse(() -> requestedItem.matches(new ItemStack(Items.FEATHER, 1))));
-        add("RequestedItem_simpleMatching_moreThanCount", Test.isTrue(() -> requestedItem.matches(new ItemStack(Items.FEATHER, 5))));
+        add("RequestedItem_simpleMatching_failsWhenMoreThanCount", Test.isFalse(() -> requestedItem.matches(new ItemStack(Items.FEATHER, 5))));
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
@@ -43,12 +43,12 @@ public class RequestedItemTests extends BuggerTests {
     }
 
     private void tagMatching() {
-        RequestedItem requestedItem = new RequestedItem(ItemTags.LOGS, 12, DataComponentPredicate.EMPTY);
+        RequestedItem requestedItem = new RequestedItem(ItemTags.LOGS, 12);
 
         add("RequestedItem_simpleMatching", Test.isTrue(() -> requestedItem.matches(new ItemStack(Items.OAK_LOG, 12))));
         add("RequestedItem_simpleMatching_failsWhenItemIsDifferent", Test.isFalse(() -> requestedItem.matches(new ItemStack(Items.WRITTEN_BOOK, 20))));
         add("RequestedItem_simpleMatching_failsWhenCountIsLesser", Test.isFalse(() -> requestedItem.matches(new ItemStack(Items.OAK_LOG, 5))));
-        add("RequestedItem_simpleMatching_moreThanCount", Test.isTrue(() -> requestedItem.matches(new ItemStack(Items.OAK_LOG, 30))));
+        add("RequestedItem_simpleMatching_failsWhenMoreThanCount", Test.isFalse(() -> requestedItem.matches(new ItemStack(Items.OAK_LOG, 30))));
 
         ItemStack stack = new ItemStack(Items.OAK_LOG, 12);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);

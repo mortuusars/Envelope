@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.inventory;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Pos2i;
 import io.github.mortuusars.envelope.util.ItemAndStack;
+import io.github.mortuusars.envelope.world.item.PaybackTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -100,7 +101,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
                     @Override
                     public void set(ItemStack stack) {
-                        stack = new ItemStack(stack.getItem(), stack.getCount()); // Remove components
+                        // stack = new ItemStack(stack.getItem(), stack.getCount()); // Remove components
                         super.set(stack);
                     }
                 });
@@ -190,7 +191,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(@NotNull Player player, int buttonId) {
         if (buttonId == CONFIRM_BUTTON_ID) {
             if (!(player instanceof ServerPlayer serverPlayer)) return true;
-            getTag().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.of(paybackContainer));
+            getTag().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.create(paybackContainer));
             player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
                   1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
             return true;
@@ -234,6 +235,6 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        return player.getItemInHand(hand).getItem() instanceof PaybackTagItem;
     }
 }

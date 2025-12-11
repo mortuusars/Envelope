@@ -1,10 +1,8 @@
 package io.github.mortuusars.envelope.world.item;
 
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -21,10 +19,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Optional;
 
-public class PackageItem extends BlockItem implements Sealable {
+public class PackageItem extends BlockItem implements Package, Sealable {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
     }
@@ -61,35 +58,6 @@ public class PackageItem extends BlockItem implements Sealable {
         level.playSound(player, player, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
 
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
-    }
-
-    // --
-
-    public int getTimesPacked(ItemStack stack) {
-        return stack.getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0);
-    }
-
-    public int getRemainingPacks(ItemStack stack) {
-        return Config.Server.PACKAGE_PACK_LIMIT.get() - getTimesPacked(stack);
-    }
-
-    public boolean canPack(ItemStack stack) {
-        return getTimesPacked(stack) < Config.Server.PACKAGE_PACK_LIMIT.get();
-    }
-
-    public boolean shouldBeDestroyedWhenEmpty(ItemStack stack) {
-        return !canPack(stack);
-    }
-
-    public List<ItemStack> unpack(ItemStack stack) {
-        PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
-        stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
-        return contents.copyItems();
-    }
-
-    public boolean canInsert(ItemStack stack) {
-        return stack.getItem().canFitInsideContainerItems()
-              && !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED);
     }
 
     // --

@@ -6,7 +6,6 @@ import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.client.util.Pos2i;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
-import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -34,16 +33,18 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
         super.init();
         inventoryLabelY = imageHeight - 94;
 
-        packButton = new ImageButton(leftPos + 126, topPos + 40, 26, 20, PACK_BUTTON_SPRITES, button -> pack(), Component.translatable("gui.envelope.package.pack"));
+        packButton = addRenderableWidget(new ImageButton(leftPos + 126, topPos + 40, 26, 20,
+              PACK_BUTTON_SPRITES,
+              button -> pack(),
+              Component.translatable("gui.envelope.package.pack")));
         packButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.package.pack")
                 .append(CommonComponents.NEW_LINE)
                 .append(Component.translatable("gui.envelope.package.pack.tooltip.packs_remaining",
                         getPrettyPacksRemaining()))));
-        addRenderableWidget(packButton);
     }
 
     protected String getPrettyPacksRemaining() {
-        int count = getMenu().getPackage().map(PackageItem::getRemainingPacks);
+        int count = getMenu().getPackage().getRemainingPacks(getMenu().getPackageStack());
         if (count > 99) {
             return ">99";
         }
@@ -58,25 +59,29 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderPackageItemInInventory(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        packButton.visible = getMenu().needsPacking() && getMenu().canPack();
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+
+        if (getMenu().isPackageDestroyedOnClose()) {
+            guiGraphics.blit(TEXTURE, leftPos + 45, topPos + 17, 0, 178, 86, 64);
+        }
+    }
+
+    protected void renderPackageItemInInventory(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Pos2i packageSlotPos = getMenu().getPackageSlotPos();
-        guiGraphics.renderItem(getMenu().getPackage().getItemStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
+        guiGraphics.renderItem(getMenu().getPackageStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
+
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0, 0, 300);
         RenderSystem.enableBlend();
         guiGraphics.blit(TEXTURE, leftPos + packageSlotPos.x - 1, topPos + packageSlotPos.y - 1, 176, 0, 18, 18);
         RenderSystem.disableBlend();
         guiGraphics.pose().popPose();
-    }
-
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        packButton.visible = getMenu().canPack() && getMenu().needsPacking();
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-        guiGraphics.blit(TEXTURE, leftPos + 45, topPos + 17, 0, 178, 86, 64);
-
-        if (getMenu().isPackageDestroyedOnClose()) {
-            guiGraphics.blit(TEXTURE, leftPos + 45, topPos + 17, 86, 178, 86, 64);
-        }
     }
 }

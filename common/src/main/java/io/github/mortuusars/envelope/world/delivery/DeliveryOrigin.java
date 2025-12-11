@@ -30,7 +30,7 @@ public record DeliveryOrigin(Optional<BlockPos> pos) {
               .orElse(null);
     }
 
-    public static DeliveryOrigin regular(BlockPos homePos) {
+    public static DeliveryOrigin real(BlockPos homePos) {
         return new DeliveryOrigin(Optional.ofNullable(homePos));
     }
 
@@ -46,11 +46,11 @@ public record DeliveryOrigin(Optional<BlockPos> pos) {
         return pos.orElseThrow();
     }
 
-    public boolean isRegular() {
+    public boolean isReal() {
         return pos.isPresent();
     }
 
     public boolean isService() {
-        return !isRegular();
+        return !isReal();
     }
 }

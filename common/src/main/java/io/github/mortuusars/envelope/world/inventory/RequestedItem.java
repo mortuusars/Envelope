@@ -6,7 +6,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPredicate;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -16,10 +15,12 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 
-public record RequestedItem(Either<TagKey<Item>, Item> item, int count, DataComponentPredicate components) {
+public record RequestedItem(Either<TagKey<Item>, Holder<Item>> item, int count, DataComponentPredicate components) {
     public static final Codec<RequestedItem> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.xor(TagKey.hashedCodec(Registries.ITEM), BuiltInRegistries.ITEM.byNameCodec())
+                Codec.xor(TagKey.hashedCodec(Registries.ITEM), ItemStack.ITEM_NON_AIR_CODEC)
                       .fieldOf("item")
                       .forGetter(RequestedItem::item),
                 ExtraCodecs.intRange(1, 99)
@@ -33,11 +34,13 @@ public record RequestedItem(Either<TagKey<Item>, Item> item, int count, DataComp
     public static final StreamCodec<RegistryFriendlyByteBuf, RequestedItem> STREAM_CODEC = StreamCodec.composite(
           ByteBufCodecs.either(
                 ResourceLocation.STREAM_CODEC.map(id -> TagKey.create(Registries.ITEM, id), TagKey::location),
-                ByteBufCodecs.holderRegistry(Registries.ITEM).map(Holder::value, Holder::direct)), RequestedItem::item,
+                ByteBufCodecs.holderRegistry(Registries.ITEM)), RequestedItem::item,
           ByteBufCodecs.INT, RequestedItem::count,
           DataComponentPredicate.STREAM_CODEC, RequestedItem::components,
           RequestedItem::new
     );
+
+    public static final RequestedItem DEFAULT = new RequestedItem(Items.EMERALD);
 
     public RequestedItem {
         Preconditions.checkArgument(count >= 1 && count <= 99, "Count must be in range 1-99.");
@@ -47,15 +50,34 @@ public record RequestedItem(Either<TagKey<Item>, Item> item, int count, DataComp
         this(Either.left(tag), count, components);
     }
 
-    public RequestedItem(Item item, int count, DataComponentPredicate components) {
-        this(Either.right(item), count, components);
+    public RequestedItem(TagKey<Item> tag, int count) {
+        this(tag, count, DataComponentPredicate.EMPTY);
+    }
+
+    public RequestedItem(TagKey<Item> tag) {
+        this(tag, 1);
+    }
+
+    // Item#builtInRegistryHolder is most likely deprecated because mojang wants us to get it through ItemStack#getItemHolder.
+    // Same deprecations are present in other places, like Block for example.
+    @SuppressWarnings("deprecation")
+    public RequestedItem(ItemLike item, int count, DataComponentPredicate components) {
+        this(Either.right(item.asItem().builtInRegistryHolder()), count, components);
+    }
+
+    public RequestedItem(ItemLike item, int count) {
+        this(item, count, DataComponentPredicate.EMPTY);
+    }
+
+    public RequestedItem(ItemLike item) {
+        this(item, 1);
     }
 
     // --
 
     public boolean matches(ItemStack stack) {
         return typeMatches(stack)
-              && countMatches(stack)
+              && countEquals(stack)
               && componentsMatch(stack);
     }
 

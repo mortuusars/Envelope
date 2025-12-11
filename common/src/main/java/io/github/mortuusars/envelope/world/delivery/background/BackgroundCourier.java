@@ -45,7 +45,7 @@ public class BackgroundCourier implements Courier, DeliveryHandler {
 
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
-        if (delivery.getOrigin().isRegular()) {
+        if (delivery.getOrigin().isReal()) {
             FinishedBackgroundCourier courier = new FinishedBackgroundCourier(
                   getEntityData(), delivery.getOrigin().getStartPos(), delivery.getMail().getItemForReading());
             level.getEnvelopeContext().getBackgroundDelivery().addFinishedCourier(courier);

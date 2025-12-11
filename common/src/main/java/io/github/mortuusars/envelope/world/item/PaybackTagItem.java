@@ -4,9 +4,12 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
+import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import io.github.mortuusars.envelope.world.item.component.Payback;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,28 +54,60 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
-        if (action != ClickAction.SECONDARY) return false;
-        ItemStack target = slot.getItem();
-        if (!target.is(Envelope.Tags.Items.MAILABLE)) return false;
+        if (action != ClickAction.SECONDARY) {
+            return false;
+        }
 
-        PaybackTagContents paybackTagContents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.EMPTY);
+        ItemStack target = slot.getItem();
+        if (!target.is(Envelope.Tags.Items.MAILABLE)) {
+            return true;
+        }
+
+        PaybackTagContents contents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.EMPTY);
         @Nullable Payback existingPayback = target.get(Envelope.DataComponents.PAYBACK);
 
-        if (existingPayback != null && paybackTagContents.isEmpty()) {
+        if (contents.isEmpty()) {
+            if (existingPayback == null) {
+                return true; // do nothing
+            }
             target.remove(Envelope.DataComponents.PAYBACK);
         } else {
-            Payback newPayback = paybackTagContents.toPayback();
-            if (Objects.equals(newPayback, existingPayback)) {
-                return true;
+            Payback payback = createPayback(player.level(), stack);
+            if (existingPayback != null && existingPayback.equals(payback)) {
+                return true; // do nothing
             }
-
-            target.set(Envelope.DataComponents.PAYBACK, newPayback);
+            target.set(Envelope.DataComponents.PAYBACK, payback);
         }
 
         slot.setChanged();
         stack.shrink(1);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
         return true;
+    }
+
+    public Payback createPayback(Level level, ItemStack stack) {
+        PaybackTagContents tagContents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.DEFAULT);
+
+        List<RequestedItem> requestedItems = tagContents.getItemsForReading().stream()
+              .limit(Payback.SLOTS)
+              .filter(item -> !item.isEmpty())
+              .map(this::createRequestedItemFromStack)
+              .toList();
+
+        return Payback.createOrDefault(requestedItems);
+    }
+
+    public RequestedItem createRequestedItemFromStack(ItemStack stack) {
+        if (stack.isEmpty()) {
+            Envelope.LOGGER.warn("Tried to create RequestedItem from empty ItemStack.");
+            return RequestedItem.DEFAULT;
+        }
+
+        DataComponentMap defaultComponents = new ItemStack(stack.getItem(), stack.getCount()).getComponents();
+        DataComponentMap components = stack.copy().getComponents();
+        DataComponentMap uniqueComponents = components.filter(type ->
+              !Objects.equals(components.get(type), defaultComponents.get(type)));
+        return new RequestedItem(stack.getItem(), stack.getCount(), DataComponentPredicate.allOf(uniqueComponents));
     }
 
     @Override

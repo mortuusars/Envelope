@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -94,16 +95,17 @@ public class EnvelopeContext {
 
     // --
 
-    public Courier startDelivery(ItemStack mail) {
+    public Courier startServiceDelivery(ItemStack mail) {
         Delivery delivery = Delivery.create(level, mail, DeliveryOrigin.service());
 
-        @Nullable Pigeon deliveringPigeon = Envelope.EntityTypes.PIGEON.get().create(level);
-        Preconditions.checkNotNull(deliveringPigeon, "Failed to create an entity. This should not happen.");
+        Pigeon deliveringPigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
+              "Failed to create an entity. This should not happen.");
 
         Optional<BlockPos> spawnPos = delivery.getRoute().senderPos().map(p -> Position.aboveGround(level, p, 1));
 
         deliveringPigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos.orElse(BlockPos.ZERO)),
               MobSpawnType.EVENT, null);
+
         deliveringPigeon.startDelivery(delivery);
 
         return spawnPos

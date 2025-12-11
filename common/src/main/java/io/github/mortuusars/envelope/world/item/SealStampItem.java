@@ -58,6 +58,11 @@ public class SealStampItem extends Item implements ApplicatorItem {
             return false;
         }
 
+        if (!slot.allowModification(player)) {
+            player.playSound(SoundEvents.COMPARATOR_CLICK);
+            return true;
+        }
+
         ItemStack target = slot.getItem();
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);

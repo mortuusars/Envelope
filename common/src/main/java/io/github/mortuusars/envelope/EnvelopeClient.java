@@ -46,6 +46,7 @@ public class EnvelopeClient {
             ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isLetterTattered);
 
             ItemProperties.register(Envelope.Items.PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
+            ItemProperties.register(Envelope.Items.PAYBACK_PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
         }
 
         public static float isLetterTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {

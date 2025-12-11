@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item.component;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -9,44 +10,36 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-public record Payback(List<RequestedItem> items) {
+public final class Payback {
     public static final int SLOTS = 6;
+    public static final Payback DEFAULT = new Payback(List.of(RequestedItem.DEFAULT));
 
     public static final Codec<Payback> CODEC =
           Codec.list(RequestedItem.CODEC, 1, 6).xmap(Payback::new, Payback::items);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Payback> STREAM_CODEC =
           RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(Payback::new, Payback::items);
+    private final List<RequestedItem> items;
 
+    private Payback(List<RequestedItem> items) {
+        Preconditions.checkArgument(!items.isEmpty(), "Payback items must have at least one requested item.");
+        this.items = items;
+    }
 
-//    public static Payback of(Container container) {
-//        SimpleContainer collapsedContainer = new SimpleContainer(SLOTS);
-//        for (int slot = 0; slot < Math.min(SLOTS, container.getContainerSize()); slot++) {
-//            ItemStack stack = container.getItem(slot);
-//            collapsedContainer.addItem(stack);
-//        }
-//        container = collapsedContainer;
-//
-//        List<RequestedItem> items = new ArrayList<>();
-//
-//        for (int slot = 0; slot < Math.min(SLOTS, container.getContainerSize()); slot++) {
-//            ItemStack stack = container.getItem(slot);
-//            if (!stack.isEmpty()) {
-//                RequestedItem requestedItem = new RequestedItem(stack.getItem(), stack.getCount(),
-//                      DataComponentPredicate.allOf(stack.getComponents()));
-//                items.add(requestedItem);
-//            }
-//        }
-//
-//        return new Payback(items);
-//    }
+    public static Optional<Payback> create(List<RequestedItem> items) {
+        return !items.isEmpty() ? Optional.of(new Payback(items)) : Optional.empty();
+    }
+
+    public static Payback createOrDefault(List<RequestedItem> items) {
+        return !items.isEmpty() ? new Payback(items) : DEFAULT;
+    }
+
+    // --
 
     public boolean matches(Container container) {
-        if (container.getContainerSize() != items().size()) {
-            return false;
-        }
-
         for (int slot = 0; slot < items().size(); slot++) {
             RequestedItem requestedItem = items().get(slot);
             ItemStack stack = container.getItem(slot);
@@ -57,4 +50,28 @@ public record Payback(List<RequestedItem> items) {
 
         return true;
     }
+
+    public List<RequestedItem> items() {
+        return items;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (Payback) obj;
+        return Objects.equals(this.items, that.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(items);
+    }
+
+    @Override
+    public String toString() {
+        return "Payback[" +
+              "items=" + items + ']';
+    }
+
 }

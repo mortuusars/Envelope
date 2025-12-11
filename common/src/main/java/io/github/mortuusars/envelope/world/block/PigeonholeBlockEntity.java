@@ -315,7 +315,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     public boolean isSendable(ItemStack stack) {
-        return !stack.isEmpty() && stack.has(Envelope.DataComponents.MAIL_RECIPIENT);
+        return stack.is(Envelope.Tags.Items.MAILABLE);
     }
 
     public boolean isExtractable(Mail stack) {
@@ -411,22 +411,21 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         ItemStack mail = getItem(SLOT_MAIL);
-        if (!isSendable(mail)) return;
+        if (mail.isEmpty() || mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
+            return;
+        }
 
         mail = mail.copyWithCount(1);
 
-        if (!mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
-            mail.set(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
-        }
         mail.set(Envelope.DataComponents.MAIL_SENDER, address);
 
-        @NotNull Address recipient = Objects.requireNonNull(mail.get(Envelope.DataComponents.MAIL_RECIPIENT));
+        Address recipient = mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
 
         if (level.getEnvelopeContext().addresses().resolve(recipient).matches(this.address)) {
             return;
         }
 
-        pigeon.startDelivery(Delivery.create(level, mail, DeliveryOrigin.regular(getBlockPos())));
+        pigeon.startDelivery(Delivery.create(level, mail, DeliveryOrigin.real(getBlockPos())));
 
         removeItem(SLOT_MAIL, 1);
         removeItem(SLOT_FOOD, 1);

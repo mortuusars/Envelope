@@ -5,17 +5,40 @@ import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
+import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public interface DeliveryHandler {
     void endDelivery(ServerLevel level, Delivery delivery);
 
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
-        if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT
-              && !level.getEnvelopeContext().addresses().canDeliverMailTo(delivery.getRecipient())) {
-            delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
-            return DeliveryPhase.APPROACHING_SENDER;
+        if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT) {
+            if (!level.getEnvelopeContext().addresses().canDeliverMailTo(delivery.getRecipient())) {
+                delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
+                return DeliveryPhase.APPROACHING_SENDER;
+            }
+
+            @Nullable Payback payback = delivery.getMail().get(Envelope.DataComponents.PAYBACK);
+            if (payback != null) {
+                ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKAGE.get());
+                paybackPackage.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, new StoredItemStack(delivery.getMail().getItemCopy()));
+                paybackPackage.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
+                paybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, delivery.getMail().getRecipientOrElse(Address.UNKNOWN));
+
+                level.getEnvelopeContext().startServiceDelivery(paybackPackage);
+
+                //TODO: write "arrived at depot" (or something) to the log
+                //TODO: store in the mail service
+                //TODO: await payback fulfilment
+
+                delivery.setMail(new Mail(ItemStack.EMPTY));
+                return DeliveryPhase.APPROACHING_SENDER;
+            }
         }
 
         return currentPhase.next(canSkipTraveling(level, delivery));

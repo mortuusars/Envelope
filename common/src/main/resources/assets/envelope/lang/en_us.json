@@ -37,6 +37,7 @@
   "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
 
   "gui.envelope.package.pack": "Pack",
+  "gui.envelope.payback_package.pack": "Pack",
   "gui.envelope.package.pack.tooltip.packs_remaining": "§7Remaining: %s",
   "gui.envelope.package.destroyed_on_close": "§4Package will be destroyed",
   "gui.envelope.package.tooltip.empty": "§7Empty",

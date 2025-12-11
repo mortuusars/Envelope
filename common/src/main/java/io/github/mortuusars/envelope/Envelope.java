@@ -183,19 +183,19 @@ public class Envelope {
               () -> new SealedLetterItem(new Item.Properties()));
 
         public static final Supplier<BlockItem> PAPER_BOX = Register.item("paper_box",
-              () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
+              () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties()));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
         public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
               () -> new SealedPackageItem(Blocks.SEALED_PACKAGE.get(), new Item.Properties().stacksTo(1)));
 
+        public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
+              () -> new PaybackTagItem(new Item.Properties()));
         public static final Supplier<PaybackPackageItem> PAYBACK_PACKAGE = Register.item("payback_package",
               () -> new PaybackPackageItem(new Item.Properties().stacksTo(1)));
 
         public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
               () -> new AddressTagItem(new Item.Properties()));
-        public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
-              () -> new PaybackTagItem(new Item.Properties()));
         public static final Supplier<SealStampItem> SEAL_STAMP = Register.item("seal_stamp",
               () -> new SealStampItem(new Item.Properties().stacksTo(1)));
 
@@ -245,7 +245,7 @@ public class Envelope {
               b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
         public static final DataComponentType<Payback> PAYBACK = Register.dataComponentType("payback",
               b -> b.persistent(Payback.CODEC).networkSynchronized(Payback.STREAM_CODEC));
-        public static final DataComponentType<StoredItemStack> PAYBACK_ITEM = Register.dataComponentType("payback_item",
+        public static final DataComponentType<StoredItemStack> PAYBACK_PACKAGE_SUBJECT = Register.dataComponentType("payback_package_subject",
               b -> b.persistent(StoredItemStack.CODEC).networkSynchronized(StoredItemStack.STREAM_CODEC));
 
         public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType("pigeons", b ->
