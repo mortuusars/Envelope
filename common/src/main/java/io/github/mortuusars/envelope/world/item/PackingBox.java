@@ -2,12 +2,9 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-
-public interface Package {
+public interface PackingBox {
     default int getTimesPacked(ItemStack stack) {
         return stack.getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0);
     }
@@ -22,12 +19,6 @@ public interface Package {
 
     default boolean shouldBeDestroyedWhenEmpty(ItemStack stack) {
         return !canPack(stack);
-    }
-
-    default List<ItemStack> unpack(ItemStack stack) {
-        PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
-        stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
-        return contents.copyItems();
     }
 
     default boolean canInsert(ItemStack stack) {

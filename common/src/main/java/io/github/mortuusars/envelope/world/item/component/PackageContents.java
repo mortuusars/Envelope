@@ -14,13 +14,12 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class PackageContents implements TooltipComponent {
     public static final int SLOTS = 6;
 
     public static final Codec<PackageContents> CODEC = ItemStack.OPTIONAL_CODEC.listOf(0, SLOTS)
-            .xmap(PackageContents::new, PackageContents::getItemsForReading);
+            .xmap(PackageContents::new, PackageContents::getItemsForSerialization);
     public static final StreamCodec<RegistryFriendlyByteBuf, PackageContents> STREAM_CODEC = ItemStack.OPTIONAL_STREAM_CODEC
             .apply(ByteBufCodecs.list(SLOTS))
             .map(PackageContents::new, PackageContents::getItemsForReading);
@@ -56,6 +55,20 @@ public final class PackageContents implements TooltipComponent {
 
     public List<ItemStack> getItemsForReading() {
         return items;
+    }
+
+    /**
+     * Removes trailing empty items.
+     */
+    private List<ItemStack> getItemsForSerialization() {
+        List<ItemStack> list = new ArrayList<>(items);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (!list.get(i).isEmpty()) {
+                break;
+            }
+            list.remove(i);
+        }
+        return list;
     }
 
     public ItemStack getItemForReading(int index) {

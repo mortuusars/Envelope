@@ -1,25 +1,18 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
-import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
-import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class PaybackPackageItem extends Item implements Package {
+public class PaybackPackageItem extends Item {
     public PaybackPackageItem(Properties properties) {
         super(properties);
     }
@@ -37,20 +30,13 @@ public class PaybackPackageItem extends Item implements Package {
     // --
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        @Nullable StoredItemStack paybackItem = player.getItemInHand(usedHand).get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
-        if (paybackItem == null || paybackItem.isEmpty() || !paybackItem.getForReading().has(Envelope.DataComponents.PAYBACK)) {
-            return InteractionResultHolder.fail(player.getItemInHand(usedHand));
-        }
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        stack = stack.transmuteCopy(Envelope.Items.PAYBACK_PACKING_BOX.get());
+        player.setItemInHand(hand, stack);
 
-        if (player instanceof ServerPlayer serverPlayer) {
-            PlatformHelper.openMenu(serverPlayer, new SimpleMenuProvider((id, inventory, pl) ->
-                        new PaybackPackageMenu(id, inventory, usedHand), player.getItemInHand(usedHand).getHoverName()),
-                  buffer -> buffer.writeEnum(usedHand));
-        }
+        ((PaybackPackingBoxItem)stack.getItem()).openPackingGui(player, hand, stack);
 
-        level.playSound(player, player, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
-
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+        return InteractionResultHolder.success(stack);
     }
 }

@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.client.util.Pos2i;
-import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
+import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import io.github.mortuusars.envelope.world.item.component.Payback;
 import net.minecraft.client.gui.GuiGraphics;
@@ -24,13 +24,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackageMenu> {
+public class PaybackPackingScreen extends AbstractContainerScreen<PaybackPackingMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/payback_package.png");
     public static final WidgetSprites PACK_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("payback_package/pack_button"));
 
     protected ImageButton packButton;
 
-    public PaybackPackageScreen(PaybackPackageMenu menu, Inventory playerInventory, Component title) {
+    public PaybackPackingScreen(PaybackPackingMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 
@@ -44,8 +44,8 @@ public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackage
         packButton = new ImageButton(leftPos + 126, topPos + 40, 26, 20,
               PACK_BUTTON_SPRITES,
               button -> pack(),
-              Component.translatable("gui.envelope.payback_package.pack"));
-        packButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.payback_package.pack")
+              Component.translatable("gui.envelope.package.pack"));
+        packButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.package.pack")
               .append(CommonComponents.NEW_LINE)
               .append(Component.translatable("gui.envelope.package.pack.tooltip.packs_remaining",
                     getPrettyPacksRemaining()))));
@@ -53,7 +53,7 @@ public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackage
     }
 
     protected String getPrettyPacksRemaining() {
-        int count = getMenu().getPackage().getRemainingPacks(getMenu().getPackageStack());
+        int count = getMenu().getPackage().getRemainingPacks(getMenu().getBoxStack());
         if (count > 99) {
             return ">99";
         }
@@ -61,7 +61,7 @@ public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackage
     }
 
     protected void pack() {
-        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PaybackPackageMenu.PACK_BUTTON_ID);
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PaybackPackingMenu.PACK_BUTTON_ID);
         onClose();
     }
 
@@ -147,7 +147,7 @@ public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackage
 
     protected void renderPackageItemInInventory(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Pos2i packageSlotPos = getMenu().getPackageSlotPos();
-        guiGraphics.renderItem(getMenu().getPackageStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
+        guiGraphics.renderItem(getMenu().getBoxStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0, 0, 300);

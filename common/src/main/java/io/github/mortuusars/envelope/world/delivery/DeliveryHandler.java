@@ -25,7 +25,7 @@ public interface DeliveryHandler {
 
             @Nullable Payback payback = delivery.getMail().get(Envelope.DataComponents.PAYBACK);
             if (payback != null) {
-                ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKAGE.get());
+                ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
                 paybackPackage.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, new StoredItemStack(delivery.getMail().getItemCopy()));
                 paybackPackage.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
                 paybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, delivery.getMail().getRecipientOrElse(Address.UNKNOWN));

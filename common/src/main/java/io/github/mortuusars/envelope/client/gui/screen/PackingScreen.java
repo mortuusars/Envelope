@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.client.util.Pos2i;
-import io.github.mortuusars.envelope.world.inventory.PackageMenu;
+import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -16,13 +16,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
+public class PackingScreen extends AbstractContainerScreen<PackingMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/package.png");
     public static final WidgetSprites PACK_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("package/pack_button"));
 
     protected ImageButton packButton;
 
-    public PackageScreen(PackageMenu menu, Inventory playerInventory, Component title) {
+    public PackingScreen(PackingMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 
@@ -44,7 +44,7 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
     }
 
     protected String getPrettyPacksRemaining() {
-        int count = getMenu().getPackage().getRemainingPacks(getMenu().getPackageStack());
+        int count = getMenu().getPackage().getRemainingPacks(getMenu().getBoxStack());
         if (count > 99) {
             return ">99";
         }
@@ -52,7 +52,7 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
     }
 
     protected void pack() {
-        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PackageMenu.PACK_BUTTON_ID);
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PackingMenu.PACK_BUTTON_ID);
         onClose();
     }
 
@@ -75,7 +75,7 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
 
     protected void renderPackageItemInInventory(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Pos2i packageSlotPos = getMenu().getPackageSlotPos();
-        guiGraphics.renderItem(getMenu().getPackageStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
+        guiGraphics.renderItem(getMenu().getBoxStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0, 0, 300);

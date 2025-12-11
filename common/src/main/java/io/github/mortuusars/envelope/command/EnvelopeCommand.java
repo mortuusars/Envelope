@@ -187,13 +187,13 @@ public class EnvelopeCommand {
         ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
         pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
         pkg.set(Envelope.DataComponents.MAIL_SENDER, new Address.Pigeonhole("Original-Sender"));
-        pkg.set(Envelope.DataComponents.MAIL_RECIPIENT, new Address.Pigeonhole("Me"));
+        pkg.set(Envelope.DataComponents.MAIL_RECIPIENT, new Address.Pigeonhole("Base"));
         pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
               new RequestedItem(Items.EMERALD, 3), new RequestedItem(Items.BARREL, 35))));
 
         Mail mail = new Mail(pkg);
 
-        ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKAGE.get());
+        ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
         paybackPackage.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, new StoredItemStack(mail.getItemCopy()));
         paybackPackage.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
         paybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, mail.getRecipientOrElse(Address.UNKNOWN));

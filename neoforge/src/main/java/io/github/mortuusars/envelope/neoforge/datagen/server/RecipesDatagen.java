@@ -38,7 +38,7 @@ public class RecipesDatagen extends RecipeProvider {
                 .unlockedBy("has_paper", has(Items.PAPER))
                 .save(output);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PACKAGE.get())
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PACKING_BOX.get())
                 .requires(Envelope.Items.PAPER_BOX.get())
                 .requires(Items.HONEYCOMB)
                 .unlockedBy("has_paper_box", has(Envelope.Items.PAPER_BOX.get()))

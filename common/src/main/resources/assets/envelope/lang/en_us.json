@@ -13,6 +13,7 @@
 
   "item.envelope.address_tag": "Address Tag",
   "item.envelope.payback_tag": "Payback Tag",
+  "item.envelope.payback_packing_box": "Payback Packing Box",
   "item.envelope.payback_package": "Payback Package",
   "item.envelope.seal_stamp": "Seal Stamp",
 
@@ -21,6 +22,7 @@
   "item.envelope.sealed_letter": "Sealed Letter",
 
   "item.envelope.paper_box": "Paper Box",
+  "item.envelope.packing_box": "Packing Box",
   "item.envelope.package": "Package",
   "item.envelope.sealed_package": "Sealed Package",
   "item.envelope.package.empty": "Empty Package",
@@ -37,7 +39,6 @@
   "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
 
   "gui.envelope.package.pack": "Pack",
-  "gui.envelope.payback_package.pack": "Pack",
   "gui.envelope.package.pack.tooltip.packs_remaining": "§7Remaining: %s",
   "gui.envelope.package.destroyed_on_close": "§4Package will be destroyed",
   "gui.envelope.package.tooltip.empty": "§7Empty",

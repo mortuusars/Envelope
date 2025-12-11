@@ -1,13 +1,13 @@
-// 1.21.1	2025-11-27T00:32:17.3454715	Recipes
+// 1.21.1	2025-12-11T17:52:47.484065	Recipes
 09f34bae49ae0d92bd3ac358c5445f38d650a200 data/envelope/advancement/recipes/decorations/oak_pigeonhole.json
 38f49c86b18e5e81f2934cc05697a8c644c91fc8 data/envelope/advancement/recipes/tools/address_tag.json
 d67ca4601a231bbac053e6b120f4edf172e253e5 data/envelope/advancement/recipes/tools/letter_and_quill.json
-ec8d5a4dd42ab51175dcfa0c81e65280112bd3ab data/envelope/advancement/recipes/tools/package.json
+114a043af8ca677c5c15f33cfd3a703e101a4cb1 data/envelope/advancement/recipes/tools/packing_box.json
 75149155f9a0199f7ece7470c4c3187f9de4955d data/envelope/advancement/recipes/tools/paper_box.json
 fc9baabd1e779eb8253b100b3feebd718062ce67 data/envelope/advancement/recipes/tools/seal_stamp.json
 4065d28f0c10c66ab32af98ded70eda05b5a9021 data/envelope/recipe/address_tag.json
 46c9f364534789b8c3d41534557434e53dfc79c4 data/envelope/recipe/letter_and_quill.json
 4c1a5f02aec66aeba67c3f0d9a4d7537a453d936 data/envelope/recipe/oak_pigeonhole.json
-82262a2e59a9225634c62a5cf756250cecbc3fbc data/envelope/recipe/package.json
+5b9a1b98be4ad2b6164537826bfefb7fd74d593e data/envelope/recipe/packing_box.json
 b17601a206a1507d070e896921de55c78b4fb914 data/envelope/recipe/paper_box.json
 792bbd2fa16e1bffd360871c867614f874cb19ee data/envelope/recipe/seal_stamp.json

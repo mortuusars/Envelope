@@ -7,7 +7,6 @@ import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.LetterAndQuillContent;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +33,6 @@ public class EnvelopeClient {
         public static final ResourceLocation LETTER_TATTERED = Envelope.resource("letter_tattered");
         public static final ResourceLocation LETTER_UNFOLDED = Envelope.resource("letter_unfolded");
         public static final ResourceLocation LETTER_CONTENT = Envelope.resource("letter_content");
-        public static final ResourceLocation PACKAGE_EMPTY = Envelope.resource("package_empty");
 
         public static void register() {
             ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasLetterContent);
@@ -45,8 +43,8 @@ public class EnvelopeClient {
 
             ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isLetterTattered);
 
-            ItemProperties.register(Envelope.Items.PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
-            ItemProperties.register(Envelope.Items.PAYBACK_PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
+//            ItemProperties.register(Envelope.Items.PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
+//            ItemProperties.register(Envelope.Items.PAYBACK_PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
         }
 
         public static float isLetterTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
@@ -66,11 +64,6 @@ public class EnvelopeClient {
                 return 1;
             }
             return 0;
-        }
-
-        public static float isPackageEmpty(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-            return stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY).isEmpty()
-                  ? 1 : 0;
         }
     }
 }

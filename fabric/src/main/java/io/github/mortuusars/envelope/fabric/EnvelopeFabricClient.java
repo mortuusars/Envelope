@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope.fabric;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
-import io.github.mortuusars.envelope.client.gui.screen.PackageScreen;
-import io.github.mortuusars.envelope.client.gui.screen.PaybackPackageScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PaybackPackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
 import io.github.mortuusars.envelope.client.model.PigeonBackpackModel;
@@ -40,8 +40,8 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         ColorProviderRegistry.BLOCK.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
 
         MenuScreens.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackageScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackingScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackingScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);
 
         FabricS2CPacketHandler.register();

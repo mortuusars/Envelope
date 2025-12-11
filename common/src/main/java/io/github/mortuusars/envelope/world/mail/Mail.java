@@ -110,6 +110,10 @@ public class Mail implements DataComponentHolder {
         return this == EMPTY || getItemForReading().isEmpty();
     }
 
+    public boolean hasPayback() {
+        return has(Envelope.DataComponents.PAYBACK);
+    }
+
     public Mail writeToLog(UnaryOperator<DeliveryLog> writer) {
         if (isEmpty()) return this;
         return new Mail(getItemForReading(), writer.apply(getDeliveryLog()));

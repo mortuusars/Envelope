@@ -69,18 +69,18 @@ public class ModelsDatagen extends BlockStateProvider {
               .texture("layer1", Envelope.resource("item/package_seal_overlay"));
 
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
-        itemModels().basicItem(Envelope.Items.PACKAGE.get())
-              .override()
-              .predicate(EnvelopeClient.ItemModelOverrides.PACKAGE_EMPTY, 1)
-              .model(model(Envelope.resource("package_empty")))
-              .end();
+        itemModels().basicItem(Envelope.Items.PACKING_BOX.get());
+        itemModels().basicItem(Envelope.Items.PACKAGE.get());
+
+//        itemModels().basicItem(Envelope.Items.PACKAGE.get())
+//              .override()
+//              .predicate(EnvelopeClient.ItemModelOverrides.PACKAGE_EMPTY, 1)
+//              .model(model(Envelope.resource("package_empty")))
+//              .end();
 
         itemModels().basicItem(Envelope.Items.PAYBACK_TAG.get());
-        itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get())
-              .override()
-              .predicate(EnvelopeClient.ItemModelOverrides.PACKAGE_EMPTY, 1)
-              .model(model(Envelope.resource("payback_package_empty")))
-              .end();
+        itemModels().basicItem(Envelope.Items.PAYBACK_PACKING_BOX.get());
+        itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get());
 
         itemModels().spawnEggItem(Envelope.Items.PIGEON_SPAWN_EGG.get());
     }

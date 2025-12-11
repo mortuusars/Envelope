@@ -1,15 +1,9 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
-import io.github.mortuusars.envelope.world.inventory.PackageMenu;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
@@ -19,9 +13,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 
-public class PackageItem extends BlockItem implements Package, Sealable {
+public class PackageItem extends BlockItem implements Sealable {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
     }
@@ -47,17 +42,20 @@ public class PackageItem extends BlockItem implements Package, Sealable {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            PlatformHelper.openMenu(serverPlayer,
-                    new SimpleMenuProvider((id, inventory, pl) ->
-                            new PackageMenu(id, inventory, usedHand), player.getItemInHand(usedHand).getHoverName()),
-                    buffer -> buffer.writeEnum(usedHand));
-        }
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        stack = stack.transmuteCopy(Envelope.Items.PACKING_BOX.get());
+        player.setItemInHand(hand, stack);
 
-        level.playSound(player, player, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
+        ((PackingBoxItem)stack.getItem()).openPackingGui(player, hand, stack);
 
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+        return InteractionResultHolder.success(stack);
+    }
+
+    public List<ItemStack> unpack(ItemStack stack) {
+        PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
+        stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+        return contents.copyItems();
     }
 
     // --

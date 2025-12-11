@@ -11,17 +11,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class PaybackPackageMenu extends PackageMenu {
+public class PaybackPackingMenu extends PackingMenu {
     protected final Payback payback;
     protected final StoredItemStack paybackItem;
 
-    protected PaybackPackageMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
+    protected PaybackPackingMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
         super(menuType, containerId, playerInventory, hand);
-        this.paybackItem = getPackageStack().getOrDefault(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, StoredItemStack.EMPTY);
+        this.paybackItem = getBoxStack().getOrDefault(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, StoredItemStack.EMPTY);
         this.payback = Objects.requireNonNull(paybackItem.getForReading().get(Envelope.DataComponents.PAYBACK));
 
         addSlot(new Slot(new SimpleContainer(paybackItem.getForReading()), 0, 21, 42) {
@@ -42,12 +43,12 @@ public class PaybackPackageMenu extends PackageMenu {
         });
     }
 
-    public PaybackPackageMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
+    public PaybackPackingMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
         this(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), containerId, playerInventory, hand);
     }
 
-    public static PaybackPackageMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
-        return new PaybackPackageMenu(id, inventory, buffer.readEnum(InteractionHand.class));
+    public static PaybackPackingMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
+        return new PaybackPackingMenu(id, inventory, buffer.readEnum(InteractionHand.class));
     }
 
     // --
@@ -113,6 +114,14 @@ public class PaybackPackageMenu extends PackageMenu {
             return 0;
         }
         return getPayback().items().get(slot).count();
+    }
+
+    @Override
+    protected ItemStack createPackingResult() {
+        ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
+        stack.remove(Envelope.DataComponents.MAIL_SENDER);
+        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, getPaybackSubject().getForReading().get(Envelope.DataComponents.MAIL_SENDER));
+        return stack;
     }
 
     // --

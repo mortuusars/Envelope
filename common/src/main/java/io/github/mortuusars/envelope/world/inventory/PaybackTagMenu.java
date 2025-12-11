@@ -96,7 +96,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
                         //TODO: Maybe find a better place for valid items check. And maybe even add additional filters for payback.
-                        return Envelope.Items.PACKAGE.get().canInsert(stack);
+                        return Envelope.Items.PACKING_BOX.get().canInsert(stack);
                     }
 
                     @Override

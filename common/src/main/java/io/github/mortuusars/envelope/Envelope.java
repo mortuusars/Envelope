@@ -5,7 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
+import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -18,7 +18,7 @@ import io.github.mortuusars.envelope.world.block.*;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.inventory.PackageMenu;
+import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -184,6 +184,8 @@ public class Envelope {
 
         public static final Supplier<BlockItem> PAPER_BOX = Register.item("paper_box",
               () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties()));
+        public static final Supplier<PackingBoxItem> PACKING_BOX = Register.item("packing_box",
+              () -> new PackingBoxItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
         public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
@@ -191,6 +193,8 @@ public class Envelope {
 
         public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
               () -> new PaybackTagItem(new Item.Properties()));
+        public static final Supplier<PaybackPackingBoxItem> PAYBACK_PACKING_BOX = Register.item("payback_packing_box",
+              () -> new PaybackPackingBoxItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<PaybackPackageItem> PAYBACK_PACKAGE = Register.item("payback_package",
               () -> new PaybackPackageItem(new Item.Properties().stacksTo(1)));
 
@@ -271,10 +275,10 @@ public class Envelope {
         public static final Supplier<MenuType<PigeonholeMenu>> PIGEONHOLE =
               Register.menuType("pigeonhole", PigeonholeMenu::fromNetwork);
 
-        public static final Supplier<MenuType<PackageMenu>> PACKAGE =
-              Register.menuType("package", PackageMenu::fromNetwork);
-        public static final Supplier<MenuType<PaybackPackageMenu>> PAYBACK_PACKAGE =
-              Register.menuType("payback_package", PaybackPackageMenu::fromNetwork);
+        public static final Supplier<MenuType<PackingMenu>> PACKAGE =
+              Register.menuType("package", PackingMenu::fromNetwork);
+        public static final Supplier<MenuType<PaybackPackingMenu>> PAYBACK_PACKAGE =
+              Register.menuType("payback_package", PaybackPackingMenu::fromNetwork);
 
         public static final Supplier<MenuType<PaybackTagMenu>> PAYBACK_TAG =
               Register.menuType("payback_tag", PaybackTagMenu::fromNetwork);

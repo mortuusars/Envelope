@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Pos2i;
-import io.github.mortuusars.envelope.world.item.Package;
+import io.github.mortuusars.envelope.world.item.PackingBox;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,14 +21,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PackageMenu extends AbstractContainerMenu {
+public class PackingMenu extends AbstractContainerMenu {
     public static final int PACK_BUTTON_ID = 0;
 
     private final Player player;
     private final InteractionHand hand;
     private final int packageSlot;
     private final ItemStack packageStack;
-    private final Package packageItem;
+    private final PackingBox packingBox;
     private final PackageContents initialPackageContents;
     private final boolean canPack;
 
@@ -37,27 +37,27 @@ public class PackageMenu extends AbstractContainerMenu {
     protected Pos2i packageSlotPos = new Pos2i(-999, -999);
     protected boolean packed = false;
 
-    protected PackageMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
+    protected PackingMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
         super(menuType, containerId);
         this.player = playerInventory.player;
         this.hand = hand;
         this.packageSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : playerInventory.selected;
         this.packageStack = playerInventory.getItem(packageSlot);
-        this.packageItem = (Package)packageStack.getItem();
+        this.packingBox = (PackingBox) packageStack.getItem();
         this.initialPackageContents = PackageContents.of(packageStack);
-        this.canPack = packageItem.canPack(packageStack);
+        this.canPack = packingBox.canPack(packageStack);
         this.packageContainer = createPackageContainer();
 
         addPackageSlots();
         addPlayerSlots(playerInventory, 8, 96, packageSlot);
     }
 
-    public PackageMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
+    public PackingMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
         this(Envelope.MenuTypes.PACKAGE.get(), containerId, playerInventory, hand);
     }
 
-    public static PackageMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
-        return new PackageMenu(id, inventory, buffer.readEnum(InteractionHand.class));
+    public static PackingMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
+        return new PackingMenu(id, inventory, buffer.readEnum(InteractionHand.class));
     }
 
     // --
@@ -137,12 +137,12 @@ public class PackageMenu extends AbstractContainerMenu {
         return packageSlot;
     }
 
-    public ItemStack getPackageStack() {
+    public ItemStack getBoxStack() {
         return packageStack;
     }
 
-    public Package getPackage() {
-        return packageItem;
+    public PackingBox getPackage() {
+        return packingBox;
     }
 
     public PackageContents getInitialPackageContents() {
@@ -150,7 +150,7 @@ public class PackageMenu extends AbstractContainerMenu {
     }
 
     protected @NotNull PackageContents getPackageContentsFromItem() {
-        return PackageContents.of(getPackageStack());
+        return PackageContents.of(getBoxStack());
     }
 
     public Pos2i getPackageSlotPos() {
@@ -167,7 +167,7 @@ public class PackageMenu extends AbstractContainerMenu {
         }
 
         PackageContents contents = PackageContents.of(packageContainer);
-        return !contents.isEmpty() && !contents.equals(getInitialPackageContents());
+        return !contents.isEmpty();
     }
 
     public boolean isContainerEmpty() {
@@ -188,8 +188,7 @@ public class PackageMenu extends AbstractContainerMenu {
         if (index < PackageContents.SLOTS) {
             if (!moveItemStackTo(clickedStack, PackageContents.SLOTS, slots.size(), true))
                 return ItemStack.EMPTY;
-        }
-        else if (index < slots.size()) {
+        } else if (index < slots.size()) {
             if (!moveItemStackTo(clickedStack, 0, PackageContents.SLOTS, false))
                 return ItemStack.EMPTY;
         }
@@ -202,31 +201,42 @@ public class PackageMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(@NotNull Player player, int buttonId) {
         if (buttonId == PACK_BUTTON_ID && canPack()) {
-            getPackageStack().set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.of(packageContainer));
-            getPackageStack().set(Envelope.DataComponents.PACKAGE_TIMES_PACKED,
-                    getPackageStack().getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0) + 1);
-            packed = true;
-
-            player.level().playSound(player, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
-                    1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
+            pack(player);
             return true;
         }
 
         return false;
     }
 
+    protected void pack(@NotNull Player player) {
+        ItemStack stack = createPackingResult();
+        stack.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.of(packageContainer));
+        stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED,
+              stack.getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0) + 1);
+
+        player.setItemInHand(getHand(), stack);
+        player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
+              1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
+        packed = true;
+    }
+
+    protected ItemStack createPackingResult() {
+        ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PACKAGE.get());
+        stack.remove(Envelope.DataComponents.MAIL_SENDER);
+        stack.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+        return stack;
+    }
+
     @Override
     public void removed(@NotNull Player player) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            if (!PackageContents.of(packageContainer).equals(getPackageContentsFromItem())) {
-                for (ItemStack stack : PackageContents.of(packageContainer).copyItems()) {
-                    player.drop(stack, true);
-                }
-                getPackageStack().remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+        if (!packed && player instanceof ServerPlayer serverPlayer) {
+            for (ItemStack stack : PackageContents.of(packageContainer).copyItems()) {
+                player.drop(stack, true);
             }
+            getBoxStack().remove(Envelope.DataComponents.PACKAGE_CONTENTS);
 
-            if (getPackageContentsFromItem().isEmpty() && getPackage().shouldBeDestroyedWhenEmpty(getPackageStack())) {
-                getPackageStack().setCount(0);
+            if (getPackage().shouldBeDestroyedWhenEmpty(getBoxStack())) {
+                player.getItemInHand(hand).shrink(1);
                 serverPlayer.serverLevel().playSound(null, serverPlayer,
                       Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 1, 1);
             }
@@ -237,6 +247,6 @@ public class PackageMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return player.getItemInHand(hand).getItem() instanceof Package;
+        return player.getItemInHand(hand).getItem() instanceof PackingBox;
     }
 }

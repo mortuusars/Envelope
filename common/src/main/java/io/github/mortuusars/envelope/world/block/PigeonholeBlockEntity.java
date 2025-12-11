@@ -411,7 +411,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         ItemStack mail = getItem(SLOT_MAIL);
-        if (mail.isEmpty() || mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
+        if (mail.isEmpty() || !mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
             return;
         }
 
