@@ -227,7 +227,16 @@ public class PaybackTagMenu extends AbstractContainerMenu {
         Slot paybackSlot = this.slots.get(slotId);
 
         if (!getCarried().isEmpty() && paybackSlot.mayPlace(getCarried())) {
-            paybackSlot.set(getCarried().copy());
+            ItemStack result = getCarried().copy();
+
+            if (button == 1) {
+                if (ItemStack.isSameItemSameComponents(paybackSlot.getItem(), result)) {
+                    result.setCount(paybackSlot.getItem().getCount() + 1);
+                } else {
+                    result.setCount(1);
+                }
+            }
+            paybackSlot.set(result);
         } else {
             paybackSlot.set(ItemStack.EMPTY);
         }

@@ -16,6 +16,7 @@ public class EntityMailReceiver implements MailReceiver {
     public Mail receiveMail(ServerLevel level, Mail mail) {
         return level.getEnvelopeContext().getMailEntities().byAddress(address)
               .map(entity -> entity.receiveMail(level, mail))
-              .orElseGet(() -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
+              .orElseGet(() -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                    .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
     }
 }

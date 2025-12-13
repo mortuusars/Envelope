@@ -24,6 +24,7 @@ public class BackgroundDelivery extends SavedData {
     ).apply(instance, BackgroundDelivery::new));
 
     protected final List<BackgroundCourier> couriers;
+    protected final List<BackgroundCourier> pendingCouriers = new ArrayList<>();
     protected final List<FinishedBackgroundCourier> finishedCouriers;
 
     public BackgroundDelivery(List<BackgroundCourier> couriers, List<FinishedBackgroundCourier> finishedCouriers) {
@@ -44,7 +45,7 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public void addCourier(BackgroundCourier courier) {
-        couriers.add(courier);
+        pendingCouriers.add(courier);
         setDirty();
     }
 
@@ -66,7 +67,17 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public void tick(ServerLevel level) {
-        couriers.removeIf(courier -> courier.tick(level));
+        couriers.removeIf(courier -> {
+            courier.tick(level);
+            return courier.delivery().isFinished();
+        });
+        processPendingCouriers();
+    }
+
+    protected void processPendingCouriers() {
+        // Using buffer for new couriers, to avoid ConcurrentModification when courier addition is caused by courier tick
+        couriers.addAll(pendingCouriers);
+        pendingCouriers.clear();
     }
 
     // -- Save / Load
@@ -81,6 +92,7 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        processPendingCouriers();
         return CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
               .ifError(e -> Envelope.LOGGER.error("Cannot save BackgroundDelivery: {}", e.message()))
               .result()

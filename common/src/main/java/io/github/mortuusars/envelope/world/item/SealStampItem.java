@@ -43,7 +43,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of(new SealDieTooltipComponent(Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_IMPRESSION))));
+        return Optional.of(new SealDieTooltipComponent(Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_IMPRESSION))));
     }
 
     @Override
@@ -99,7 +99,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     public Optional<Holder<SealImpression>> getImpression(ItemStack stack) {
-        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_IMPRESSION));
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_IMPRESSION));
     }
 
     public Holder<SealImpression> getImpressionOrDefault(ItemStack stack, RegistryAccess registryAccess, @Nullable Player player) {

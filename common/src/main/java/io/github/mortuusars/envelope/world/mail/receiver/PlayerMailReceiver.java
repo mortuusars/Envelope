@@ -17,6 +17,7 @@ public class PlayerMailReceiver implements MailReceiver {
         return level.getEnvelopeContext().getPlayers().getDefaultAddressOf(address)
               .map(PigeonholeMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
-              .orElseGet(() -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
+              .orElseGet(() -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                    .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
     }
 }

@@ -32,7 +32,7 @@ public interface Address {
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::type, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
 
-    Address MAIL_SERVICE = new Entity("Mail Service", Component.translatable("address.envelope.mail_service"));
+    Address.Entity MAIL_SERVICE = new Entity("Mail Service", Component.translatable("address.envelope.mail_service"));
     Address UNKNOWN = new Entity("Unknown", Component.translatable("address.envelope.unknown"));
 
     Type type();

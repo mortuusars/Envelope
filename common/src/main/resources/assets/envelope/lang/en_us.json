@@ -105,6 +105,11 @@
 
   "gui.envelope.delivery.log.message.recipient_not_found": "§7[Recipient Not Found]",
   "gui.envelope.delivery.log.message.unable_to_reach": "§7[Unable To Reach]",
+  "gui.envelope.delivery.log.message.waiting_for_payment": "§7[Waiting For Payment]",
+  "gui.envelope.delivery.log.message.payback_subject_not_found": "§7[Payback Subject Not Found]",
+  "gui.envelope.delivery.log.message.payback_fulfilled": "§7[Payback Fulfilled]",
+  "gui.envelope.delivery.log.message.payback_is_not_valid": "§7[Payback Is Not Valid]",
+  "gui.envelope.delivery.log.message.payback_is_timed_out": "§7[Payback Is Timed Out]",
 
   "gui.envelope.letter.subject": "Subject: ",
 
@@ -161,5 +166,9 @@
   "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
   "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
 
-  "gui.exposure.pigeonhole.address_box.title": "Address"
+  "gui.exposure.pigeonhole.address_box.title": "Address",
+
+  "error.envelope.delivery.same_addresses": "Recipient address cannot be the same as sender address.",
+  "error.envelope.delivery.unknown_address": "Cannot deliver to unknown address.",
+  "error.envelope.delivery.no_mail": "No mail to deliver."
 }

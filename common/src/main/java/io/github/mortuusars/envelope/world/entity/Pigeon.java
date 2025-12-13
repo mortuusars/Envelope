@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.IntFunction;
 
-public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, TransitionableCourier<Pigeon> {
+public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, TransitionableCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -529,7 +529,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         tag.putBoolean("Sitting", isSitting());
 
         if (delivery != null) {
-            tag.put("Delivery", delivery.encode(registryAccess()));
+            Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
+                  .resultOrPartial(LOGGER::error)
+                  .ifPresent(value -> tag.put("Delivery", value));
         }
     }
 
@@ -539,7 +541,13 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         setPigeonholeHandler(PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler")).getOrThrow());
         setVariant(Variant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
-        setDelivery(Delivery.parse(tag.getCompound("Delivery"), registryAccess()));
+
+        if (tag.contains("Delivery")) {
+            setDelivery(Delivery.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.getCompound("Delivery"))
+                  .resultOrPartial(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag.getCompound("Delivery"), e))
+                  .orElse(null)
+            );
+        }
 
         setDelivering(delivery != null);
         setHasMail(delivery != null && !delivery.getMail().isEmpty());

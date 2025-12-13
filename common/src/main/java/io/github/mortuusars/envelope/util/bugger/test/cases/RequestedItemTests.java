@@ -58,19 +58,19 @@ public class RequestedItemTests extends BuggerTests {
 
     private void componentMatching() {
         RequestedItem requestedItem = new RequestedItem(Items.FEATHER, 3, DataComponentPredicate.builder()
-              .expect(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE)
+              .expect(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE)
               .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
               .expect(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5)
               .build());
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
-        stack.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
+        stack.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
         stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5);
         add("RequestedItem_componentMatching", Test.isTrue(() -> requestedItem.matches(stack)));
 
         ItemStack stack2 = stack.copy();
-        stack2.remove(Envelope.DataComponents.MAIL_SENDER);
+        stack2.remove(Envelope.DataComponents.SENDER);
         add("RequestedItem_componentMatching_failsWhenMissing", Test.isFalse(() -> requestedItem.matches(stack2)));
     }
 
@@ -103,8 +103,8 @@ public class RequestedItemTests extends BuggerTests {
               Test.isTrue(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-                  stack.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
-                  stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new Address.Pigeonhole("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
+                  stack.set(Envelope.DataComponents.RECIPIENT, new Address.Pigeonhole("Mortuusars Laboratory"));
                   return decodeFromJson(json).matches(stack);
               }));
     }

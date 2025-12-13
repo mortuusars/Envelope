@@ -9,8 +9,8 @@ import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
-import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.Payback;
@@ -64,11 +64,17 @@ public class EnvelopeCommand {
         ItemStack mail = item.createItemStack(1, false);
 
         try {
-            Courier courier = level.getEnvelopeContext().startServiceDelivery(mail);
-            Delivery delivery = courier.getDelivery().orElseThrow();
-            Component message = Component.literal("Mail sent to ")
-                  .append(delivery.getRecipient().format().asRecipient().toComponent());
-            context.getSource().sendSuccess(() -> message, true);
+            Delivery.create(level, new Mail(mail), DeliveryOrigin.service()).ifPresentOrElse(
+                  delivery -> {
+                      level.getEnvelopeContext().startServiceDelivery(delivery);
+                      Component message = Component.literal("Mail sent to ")
+                            .append(delivery.getRecipient().format().asRecipient().toComponent());
+                      context.getSource().sendSuccess(() -> message, true);
+                  },
+                  error -> {
+                      error.log(Envelope.LOGGER);
+                      context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()));
+                  });
         } catch (Exception e) {
             context.getSource().sendFailure(Component.literal("Cannot send: " + e.getMessage()));
         }
@@ -186,17 +192,17 @@ public class EnvelopeCommand {
 
         ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
         pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
-        pkg.set(Envelope.DataComponents.MAIL_SENDER, new Address.Pigeonhole("Original-Sender"));
-        pkg.set(Envelope.DataComponents.MAIL_RECIPIENT, new Address.Pigeonhole("Base"));
+        pkg.set(Envelope.DataComponents.SENDER, new Address.Pigeonhole("Original-Sender"));
+        pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Pigeonhole("Base"));
         pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
               new RequestedItem(Items.EMERALD, 3), new RequestedItem(Items.BARREL, 35))));
 
         Mail mail = new Mail(pkg);
 
         ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
-        paybackPackage.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, new StoredItemStack(mail.getItemCopy()));
-        paybackPackage.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
-        paybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, mail.getRecipientOrElse(Address.UNKNOWN));
+        paybackPackage.set(Envelope.DataComponents.PAYBACK_SUBJECT, new StoredItemStack(mail.getItemCopy()));
+        paybackPackage.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
+        paybackPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
 
         Containers.dropItemStack(context.getSource().getLevel(), player.getX(), player.getY(), player.getZ(), paybackPackage);
 

@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -22,7 +21,7 @@ public class PaybackPackingMenu extends PackingMenu {
 
     protected PaybackPackingMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
         super(menuType, containerId, playerInventory, hand);
-        this.paybackItem = getBoxStack().getOrDefault(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, StoredItemStack.EMPTY);
+        this.paybackItem = getBoxStack().getOrDefault(Envelope.DataComponents.PAYBACK_SUBJECT, StoredItemStack.EMPTY);
         this.payback = Objects.requireNonNull(paybackItem.getForReading().get(Envelope.DataComponents.PAYBACK));
 
         addSlot(new Slot(new SimpleContainer(paybackItem.getForReading()), 0, 21, 42) {
@@ -119,8 +118,8 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
-        stack.remove(Envelope.DataComponents.MAIL_SENDER);
-        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, getPaybackSubject().getForReading().get(Envelope.DataComponents.MAIL_SENDER));
+        stack.remove(Envelope.DataComponents.SENDER);
+        stack.set(Envelope.DataComponents.RECIPIENT, getPaybackSubject().getForReading().get(Envelope.DataComponents.SENDER));
         return stack;
     }
 

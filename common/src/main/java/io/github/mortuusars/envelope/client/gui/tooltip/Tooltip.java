@@ -19,8 +19,8 @@ public class Tooltip {
                 return;
             }
 
-            @Nullable Address sender = stack.get(Envelope.DataComponents.MAIL_SENDER);
-            @Nullable Address recipient = stack.get(Envelope.DataComponents.MAIL_RECIPIENT);
+            @Nullable Address sender = stack.get(Envelope.DataComponents.SENDER);
+            @Nullable Address recipient = stack.get(Envelope.DataComponents.RECIPIENT);
 
             if (Screen.hasShiftDown()) {
                 if (sender != null) {

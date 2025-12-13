@@ -35,10 +35,6 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
           DeliveryRecord::new
     );
 
-    public DeliveryRecord(Status status, Address address) {
-        this(status, address, Optional.empty(), Optional.empty());
-    }
-
     public DeliveryRecord atTime(long timestamp) {
         return new DeliveryRecord(status, address, Optional.of(timestamp), message);
     }
@@ -47,37 +43,18 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
         return new DeliveryRecord(status, address, timestamp, Optional.of(message));
     }
 
-    public DeliveryRecord withMessage(Optional<Component> message) {
-        return new DeliveryRecord(status, address, timestamp, message);
-    }
-
-    public DeliveryRecord withOperatorMessage(Optional<Component> operator) {
-        return new DeliveryRecord(status, address, timestamp,
-              operator.map(name -> Component.translatable("gui.envelope.delivery.log.record.message.by", name)));
-    }
-
     // --
 
-    public static DeliveryRecord sentFrom(Address address) {
-        return new DeliveryRecord(Status.SENT, address);
+    public static Builder sentFrom(Address address) {
+        return new Builder(Status.SENT, address);
     }
 
-    public static DeliveryRecord arrivedTo(Address address) {
-        return new DeliveryRecord(Status.ARRIVED, address);
+    public static Builder arrivedTo(Address address) {
+        return new Builder(Status.ARRIVED, address);
     }
 
-    public static DeliveryRecord returnedFrom(Address address) {
-        return new DeliveryRecord(Status.RETURNED, address);
-    }
-
-    public static DeliveryRecord returned_recipientNotFound() {
-        return new DeliveryRecord(Status.RETURNED, Address.MAIL_SERVICE, Optional.empty(),
-              Optional.of(Component.translatable("gui.envelope.delivery.log.message.recipient_not_found")));
-    }
-
-    public static DeliveryRecord returned_unableToReach() {
-        return new DeliveryRecord(Status.RETURNED, Address.MAIL_SERVICE, Optional.empty(),
-              Optional.of(Component.translatable("gui.envelope.delivery.log.message.unable_to_reach")));
+    public static Builder returnedFrom(Address address) {
+        return new Builder(Status.ARRIVED, address);
     }
 
     // --
@@ -113,6 +90,34 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
 
     // --
 
+    public static class Builder {
+        private final Status status;
+        private final Address address;
+        private Optional<Long> timestamp = Optional.empty();
+        private Optional<Component> message = Optional.empty();
+
+        public Builder(Status status, Address address) {
+            this.status = status;
+            this.address = address;
+        }
+
+        public Builder at(long timestamp) {
+            this.timestamp = Optional.of(timestamp);
+            return this;
+        }
+
+        public Builder withMessage(Component message) {
+            this.message = Optional.ofNullable(message);
+            return this;
+        }
+
+        public DeliveryRecord build() {
+            return new DeliveryRecord(status, address, timestamp, message);
+        }
+    }
+
+    // --
+
     public enum Status implements StringRepresentable {
         SENT("sent", false),
         ARRIVED("arrived", false),
@@ -144,5 +149,16 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
         public MutableComponent translate() {
             return Component.translatable("gui.envelope.delivery.log.status." + getSerializedName());
         }
+    }
+
+    public interface Message {
+        Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery.log.message.recipient_not_found");
+        Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery.log.message.unable_to_reach");
+
+        Component WAITING_FOR_PAYMENT = Component.translatable("gui.envelope.delivery.log.message.waiting_for_payment");
+        Component PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery.log.message.payback_subject_not_found");
+        Component PAYBACK_FULFILLED = Component.translatable("gui.envelope.delivery.log.message.payback_fulfilled");
+        Component PAYBACK_IS_NOT_VALID = Component.translatable("gui.envelope.delivery.log.message.payback_is_not_valid");
+        Component PAYBACK_IS_TIMED_OUT = Component.translatable("gui.envelope.delivery.log.message.payback_is_timed_out");
     }
 }

@@ -52,6 +52,12 @@ public record DeliveryLog(List<DeliveryRecord> records) {
         return new DeliveryLog(records);
     }
 
+    public DeliveryLog append(DeliveryRecord.Builder recordBuilder) {
+        List<DeliveryRecord> records = new ArrayList<>(this.records);
+        records.add(recordBuilder.build());
+        return new DeliveryLog(records);
+    }
+
     public DeliveryLog append(DeliveryRecord... records) {
         List<DeliveryRecord> recordsList = new ArrayList<>(this.records);
         recordsList.addAll(List.of(records));

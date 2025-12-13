@@ -11,13 +11,13 @@ import net.minecraft.world.item.ItemStack;
 public class StoredMail extends Mail {
     public static final Codec<StoredMail> CODEC = RecordCodecBuilder.create(i -> i.group(
           ItemStack.OPTIONAL_CODEC.optionalFieldOf("item", ItemStack.EMPTY).forGetter(StoredMail::getItemForReading),
-          DeliveryLog.CODEC.optionalFieldOf("log", DeliveryLog.EMPTY).forGetter(StoredMail::getDeliveryLog),
+          DeliveryLog.CODEC.optionalFieldOf("log", DeliveryLog.EMPTY).forGetter(StoredMail::getLog),
           MailId.CODEC.fieldOf("id").forGetter(StoredMail::getId)
     ).apply(i, StoredMail::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, StoredMail> STREAM_CODEC = StreamCodec.composite(
           ItemStack.STREAM_CODEC, StoredMail::getItemForReading,
-          DeliveryLog.STREAM_CODEC, StoredMail::getDeliveryLog,
+          DeliveryLog.STREAM_CODEC, StoredMail::getLog,
           MailId.STREAM_CODEC, StoredMail::getId,
           StoredMail::new
     );

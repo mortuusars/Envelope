@@ -33,6 +33,9 @@ public class EnvelopeBuggerPage implements BuggerPage {
                         ""
                   ));
 
+                  lines.add("Mail Awaiting Payback: " + tag.getInt("mail_awaiting_payback"));
+                  lines.add("");
+
                   ListTag deliveries = tag.getList("deliveries", Tag.TAG_STRING);
                   if (!deliveries.isEmpty()) {
                       lines.add("Deliveries:");

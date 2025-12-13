@@ -42,7 +42,25 @@ public final class Payback {
     public boolean matches(Container container) {
         for (int slot = 0; slot < items().size(); slot++) {
             RequestedItem requestedItem = items().get(slot);
+            if (slot >= container.getContainerSize()) {
+                return false;
+            }
             ItemStack stack = container.getItem(slot);
+            if (!requestedItem.matches(stack)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean matches(PackageContents packageContents) {
+        for (int slot = 0; slot < items().size(); slot++) {
+            RequestedItem requestedItem = items().get(slot);
+            if (slot >= packageContents.size()) {
+                return false;
+            }
+            ItemStack stack = packageContents.getItemForReading(slot);
             if (!requestedItem.matches(stack)) {
                 return false;
             }

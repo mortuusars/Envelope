@@ -28,8 +28,7 @@ public class DeliveryRoute {
 
     public static final int DEFAULT_ASCEND_DISTANCE = 12;
 
-    public static final DeliveryRoute EMPTY = new DeliveryRoute(
-          Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    public static final DeliveryRoute EMPTY = new DeliveryRoute(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
     private final Optional<BlockPos> senderPos;
     private final Optional<BlockPos> senderAscendPos;

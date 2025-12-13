@@ -38,7 +38,7 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
     }
 
     public boolean openPackingGui(Player player, InteractionHand hand, ItemStack stack) {
-        @Nullable StoredItemStack paybackItem = stack.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
+        @Nullable StoredItemStack paybackItem = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
         if (paybackItem == null || paybackItem.isEmpty() || !paybackItem.getForReading().has(Envelope.DataComponents.PAYBACK)) {
             return false;
         }

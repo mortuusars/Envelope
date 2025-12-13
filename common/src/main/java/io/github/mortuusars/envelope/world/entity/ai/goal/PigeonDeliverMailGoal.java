@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -68,7 +69,7 @@ public class PigeonDeliverMailGoal extends Goal implements DeliveryHandler {
     public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
             // Longer approach/depart phases to allow for pathfinding to finish
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> Ticks.fromSeconds(30);
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> (int)Ticks.fromSeconds(30);
             default -> DeliveryHandler.super.getPhaseDuration(level, delivery, phase);
         };
     }
@@ -85,12 +86,14 @@ public class PigeonDeliverMailGoal extends Goal implements DeliveryHandler {
     @Override
     public DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_unableToReach())));
+            delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                  .withMessage(DeliveryRecord.Message.UNABLE_TO_REACH)));
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
         if (currentPhase == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
-            delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_unableToReach())));
+            delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                  .withMessage(DeliveryRecord.Message.UNABLE_TO_REACH)));
             return DeliveryPhase.DEPARTING_RECIPIENT;
         }
 

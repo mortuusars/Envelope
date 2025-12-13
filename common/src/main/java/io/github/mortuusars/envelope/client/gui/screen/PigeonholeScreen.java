@@ -427,7 +427,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                   .toComponent());
         }
 
-        DeliveryLog deliveryLog = hoveredMail.getDeliveryLog();
+        DeliveryLog deliveryLog = hoveredMail.getLog();
 
         if (!Screen.hasShiftDown() || deliveryLog.isEmpty()) {
             deliveryLog.getLastExceptionRecord().ifPresent(record -> {
@@ -611,13 +611,13 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     // --
 
     protected Address getDisplayedSender(StoredMail mail) {
-        return mail.getDeliveryLog().getLastExceptionRecord()
+        return mail.getLog().getLastExceptionRecord()
               .map(DeliveryRecord::address)
-              .orElse(mail.getSenderOrElse(Address.UNKNOWN));
+              .orElse(mail.getSender());
     }
 
     protected WidgetSprites getMailIconSprites(StoredMail mail) {
-        return mail.getDeliveryLog().getLastExceptionRecord()
+        return mail.getLog().getLastExceptionRecord()
               .map(record -> switch (record.status()) {
                   case RETURNED -> ICON_RETURNED_SPRITES;
                   case REJECTED -> ICON_REJECTED_SPRITES;
@@ -625,7 +625,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                   default -> throw new IllegalStateException("Unexpected value: " + record.status());
               })
               .orElseGet(() -> {
-                  Address sender = mail.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);
+                  Address sender = mail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN);
                   if (sender == Address.UNKNOWN) return ICON_ADDRESS_UNKNOWN_SPRITES;
                   if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
                   if (sender.type() == Address.Type.PIGEONHOLE) return ICON_ADDRESS_PIGEONHOLE_SPRITES;

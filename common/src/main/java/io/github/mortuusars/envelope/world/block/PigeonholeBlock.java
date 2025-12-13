@@ -259,12 +259,12 @@ public class PigeonholeBlock extends BaseEntityBlock {
         }
 
         if (stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Pigeonhole pigeonhole
+              && stack.get(Envelope.DataComponents.RECIPIENT) instanceof Address.Pigeonhole pigeonhole
               && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
               && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
             if (level instanceof ServerLevel serverLevel) {
-                if (!stack.has(Envelope.DataComponents.MAIL_SENDER)) {
-                    stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
+                if (!stack.has(Envelope.DataComponents.SENDER)) {
+                    stack.set(Envelope.DataComponents.SENDER, new Address.Player(player));
                 }
 
                 Mail result = blockEntity.getAddress().orElseThrow().receiveMail(serverLevel, new Mail(stack));

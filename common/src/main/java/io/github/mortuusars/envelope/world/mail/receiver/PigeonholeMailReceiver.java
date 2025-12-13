@@ -27,21 +27,18 @@ public class PigeonholeMailReceiver implements MailReceiver {
 
         return pigeonholeManager.getBlockEntityOf(address)
               .map(blockEntity -> {
-                  blockEntity.insertMail(
-                        mail.writeToLog(log -> log.append(DeliveryRecord.arrivedTo(address).atTime(level.getGameTime())))
-                  );
+                  blockEntity.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
                   return Mail.EMPTY;
               })
               .orElseGet(() -> pigeonholeManager.getData(address)
                     .map(data -> {
-                        data.insertMail(
-                              mail.writeToLog(log -> log.append(DeliveryRecord.arrivedTo(address).atTime(level.getGameTime())))
-                        );
+                        data.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
                         return Mail.EMPTY;
                     })
                     .orElseGet(() -> {
                         LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
-                        return mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound()));
+                        return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                              .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
                     }));
     }
 }

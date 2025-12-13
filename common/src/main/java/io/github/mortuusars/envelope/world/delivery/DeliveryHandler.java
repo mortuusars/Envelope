@@ -5,13 +5,8 @@ import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
-import io.github.mortuusars.envelope.world.item.component.Payback;
-import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
-import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public interface DeliveryHandler {
     void endDelivery(ServerLevel level, Delivery delivery);
@@ -19,24 +14,8 @@ public interface DeliveryHandler {
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT) {
             if (!level.getEnvelopeContext().addresses().canDeliverMailTo(delivery.getRecipient())) {
-                delivery.updateMail(mail -> mail.writeToLog(log -> log.append(DeliveryRecord.returned_recipientNotFound())));
-                return DeliveryPhase.APPROACHING_SENDER;
-            }
-
-            @Nullable Payback payback = delivery.getMail().get(Envelope.DataComponents.PAYBACK);
-            if (payback != null) {
-                ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
-                paybackPackage.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, new StoredItemStack(delivery.getMail().getItemCopy()));
-                paybackPackage.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
-                paybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, delivery.getMail().getRecipientOrElse(Address.UNKNOWN));
-
-                level.getEnvelopeContext().startServiceDelivery(paybackPackage);
-
-                //TODO: write "arrived at depot" (or something) to the log
-                //TODO: store in the mail service
-                //TODO: await payback fulfilment
-
-                delivery.setMail(new Mail(ItemStack.EMPTY));
+                delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                      .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
                 return DeliveryPhase.APPROACHING_SENDER;
             }
         }
@@ -56,18 +35,18 @@ public interface DeliveryHandler {
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> Ticks.fromSeconds(5);
-            case LOCATING_RECIPIENT, TRAVELING_TO_RECIPIENT -> delivery.getTravelDuration() / 2;
-            case TRAVELING_TO_SENDER -> delivery.getTravelDuration();
-            case HANDLING_DELIVERY, HANDLING_RETURN -> Ticks.fromSeconds(0.20f);
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> (int)Ticks.fromSeconds(5);
+            case LOCATING_RECIPIENT, TRAVELING_TO_RECIPIENT -> delivery.getTravelDuration().ticks() / 2;
+            case TRAVELING_TO_SENDER -> delivery.getTravelDuration().ticks();
+            case HANDLING_DELIVERY, HANDLING_RETURN -> (int)Ticks.fromSeconds(0.20f);
             case STARTED, FINISHED -> 1;
         };
     }
 
     default void phaseStarted(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         if (phase == DeliveryPhase.STARTED) {
-            delivery.updateMail(mail -> mail.writeToLog(log ->
-                  log.append(DeliveryRecord.sentFrom(mail.getSenderOrElse(Address.UNKNOWN)).atTime(level.getGameTime()))));
+            delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.sentFrom(delivery.getSender())
+                  .at(level.getGameTime())));
         }
     }
 

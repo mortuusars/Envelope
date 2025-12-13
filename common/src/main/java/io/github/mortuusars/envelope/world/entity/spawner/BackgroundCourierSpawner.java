@@ -47,8 +47,8 @@ public class BackgroundCourierSpawner implements CustomSpawner {
             return;
         }
 
-        @Nullable Entity entity = backgroundCourier.getEntityData().createEntity(level);
-        if (entity instanceof TransitionableCourier<?> courier) {
+        @Nullable Entity entity = backgroundCourier.entityData().createEntity(level);
+        if (entity instanceof TransitionableCourier courier) {
             entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
 
             level.addFreshEntityWithPassengers(entity);

@@ -411,24 +411,29 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         ItemStack mail = getItem(SLOT_MAIL);
-        if (mail.isEmpty() || !mail.has(Envelope.DataComponents.MAIL_RECIPIENT)) {
+        if (mail.isEmpty() || !mail.has(Envelope.DataComponents.RECIPIENT)) {
             return;
         }
 
         mail = mail.copyWithCount(1);
 
-        mail.set(Envelope.DataComponents.MAIL_SENDER, address);
+        mail.set(Envelope.DataComponents.SENDER, address);
 
-        Address recipient = mail.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
+        Address recipient = mail.getOrDefault(Envelope.DataComponents.RECIPIENT, Address.UNKNOWN);
 
         if (level.getEnvelopeContext().addresses().resolve(recipient).matches(this.address)) {
             return;
         }
 
-        pigeon.startDelivery(Delivery.create(level, mail, DeliveryOrigin.real(getBlockPos())));
-
-        removeItem(SLOT_MAIL, 1);
-        removeItem(SLOT_FOOD, 1);
+        Delivery.create(level, new Mail(mail), DeliveryOrigin.local(getBlockPos()))
+              .ifPresentOrElse(
+                    delivery -> {
+                        pigeon.startDelivery(delivery);
+                        removeItem(SLOT_MAIL, 1);
+                        removeItem(SLOT_FOOD, 1);
+                    },
+                    error -> error.log(Envelope.LOGGER)
+              );
     }
 
     @Override

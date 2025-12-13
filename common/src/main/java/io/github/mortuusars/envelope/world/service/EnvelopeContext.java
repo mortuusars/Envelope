@@ -8,12 +8,15 @@ import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.DeliveryProgress;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressHelper;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
+import io.github.mortuusars.envelope.world.mail.entity.MailService;
 import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
@@ -42,10 +45,11 @@ public class EnvelopeContext {
     protected final ServerLevel level;
     protected final PigeonholeManager pigeonholeManager;
     protected final MailEntities mailEntities;
+    protected final AddressHelper addressHelper;
+    protected final MailService mailService;
 
     protected @Nullable Players players;
     protected @Nullable BackgroundDelivery backgroundDelivery;
-    protected AddressHelper addressHelper;
 
     public EnvelopeContext(ServerLevel level) {
         Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "EnvelopeContext can exist only on overworld level.");
@@ -53,7 +57,9 @@ public class EnvelopeContext {
         this.pigeonholeManager = new PigeonholeManager(level);
         this.mailEntities = new MailEntities();
         this.addressHelper = new AddressHelper(this);
+        this.mailService = new MailService(level);
 
+        this.mailEntities.register(mailService);
         this.mailEntities.register(new VillagerMailEntity(new Address.Entity("Villager"), 1500));
     }
 
@@ -77,6 +83,10 @@ public class EnvelopeContext {
         return mailEntities;
     }
 
+    public MailService getMailService() {
+        return mailService;
+    }
+
     public @NotNull Players getPlayers() {
         return players == null
               ? players = Players.get(level, "envelope_players")
@@ -95,9 +105,7 @@ public class EnvelopeContext {
 
     // --
 
-    public Courier startServiceDelivery(ItemStack mail) {
-        Delivery delivery = Delivery.create(level, mail, DeliveryOrigin.service());
-
+    public Courier startServiceDelivery(Delivery delivery) {
         Pigeon deliveringPigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
               "Failed to create an entity. This should not happen.");
 
@@ -128,6 +136,7 @@ public class EnvelopeContext {
 
     public void tick() {
         getBackgroundDelivery().tick(level);
+        getMailService().tick();
 
         if (level.getGameTime() % 20 == 0) {
             Bugger.ENVELOPE.sendValues(this::collectDebugInfo);
@@ -144,6 +153,8 @@ public class EnvelopeContext {
         tag.putInt("delivering_pigeons", pigeons.size());
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
         tag.putInt("background_finished_pigeons", getBackgroundDelivery().getFinishedCouriers().size());
+
+        tag.putInt("mail_awaiting_payback", getMailService().getData().getMailAwaitingPayback().size());
 
         ListTag deliveries = Stream.concat(
                     pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
@@ -163,7 +174,7 @@ public class EnvelopeContext {
               ChatFormatting.GRAY +
               (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
               addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
-              " | ⌚" + delivery.getTravelDuration() / 20 + "s" +
+              " | ⌚" + delivery.getTravelDuration().seconds() + "s" +
               (delivery.getOrigin().isService() ? " | Service" : "") +
               ChatFormatting.RESET +
 
