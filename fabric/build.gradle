@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow"
+    id "com.gradleup.shadow"
 }
 
 architectury {
@@ -32,10 +32,9 @@ dependencies {
     modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forge_config_api_port_version}")
 
     modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
-    modRuntimeOnly("maven.modrinth:modmenu:YIfqIJ8q")
-    modRuntimeOnly("maven.modrinth:jade:15.10.0+fabric")
-    modRuntimeOnly("maven.modrinth:sodium:mc1.21.1-0.6.13-fabric")
-    // modRuntimeOnly("maven.modrinth:iris:1.8.8+1.21.1-fabric")
+    modRuntimeOnly("maven.modrinth:modmenu:${modmenu_version}")
+    modRuntimeOnly("maven.modrinth:jade:${jade_version}+fabric")
+    modRuntimeOnly("maven.modrinth:sodium:${sodium_version}-fabric")
 
     modRuntimeOnly("tschipp.carryon:carryon-fabric-${minecraft_version}:${carry_on_version}") { transitive false }
 
@@ -69,9 +68,4 @@ shadowJar {
 remapJar {
     injectAccessWidener = true
     input.set shadowJar.archiveFile
-    dependsOn shadowJar
-}
-
-fabricApi {
-    configureDataGeneration()
 }

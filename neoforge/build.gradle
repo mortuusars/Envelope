@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow"
+    id "com.gradleup.shadow"
 }
 
 architectury {
@@ -31,8 +31,10 @@ dependencies {
     implementation(include("io.github.llamalad7:mixinextras-neoforge:0.4.1"))
 
     modRuntimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
-    modRuntimeOnly("curse.maven:jade-324717:${jade_neoforge_id}") { transitive = false }
+
+    modRuntimeOnly("maven.modrinth:jade:${jade_version}+neoforge") { transitive = false }
     modRuntimeOnly("curse.maven:embeddium-908741:6118392")
+    //modRuntimeOnly("maven.modrinth:sodium:${sodium_version}-neoforge") // Doesn't want to work
 
     modRuntimeOnly("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}" )
 
@@ -71,6 +73,5 @@ shadowJar {
 remapJar {
     injectAccessWidener = true
     atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
-    input.set shadowJar.archiveFile
-    dependsOn shadowJar
+    inputFile.set shadowJar.archiveFile
 }
