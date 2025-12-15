@@ -1,10 +1,12 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Pos2i;
 import io.github.mortuusars.envelope.util.ItemAndStack;
+import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
+import io.github.mortuusars.envelope.world.inventory.slot.FilteredSlot;
 import io.github.mortuusars.envelope.world.item.PaybackTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.Payback;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,7 +44,6 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     private final int tagSlot;
     private final ItemAndStack<Item> tagStack;
     private final SimpleContainer paybackContainer;
-    protected Pos2i tagSlotPos = new Pos2i(-999, -999);
 
     protected PaybackTagMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
         super(menuType, containerId);
@@ -53,7 +54,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
         this.paybackContainer = createPaybackContainer();
 
         addPaybackSlots();
-        addPlayerSlots(playerInventory, 13, 68, tagSlot);
+        addPlayerSlots(playerInventory, 13, 72, tagSlot);
     }
 
     public PaybackTagMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -85,57 +86,37 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
     protected void addPaybackSlots() {
         int slotsX = 67;
-        int slotsY = 18;
+        int slotsY = 20;
 
         for (int row = 0; row < 2; row++) {
             for (int column = 0; column < 3; column++) {
                 int index = column + row * 3;
                 int x = slotsX + column * 18;
                 int y = slotsY + row * 18;
-                addSlot(new Slot(paybackContainer, index, x, y) {
-                    @Override
-                    public boolean mayPlace(ItemStack stack) {
-                        //TODO: Maybe find a better place for valid items check. And maybe even add additional filters for payback.
-                        return Envelope.Items.PACKING_BOX.get().canInsert(stack);
-                    }
-
-                    @Override
-                    public void set(ItemStack stack) {
-                        // stack = new ItemStack(stack.getItem(), stack.getCount()); // Remove components
-                        super.set(stack);
-                    }
-                });
+                addSlot(new FilteredSlot(paybackContainer, index, x, y, Payback::isValidPaybackItem));
             }
         }
     }
 
-    protected void addPlayerSlots(Container playerInventory, int x, int y, int packageSlot) {
+    protected void addPlayerSlots(Container inventory, int x, int y, int tagSlot) {
         // Hotbar
-        for (int slot = 0; slot < 9; slot++) {
-            int slotX = x + slot * 18;
+        for (int index = 0; index < 9; index++) {
+            int slotX = x + index * 18;
             int slotY = y + 58;
-
-            if (slot == packageSlot) {
-                tagSlotPos = new Pos2i(slotX, slotY);
-                continue;
-            }
-
-            addSlot(new Slot(playerInventory, slot, slotX, slotY));
+            addSlot(index == tagSlot
+                  ? new DisabledSlot(inventory, index, slotX, slotY)
+                  : new Slot(inventory, index, slotX, slotY));
         }
 
         // Inventory
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
-                int slot = (column + row * 9) + 9;
+                int index = (column + row * 9) + 9;
                 int slotX = x + column * 18;
                 int slotY = y + row * 18;
-
-                if (slot == packageSlot) {
-                    tagSlotPos = new Pos2i(slotX, slotY);
-                    continue;
-                }
-
-                addSlot(new Slot(playerInventory, slot, slotX, slotY));
+                addSlot(index == tagSlot
+                      ? new DisabledSlot(inventory, index, slotX, slotY)
+                      : new Slot(inventory, index, slotX, slotY));
             }
         }
     }
@@ -156,10 +137,6 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
     public ItemAndStack<Item> getTag() {
         return tagStack;
-    }
-
-    public Pos2i getTagSlotPos() {
-        return tagSlotPos;
     }
 
     // --

@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item.component;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -10,10 +11,9 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-public final class Payback {
+public record Payback(List<RequestedItem> items) {
     public static final int SLOTS = 6;
     public static final Payback DEFAULT = new Payback(List.of(RequestedItem.DEFAULT));
 
@@ -22,11 +22,9 @@ public final class Payback {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Payback> STREAM_CODEC =
           RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(Payback::new, Payback::items);
-    private final List<RequestedItem> items;
 
-    private Payback(List<RequestedItem> items) {
-        Preconditions.checkArgument(!items.isEmpty(), "Payback items must have at least one requested item.");
-        this.items = items;
+    public Payback {
+        Preconditions.checkArgument(!items.isEmpty(), "Payback must have at least one requested item.");
     }
 
     public static Optional<Payback> create(List<RequestedItem> items) {
@@ -69,27 +67,13 @@ public final class Payback {
         return true;
     }
 
-    public List<RequestedItem> items() {
-        return items;
+    public Optional<RequestedItem> getRequestedItem(int index) {
+        return index < items.size() ? Optional.of(items.get(index)) : Optional.empty();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Payback) obj;
-        return Objects.equals(this.items, that.items);
-    }
+    // --
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(items);
+    public static boolean isValidPaybackItem(ItemStack stack) {
+        return Envelope.Items.PACKING_BOX.get().canInsert(stack) && !stack.is(Envelope.Tags.Items.CANNOT_BE_USED_AS_PAYBACK);
     }
-
-    @Override
-    public String toString() {
-        return "Payback[" +
-              "items=" + items + ']';
-    }
-
 }

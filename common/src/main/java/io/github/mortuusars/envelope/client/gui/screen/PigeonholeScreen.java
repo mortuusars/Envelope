@@ -155,17 +155,19 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         mailArea = new Rect2i(leftPos + 8, topPos + 32, 117, 162);
         scrollBarArea = new Rect2i(leftPos + 128, topPos + 33, 6, 161);
 
-        addressButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10, ADDRESS_BUTTON_SPRITES, btn -> {
-            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.ADDRESS_BUTTON_ID);
-        }, Component.translatable("gui.envelope.pigeonhole.address"));
+        addressButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10,
+              ADDRESS_BUTTON_SPRITES,
+              button -> setAsDefaultAddress(),
+              Component.translatable("gui.envelope.pigeonhole.address"));
         addressButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
               .append("\n")
               .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
         addRenderableWidget(addressButton);
 
-        addressAttentionButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10, ADDRESS_ATTENTION_BUTTON_SPRITES, btn -> {
-            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.ADDRESS_BUTTON_ID);
-        }, Component.translatable("gui.envelope.pigeonhole.address"));
+        addressAttentionButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10,
+              ADDRESS_ATTENTION_BUTTON_SPRITES,
+              button -> setAsDefaultAddress(),
+              Component.translatable("gui.envelope.pigeonhole.address"));
         addressAttentionButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
               .append("\n")
               .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
@@ -179,16 +181,26 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         addressDefaultButton.active = false;
         addRenderableWidget(addressDefaultButton);
 
-        newMailButton = new ImageButton(leftPos + 7, topPos + 21, 8, 8, NEW_MAIL_INDICATOR_SPRITES, btn -> {
-            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.REFRESH_MAIL_BUTTON_ID);
-            scrollTo(0);
-        });
+        newMailButton = new ImageButton(leftPos + 7, topPos + 21, 8, 8,
+              NEW_MAIL_INDICATOR_SPRITES,
+              button -> {
+                  refreshMail();
+                  scrollTo(0);
+              });
         newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail")
               .append("\n")
               .append(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh"))));
         addRenderableWidget(newMailButton);
 
         updateButtons();
+    }
+
+    protected void setAsDefaultAddress() {
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.ADDRESS_BUTTON_ID);
+    }
+
+    protected void refreshMail() {
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PigeonholeMenu.REFRESH_MAIL_BUTTON_ID);
     }
 
     protected void updateScrollThumb() {

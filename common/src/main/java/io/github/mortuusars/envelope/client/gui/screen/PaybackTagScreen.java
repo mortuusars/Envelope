@@ -1,11 +1,12 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.client.util.Pos2i;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
+import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.item.component.Payback;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -31,14 +32,14 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
     @Override
     protected void init() {
         imageWidth = 186;
-        imageHeight = 150;
+        imageHeight = 154;
         super.init();
         inventoryLabelY = imageHeight - 94;
         inventoryLabelX = 12;
 
         titleLabelX = (imageWidth / 2) - (font.width(getTitle()) / 2);
 
-        confirmButton = new ImageButton(leftPos + 128, topPos + 26, 19, 19,
+        confirmButton = new ImageButton(leftPos + 128, topPos + 28, 19, 19,
               Sprites.CONFIRM_BUTTON_SPRITES, button -> confirm(), Component.translatable("gui.envelope.confirm"));
         confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
         addRenderableWidget(confirmButton);
@@ -53,38 +54,36 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        for (int i = 0; i < Payback.SLOTS; i++) {
-            Slot paybackSlot = getMenu().slots.get(i);
-            guiGraphics.fill(
-                  leftPos + paybackSlot.x - 1, topPos + paybackSlot.y - 1,
-                  leftPos + paybackSlot.x + 17, topPos + paybackSlot.y + 17,
-                  0x55e0bfbf);
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0, 0, 290);
-            guiGraphics.fill(
-                  leftPos + paybackSlot.x - 1, topPos + paybackSlot.y - 1,
-                  leftPos + paybackSlot.x + 17, topPos + paybackSlot.y + 17,
-                  0x11FFFFFF);
-            guiGraphics.pose().popPose();
-        }
-
         renderTargetPreview(guiGraphics, mouseX, mouseY);
         renderTooltip(guiGraphics, mouseX, mouseY);
-
-        Pos2i packageSlotPos = getMenu().getTagSlotPos();
-        guiGraphics.renderItem(getMenu().getTag().getItemStack(), leftPos + packageSlotPos.x, topPos + packageSlotPos.y);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0, 300);
-        RenderSystem.enableBlend();
-        guiGraphics.blit(TEXTURE, leftPos + packageSlotPos.x - 1, topPos + packageSlotPos.y - 1, 186, 0, 18, 18);
-        RenderSystem.disableBlend();
-        guiGraphics.pose().popPose();
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+    }
+
+    @Override
+    protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+        super.renderSlot(guiGraphics, slot);
+
+        if (slot instanceof DisabledSlot) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(0, 0, 300);
+            RenderSystem.enableBlend();
+            guiGraphics.blit(TEXTURE, slot.x - 1, slot.y - 1, 186, 0, 18, 18);
+            RenderSystem.disableBlend();
+            guiGraphics.pose().popPose();
+        }
+
+        if (slot.index < Payback.SLOTS) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(0, 0, 300);
+            RenderSystem.enableBlend();
+            guiGraphics.blit(TEXTURE, slot.x - 1, slot.y - 1, 186, 18, 18, 18);
+            RenderSystem.disableBlend();
+            guiGraphics.pose().popPose();
+        }
     }
 
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -97,7 +96,7 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
         int size = (int) (16 * scale);
 
         int x = leftPos - size - 4;
-        int y = topPos + 34 - size / 2;
+        int y = topPos + 36 - size / 2;
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2, 0);
@@ -113,7 +112,6 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
 
     // -- Input
 
-
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
@@ -123,13 +121,39 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
         if (hoveredSlot != null && hoveredSlot.index < Payback.SLOTS) {
             boolean decreasing = scrollY < 0;
             boolean fast = Screen.hasShiftDown();
-            int startId = decreasing ? PaybackTagMenu.DECREASE_COUNT_START_BUTTON_ID : PaybackTagMenu.INCREASE_COUNT_START_BUTTON_ID;
-            int id = startId + hoveredSlot.index + (fast ? Payback.SLOTS : 0);
-            getMenu().clickMenuButton(getMenu().getPlayer(), id);
-            Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, id);
+            changeRequestedItemCount(decreasing, fast);
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if ( super.keyPressed(keyCode, scanCode, modifiers)){
+            return true;
+        }
+
+        if (hoveredSlot != null && hoveredSlot.index < Payback.SLOTS) {
+            if (keyCode == InputConstants.KEY_ADD || keyCode == InputConstants.KEY_EQUALS) {
+                changeRequestedItemCount(false, Screen.hasShiftDown());
+                return true;
+            }
+
+            if (keyCode == 333 /*KEY_SUBTRACT*/ || keyCode == InputConstants.KEY_MINUS) {
+                changeRequestedItemCount(true, Screen.hasShiftDown());
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected void changeRequestedItemCount(boolean decreasing, boolean fast) {
+        if (hoveredSlot == null) return;
+        int startId = decreasing ? PaybackTagMenu.DECREASE_COUNT_START_BUTTON_ID : PaybackTagMenu.INCREASE_COUNT_START_BUTTON_ID;
+        int id = startId + hoveredSlot.index + (fast ? Payback.SLOTS : 0);
+        getMenu().clickMenuButton(getMenu().getPlayer(), id);
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, id);
     }
 }

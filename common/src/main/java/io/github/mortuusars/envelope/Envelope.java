@@ -372,20 +372,25 @@ public class Envelope {
         }
 
         public static class Items {
-            public static final TagKey<Item> PIGEONHOLES =
-                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeonholes"));
             public static final TagKey<Item> PIGEON_FOOD =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeon_food"));
+
+            public static final TagKey<Item> PIGEONHOLES =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeonholes"));
             public static final TagKey<Item> WASTE_SCOOPABLE =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("waste_scoopable"));
-            public static final TagKey<Item> MAILABLE =
-                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("mailable"));
-            public static final TagKey<Item> CANNOT_BE_PACKAGED =
-                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cannot_be_packaged"));
+
             public static final TagKey<Item> LETTERS =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("letters"));
             public static final TagKey<Item> PACKAGES =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("packages"));
+            public static final TagKey<Item> MAILABLE =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("mailable"));
+
+            public static final TagKey<Item> CANNOT_BE_PACKAGED =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cannot_be_packaged"));
+            public static final TagKey<Item> CANNOT_BE_USED_AS_PAYBACK =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cannot_be_used_as_payback"));
         }
 
         public static class EntityTypes {

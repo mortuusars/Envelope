@@ -48,6 +48,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     @Override
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
         if (action != ClickAction.SECONDARY) return false;
+        if (!slot.allowModification(player)) return false;
         if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
         if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.RECIPIENT))) return true; // Do nothing

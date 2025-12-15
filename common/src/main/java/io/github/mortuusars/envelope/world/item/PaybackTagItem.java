@@ -54,9 +54,8 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
-        if (action != ClickAction.SECONDARY) {
-            return false;
-        }
+        if (action != ClickAction.SECONDARY) return false;
+        if (!slot.allowModification(player)) return false;
 
         ItemStack target = slot.getItem();
         if (!target.is(Envelope.Tags.Items.MAILABLE)) {

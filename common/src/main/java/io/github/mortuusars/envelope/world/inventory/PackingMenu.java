@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Pos2i;
+import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.item.PackingBox;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -31,10 +32,8 @@ public class PackingMenu extends AbstractContainerMenu {
     private final PackingBox packingBox;
     private final PackageContents initialPackageContents;
     private final boolean canPack;
+    private final SimpleContainer packageContainer;
 
-    protected final SimpleContainer packageContainer;
-
-    protected Pos2i packageSlotPos = new Pos2i(-999, -999);
     protected boolean packed = false;
 
     protected PackingMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -47,9 +46,7 @@ public class PackingMenu extends AbstractContainerMenu {
         this.initialPackageContents = PackageContents.of(packageStack);
         this.canPack = packingBox.canPack(packageStack);
         this.packageContainer = createPackageContainer();
-
-        addPackageSlots();
-        addPlayerSlots(playerInventory, 8, 96, packageSlot);
+        init();
     }
 
     public PackingMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -58,6 +55,11 @@ public class PackingMenu extends AbstractContainerMenu {
 
     public static PackingMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         return new PackingMenu(id, inventory, buffer.readEnum(InteractionHand.class));
+    }
+
+    protected void init() {
+        addPackageSlots();
+        addPlayerSlots(player.getInventory(), 8, 96, packageSlot);
     }
 
     // --
@@ -92,33 +94,25 @@ public class PackingMenu extends AbstractContainerMenu {
         }
     }
 
-    protected void addPlayerSlots(Container playerInventory, int x, int y, int packageSlot) {
+    protected void addPlayerSlots(Container inventory, int x, int y, int packageSlot) {
         // Hotbar
-        for (int slot = 0; slot < 9; slot++) {
-            int slotX = x + slot * 18;
+        for (int index = 0; index < 9; index++) {
+            int slotX = x + index * 18;
             int slotY = y + 58;
-
-            if (slot == packageSlot) {
-                packageSlotPos = new Pos2i(slotX, slotY);
-                continue;
-            }
-
-            addSlot(new Slot(playerInventory, slot, slotX, slotY));
+            addSlot(index == packageSlot
+                  ? new DisabledSlot(inventory, index, slotX, slotY)
+                  : new Slot(inventory, index, slotX, slotY));
         }
 
         // Inventory
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
-                int slot = (column + row * 9) + 9;
+                int index = (column + row * 9) + 9;
                 int slotX = x + column * 18;
                 int slotY = y + row * 18;
-
-                if (slot == packageSlot) {
-                    packageSlotPos = new Pos2i(slotX, slotY);
-                    continue;
-                }
-
-                addSlot(new Slot(playerInventory, slot, slotX, slotY));
+                addSlot(index == packageSlot
+                      ? new DisabledSlot(inventory, index, slotX, slotY)
+                      : new Slot(inventory, index, slotX, slotY));
             }
         }
     }
@@ -153,12 +147,12 @@ public class PackingMenu extends AbstractContainerMenu {
         return PackageContents.of(getBoxStack());
     }
 
-    public Pos2i getPackageSlotPos() {
-        return packageSlotPos;
-    }
-
     public boolean canPack() {
         return canPack;
+    }
+
+    public SimpleContainer getPackageContainer() {
+        return packageContainer;
     }
 
     public boolean needsPacking() {

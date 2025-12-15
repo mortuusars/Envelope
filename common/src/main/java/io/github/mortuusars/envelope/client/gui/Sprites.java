@@ -11,12 +11,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class Sprites {
-    public static WidgetSprites SCROLL_THUMB = threeStates(Envelope.resource("widgets/scroll_thumb"));
-
     public static final WidgetSprites CONFIRM_BUTTON_SPRITES =
-            threeStates(Envelope.resource("widgets/confirm_button"));
+            threeStates(Envelope.resource("button/confirm_button"));
     public static final WidgetSprites CANCEL_BUTTON_SPRITES =
-            threeStates(Envelope.resource("widgets/cancel_button"));
+            threeStates(Envelope.resource("button/cancel_button"));
 
     public static WidgetSprites normalOnly(ResourceLocation base) {
         return new WidgetSprites(base, base);

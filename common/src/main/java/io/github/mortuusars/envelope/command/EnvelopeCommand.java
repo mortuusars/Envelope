@@ -28,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -195,7 +196,7 @@ public class EnvelopeCommand {
         pkg.set(Envelope.DataComponents.SENDER, new Address.Pigeonhole("Original-Sender"));
         pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Pigeonhole("Base"));
         pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
-              new RequestedItem(Items.EMERALD, 3), new RequestedItem(Items.BARREL, 35))));
+              new RequestedItem(Items.EMERALD, 3), new RequestedItem(ItemTags.LOGS, 13))));
 
         Mail mail = new Mail(pkg);
 

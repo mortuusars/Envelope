@@ -28,7 +28,7 @@ public class BuggerDebugScreen {
     private static final List<BuggerPage> pages = new ArrayList<>();
     private static int currentPageIndex;
     private static BuggerPage currentPage;
-    private static int zoom = ((int) Minecrft.get().getWindow().getGuiScale());
+    private static int zoom = 0;
     private static int scroll;
 
     static {
@@ -92,6 +92,10 @@ public class BuggerDebugScreen {
         if (!active()) return false;
 
         Minecraft.getInstance().getProfiler().push("bugger");
+
+        if (zoom == 0) {
+            zoom = ((int) Minecrft.get().getWindow().getGuiScale());
+        }
 
         //noinspection deprecation
         guiGraphics.drawManaged(() -> {
