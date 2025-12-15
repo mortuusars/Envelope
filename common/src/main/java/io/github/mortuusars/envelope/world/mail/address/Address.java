@@ -40,13 +40,13 @@ public interface Address {
     String id();
 
     /**
-     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * @return "Display" name of an address. For Block and Player addresses that's just id.<br>
      * Entity address returns its translation, if present.
      */
     String toString();
 
     /**
-     * @return "Display" name of an address. For Pigeonhole and Player addresses that's just id.<br>
+     * @return "Display" name of an address. For Block and Player addresses that's just id.<br>
      * Entity address returns its translation, if present.
      */
     default MutableComponent getName() {
@@ -57,7 +57,7 @@ public interface Address {
 
     /**
      * Compares "display" name of a current address to the given string (ignoring the case).<br>
-     * Nothing special for Pigeonhole and Player addresses, but Entity address will be compared by its translation, if present.
+     * Nothing special for Block and Player addresses, but Entity address will be compared by its translation, if present.
      *
      * @return {@code true} if names look the same (ignoring the case).
      */
@@ -78,9 +78,9 @@ public interface Address {
         return AddressFormatter.of(this);
     }
 
-    default <R> R map(Function<Pigeonhole, R> ifPigeonhole, Function<Player, R> ifPlayer, Function<Entity, R> ifEntity) {
+    default <R> R map(Function<Block, R> ifBlock, Function<Player, R> ifPlayer, Function<Entity, R> ifEntity) {
         return switch (this) {
-            case Pigeonhole pigeonhole -> ifPigeonhole.apply(pigeonhole);
+            case Block block -> ifBlock.apply(block);
             case Player player -> ifPlayer.apply(player);
             case Entity entity -> ifEntity.apply(entity);
             default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
@@ -104,7 +104,7 @@ public interface Address {
     // --
 
     enum Type implements StringRepresentable {
-        PIGEONHOLE(0, "pigeonhole", Pigeonhole.CODEC, Pigeonhole.STREAM_CODEC),
+        BLOCK(0, "block", Block.CODEC, Block.STREAM_CODEC),
         PLAYER(1, "player", Player.CODEC, Player.STREAM_CODEC),
         ENTITY(2, "entity", Entity.CODEC, Entity.STREAM_CODEC);
 
@@ -146,36 +146,36 @@ public interface Address {
         }
     }
 
-    record Pigeonhole(String id) implements Address {
-        public static final MapCodec<Pigeonhole> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              ID_CODEC.fieldOf("id").forGetter(Pigeonhole::id)
-        ).apply(instance, Pigeonhole::new));
+    record Block(String id) implements Address {
+        public static final MapCodec<Block> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+              ID_CODEC.fieldOf("id").forGetter(Block::id)
+        ).apply(instance, Block::new));
 
-        public static final Codec<Pigeonhole> STRING_CODEC = Codec.STRING.xmap(Pigeonhole::new, Pigeonhole::id);
+        public static final Codec<Block> STRING_CODEC = Codec.STRING.xmap(Block::new, Block::id);
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, Pigeonhole> STREAM_CODEC =
-              ByteBufCodecs.STRING_UTF8.map(Pigeonhole::new, Pigeonhole::id).cast();
+        public static final StreamCodec<RegistryFriendlyByteBuf, Block> STREAM_CODEC =
+              ByteBufCodecs.STRING_UTF8.map(Block::new, Block::id).cast();
 
-        public Pigeonhole {
+        public Block {
             validate(id).getOrThrow();
         }
 
         @Override
         public Type type() {
-            return Type.PIGEONHOLE;
+            return Type.BLOCK;
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Pigeonhole that = (Pigeonhole) o;
+            Block that = (Block) o;
             return this.id.equalsIgnoreCase(that.id);
         }
 
         @Override
         public int hashCode() {
-            return ("p" + id.toLowerCase(Locale.ROOT)).hashCode();
+            return ("b" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
 
         @Override
@@ -220,7 +220,7 @@ public interface Address {
 
         @Override
         public int hashCode() {
-            return ("pl" + id.toLowerCase(Locale.ROOT)).hashCode();
+            return ("p" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
     }
 
@@ -277,7 +277,7 @@ public interface Address {
 
         @Override
         public int hashCode() {
-            return ("n" + id.toLowerCase(Locale.ROOT)).hashCode();
+            return ("e" + id.toLowerCase(Locale.ROOT)).hashCode();
         }
     }
 }

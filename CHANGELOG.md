@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0.1
+- Added Payback system
+  - Added Payback Tag, Payback Packing Box and Payback Package
+  - Mail with Payback will be handled by Mail Service for safe transfer of goods and payment between addresses
+- Added Packing Box - separate item type that represents an empty package; Package usage experience remains basically the same  
+- Renamed address type `pigeonhole` to `block` 
+- Update Mail Service icon
+
 ## 0.3.0.2
 - Package
   - Added **Sealed Package**

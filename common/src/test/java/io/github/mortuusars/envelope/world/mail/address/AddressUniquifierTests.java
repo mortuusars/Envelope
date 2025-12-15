@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
-import io.github.mortuusars.envelope.world.mail.address.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -38,7 +37,7 @@ public class AddressUniquifierTests {
 
     public static AddressUniquifier createDefaultUniquifier() {
         AllAddresses addresses = new AllAddresses(
-            Set.of("Addr", "Addr-1", "Addr-2", "Addr-5", "Addr-", "Addr----").stream().map(Address.Pigeonhole::new).collect(Collectors.toSet()),
+            Set.of("Addr", "Addr-1", "Addr-2", "Addr-5", "Addr-", "Addr----").stream().map(Address.Block::new).collect(Collectors.toSet()),
             Set.of("Addr-too-long-of-an-A", "Addr-too-long-of-an--9", "Addr-too-long-of-an-address-asdasdaasdas", "Addr-too-long-of-an-address-asdasdaasd-4").stream().map(Address.Player::new).collect(Collectors.toSet()),
             Set.of());
         return new AddressUniquifier(addresses);

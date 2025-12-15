@@ -87,7 +87,7 @@ public abstract class Config {
                 builder.push("delivery");
                 DELIVERY_DEFAULT_DISTANCE = builder
                       .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined (recipient does not exist, for example).")
-                      .defineInRange("default_distance", 1000, 1, Integer.MAX_VALUE);
+                      .defineInRange("default_distance", 1500, 1, Integer.MAX_VALUE);
                 DELIVERY_COURIER_TRAVEL_SPEED = builder
                       .comment("Courier speed (in blocks per second) while in traveling (background) phases.")
                       .defineInRange("courier_travel_speed", 25.0, 0.01, 9999.0);

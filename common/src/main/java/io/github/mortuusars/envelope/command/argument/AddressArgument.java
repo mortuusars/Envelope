@@ -25,7 +25,7 @@ public class AddressArgument implements ArgumentType<Address> {
     }
 
     public static AddressArgument pigeonhole() {
-        return new AddressArgument(Address.Type.PIGEONHOLE);
+        return new AddressArgument(Address.Type.BLOCK);
     }
 
     public static AddressArgument player() {
@@ -36,13 +36,13 @@ public class AddressArgument implements ArgumentType<Address> {
         return new AddressArgument(Address.Type.ENTITY);
     }
 
-    public static Address.Pigeonhole getPigeonhole(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
+    public static Address.Block getPigeonhole(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
         Address address = context.getArgument(name, Address.class);
-        if (address instanceof Address.Pigeonhole pigeonhole) {
-            return pigeonhole;
+        if (address instanceof Address.Block block) {
+            return block;
         }
         Component message = Component.literal("Address has wrong type: Expected: "
-              + Address.Type.PIGEONHOLE.getSerializedName() + ", Got: "
+              + Address.Type.BLOCK.getSerializedName() + ", Got: "
               + address.type().getSerializedName());
         throw new SimpleCommandExceptionType(message).create();
     }
@@ -58,10 +58,10 @@ public class AddressArgument implements ArgumentType<Address> {
         }
 
         return switch (type) {
-            case PIGEONHOLE -> new Address.Pigeonhole(id);
+            case BLOCK -> new Address.Block(id);
             case PLAYER -> new Address.Player(id);
             case ENTITY -> new Address.Entity(id);
-            case null -> new Address.Pigeonhole(id);
+            case null -> new Address.Block(id);
         };
     }
 }

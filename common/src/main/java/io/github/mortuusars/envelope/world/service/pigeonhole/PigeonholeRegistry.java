@@ -18,13 +18,13 @@ import java.util.Map;
 
 public class PigeonholeRegistry extends SavedData {
     public static final Codec<PigeonholeRegistry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          Codec.unboundedMap(Address.Pigeonhole.STRING_CODEC, PigeonholeData.CODEC)
+          Codec.unboundedMap(Address.Block.STRING_CODEC, PigeonholeData.CODEC)
                 .optionalFieldOf("pigeonholes", Collections.emptyMap()).forGetter(PigeonholeRegistry::getPigeonholes)
     ).apply(instance, PigeonholeRegistry::new));
 
-    private final HashMap<Address.Pigeonhole, PigeonholeData> pigeonholes;
+    private final HashMap<Address.Block, PigeonholeData> pigeonholes;
 
-    protected PigeonholeRegistry(Map<Address.Pigeonhole, PigeonholeData> pigeonholes) {
+    protected PigeonholeRegistry(Map<Address.Block, PigeonholeData> pigeonholes) {
         this.pigeonholes = new HashMap<>(pigeonholes);
     }
 
@@ -32,7 +32,7 @@ public class PigeonholeRegistry extends SavedData {
         this(new HashMap<>());
     }
 
-    public HashMap<Address.Pigeonhole, PigeonholeData> getPigeonholes() {
+    public HashMap<Address.Block, PigeonholeData> getPigeonholes() {
         return pigeonholes;
     }
 

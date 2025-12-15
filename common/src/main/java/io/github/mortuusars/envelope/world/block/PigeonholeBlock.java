@@ -259,9 +259,9 @@ public class PigeonholeBlock extends BaseEntityBlock {
         }
 
         if (stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.RECIPIENT) instanceof Address.Pigeonhole pigeonhole
+              && stack.get(Envelope.DataComponents.RECIPIENT) instanceof Address.Block block
               && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-              && blockEntity.getAddress().map(a -> a.equals(pigeonhole)).orElse(false)) {
+              && blockEntity.getAddress().map(a -> a.equals(block)).orElse(false)) {
             if (level instanceof ServerLevel serverLevel) {
                 if (!stack.has(Envelope.DataComponents.SENDER)) {
                     stack.set(Envelope.DataComponents.SENDER, new Address.Player(player));
@@ -302,7 +302,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
         }
 
         if (level instanceof ServerLevel serverLevel && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-            Optional<Address.Pigeonhole> currentAddress = blockEntity.getAddress();
+            Optional<Address.Block> currentAddress = blockEntity.getAddress();
 
             if (currentAddress.isPresent() && !currentAddress.get().matches(addressId)) {
                 List<Issue> issues = AddressValidation.forPigeonhole(
@@ -317,7 +317,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 }
             }
 
-            Address.Pigeonhole address = new Address.Pigeonhole(addressId);
+            Address.Block address = new Address.Block(addressId);
             blockEntity.setAddress(address);
             blockEntity.setOwner(player.getUUID());
             level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);

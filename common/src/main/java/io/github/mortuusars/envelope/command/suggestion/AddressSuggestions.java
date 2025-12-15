@@ -26,7 +26,7 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
     }
 
     public static AddressSuggestions pigeonhole() {
-        return new AddressSuggestions(Address.Type.PIGEONHOLE);
+        return new AddressSuggestions(Address.Type.BLOCK);
     }
 
     public static AddressSuggestions player() {

@@ -115,7 +115,7 @@ public class AddressTagScreen extends Screen {
             return Optional.empty();
         }
 
-        return getMatchedKnownAddress().or(() -> Optional.of(new Address.Pigeonhole(addressId)));
+        return getMatchedKnownAddress().or(() -> Optional.of(new Address.Block(addressId)));
     }
 
     protected AllAddresses getAddressesForSuggestions() {

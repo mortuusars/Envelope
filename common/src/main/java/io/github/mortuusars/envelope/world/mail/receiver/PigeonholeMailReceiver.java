@@ -11,9 +11,9 @@ import org.slf4j.Logger;
 public class PigeonholeMailReceiver implements MailReceiver {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Address.Pigeonhole address;
+    private final Address.Block address;
 
-    public PigeonholeMailReceiver(Address.Pigeonhole address) {
+    public PigeonholeMailReceiver(Address.Block address) {
         this.address = address;
     }
 

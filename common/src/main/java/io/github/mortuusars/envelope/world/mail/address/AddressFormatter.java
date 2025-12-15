@@ -139,9 +139,9 @@ public class AddressFormatter {
         if (address.equals(Address.UNKNOWN)) return EnvelopeSymbols.ADDRESS_UNKNOWN;
         if (address.equals(Address.MAIL_SERVICE)) return EnvelopeSymbols.ADDRESS_MAIL_SERVICE;
         return switch (address.type()) {
-            case PIGEONHOLE -> EnvelopeSymbols.ADDRESS_PIGEONHOLE;
+            case BLOCK -> EnvelopeSymbols.ADDRESS_BLOCK;
             case PLAYER -> EnvelopeSymbols.ADDRESS_PLAYER;
-            case ENTITY -> EnvelopeSymbols.ADDRESS_NPC;
+            case ENTITY -> EnvelopeSymbols.ADDRESS_ENTITY;
         };
     }
 

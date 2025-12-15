@@ -87,11 +87,11 @@ public class EnvelopeCommand {
 
     private static int listAllPigeonholes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
-        Set<Address.Pigeonhole> addresses = level.getEnvelopeContext().getPigeonholeManager().getAllAddresses();
+        Set<Address.Block> addresses = level.getEnvelopeContext().getPigeonholeManager().getAllAddresses();
 
         if (!addresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("All pigeonholes:"), true);
-            for (Address.Pigeonhole address : addresses) {
+            for (Address.Block address : addresses) {
                 context.getSource().sendSuccess(() -> copyableAddressAndPos(address,
                       level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address)), true);
             }
@@ -105,7 +105,7 @@ public class EnvelopeCommand {
     private static int listDefaultPigeonholes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
 
-        Map<Address.Player, Address.Pigeonhole> defaultAddresses = level.getEnvelopeContext().getPlayers().getDefaultAddresses();
+        Map<Address.Player, Address.Block> defaultAddresses = level.getEnvelopeContext().getPlayers().getDefaultAddresses();
 
         if (!defaultAddresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
@@ -124,7 +124,7 @@ public class EnvelopeCommand {
         return 0;
     }
 
-    private static int pigeonholePosition(CommandContext<CommandSourceStack> context, Address.Pigeonhole address) {
+    private static int pigeonholePosition(CommandContext<CommandSourceStack> context, Address.Block address) {
         ServerLevel level = context.getSource().getLevel();
         if (!level.getEnvelopeContext().getPigeonholeManager().exists(address)) {
             context.getSource().sendFailure(address.getName().append(" does not exist."));
@@ -193,8 +193,8 @@ public class EnvelopeCommand {
 
         ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
         pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
-        pkg.set(Envelope.DataComponents.SENDER, new Address.Pigeonhole("Original-Sender"));
-        pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Pigeonhole("Base"));
+        pkg.set(Envelope.DataComponents.SENDER, new Address.Block("Original-Sender"));
+        pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Block("Base"));
         pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
               new RequestedItem(Items.EMERALD, 3), new RequestedItem(ItemTags.LOGS, 13))));
 

@@ -41,7 +41,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
@@ -66,7 +65,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     protected List<Occupant.Mutable> occupants = new ArrayList<>();
     protected NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
 
-    protected @Nullable Address.Pigeonhole address;
+    protected @Nullable Address.Block address;
     protected @Nullable PigeonholeData data;
     protected @Nullable UUID owner;
     protected boolean updatedAfterLoading;
@@ -81,11 +80,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     // -- Address
 
-    public Optional<Address.Pigeonhole> getAddress() {
+    public Optional<Address.Block> getAddress() {
         return Optional.ofNullable(address);
     }
 
-    public void setAddress(@NotNull Address.Pigeonhole address) {
+    public void setAddress(@NotNull Address.Block address) {
         if (Objects.equals(this.address, address)) {
             return;
         }
@@ -233,7 +232,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         super.setChanged();
 
         if (level instanceof ServerLevel serverLevel && !PigeonholeMenu.playersWithMenu(serverLevel, address).isEmpty()) {
-            serverLevel.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+            serverLevel.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
         }
     }
 
@@ -339,7 +338,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         // Forces sync of be data to the client
-        player.level().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        player.level().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
 
         PlatformHelper.openMenu(player, this, buffer -> {
             List<StoredMail> mail = mapAddressed((level, address, data) -> data.getMail()).orElse(Collections.emptyList());
@@ -348,7 +347,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             for (StoredMail stored : mail) {
                 StoredMail.STREAM_CODEC.encode(buffer, stored);
             }
-            Address.Pigeonhole.STREAM_CODEC.encode(buffer, address);
+            Address.Block.STREAM_CODEC.encode(buffer, address);
         });
 
         return true;
@@ -508,7 +507,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.loadAllItems(tag, items, registries);
         address = tag.contains("address", Tag.TAG_STRING)
-              ? new Address.Pigeonhole(tag.getString("address"))
+              ? new Address.Block(tag.getString("address"))
               : null;
         data = null; // Force re-query
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
@@ -542,13 +541,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
     }
 
-    public void ifAddressed(TriConsumer<ServerLevel, Address.Pigeonhole, PigeonholeData> consumer) {
+    public void ifAddressed(TriConsumer<ServerLevel, Address.Block, PigeonholeData> consumer) {
         if (address != null && level instanceof ServerLevel serverLevel) {
             getData().ifPresent(data -> consumer.accept(serverLevel, address, data));
         }
     }
 
-    public void ifAddressedOrElse(TriConsumer<ServerLevel, Address.Pigeonhole, PigeonholeData> consumer, Runnable orElse) {
+    public void ifAddressedOrElse(TriConsumer<ServerLevel, Address.Block, PigeonholeData> consumer, Runnable orElse) {
         if (address != null && level instanceof ServerLevel serverLevel) {
             getData().ifPresentOrElse(data -> consumer.accept(serverLevel, address, data), orElse);
         } else {
@@ -556,7 +555,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
     }
 
-    public <T> Optional<T> mapAddressed(TriFunction<ServerLevel, Address.Pigeonhole, PigeonholeData, T> function) {
+    public <T> Optional<T> mapAddressed(TriFunction<ServerLevel, Address.Block, PigeonholeData, T> function) {
         if (address != null && level instanceof ServerLevel serverLevel) {
             return getData().map(data -> function.apply(serverLevel, address, data));
         }

@@ -28,13 +28,13 @@ public class AddressHelper {
             return getAll();
         }
         return switch (type) {
-            case PIGEONHOLE -> AllAddresses.pigeonholes(context.getPigeonholeManager().getAllAddresses());
+            case BLOCK -> AllAddresses.pigeonholes(context.getPigeonholeManager().getAllAddresses());
             case PLAYER -> AllAddresses.players(context.getPlayers().getDefaultAddresses().keySet());
             case ENTITY -> AllAddresses.entities(context.getMailEntities().getAllAddresses());
         };
     }
 
-    public Optional<Address.Pigeonhole> getPlayerDefaultAddress(Address.Player playerAddress) {
+    public Optional<Address.Block> getPlayerDefaultAddress(Address.Player playerAddress) {
         return Optional.ofNullable(context.getPlayers().getDefaultAddresses().get(playerAddress));
     }
 

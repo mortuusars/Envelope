@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
-import com.mojang.datafixers.TypeRewriteRule;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
@@ -30,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -41,7 +39,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     protected CachedValidator<String> addressValidator;
 
     public PigeonholeAddressTagScreen(InteractionHand hand, AllAddresses knownAddresses,
-                                      BlockPos pos, Optional<Address.Pigeonhole> existingAddress,
+                                      BlockPos pos, Optional<Address.Block> existingAddress,
                                       Component title) {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
@@ -142,7 +140,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     @Override
     protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int color = getAddressValidator().getIssues().isEmpty() ? 0xFFFFFFFF : 0xAAFFFFFF;
-        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_PIGEONHOLE, leftPos + 17, topPos + 21, color, true);
+        guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_BLOCK, leftPos + 17, topPos + 21, color, true);
     }
 
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {

@@ -38,14 +38,14 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     protected final Inventory playerInventory;
     protected final Player player;
     protected final BlockPos pigeonholePos;
-    protected final Address.Pigeonhole address;
+    protected final Address.Block address;
     protected final PigeonholeBlockEntity blockEntity;
 
     protected List<StoredMail> mail;
     protected boolean hasNewMail;
 
     protected PigeonholeMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
-                             BlockPos pigeonholePos, List<StoredMail> mail, Address.Pigeonhole address) {
+                             BlockPos pigeonholePos, List<StoredMail> mail, Address.Block address) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -76,7 +76,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         updateIsDefault();
     }
 
-    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<StoredMail> mail, Address.Pigeonhole address) {
+    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<StoredMail> mail, Address.Block address) {
         this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pigeonholePos, mail, address);
     }
 
@@ -87,7 +87,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         for (int i = 0; i < mailCount; i++) {
             mail.add(StoredMail.STREAM_CODEC.decode(buffer));
         }
-        Address.Pigeonhole address = Address.Pigeonhole.STREAM_CODEC.decode(buffer);
+        Address.Block address = Address.Block.STREAM_CODEC.decode(buffer);
         return new PigeonholeMenu(id, inventory, mailboxPos, mail, address);
     }
 
@@ -286,7 +286,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         return false;
     }
 
-    public static List<ServerPlayer> playersWithMenu(ServerLevel level, @Nullable Address.Pigeonhole address) {
+    public static List<ServerPlayer> playersWithMenu(ServerLevel level, @Nullable Address.Block address) {
         return level.players().stream()
               .filter(pl -> pl.containerMenu instanceof PigeonholeMenu menu && menu.getAddress().equals(address))
               .toList();

@@ -9,9 +9,9 @@ package io.github.mortuusars.envelope.util;
  */
 public class EnvelopeSymbols {
     public static final String SMALL_SPACE = "\uEEFF";
-    public static final String ADDRESS_PIGEONHOLE = "\uEE00";
+    public static final String ADDRESS_BLOCK = "\uEE00";
     public static final String ADDRESS_PLAYER = "\uEE01";
-    public static final String ADDRESS_NPC = "\uEE02";
+    public static final String ADDRESS_ENTITY = "\uEE02";
     public static final String ADDRESS_UNKNOWN = "\uEE03";
     public static final String ADDRESS_MAIL_SERVICE = "\uEE04";
     public static final String LETTER = "\uEE10";

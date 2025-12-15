@@ -88,12 +88,12 @@ public class RequestedItemTests extends BuggerTests {
                 "count": 3,
                 "components": {
                   "envelope:letter_tattered": {},
-                  "envelope:mail_sender": {
+                  "envelope:sender": {
                       "type": "entity",
                       "id": "Mail Service"
                   },
-                  "envelope:mail_recipient": {
-                      "type": "pigeonhole",
+                  "envelope:recipient": {
+                      "type": "block",
                       "id": "Mortuusars Laboratory"
                   }
                 }
@@ -104,7 +104,7 @@ public class RequestedItemTests extends BuggerTests {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
-                  stack.set(Envelope.DataComponents.RECIPIENT, new Address.Pigeonhole("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.RECIPIENT, new Address.Block("Mortuusars Laboratory"));
                   return decodeFromJson(json).matches(stack);
               }));
     }

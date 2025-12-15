@@ -28,7 +28,7 @@ public class Players extends SavedData {
 //    protected @Nullable Map<UUID, PlayerData> dataById;
 //    protected @Nullable Map<Address.Player, PlayerData> dataByAddress;
     protected @Nullable Set<Address.Player> addresses;
-    protected @Nullable Map<Address.Player, Address.Pigeonhole> defaultAddresses;
+    protected @Nullable Map<Address.Player, Address.Block> defaultAddresses;
 
     public Players(Map<String, PlayerData> data) {
         this.data = new HashMap<>(data); // Make sure it's modifiable
@@ -68,19 +68,19 @@ public class Players extends SavedData {
 
     // --
 
-    public Optional<Address.Pigeonhole> getDefaultAddressOf(Player player) {
+    public Optional<Address.Block> getDefaultAddressOf(Player player) {
         return getDataOf(player.getScoreboardName()).flatMap(PlayerData::getDefaultAddress);
     }
 
-    public Optional<Address.Pigeonhole> getDefaultAddressOf(Address.Player playerAddress) {
+    public Optional<Address.Block> getDefaultAddressOf(Address.Player playerAddress) {
         return getDataOf(playerAddress.toString()).flatMap(PlayerData::getDefaultAddress);
     }
 
-    public void setDefaultAddress(Player player, Address.Pigeonhole address) {
+    public void setDefaultAddress(Player player, Address.Block address) {
         update(player, data -> data.setDefaultAddress(address));
     }
 
-    public void renameDefaultAddress(Address.Pigeonhole oldAddress, Address.Pigeonhole newAddress) {
+    public void renameDefaultAddress(Address.Block oldAddress, Address.Block newAddress) {
         getData().values().forEach(data -> {
             if (data.getDefaultAddress().map(a -> a.equals(oldAddress)).orElse(false)) {
                 data.setDefaultAddress(newAddress);
@@ -89,7 +89,7 @@ public class Players extends SavedData {
         setDirty();
     }
 
-    public void removeDefaultAddress(Address.Pigeonhole address) {
+    public void removeDefaultAddress(Address.Block address) {
         getData().values().forEach(data -> {
             if (data.getDefaultAddress().map(a -> a.equals(address)).orElse(false)) {
                 data.setDefaultAddress(null);
@@ -139,7 +139,7 @@ public class Players extends SavedData {
         return addresses;
     }
 
-    public Map<Address.Player, Address.Pigeonhole> getDefaultAddresses() {
+    public Map<Address.Player, Address.Block> getDefaultAddresses() {
         if (defaultAddresses == null) {
             defaultAddresses = new HashMap<>();
             getData().forEach((name, data) ->
@@ -190,14 +190,14 @@ public class Players extends SavedData {
     public static class PlayerData {
         public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(i -> i.group(
               ExtraCodecs.GAME_PROFILE_WITHOUT_PROPERTIES.codec().fieldOf("profile").forGetter(PlayerData::getProfile),
-              Address.Pigeonhole.STRING_CODEC.optionalFieldOf("default_address").forGetter(PlayerData::getDefaultAddress)
+              Address.Block.STRING_CODEC.optionalFieldOf("default_address").forGetter(PlayerData::getDefaultAddress)
         ).apply(i, PlayerData::new));
 
         protected final GameProfile profile;
         protected final Address.Player address;
-        protected Optional<Address.Pigeonhole> defaultAddress;
+        protected Optional<Address.Block> defaultAddress;
 
-        public PlayerData(GameProfile profile, Optional<Address.Pigeonhole> defaultAddress) {
+        public PlayerData(GameProfile profile, Optional<Address.Block> defaultAddress) {
             this.profile = profile;
             this.address = new Address.Player(profile.getName());
             this.defaultAddress = defaultAddress;
@@ -215,11 +215,11 @@ public class Players extends SavedData {
             return address;
         }
 
-        public Optional<Address.Pigeonhole> getDefaultAddress() {
+        public Optional<Address.Block> getDefaultAddress() {
             return defaultAddress;
         }
 
-        public void setDefaultAddress(@Nullable Address.Pigeonhole address) {
+        public void setDefaultAddress(@Nullable Address.Block address) {
             this.defaultAddress = Optional.ofNullable(address);
         }
     }

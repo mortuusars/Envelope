@@ -21,7 +21,7 @@ import java.util.Optional;
 public record OpenPigeonholeAddressTagScreenS2CP(InteractionHand hand,
                                                  AllAddresses knownAddresses,
                                                  BlockPos pos,
-                                                 Optional<Address.Pigeonhole> currentAddress) implements Packet {
+                                                 Optional<Address.Block> currentAddress) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("open_pigeonhole_address_tag_screen");
     public static final Type<OpenPigeonholeAddressTagScreenS2CP> TYPE = new Type<>(ID);
 
@@ -29,7 +29,7 @@ public record OpenPigeonholeAddressTagScreenS2CP(InteractionHand hand,
             ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), OpenPigeonholeAddressTagScreenS2CP::hand,
             AllAddresses.STREAM_CODEC, OpenPigeonholeAddressTagScreenS2CP::knownAddresses,
             BlockPos.STREAM_CODEC, OpenPigeonholeAddressTagScreenS2CP::pos,
-            ByteBufCodecs.optional(Address.Pigeonhole.STREAM_CODEC), OpenPigeonholeAddressTagScreenS2CP::currentAddress,
+            ByteBufCodecs.optional(Address.Block.STREAM_CODEC), OpenPigeonholeAddressTagScreenS2CP::currentAddress,
             OpenPigeonholeAddressTagScreenS2CP::new
     );
 

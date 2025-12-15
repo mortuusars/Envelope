@@ -7,9 +7,9 @@ import net.minecraft.network.codec.StreamCodec;
 import java.util.*;
 import java.util.stream.Stream;
 
-public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Player> players, Set<Address.Entity> entities) {
+public record AllAddresses(Set<Address.Block> blocks, Set<Address.Player> players, Set<Address.Entity> entities) {
     public static final StreamCodec<RegistryFriendlyByteBuf, AllAddresses> STREAM_CODEC = StreamCodec.composite(
-            Address.Pigeonhole.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::pigeonholes,
+            Address.Block.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::blocks,
             Address.Player.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::players,
             Address.Entity.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::entities,
             AllAddresses::new
@@ -17,7 +17,7 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
 
     public static final AllAddresses EMPTY = new AllAddresses(Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
 
-    public static AllAddresses pigeonholes(Set<Address.Pigeonhole> addresses) {
+    public static AllAddresses pigeonholes(Set<Address.Block> addresses) {
         return new AllAddresses(addresses, Collections.emptySet(), Collections.emptySet());
     }
 
@@ -30,7 +30,7 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
     }
 
     public Stream<Address> stream() {
-        return Stream.of(pigeonholes, players, entities).flatMap(Set::stream);
+        return Stream.of(blocks, players, entities).flatMap(Set::stream);
     }
 
     public Optional<Address> byName(String name) {
@@ -47,7 +47,7 @@ public record AllAddresses(Set<Address.Pigeonhole> pigeonholes, Set<Address.Play
 
     public boolean isKnownOfType(Address address, Address.Type type) {
         return switch (type) {
-            case PIGEONHOLE -> pigeonholes.stream().anyMatch(a -> a.matches(address));
+            case BLOCK -> blocks.stream().anyMatch(a -> a.matches(address));
             case PLAYER -> players.stream().anyMatch(a -> a.matches(address));
             case ENTITY -> entities.stream().anyMatch(a -> a.matches(address));
         };

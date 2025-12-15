@@ -640,7 +640,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                   Address sender = mail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN);
                   if (sender == Address.UNKNOWN) return ICON_ADDRESS_UNKNOWN_SPRITES;
                   if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
-                  if (sender.type() == Address.Type.PIGEONHOLE) return ICON_ADDRESS_PIGEONHOLE_SPRITES;
+                  if (sender.type() == Address.Type.BLOCK) return ICON_ADDRESS_PIGEONHOLE_SPRITES;
                   if (sender.type() == Address.Type.PLAYER) return ICON_ADDRESS_PLAYER_SPRITES;
                   if (sender.type() == Address.Type.ENTITY) return ICON_ADDRESS_NPC_SPRITES;
                   return ICON_ADDRESS_UNKNOWN_SPRITES;

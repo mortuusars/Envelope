@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
@@ -28,7 +29,7 @@ public class MailService extends MailEntity {
     private @Nullable MailServiceData data;
 
     public MailService(ServerLevel level) {
-        super(Address.MAIL_SERVICE, 1000);
+        super(Address.MAIL_SERVICE, 1500);
         this.level = level;
     }
 
@@ -71,7 +72,13 @@ public class MailService extends MailEntity {
     @Override
     public Mail receiveMail(ServerLevel level, Mail mail) {
         if (mail.hasPayback()) {
-            MailId subjectId = storePaybackSubject(level, mail);
+            mail.writeToLog(DeliveryRecord
+                  .arrivedTo(getAddress())
+                  .at(level.getGameTime())
+                  .withMessage(DeliveryRecord.Message.WAITING_FOR_PAYMENT));
+
+            MailId subjectId = awaitPayback(level, mail);
+
             if (sendPaybackPackingBoxToBuyer(level, mail, subjectId)) {
                 return Mail.EMPTY;
             } else {
@@ -106,7 +113,9 @@ public class MailService extends MailEntity {
             paymentPackage.set(Envelope.DataComponents.SENDER, mail.getSender());
             paymentPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
 
-            return Delivery.create(level, new Mail(paymentPackage, mail.getLog()), Address.MAIL_SERVICE, mail.getRecipient(), DeliveryOrigin.service())
+            DeliveryLog log = mail.getLog().append(DeliveryRecord.arrivedTo(getAddress()).at(level.getGameTime()));
+
+            return Delivery.create(level, new Mail(paymentPackage, log), getAddress(), mail.getRecipient(), DeliveryOrigin.service())
                   .map(
                         delivery -> {
                             level.getEnvelopeContext().startServiceDelivery(delivery);
@@ -124,15 +133,6 @@ public class MailService extends MailEntity {
         }
 
         return mail.writeToLog(DeliveryRecord.returnedFrom(getAddress()));
-    }
-
-    private MailId storePaybackSubject(ServerLevel level, Mail mail) {
-        mail.writeToLog(DeliveryRecord
-              .arrivedTo(getAddress())
-              .at(level.getGameTime())
-              .withMessage(DeliveryRecord.Message.WAITING_FOR_PAYMENT));
-
-        return awaitPayback(level, mail);
     }
 
     private boolean sendPaybackPackingBoxToBuyer(ServerLevel level, Mail mail, MailId subjectId) {

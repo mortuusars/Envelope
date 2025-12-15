@@ -31,7 +31,7 @@ public class PigeonholeManager {
         return data;
     }
 
-    protected Map<Address.Pigeonhole, PigeonholeData> getPigeonholes() {
+    protected Map<Address.Block, PigeonholeData> getPigeonholes() {
         return data().getPigeonholes();
     }
 
@@ -41,7 +41,7 @@ public class PigeonholeManager {
 
     // -- Pigeonhole
 
-    public Set<Address.Pigeonhole> getAllAddresses() {
+    public Set<Address.Block> getAllAddresses() {
         return getPigeonholes().keySet();
     }
 
@@ -49,7 +49,7 @@ public class PigeonholeManager {
      * Ensures that address is properly registered at current block position.<br>
      * If suggestedAddress is already in use elsewhere - it will be uniquified and registered properly.
      */
-    public @NotNull PigeonholeData getOrRegister(Address.Pigeonhole suggestedAddress, BlockPos pos) {
+    public @NotNull PigeonholeData getOrRegister(Address.Block suggestedAddress, BlockPos pos) {
         @Nullable PigeonholeData dataAtPos = getDataAt(pos);
         if (dataAtPos != null) {
             // inUseAsPlayerOrEntity check is to handle the case when new player joins, or new mail entity is added with the same address id
@@ -61,7 +61,7 @@ public class PigeonholeManager {
             return rename(dataAtPos, suggestedAddress);
         }
 
-        Address.Pigeonhole address = uniquifyIfKnown(suggestedAddress);
+        Address.Block address = uniquifyIfKnown(suggestedAddress);
 
         getPigeonholes().entrySet().removeIf(entry -> {
             if (entry.getValue().getPos().equals(pos)) {
@@ -79,7 +79,7 @@ public class PigeonholeManager {
         return data;
     }
 
-    public void remove(Address.Pigeonhole address) {
+    public void remove(Address.Block address) {
         @Nullable PigeonholeData removed = getPigeonholes().remove(address);
         if (removed != null) {
             removed.invalidate();
@@ -90,8 +90,8 @@ public class PigeonholeManager {
         }
     }
 
-    public @NotNull PigeonholeData rename(PigeonholeData data, Address.Pigeonhole suggestedAddress) {
-        Address.Pigeonhole newAddress = uniquifyIfKnown(suggestedAddress);
+    public @NotNull PigeonholeData rename(PigeonholeData data, Address.Block suggestedAddress) {
+        Address.Block newAddress = uniquifyIfKnown(suggestedAddress);
 
         level.getEnvelopeContext().getPlayers().renameDefaultAddress(data.getAddress(), newAddress);
 
@@ -111,17 +111,17 @@ public class PigeonholeManager {
         return newData;
     }
 
-    public void rename(Address.Pigeonhole oldAddress, Address.Pigeonhole suggestedAddress) {
+    public void rename(Address.Block oldAddress, Address.Block suggestedAddress) {
         getData(oldAddress).ifPresent(data -> rename(data, suggestedAddress));
     }
 
-    public boolean exists(Address.Pigeonhole pigeonhole) {
-        return getPigeonholes().containsKey(pigeonhole);
+    public boolean exists(Address.Block block) {
+        return getPigeonholes().containsKey(block);
     }
 
     // --
 
-    public Optional<PigeonholeData> getData(Address.Pigeonhole address) {
+    public Optional<PigeonholeData> getData(Address.Block address) {
         @Nullable PigeonholeData value = getPigeonholes().get(address);
         if (value != null) {
             value.setValid(true);
@@ -138,11 +138,11 @@ public class PigeonholeManager {
         return null;
     }
 
-    public Optional<BlockPos> getPositionOf(Address.Pigeonhole address) {
+    public Optional<BlockPos> getPositionOf(Address.Block address) {
         return getData(address).map(PigeonholeData::getPos);
     }
 
-    public Optional<PigeonholeBlockEntity> getBlockEntityOf(Address.Pigeonhole address) {
+    public Optional<PigeonholeBlockEntity> getBlockEntityOf(Address.Block address) {
         return getPositionOf(address)
               .flatMap(pos -> level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
                     ? Optional.of(blockEntity)
@@ -151,19 +151,19 @@ public class PigeonholeManager {
 
     // --
 
-    protected boolean inUseAsPlayerOrEntity(Address.Pigeonhole address) {
+    protected boolean inUseAsPlayerOrEntity(Address.Block address) {
         AllAddresses knownAddresses = level.getEnvelopeContext().addresses().getAll();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
               || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
     }
 
-    protected Address.Pigeonhole uniquifyIfKnown(Address.Pigeonhole address) {
+    protected Address.Block uniquifyIfKnown(Address.Block address) {
         AllAddresses knownAddresses = level.getEnvelopeContext().addresses().getAll();
         if (!knownAddresses.isKnown(address)) {
             return address;
         }
         AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses);
         String uniqueId = uniquifier.uniquify(address.id());
-        return new Address.Pigeonhole(uniqueId);
+        return new Address.Block(uniqueId);
     }
 }
