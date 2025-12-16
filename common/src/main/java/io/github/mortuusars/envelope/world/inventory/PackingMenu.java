@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Pos2i;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.item.PackingBox;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;

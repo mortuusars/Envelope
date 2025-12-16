@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
+import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -53,6 +54,7 @@ public class PackingScreen extends AbstractContainerScreen<PackingMenu> {
     }
 
     protected void pack() {
+        getMenu().clickMenuButton(getMenu().getPlayer(), PackingMenu.PACK_BUTTON_ID);
         Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PackingMenu.PACK_BUTTON_ID);
         onClose();
     }
