@@ -10,10 +10,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix4f;
 
-public class SealTooltip implements ClientTooltipComponent {
+public class SealTooltipComponent implements ClientTooltipComponent {
     protected final Seal seal;
 
-    public SealTooltip(Seal seal) {
+    public SealTooltipComponent(Seal seal) {
         this.seal = seal;
     }
 

@@ -1,41 +1,42 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
+import io.github.mortuusars.envelope.client.gui.RequestedItemDisplay;
+import io.github.mortuusars.envelope.world.inventory.RequestedItem;
+import io.github.mortuusars.envelope.world.item.component.Payback;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-
-public record PaybackTagContentsTooltip(PaybackTagContents contents) implements ClientTooltipComponent {
+public record PaybackTooltipComponent(Payback payback) implements ClientTooltipComponent {
     public static final ResourceLocation SLOT_SPRITE = Envelope.resource("tooltip/payback/slot");
+
+    private static final ItemStack PAYBACK_TAG = new ItemStack(Envelope.Items.PAYBACK_TAG.get());
 
     @Override
     public int getWidth(Font font) {
-        return !contents.isEmpty() ? 18 * contents().items().size() + 4 : 0 ;
+        return 16 + (18 * payback().items().size()) + 5;
     }
 
     @Override
     public int getHeight() {
-        return !contents.isEmpty() ? 24 : 0;
+        return 23;
     }
 
     @Override
     public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-        if (contents.isEmpty()) {
-            return;
-        }
+        guiGraphics.renderFakeItem(PAYBACK_TAG, x - 1, y + 3, 0);
 
-        List<ItemStack> items = contents().items().stream().filter(i -> !i.isEmpty()).toList();
-        int slots = items.size();
+        int slots = payback().items().size();
 
         for (int i = 0; i < slots; i++) {
-            ItemStack stack = items.get(i);
+            RequestedItem requestedItem = payback().items().get(i);
+            RequestedItemDisplay display = new RequestedItemDisplay(requestedItem);
+            ItemStack stack = display.getDisplayedItem();
 
-            int slotX = x + 2 + (i * 18);
+            int slotX = x + 17 + 2 + (i * 18);
             int slotY = y + 2;
 
             if (i == 0) {
@@ -51,6 +52,11 @@ public record PaybackTagContentsTooltip(PaybackTagContents contents) implements 
             guiGraphics.blitSprite(SLOT_SPRITE, 22, 22, 2, 0, slotX, y, 18, 22);
             guiGraphics.renderFakeItem(stack, slotX + 1, slotY + 1, 0);
             guiGraphics.renderItemDecorations(font, stack, slotX + 1, slotY + 1);
+
+            if (requestedItem.item().left().isPresent()) {
+                guiGraphics.pose().translate(0, 0, 200);
+                guiGraphics.drawString(font, "#", slotX + 1 + 19 - 2 - font.width("#"), y + 1, 0xFFFFFFFF, true);
+            }
         }
     }
 }

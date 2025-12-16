@@ -1,18 +1,25 @@
 package io.github.mortuusars.envelope;
 
+import io.github.mortuusars.envelope.client.gui.tooltip.*;
 import io.github.mortuusars.envelope.client.renderer.SealRenderer;
 import io.github.mortuusars.envelope.util.bugger.BuggerDebugScreen;
 import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
-import io.github.mortuusars.envelope.world.item.component.LetterAndQuillContent;
-import io.github.mortuusars.envelope.world.item.component.LetterContent;
+import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
+import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTooltip;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class EnvelopeClient {
     private static final SealRenderer sealRenderer = new SealRenderer();
@@ -35,16 +42,13 @@ public class EnvelopeClient {
         public static final ResourceLocation LETTER_CONTENT = Envelope.resource("letter_content");
 
         public static void register() {
-            ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasLetterContent);
+            ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isLetterTattered);
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_UNFOLDED, EnvelopeClient.ItemModelOverrides::isLetterUnfolded);
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, EnvelopeClient.ItemModelOverrides::hasLetterContent);
+            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
+            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_UNFOLDED, ItemModelOverrides::isLetterUnfolded);
+            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
-            ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, EnvelopeClient.ItemModelOverrides::isLetterTattered);
-
-//            ItemProperties.register(Envelope.Items.PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
-//            ItemProperties.register(Envelope.Items.PAYBACK_PACKAGE.get(), PACKAGE_EMPTY, EnvelopeClient.ItemModelOverrides::isPackageEmpty);
+            ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
         }
 
         public static float isLetterTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
@@ -64,6 +68,35 @@ public class EnvelopeClient {
                 return 1;
             }
             return 0;
+        }
+    }
+
+    public static class TooltipComponents {
+        public static ClientTooltipComponent create(TooltipComponent component) {
+            return switch (component) {
+                case MailAddressTooltip mailAddress -> new MailAddressTooltipComponent(mailAddress.sender(), mailAddress.recipient());
+                case PackageContents packageContents -> new PackageTooltipComponent(packageContents);
+                case Payback payback -> new PaybackTooltipComponent(payback);
+                case PaybackTagContents paybackTagContents -> new PaybackTagContentsTooltipComponent(paybackTagContents);
+                case Seal seal -> new SealTooltipComponent(seal);
+                case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die -> new SealDieTooltipComponent(die.impression());
+                case CompositeTooltip composite -> new CompositeTooltipComponent(
+                      composite.components().stream().map(ClientTooltipComponent::create).toList()
+                );
+                default -> null;
+            };
+        }
+
+        public static Optional<TooltipComponent> modifyTooltipImage(ItemStack stack, Optional<TooltipComponent> original) {
+            if (stack.is(Envelope.Tags.Items.MAILABLE)) {
+                return CompositeTooltip.of(
+                      original,
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.PAYBACK)),
+                      Optional.ofNullable(MailAddressTooltip.of(stack))
+                );
+            }
+
+            return original;
         }
     }
 }

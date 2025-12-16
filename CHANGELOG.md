@@ -1,12 +1,18 @@
 # Changelog
 
 ## 0.4.0.1
+[Some existing envelope world data might disappear when updating to this version]
+
 - Added Payback system
   - Added Payback Tag, Payback Packing Box and Payback Package
   - Mail with Payback will be handled by Mail Service for safe transfer of goods and payment between addresses
-- Added Packing Box - separate item type that represents an empty package; Package usage experience remains basically the same  
+- Added Packing Box - separate item type that represents an empty package; Package usage experience remains basically the same
+- Improved visual style of sender/recipient addresses on mailable items 
+- Changed Mail Service address icon
 - Renamed address type `pigeonhole` to `block` 
-- Update Mail Service icon
+- Fixed relocating Pigeonhole block with CarryOn not removing background Pigeonhole data
+  - This system will most likely receive proper rework in the future updates  
+- Smaller changes and improvements
 
 ## 0.3.0.2
 - Package

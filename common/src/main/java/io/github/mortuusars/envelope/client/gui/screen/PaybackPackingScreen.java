@@ -2,12 +2,14 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.client.gui.RequestedItemDisplay;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -85,11 +87,16 @@ public class PaybackPackingScreen extends AbstractContainerScreen<PaybackPacking
     protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
         if (slot instanceof RequestedItemSlot requestedItemSlot) {
             if (!slot.hasItem()) {
-                ItemStack preview = requestedItemSlot.getRequestedItemPreview();
+                RequestedItemDisplay display = new RequestedItemDisplay(requestedItemSlot.getRequestedItem());
+                ItemStack preview = display.getDisplayedItem();
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, -100);
                 guiGraphics.renderItem(preview, slot.x, slot.y);
                 guiGraphics.renderItemDecorations(Minecrft.get().font, preview, slot.x, slot.y);
+                if (requestedItemSlot.getRequestedItem().item().left().isPresent()) {
+                    guiGraphics.pose().translate(0, 0, 200);
+                    guiGraphics.drawString(font, "#", slot.x + 1 + 19 - 2 - font.width("#"), slot.y - 1, 0xFFFFFFFF, true);
+                }
                 guiGraphics.pose().popPose();
             }
 
@@ -137,7 +144,8 @@ public class PaybackPackingScreen extends AbstractContainerScreen<PaybackPacking
             List<Component> lines = requestedItemSlot.getRequestedItem().item().map(
                   tag -> {
                       List<Component> list = new ArrayList<>(getTooltipFromContainerItem(stack));
-                      list.addFirst(Component.literal("Accepts any #" + tag.location()));
+                      list.addLast(Component.literal("Accepts Tag:").withStyle(ChatFormatting.GRAY));
+                      list.addLast(Component.literal("#" + tag.location()).withStyle(ChatFormatting.GRAY));
                       return list;
                   },
                   item -> getTooltipFromContainerItem(stack));

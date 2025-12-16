@@ -8,14 +8,14 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public class PackageTooltip implements ClientTooltipComponent {
+public class PackageTooltipComponent implements ClientTooltipComponent {
     public static final ResourceLocation BACKGROUND_SPRITE = Envelope.resource("container/package/background");
     protected static final int BG_WIDTH = 58;
     protected static final int BG_HEIGHT = 40;
 
     protected final PackageContents packageContents;
 
-    public PackageTooltip(PackageContents packageContents) {
+    public PackageTooltipComponent(PackageContents packageContents) {
         this.packageContents = packageContents;
     }
 

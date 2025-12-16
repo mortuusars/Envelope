@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.datafixers.util.Either;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -13,9 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 public class AddressFormatter {
-    public static final int NEUTRAL_COLOR = 0xFFD2BCA4;
-    public static final int SENDER_COLOR = 0xFFA3A7D4;
-    public static final int RECIPIENT_COLOR = 0xFF93C48F;
+    public static final int NEUTRAL_COLOR = 0xFFD7C6B3;
+    public static final int SENDER_COLOR = 0xFF9DB8D9;
+    public static final int RECIPIENT_COLOR = 0xFFE9B68B;
 
     protected final Address address;
     protected boolean icon = false;
@@ -145,8 +146,22 @@ public class AddressFormatter {
         };
     }
 
-    public static @Nullable MutableComponent senderToRecipient(@Nullable Address sender, @Nullable Address recipient) {
-        if (sender == null && recipient == null) return null;
+    public static @NotNull Component fullSender(@Nullable Address sender) {
+        if (sender == null) return CommonComponents.EMPTY;
+        return Component.translatable("gui.envelope.mail.sender").withStyle(ChatFormatting.GRAY)
+              .append(": ").withStyle(ChatFormatting.GRAY)
+              .append(sender.format().asSender().toComponent());
+    }
+
+    public static @NotNull Component fullRecipient(@Nullable Address recipient) {
+        if (recipient == null) return CommonComponents.EMPTY;
+        return Component.translatable("gui.envelope.mail.recipient").withStyle(ChatFormatting.GRAY)
+              .append(": ").withStyle(ChatFormatting.GRAY)
+              .append(recipient.format().asRecipient().toComponent());
+    }
+
+    public static @NotNull Component senderToRecipient(@Nullable Address sender, @Nullable Address recipient) {
+        if (sender == null && recipient == null) return CommonComponents.EMPTY;
 
         if (sender != null) {
             if (recipient == null) {
@@ -158,8 +173,6 @@ public class AddressFormatter {
                   .append(recipient.format().asRecipient().withMaxLength(25).toComponent());
         }
 
-        return Component.empty()
-              .append(Component.literal(EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " ").withStyle(ChatFormatting.GRAY))
-              .append(recipient.format().asRecipient().toComponent());
+        return recipient.format().asRecipient().toComponent();
     }
 }

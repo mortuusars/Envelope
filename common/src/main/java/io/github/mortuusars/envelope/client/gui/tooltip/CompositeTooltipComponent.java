@@ -1,27 +1,51 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.MultiBufferSource;
+import org.joml.Matrix4f;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-public record CompositeTooltipComponent(List<TooltipComponent> components) implements TooltipComponent {
-    @SafeVarargs
-    public static Optional<TooltipComponent> combine(Optional<TooltipComponent>... components) {
-        if (components.length == 0) {
-            return Optional.empty();
+public class CompositeTooltipComponent implements ClientTooltipComponent {
+    private final List<ClientTooltipComponent> components;
+
+    public CompositeTooltipComponent(List<ClientTooltipComponent> components) {
+        this.components = components;
+    }
+
+    @Override
+    public int getWidth(Font font) {
+        int width = 0;
+        for (ClientTooltipComponent component : components) {
+            width = Math.max(component.getWidth(font), width);
         }
+        return width;
+    }
 
-        List<TooltipComponent> list = Arrays.stream(components).filter(Optional::isPresent).map(Optional::get).toList();
-        if (list.isEmpty()) {
-            return Optional.empty();
+    @Override
+    public int getHeight() {
+        int height = 0;
+        for (ClientTooltipComponent component : components) {
+            height += component.getHeight();
         }
+        return height;
+    }
 
-        if (list.size() == 1) {
-            return Optional.of(list.getFirst());
+    @Override
+    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+        for (ClientTooltipComponent component : components) {
+            component.renderImage(font, x, y, guiGraphics);
+            y += component.getHeight();
         }
+    }
 
-        return Optional.of(new CompositeTooltipComponent(list));
+    @Override
+    public void renderText(Font font, int mouseX, int mouseY, Matrix4f matrix, MultiBufferSource.BufferSource bufferSource) {
+        for (ClientTooltipComponent component : components) {
+            component.renderText(font, mouseX, mouseY, matrix, bufferSource);
+            mouseY += component.getHeight();
+        }
     }
 }
