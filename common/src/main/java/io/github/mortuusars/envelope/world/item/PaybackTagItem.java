@@ -7,20 +7,18 @@ import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import io.github.mortuusars.envelope.world.item.component.Payback;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class PaybackTagItem extends Item implements ApplicatorItem {
     public PaybackTagItem(Properties properties) {
@@ -36,20 +35,8 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        @Nullable PaybackTagContents paybackTagContents = stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
-        if (paybackTagContents != null) {
-            tooltipComponents.add(Component.literal("Payback:").withStyle(ChatFormatting.RED));
-            paybackTagContents.getItemsForReading().forEach(item -> {
-                if (!item.isEmpty()) {
-                    MutableComponent name = Component.empty().append(item.getHoverName());
-                    if (item.getCount() > 1) {
-                        name.append(" " + item.getCount() + "x");
-                    }
-                    tooltipComponents.add(name.withStyle(ChatFormatting.DARK_RED));
-                }
-            });
-        }
+    public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS));
     }
 
     @Override

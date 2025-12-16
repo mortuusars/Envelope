@@ -28,7 +28,7 @@ public record PaybackTagContents(List<ItemStack> items) implements TooltipCompon
 
     public static PaybackTagContents create(Container container) {
         Container compactedContainer = ContainerUtils.compact(container, SLOTS);
-        List<ItemStack> items = ContainerUtils.toList(compactedContainer, SLOTS);
+        List<ItemStack> items = ContainerUtils.toList(compactedContainer, SLOTS).stream().filter(i -> !i.isEmpty()).toList();
         return new PaybackTagContents(items);
     }
 

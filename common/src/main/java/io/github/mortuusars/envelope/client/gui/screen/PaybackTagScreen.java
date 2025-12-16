@@ -76,14 +76,14 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
             guiGraphics.pose().popPose();
         }
 
-        if (slot.index < Payback.SLOTS) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0, 0, 300);
-            RenderSystem.enableBlend();
-            guiGraphics.blit(TEXTURE, slot.x - 1, slot.y - 1, 186, 18, 18, 18);
-            RenderSystem.disableBlend();
-            guiGraphics.pose().popPose();
-        }
+//        if (slot.index < Payback.SLOTS) {
+//            guiGraphics.pose().pushPose();
+//            guiGraphics.pose().translate(0, 0, 300);
+//            RenderSystem.enableBlend();
+//            guiGraphics.blit(TEXTURE, slot.x - 1, slot.y - 1, 186, 18, 18, 18);
+//            RenderSystem.disableBlend();
+//            guiGraphics.pose().popPose();
+//        }
     }
 
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -130,7 +130,7 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if ( super.keyPressed(keyCode, scanCode, modifiers)){
+        if (super.keyPressed(keyCode, scanCode, modifiers)){
             return true;
         }
 

@@ -167,10 +167,15 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(@NotNull Player player, int buttonId) {
         if (buttonId == CONFIRM_BUTTON_ID) {
-            if (!(player instanceof ServerPlayer serverPlayer)) return true;
-            getTag().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.create(paybackContainer));
-            player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
+            PaybackTagContents contents = PaybackTagContents.create(paybackContainer);
+            if (contents.isEmpty()) {
+                getTag().remove(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+            } else {
+                getTag().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, contents);
+            }
+            player.level().playSound(player, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
                   1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
+            player.setItemInHand(getHand(), getTag().getItemStack());
             return true;
         }
 

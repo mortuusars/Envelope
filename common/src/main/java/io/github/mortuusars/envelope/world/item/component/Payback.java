@@ -8,12 +8,13 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.Container;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Optional;
 
-public record Payback(List<RequestedItem> items) {
+public record Payback(List<RequestedItem> items) implements TooltipComponent {
     public static final int SLOTS = 6;
     public static final Payback DEFAULT = new Payback(List.of(RequestedItem.DEFAULT));
 

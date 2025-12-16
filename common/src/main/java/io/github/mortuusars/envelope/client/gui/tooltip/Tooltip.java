@@ -1,15 +1,16 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.Payback;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Tooltip {
@@ -39,14 +40,17 @@ public class Tooltip {
                     consumer.accept(senderToRecipient);
                 }
             }
+        }
 
-            @Nullable Payback payback = stack.get(Envelope.DataComponents.PAYBACK);
-            if (payback != null) {
-                consumer.accept(Component.literal("Payback:").withStyle(ChatFormatting.RED));
-                payback.items().forEach(i -> {
-                    consumer.accept(Component.literal(i.toString()).withStyle(ChatFormatting.DARK_RED));
-                });
+        public static Optional<TooltipComponent> appendComponents(ItemStack stack, Optional<TooltipComponent> original) {
+            if (!stack.is(Envelope.Tags.Items.MAILABLE)) {
+                return original;
             }
+
+            return CompositeTooltipComponent.combine(
+                  original,
+                  Optional.ofNullable(stack.get(Envelope.DataComponents.PAYBACK))
+            );
         }
     }
 }

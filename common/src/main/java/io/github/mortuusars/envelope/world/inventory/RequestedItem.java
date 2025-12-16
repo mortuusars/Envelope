@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -17,6 +18,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+
+import java.util.List;
 
 public record RequestedItem(Either<TagKey<Item>, Holder<Item>> item, int count, DataComponentPredicate components) {
     public static final Codec<RequestedItem> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -71,6 +74,18 @@ public record RequestedItem(Either<TagKey<Item>, Holder<Item>> item, int count, 
 
     public RequestedItem(ItemLike item) {
         this(item, 1);
+    }
+
+    // --
+
+    public List<Item> items() {
+        return this.item().map(
+              tag -> BuiltInRegistries.ITEM.getTag(tag)
+                    .map(named -> named.stream()
+                          .map(Holder::value)
+                          .toList())
+                    .orElse(List.of(Items.BARRIER)),
+              itemHolder -> List.of(itemHolder.value()));
     }
 
     // --

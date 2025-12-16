@@ -1,11 +1,11 @@
 package io.github.mortuusars.envelope.mixin.tooltip;
 
-import io.github.mortuusars.envelope.client.gui.tooltip.PackageTooltip;
-import io.github.mortuusars.envelope.client.gui.tooltip.SealDieTooltip;
-import io.github.mortuusars.envelope.client.gui.tooltip.SealTooltip;
+import io.github.mortuusars.envelope.client.gui.tooltip.*;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -24,18 +24,22 @@ public interface ClientTooltipComponentMixin {
     private static void onCreate(TooltipComponent component, CallbackInfoReturnable<ClientTooltipComponent> cir) {
         if (component instanceof PackageContents packageContents) {
             cir.setReturnValue(new PackageTooltip(packageContents));
-        }
-
-        if (component instanceof Seal seal) {
+        } else if (component instanceof Payback payback) {
+            cir.setReturnValue(new PaybackTooltip(payback));
+        } else if (component instanceof PaybackTagContents paybackTagContents) {
+            cir.setReturnValue(new PaybackTagContentsTooltip(paybackTagContents));
+        } else if (component instanceof Seal seal) {
             cir.setReturnValue(new SealTooltip(seal));
-        }
-
-        if (component instanceof SealDieTooltipComponent die) {
+        } else if (component instanceof SealDieTooltipComponent die) {
             SealImpression impression = die.impression().orElseGet(() -> {
                 ResourceKey<SealImpression> key = SealImpression.firstCharOrDefault(Minecrft.player());
                 return SealImpression.getHolder(Minecrft.registryAccess(), key);
             }).value();
             cir.setReturnValue(new SealDieTooltip(impression));
+        } else if (component instanceof CompositeTooltipComponent composite) {
+            cir.setReturnValue(new CompositeClientTooltipComponent(
+                  composite.components().stream().map(ClientTooltipComponent::create).toList()
+            ));
         }
     }
 }
