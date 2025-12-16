@@ -43,26 +43,22 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
         if (action != ClickAction.SECONDARY) return false;
         if (!slot.allowModification(player)) return false;
-
-        ItemStack target = slot.getItem();
-        if (!target.is(Envelope.Tags.Items.MAILABLE)) {
-            return true;
-        }
+        if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
 
         PaybackTagContents contents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.EMPTY);
-        @Nullable Payback existingPayback = target.get(Envelope.DataComponents.PAYBACK);
+        @Nullable Payback existingPayback = slot.getItem().get(Envelope.DataComponents.PAYBACK);
 
         if (contents.isEmpty()) {
             if (existingPayback == null) {
                 return true; // do nothing
             }
-            target.remove(Envelope.DataComponents.PAYBACK);
+            slot.getItem().remove(Envelope.DataComponents.PAYBACK);
         } else {
             Payback payback = createPayback(player.level(), stack);
             if (existingPayback != null && existingPayback.equals(payback)) {
                 return true; // do nothing
             }
-            target.set(Envelope.DataComponents.PAYBACK, payback);
+            slot.getItem().set(Envelope.DataComponents.PAYBACK, payback);
         }
 
         slot.setChanged();
