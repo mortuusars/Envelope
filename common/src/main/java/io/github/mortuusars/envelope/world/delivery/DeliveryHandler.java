@@ -15,7 +15,7 @@ public interface DeliveryHandler {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT) {
             if (!level.getEnvelopeContext().addresses().canDeliverMailTo(delivery.getRecipient())) {
                 delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                      .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
+                      .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
                 return DeliveryPhase.APPROACHING_SENDER;
             }
         }
@@ -61,10 +61,10 @@ public interface DeliveryHandler {
 
         switch (phase) {
             case HANDLING_DELIVERY -> {
-                delivery.updateMail(mail -> delivery.getRecipient().receiveMail(level, mail));
+                delivery.updateMail(mail -> level.getEnvelopeContext().receiveMail(level, delivery.getRecipient(), mail));
             }
             case HANDLING_RETURN -> {
-                delivery.updateMail(mail -> delivery.getSender().receiveMail(level, mail));
+                delivery.updateMail(mail -> level.getEnvelopeContext().receiveMail(level, delivery.getSender(), mail));
             }
         }
     }

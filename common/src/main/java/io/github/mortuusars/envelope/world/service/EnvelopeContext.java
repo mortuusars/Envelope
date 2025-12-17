@@ -6,9 +6,7 @@ import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.Courier;
-import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.DeliveryProgress;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -16,8 +14,11 @@ import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressHelper;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.entity.MailService;
+import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailService;
 import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
+import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -28,7 +29,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +57,7 @@ public class EnvelopeContext {
         this.pigeonholeManager = new PigeonholeManager(level);
         this.mailEntities = new MailEntities();
         this.addressHelper = new AddressHelper(this);
-        this.mailService = new MailService(level);
+        this.mailService = new MailService(this);
 
         this.mailEntities.register(mailService);
         this.mailEntities.register(new VillagerMailEntity(new Address.Entity("Villager"), 1500));
@@ -104,6 +104,11 @@ public class EnvelopeContext {
     }
 
     // --
+
+    public Mail receiveMail(ServerLevel level, Address address, Mail mail) {
+        if (mail.isEmpty()) return Mail.EMPTY;
+        return address.map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
+    }
 
     public Courier startServiceDelivery(Delivery delivery) {
         Pigeon deliveringPigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
@@ -154,7 +159,7 @@ public class EnvelopeContext {
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
         tag.putInt("background_finished_pigeons", getBackgroundDelivery().getFinishedCouriers().size());
 
-        tag.putInt("mail_awaiting_payback", getMailService().getData().getMailAwaitingPayback().size());
+        tag.putInt("mail_awaiting_payback", getMailService().getPaybackDepartment().getMailAwaitingPaybackCount());
 
         ListTag deliveries = Stream.concat(
                     pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
@@ -183,5 +188,11 @@ public class EnvelopeContext {
               ChatFormatting.GRAY +
               " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
               ChatFormatting.RESET;
+    }
+
+    // --
+
+    public long getGameTime() {
+        return getLevel().getGameTime();
     }
 }

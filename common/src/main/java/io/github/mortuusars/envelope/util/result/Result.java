@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.util.result;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.mojang.serialization.DataResult;
-import io.github.mortuusars.envelope.Envelope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,0 +1,199 @@
+package io.github.mortuusars.envelope.world.mail.entity.mail_service;
+
+import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
+import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.MailId;
+import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.EnvelopeContext;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+
+import java.util.function.Supplier;
+
+public class PaybackHandlingDepartment {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    private final EnvelopeContext context;
+    private final MailService mailService;
+    private final Supplier<PaybackDepartmentData> data;
+
+    public PaybackHandlingDepartment(EnvelopeContext context, MailService mailService, Supplier<PaybackDepartmentData> data) {
+        this.context = context;
+        this.mailService = mailService;
+        this.data = data;
+    }
+
+    public EnvelopeContext getContext() {
+        return context;
+    }
+
+    public PaybackDepartmentData getData() {
+        return data.get();
+    }
+
+    public int getMailAwaitingPaybackCount() {
+        return getData().getMailAwaitingPayback().size();
+    }
+
+    protected MailAwaitingPayback getMailAwaitingPayback(MailId id) {
+        return getData().getMailAwaitingPayback().get(id);
+    }
+
+    protected void removeMailAwaitingPayback(MailId subjectId) {
+        getData().getMailAwaitingPayback().remove(subjectId);
+        getData().setDirty();
+    }
+
+    protected MailId awaitPayback(Mail mail, long timeoutTicks) {
+        MailId id = MailId.createRandom();
+        MailAwaitingPayback mailAwaitingPayback = new MailAwaitingPayback(mail, getContext().getGameTime() + timeoutTicks);
+        getData().getMailAwaitingPayback().put(id, mailAwaitingPayback);
+        getData().setDirty();
+        return id;
+    }
+
+    protected long getPaybackTimeoutTickFor(Mail mail) {
+        return Ticks.fromSeconds(Config.Server.DELIVERY_PAYBACK_TIMEOUT_SECONDS.get());
+    }
+
+    // --
+
+    public boolean shouldHandle(Mail mail) {
+        return mail.hasPayback() || mail.getItemForReading().getItem() instanceof PaybackPackageItem;
+    }
+
+    public Mail handle(Mail mail) {
+        if (mail.hasPayback()) {
+            mail.writeToLog(DeliveryRecord
+                  .arrivedTo(Address.MAIL_SERVICE)
+                  .at(getContext().getGameTime())
+                  .message(DeliveryRecord.Message.WAITING_FOR_PAYMENT));
+
+            MailId subjectId = awaitPayback(mail, getPaybackTimeoutTickFor(mail));
+
+            if (sendPaybackPackingBoxToBuyer(mail, subjectId)) {
+                return Mail.EMPTY;
+            } else {
+                return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                      .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
+            }
+        }
+
+        if (mail.getItemForReading().getItem() instanceof PaybackPackageItem) {
+            MailId subjectId = mail.getOrDefault(Envelope.DataComponents.PAYBACK_SUBJECT, StoredItemStack.EMPTY)
+                  .getForReading()
+                  .getOrDefault(Envelope.DataComponents.PAYBACK_SUBJECT_ID, MailId.NIL);
+
+            @Nullable MailAwaitingPayback mailAwaitingPayback = getMailAwaitingPayback(subjectId);
+
+            if (mailAwaitingPayback == null) {
+                return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                      .message(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND));
+            }
+
+            Payback payback = mailAwaitingPayback.mail().getOrDefault(Envelope.DataComponents.PAYBACK, Payback.DEFAULT);
+            PackageContents packageContents = PackageContents.of(mail.getItemForReading());
+
+            if (!payback.matches(packageContents)) {
+                return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                      .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
+            }
+
+            //TODO: Dedicated payment package item? that shows the subject.
+            ItemStack paymentPackage = new ItemStack(Envelope.Items.PACKAGE.get());
+            paymentPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, packageContents);
+            paymentPackage.set(Envelope.DataComponents.SENDER, mail.getSender());
+            paymentPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
+
+            DeliveryLog log = mail.getLog().append(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE).at(getContext().getGameTime()));
+
+            return Delivery.create(getContext().getLevel(), new Mail(paymentPackage, log), Address.MAIL_SERVICE, mail.getRecipient(), DeliveryOrigin.service())
+                  .map(
+                        delivery -> {
+                            getContext().startServiceDelivery(delivery);
+                            removeMailAwaitingPayback(subjectId);
+                            // Return goods to the original recipient using the same courier:
+                            return mailAwaitingPayback.mail().writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
+                                  .message(DeliveryRecord.Message.PAYBACK_FULFILLED));
+                        },
+                        error -> {
+                            error.log(LOGGER);
+                            return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                                  .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
+                        }
+                  );
+        }
+
+        return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE));
+    }
+
+    private boolean sendPaybackPackingBoxToBuyer(Mail mailAwaitingPayback, MailId subjectId) {
+        ItemStack subject = mailAwaitingPayback.getItemCopy();
+        subject.set(Envelope.DataComponents.PAYBACK_SUBJECT_ID, subjectId);
+
+        ItemStack box = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
+        box.set(Envelope.DataComponents.PAYBACK_SUBJECT, new StoredItemStack(subject));
+        box.set(Envelope.DataComponents.SENDER, mailAwaitingPayback.getSender());
+        box.set(Envelope.DataComponents.RECIPIENT, mailAwaitingPayback.getRecipient());
+
+        return Delivery.create(getContext().getLevel(), new Mail(box), Address.MAIL_SERVICE, mailAwaitingPayback.getRecipient(), DeliveryOrigin.service()).map(
+              delivery -> {
+                  getContext().startServiceDelivery(delivery);
+                  return true;
+              },
+              error -> {
+                  error.log(LOGGER);
+                  return false;
+              }
+        );
+    }
+
+    // --
+
+    public void tick() {
+        //TODO: It would be a good idea to consider performance here.
+        // Depending on mail counts this could get laggy, especially if multiple returns occur at the same time.
+
+        boolean removed = getData().getMailAwaitingPayback().entrySet().removeIf(entry -> {
+            if (entry.getValue().timeoutTick() <= getContext().getGameTime()) {
+                returnTimedOutPaybackMail(entry.getValue().mail());
+                return true;
+            }
+            return false;
+        });
+
+        if (removed) {
+            getData().setDirty();
+        }
+    }
+
+    protected void returnTimedOutPaybackMail(Mail mail) {
+        mail = mail.writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
+              .at(getContext().getGameTime())
+              .message(DeliveryRecord.Message.PAYBACK_IS_TIMED_OUT));
+
+        Delivery.service()
+              .deliver(mail)
+              .from(Address.MAIL_SERVICE)
+              .to(mail.getSender())
+              .createOrThrow(getContext().getLevel());
+
+        Delivery.service(getContext().getLevel(), mail, Address.MAIL_SERVICE, mail.getSender())
+              .ifPresentOrElse(
+                    delivery -> getContext().startServiceDelivery(delivery),
+                    error -> error.log(LOGGER)
+              );
+    }
+}

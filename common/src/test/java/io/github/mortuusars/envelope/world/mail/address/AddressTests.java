@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
+import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -35,6 +36,26 @@ class AddressTests {
         assertEquals(new Address.Entity("Id"), new Address.Entity("Id"));
         assertEquals(new Address.Entity("Case Insensitive"), new Address.Entity("caSE iNSeNSitiVe"));
         assertNotEquals(new Address.Entity("Case Insensitive"), new Address.Entity("Different caSE iNSeNSitiVe"));
+    }
+
+    @Test
+    void matching() {
+        assertTrue(new Address.Block("Id").matches(new Address.Block("Id")));
+        assertTrue(new Address.Block("Case Insensitive").matches(new Address.Block("caSE iNSeNSitiVe")));
+        assertFalse(new Address.Block("Id").matches(new Address.Block("Different Id")));
+
+        assertTrue(new Address.Player("Id").matches(new Address.Player("Id")));
+        assertTrue(new Address.Player("Case Insensitive").matches(new Address.Player("caSE iNSeNSitiVe")));
+        assertFalse(new Address.Player("Id").matches(new Address.Player("Different Id")));
+
+        assertTrue(new Address.Entity("Id").matches(new Address.Entity("Id")));
+        assertTrue(new Address.Entity("Case Insensitive").matches(new Address.Entity("caSE iNSeNSitiVe")));
+        assertFalse(new Address.Entity("Id").matches(new Address.Entity("Different Id")));
+
+        assertTrue(new Address.Block("Id").matches(new Address.Entity("Id")));
+        assertTrue(new Address.Block("Villager").matches(new Address.Entity("Id", Component.literal("Villager"))));
+        assertFalse(new Address.Block("Villager").matches(new Address.Entity("Id", Component.literal("Different Villager"))));
+        assertFalse(new Address.Entity("Villager").matches(new Address.Entity("Id", Component.literal("Different Villager"))));
     }
 
     @Test

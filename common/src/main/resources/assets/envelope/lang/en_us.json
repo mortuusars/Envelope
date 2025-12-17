@@ -53,11 +53,11 @@
   "gui.envelope.pigeonhole.send": "Send",
   "gui.envelope.pigeonhole.empty": "Empty",
 
-  "gui.envelope.validation.issue.address.empty": "Address cannot be empty",
-  "gui.envelope.validation.issue.address.too_long": "Address is too long",
-  "gui.envelope.validation.issue.address.contains_invalid_chars": "Address contains invalid characters",
-  "gui.envelope.validation.issue.address.taken": "Address is already taken",
-  "gui.envelope.validation.issue.address.not_enough_xp_levels": "Not enough experience levels",
+  "error.envelope.address.id_cannot_be_empty": "Address cannot be empty",
+  "error.envelope.address.id_too_long": "Address is too long",
+  "error.envelope.address.id_contains_invalid_chars": "Address contains invalid characters",
+  "error.envelope.address.taken": "Address is already taken",
+  "error.envelope.address.not_enough_xp_levels": "Not enough experience levels",
 
   "entity.envelope.pigeon": "Pigeon",
 

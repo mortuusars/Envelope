@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
-import io.github.mortuusars.envelope.util.validation.Issue;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.*;
@@ -63,7 +62,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PigeonholeBlock extends BaseEntityBlock {
@@ -258,6 +256,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
+        /* Not decided on yet
         if (stack.is(Envelope.Tags.Items.MAILABLE)
               && stack.get(Envelope.DataComponents.RECIPIENT) instanceof Address.Block block
               && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
@@ -272,7 +271,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 player.setItemInHand(hand, result.getItemCopy());
             }
             return ItemInteractionResult.SUCCESS;
-        }
+        }*/
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
@@ -294,48 +293,48 @@ public class PigeonholeBlock extends BaseEntityBlock {
     }
 
     public void applyAddress(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
-        Level level = player.level();
+        if (!(player.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        if (!(level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity)) {
+            Envelope.LOGGER.error("Cannot apply address: be at pos [{}] is not PigeonholeBlockEntity", pos.toShortString());
+            return;
+        }
 
         if (!isValidDimension(level)) {
             Envelope.LOGGER.error("Cannot apply an address in {}", level.dimension().location());
             return;
         }
 
-        if (level instanceof ServerLevel serverLevel && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-            Optional<Address.Block> currentAddress = blockEntity.getAddress();
-
-            if (currentAddress.isPresent() && !currentAddress.get().matches(addressId)) {
-                List<Issue> issues = AddressValidation.forPigeonhole(
-                            () -> serverLevel.getEnvelopeContext().addresses().getAll(),
-                            () -> player)
-                      .validate(addressId);
-
-                if (!issues.isEmpty()) {
-                    player.displayClientMessage(issues.getFirst().getMessage(), true);
-                    level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
-                    return;
-                }
-            }
-
-            Address.Block address = new Address.Block(addressId);
-            blockEntity.setAddress(address);
-            blockEntity.setOwner(player.getUUID());
-            level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
-
-            boolean hasChanged = currentAddress.isEmpty() || !currentAddress.get().matches(addressId);
-            if (hasChanged) {
-                serverLevel.getEnvelopeContext().getPigeonholeManager().getOrRegister(address, pos);
-
-                if (!player.isCreative()) {
-                    player.getInventory().getItem(slot).shrink(1);
-                    player.giveExperienceLevels(-Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get());
-                    level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1, 1);
-                }
-
-                player.swing(slot == Inventory.SLOT_OFFHAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
-                level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
-            }
+        if (blockEntity.getAddress().filter(address -> address.matches(addressId)).isPresent()) {
+            return;
         }
+
+        AddressValidation.forPigeonhole(level.getEnvelopeContext().addresses().getAll(), player)
+              .test(addressId)
+              .ifPresentOrElse(
+                    id -> {
+                        Address.Block address = new Address.Block(addressId);
+                        blockEntity.setAddress(address);
+                        blockEntity.setOwner(player.getUUID());
+                        level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
+
+                        level.getEnvelopeContext().getPigeonholeManager().getOrRegister(address, pos);
+
+                        if (!player.isCreative()) {
+                            player.getInventory().getItem(slot).shrink(1);
+                            player.giveExperienceLevels(-Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get());
+                            level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1, 1);
+                        }
+
+                        player.swing(slot == Inventory.SLOT_OFFHAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+                        level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
+                    },
+                    error -> {
+                        player.displayClientMessage(error.getTranslation(), true);
+                        level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                    });
     }
 
     public boolean isValidDimension(Level level) {

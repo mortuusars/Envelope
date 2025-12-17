@@ -69,12 +69,29 @@ public class Delivery {
         return Result.success(this);
     }
 
-    public static Builder create() {
+    public static Builder builder() {
         return new Builder();
     }
 
+    public static Builder service() {
+        return new Builder().service();
+    }
+
+    public static Builder real(BlockPos pos) {
+        return new Builder().real(pos);
+    }
+
+    public static Result<Delivery> service(ServerLevel level, Mail mail, Address from, Address to) {
+        return builder()
+              .deliver(mail)
+              .from(from)
+              .to(to)
+              .origin(DeliveryOrigin.service())
+              .create(level);
+    }
+
     public static Result<Delivery> create(ServerLevel level, Mail mail, Address from, Address to, DeliveryOrigin origin) {
-        return create()
+        return builder()
               .deliver(mail)
               .from(from)
               .to(to)
@@ -248,6 +265,10 @@ public class Delivery {
                 LOGGER.info("Delivery of {} - '{} > {}' is created.", mail.toString(), sender, recipient);
             }
             return delivery;
+        }
+
+        public Delivery createOrThrow(ServerLevel level) {
+            return create(level).getValue().orElseThrow();
         }
     }
 }

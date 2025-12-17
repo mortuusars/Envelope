@@ -38,7 +38,7 @@ public class PigeonholeMailReceiver implements MailReceiver {
                     .orElseGet(() -> {
                         LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
                         return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                              .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+                              .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
                     }));
     }
 }

@@ -1,13 +1,12 @@
 package io.github.mortuusars.envelope.util.result;
 
+import com.mojang.serialization.DataResult;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Error {
-    private static final Logger log = LoggerFactory.getLogger(Error.class);
     protected final String message;
     protected final @Nullable String translationKey;
 
@@ -30,5 +29,9 @@ public class Error {
 
     public void log(Logger logger) {
         logger.error(getMessage());
+    }
+
+    public <T> DataResult<T> asDataResult() {
+        return DataResult.error(this::getMessage);
     }
 }

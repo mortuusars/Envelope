@@ -4,20 +4,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
-import io.github.mortuusars.envelope.world.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
-import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
+import io.github.mortuusars.envelope.util.result.Error;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -87,18 +82,12 @@ public interface Address {
         };
     }
 
-    default Mail receiveMail(ServerLevel level, Mail mail) {
-        if (mail.isEmpty()) return Mail.EMPTY;
-        return map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
-    }
-
     // --
 
-    static @NotNull DataResult<String> validate(String str) {
-        if (StringUtil.isBlank(str)) return DataResult.error(() -> "id cannot be empty");
-        if (str.length() > MAX_LENGTH) return DataResult.error(() -> "id cannot be longer than " + MAX_LENGTH);
-        if (!StringUtil.filterText(str).equals(str)) return DataResult.error(() -> "id contains invalid characters");
-        return DataResult.success(str);
+    static @NotNull DataResult<String> validate(String id) {
+        return AddressValidation.id()
+              .test(id)
+              .map(DataResult::success, Error::asDataResult);
     }
 
     // --

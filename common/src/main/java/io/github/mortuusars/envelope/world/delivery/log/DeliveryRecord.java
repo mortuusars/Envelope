@@ -106,7 +106,7 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
             return this;
         }
 
-        public Builder withMessage(Component message) {
+        public Builder message(Component message) {
             this.message = Optional.ofNullable(message);
             return this;
         }

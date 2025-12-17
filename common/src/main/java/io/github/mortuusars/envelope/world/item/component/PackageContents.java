@@ -82,11 +82,10 @@ public final class PackageContents implements TooltipComponent {
     // --
 
     @SuppressWarnings("deprecation")
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        return object instanceof PackageContents packageContents && ItemStack.listMatches(this.items, packageContents.items);
+    public boolean equals(Object another) {
+        return this == another ||
+              (another instanceof PackageContents packageContents
+                    && ItemStack.listMatches(this.items, packageContents.items));
     }
 
     @SuppressWarnings("deprecation")

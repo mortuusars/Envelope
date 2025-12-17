@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.mail.entity;
+package io.github.mortuusars.envelope.world.mail.entity.mail_service;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -16,16 +16,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MailServiceData extends SavedData {
+public class MailServiceData extends SavedData implements PaybackDepartmentData {
     public static final Codec<MailServiceData> CODEC = RecordCodecBuilder.create(i -> i.group(
-          Codec.unboundedMap(MailId.STRING_CODEC, MailService.MailAwaitingPayback.CODEC)
+          Codec.unboundedMap(MailId.STRING_CODEC, MailAwaitingPayback.CODEC)
                 .optionalFieldOf("mail_awaiting_payback", Collections.emptyMap())
                 .forGetter(MailServiceData::getMailAwaitingPayback)
     ).apply(i, MailServiceData::new));
 
-    private final Map<MailId, MailService.MailAwaitingPayback> mailAwaitingPayback;
+    private final Map<MailId, MailAwaitingPayback> mailAwaitingPayback;
 
-    public MailServiceData(Map<MailId, MailService.MailAwaitingPayback> mailAwaitingPayback) {
+    public MailServiceData(Map<MailId, MailAwaitingPayback> mailAwaitingPayback) {
         this.mailAwaitingPayback = new HashMap<>(mailAwaitingPayback); // Make sure it's mutable
     }
 
@@ -33,7 +33,7 @@ public class MailServiceData extends SavedData {
         this(Collections.emptyMap());
     }
 
-    public Map<MailId, MailService.MailAwaitingPayback> getMailAwaitingPayback() {
+    public Map<MailId, MailAwaitingPayback> getMailAwaitingPayback() {
         return mailAwaitingPayback;
     }
 

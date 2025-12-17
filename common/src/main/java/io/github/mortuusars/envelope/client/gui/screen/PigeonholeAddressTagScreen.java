@@ -46,7 +46,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
         this.pos = pos;
         this.state = Minecrft.level().getBlockState(pos);
         this.existingAddress = existingAddress.map(Address.class::cast);
-        this.addressValidator = AddressValidation.forPigeonhole(() -> knownAddresses, () -> player).cached();
+        this.addressValidator = AddressValidation.forPigeonhole(knownAddresses, player).cached();
     }
 
     // -- Address
@@ -81,10 +81,10 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
         MutableComponent confirmTooltip = Component.translatable("gui.envelope.confirm");
 
         if (!canConfirm()) {
-            getAddressValidator().getIssues()
+            getAddressValidator().getErrors()
                   .forEach(issue -> confirmTooltip.append("\n")
                         .append(Component.literal("• ").withStyle(ChatFormatting.RED))
-                        .append(issue.getMessage().withStyle(ChatFormatting.RED)));
+                        .append(issue.getTranslation().withStyle(ChatFormatting.RED)));
             confirmButton.setTooltip(Tooltip.create(confirmTooltip));
             return;
         }
@@ -105,7 +105,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     @Override
     protected void addressTextChanged(String text) {
         super.addressTextChanged(text);
-        getAddressValidator().validate(getCurrentAddressId());
+        getAddressValidator().testAll(getCurrentAddressId());
     }
 
     @Override
@@ -139,7 +139,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
 
     @Override
     protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        int color = getAddressValidator().getIssues().isEmpty() ? 0xFFFFFFFF : 0xAAFFFFFF;
+        int color = getAddressValidator().getErrors().isEmpty() ? 0xFFFFFFFF : 0xAAFFFFFF;
         guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_BLOCK, leftPos + 17, topPos + 21, color, true);
     }
 
@@ -193,6 +193,6 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     }
 
     protected boolean canConfirm() {
-        return isCurrentIdSameAsExistingAddress() || getAddressValidator().getIssues().isEmpty();
+        return isCurrentIdSameAsExistingAddress() || getAddressValidator().getErrors().isEmpty();
     }
 }

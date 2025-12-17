@@ -1,48 +1,42 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
 import io.github.mortuusars.envelope.Config;
-import io.github.mortuusars.envelope.util.validation.Issue;
+import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.validation.Rule;
 import io.github.mortuusars.envelope.util.validation.Validator;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.function.Supplier;
+public interface AddressValidation {
+    Error CANNOT_BE_EMPTY = new Error("Id cannot be empty", "error.envelope.address.id_cannot_be_empty");
+    Error TOO_LONG = new Error("Id is too long", "error.envelope.address.id_too_long");
+    Error CONTAINS_INVALID_CHARS = new Error("Id is too long", "error.envelope.address.id_contains_invalid_chars");
+    Error TAKEN = new Error("Id is in use", "error.envelope.address.taken");
+    Error NOT_ENOUGH_XP = new Error("Not enough xp levels", "error.envelope.address.not_enough_xp_levels");
 
-public abstract class AddressValidation {
-    public static Issue CANNOT_BE_EMPTY = () -> "address.empty";
-    public static Issue TOO_LONG = () -> "address.too_long";
-    public static Issue CONTAINS_INVALID_CHARS = () -> "address.contains_invalid_chars";
-    public static Issue TAKEN = () -> "address.taken";
-    public static Issue NOT_ENOUGH_XP = () -> "address.not_enough_xp_levels";
-
-    // Address#validate logic is duplicated here, I haven't found a good way to merge them. Validation shouldn't change much anyway.
-    private static final Validator<String> FORMAT = Validator.of(
+    Validator<String> ID = Validator.of(
           Rule.when(StringUtil::isBlank, CANNOT_BE_EMPTY),
           Rule.when(id -> id.length() > Address.MAX_LENGTH, TOO_LONG),
           Rule.when(id -> !StringUtil.filterText(id).equals(id), CONTAINS_INVALID_CHARS)
     );
 
-    public static Validator<String> format() {
-        return FORMAT;
+    static Validator<String> id() {
+        return ID;
     }
 
-    public static Validator<String> forPigeonhole(Supplier<AllAddresses> addresses, Supplier<Player> player) {
-        return format()
+    static Validator<String> forPigeonhole(AllAddresses addresses, Player player) {
+        return id()
               .and(isNotTaken(addresses))
               .and(hasEnoughXp(player, Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get()));
     }
 
     // --
 
-    public static Rule<String> isNotTaken(Supplier<AllAddresses> addresses) {
-        return Rule.when(id -> addresses.get().isKnown(id), TAKEN);
+    static Rule<String> isNotTaken(AllAddresses addresses) {
+        return Rule.when(addresses::isKnown, TAKEN);
     }
 
-    public static Rule<String> hasEnoughXp(Supplier<Player> player, int xpLevelsRequired) {
-        return Rule.when(id -> {
-            Player pl = player.get();
-            return !pl.isCreative() && pl.experienceLevel < xpLevelsRequired;
-        }, NOT_ENOUGH_XP);
+    static Rule<String> hasEnoughXp(Player player, int xpLevelsRequired) {
+        return Rule.when(id -> !player.isCreative() && player.experienceLevel < xpLevelsRequired, NOT_ENOUGH_XP);
     }
 }

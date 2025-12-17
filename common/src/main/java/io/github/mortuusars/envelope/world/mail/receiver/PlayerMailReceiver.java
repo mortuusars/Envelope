@@ -18,6 +18,6 @@ public class PlayerMailReceiver implements MailReceiver {
               .map(PigeonholeMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
               .orElseGet(() -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                    .withMessage(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
+                    .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
     }
 }

@@ -87,13 +87,13 @@ public class PigeonDeliverMailGoal extends Goal implements DeliveryHandler {
     public DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
             delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                  .withMessage(DeliveryRecord.Message.UNABLE_TO_REACH)));
+                  .message(DeliveryRecord.Message.UNABLE_TO_REACH)));
             return DeliveryPhase.APPROACHING_SENDER;
         }
 
         if (currentPhase == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
             delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                  .withMessage(DeliveryRecord.Message.UNABLE_TO_REACH)));
+                  .message(DeliveryRecord.Message.UNABLE_TO_REACH)));
             return DeliveryPhase.DEPARTING_RECIPIENT;
         }
 

@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.util.validation;
 
+import io.github.mortuusars.envelope.util.result.Error;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -7,7 +8,7 @@ import java.util.List;
 
 public class CachedValidator<T> extends Validator<T> {
     protected @Nullable T value = null;
-    protected List<Issue> issues = Collections.emptyList();
+    protected List<Error> issues = Collections.emptyList();
 
     public CachedValidator(List<Rule<T>> rules) {
         super(rules);
@@ -17,15 +18,15 @@ public class CachedValidator<T> extends Validator<T> {
         return value;
     }
 
-    public List<Issue> getIssues() {
+    public List<Error> getErrors() {
         return issues;
     }
 
     @Override
-    public List<Issue> validate(T value) {
-        List<Issue> issues = super.validate(value);
+    public List<Error> testAll(T value) {
+        List<Error> errors = super.testAll(value);
         this.value = value;
-        this.issues = issues;
-        return issues;
+        this.issues = errors;
+        return errors;
     }
 }
