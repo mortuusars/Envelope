@@ -17,6 +17,7 @@ import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -63,7 +64,7 @@ public class EnvelopeCommand {
         ServerLevel level = context.getSource().getLevel();
         ItemStack mail = item.createItemStack(1, false);
 
-        level.getEnvelopeContext().getDeliveryManager()
+        MailService.of(level).getDeliveryManager()
               .startService(Delivery.of(new Mail(mail)))
               .ifPresentOrElse(
                     delivery -> {
@@ -81,13 +82,13 @@ public class EnvelopeCommand {
 
     private static int listAllPigeonholes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
-        Set<Address.Block> addresses = level.getEnvelopeContext().getPigeonholeManager().getAllAddresses();
+        Set<Address.Block> addresses = MailService.of(level).getPigeonholeManager().getAllAddresses();
 
         if (!addresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("All pigeonholes:"), true);
             for (Address.Block address : addresses) {
                 context.getSource().sendSuccess(() -> copyableAddressAndPos(address,
-                      level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address)), true);
+                      MailService.of(level).getPigeonholeManager().getPositionOf(address)), true);
             }
         } else {
             context.getSource().sendSuccess(() ->
@@ -99,13 +100,13 @@ public class EnvelopeCommand {
     private static int listDefaultPigeonholes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
 
-        Map<Address.Player, Address.Block> defaultAddresses = level.getEnvelopeContext().getPlayers().getDefaultAddresses();
+        Map<Address.Player, Address.Block> defaultAddresses = MailService.of(level).getPlayers().getDefaultAddresses();
 
         if (!defaultAddresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
 
             defaultAddresses.forEach((playerAddress, address) -> {
-                Optional<BlockPos> position = level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address);
+                Optional<BlockPos> position = MailService.of(level).getPigeonholeManager().getPositionOf(address);
                 context.getSource().sendSuccess(() -> Component.literal(playerAddress.toString())
                       .append(" - ")
                       .append(copyableAddressAndPos(address, position)), true);
@@ -120,12 +121,12 @@ public class EnvelopeCommand {
 
     private static int pigeonholePosition(CommandContext<CommandSourceStack> context, Address.Block address) {
         ServerLevel level = context.getSource().getLevel();
-        if (!level.getEnvelopeContext().getPigeonholeManager().exists(address)) {
+        if (!MailService.of(level).getPigeonholeManager().exists(address)) {
             context.getSource().sendFailure(address.getName().append(" does not exist."));
             return 1;
         }
 
-        level.getEnvelopeContext().getPigeonholeManager().getPositionOf(address)
+        MailService.of(level).getPigeonholeManager().getPositionOf(address)
               .ifPresentOrElse(
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
                     () -> context.getSource().sendFailure(address.getName()

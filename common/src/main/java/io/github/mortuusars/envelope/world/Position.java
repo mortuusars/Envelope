@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -23,8 +24,8 @@ public class Position {
 
     public static Optional<BlockPos> ofAddress(ServerLevel level, Address address) {
         return address.map(
-              pigeonhole -> level.getEnvelopeContext().getPigeonholeManager().getPositionOf(pigeonhole),
-              player -> level.getEnvelopeContext().getPlayers().getDefaultAddressOf(player)
+              pigeonhole -> MailService.of(level).getPigeonholeManager().getPositionOf(pigeonhole),
+              player -> MailService.of(level).getPlayers().getDefaultAddressOf(player)
                     .flatMap(pigeonholeAddress -> ofAddress(level, pigeonholeAddress)),
               entity -> Optional.empty());
     }

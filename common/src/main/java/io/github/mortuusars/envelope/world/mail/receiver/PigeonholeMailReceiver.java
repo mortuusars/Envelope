@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.MailService;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.server.level.ServerLevel;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ public class PigeonholeMailReceiver implements MailReceiver {
 
     @Override
     public Mail receiveMail(ServerLevel level, Mail mail) {
-        PigeonholeManager pigeonholeManager = level.getEnvelopeContext().getPigeonholeManager();
+        PigeonholeManager pigeonholeManager = MailService.of(level).getPigeonholeManager();
 
         if (mail.isEmpty()) {
             return Mail.EMPTY;

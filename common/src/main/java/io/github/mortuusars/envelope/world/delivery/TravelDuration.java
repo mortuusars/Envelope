@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.MailService;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -39,8 +40,7 @@ public record TravelDuration(int ticks) {
 
     public static Supplier basedOnSenderToRecipientDistance() {
         return (level, sender, recipient) -> {
-            int distance = level.getEnvelopeContext().addresses().getDistanceTo(sender, recipient)
-                  .orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
+            int distance = MailService.of(level).getDistanceBetweenOrDefault(sender, recipient);
             return basedOnDistance(distance).get(level, sender, recipient);
         };
     }

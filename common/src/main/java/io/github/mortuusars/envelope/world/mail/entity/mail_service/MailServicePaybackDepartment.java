@@ -14,7 +14,7 @@ import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailId;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.service.EnvelopeContext;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,15 +24,15 @@ import java.util.function.Supplier;
 public class MailServicePaybackDepartment {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final EnvelopeContext context;
+    private final MailService context;
     private final Supplier<PaybackDepartmentData> data;
 
-    public MailServicePaybackDepartment(EnvelopeContext context, MailService mailService, Supplier<PaybackDepartmentData> data) {
+    public MailServicePaybackDepartment(MailService context, MailServiceEntity mailServiceEntity, Supplier<PaybackDepartmentData> data) {
         this.context = context;
         this.data = data;
     }
 
-    public EnvelopeContext getContext() {
+    public MailService getContext() {
         return context;
     }
 

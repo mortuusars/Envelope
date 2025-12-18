@@ -12,8 +12,8 @@ package io.github.mortuusars.envelope.world.service;
  * }
  * </pre>
  */
-public interface EnvelopeContextHolder {
-    default EnvelopeContext getEnvelopeContext() {
+public interface MailServiceHolder {
+    default MailService getEnvelopeMailService() {
         throw new IllegalStateException("This method must be implemented");
     }
 }

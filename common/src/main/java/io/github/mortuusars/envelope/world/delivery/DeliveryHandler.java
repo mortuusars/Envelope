@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
 public interface DeliveryHandler {
@@ -13,7 +14,7 @@ public interface DeliveryHandler {
 
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT) {
-            if (!level.getEnvelopeContext().addresses().canDeliverMailTo(delivery.getRecipient())) {
+            if (!MailService.of(level).canDeliverMailTo(delivery.getRecipient())) {
                 delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                       .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
                 return DeliveryPhase.APPROACHING_SENDER;
@@ -61,10 +62,10 @@ public interface DeliveryHandler {
 
         switch (phase) {
             case HANDLING_DELIVERY -> {
-                delivery.updateMail(mail -> level.getEnvelopeContext().receiveMail(level, delivery.getRecipient(), mail));
+                delivery.updateMail(mail -> MailService.of(level).receiveMail(level, delivery.getRecipient(), mail));
             }
             case HANDLING_RETURN -> {
-                delivery.updateMail(mail -> level.getEnvelopeContext().receiveMail(level, delivery.getSender(), mail));
+                delivery.updateMail(mail -> MailService.of(level).receiveMail(level, delivery.getSender(), mail));
             }
         }
     }

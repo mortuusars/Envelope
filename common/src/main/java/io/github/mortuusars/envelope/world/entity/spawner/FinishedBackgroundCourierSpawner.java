@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity.spawner;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.background.FinishedBackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -26,7 +27,7 @@ public class FinishedBackgroundCourierSpawner implements CustomSpawner {
 
         nextAttemptDelay = SPAWN_ATTEMPT_DELAY;
 
-        BackgroundDelivery backgroundDelivery = level.getEnvelopeContext().getBackgroundDelivery();
+        BackgroundDelivery backgroundDelivery = MailService.of(level).getBackgroundDelivery();
         List<FinishedBackgroundCourier> couriers = backgroundDelivery.getFinishedCouriers();
 
         if (couriers.isEmpty()) {

@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.mail.receiver;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
 public class PlayerMailReceiver implements MailReceiver {
@@ -14,7 +15,7 @@ public class PlayerMailReceiver implements MailReceiver {
 
     @Override
     public Mail receiveMail(ServerLevel level, Mail mail) {
-        return level.getEnvelopeContext().getPlayers().getDefaultAddressOf(address)
+        return MailService.of(level).getPlayers().getDefaultAddressOf(address)
               .map(PigeonholeMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
               .orElseGet(() -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)

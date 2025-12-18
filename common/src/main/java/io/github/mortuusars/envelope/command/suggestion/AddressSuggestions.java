@@ -6,7 +6,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.service.EnvelopeContext;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import org.jetbrains.annotations.Nullable;
@@ -39,10 +39,8 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        EnvelopeContext envelopeContext = context.getSource().getLevel().getEnvelopeContext();
-
-        Stream<String> addresses = envelopeContext.addresses().getAll(type).stream().map(Address::id);
-
+        MailService mailService = context.getSource().getLevel().getEnvelopeMailService();
+        Stream<String> addresses = mailService.getKnownAddressesOfType(type).stream().map(Address::id);
         return SharedSuggestionProvider.suggest(addresses, builder);
     }
 }

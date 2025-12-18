@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.delivery.*;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.Optional;
@@ -35,7 +36,7 @@ public record BackgroundCourier(SpawnableEntityData entityData, Delivery deliver
         if (origin.isRegular()) {
             FinishedBackgroundCourier courier = new FinishedBackgroundCourier(
                   entityData(), origin.getPos(), delivery.getMail().getItemForReading());
-            level.getEnvelopeContext().getBackgroundDelivery().addFinishedCourier(courier);
+            MailService.of(level).getBackgroundDelivery().addFinishedCourier(courier);
         }
     }
 

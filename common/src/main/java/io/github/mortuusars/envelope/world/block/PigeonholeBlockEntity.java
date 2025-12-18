@@ -7,7 +7,6 @@ import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNew
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.delivery.Courier;
-import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.StoredMail;
@@ -15,6 +14,7 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
+import io.github.mortuusars.envelope.world.service.MailService;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
@@ -120,7 +120,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
         if (level instanceof ServerLevel serverLevel) {
             if (data == null || !data.stillValid()) {
-                data = serverLevel.getEnvelopeContext().getPigeonholeManager().getOrRegister(address, getBlockPos());
+                data = MailService.of(serverLevel).getPigeonholeManager().getOrRegister(address, getBlockPos());
                 address = data.getAddress(); // Update address to correct and registered value
             }
         }
@@ -418,11 +418,11 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         mailStack.set(Envelope.DataComponents.SENDER, address);
 
         Address recipient = mailStack.getOrDefault(Envelope.DataComponents.RECIPIENT, Address.UNKNOWN);
-        if (level.getEnvelopeContext().addresses().resolve(recipient).matches(this.address)) {
+        if (MailService.of(level).resolve(recipient).matches(this.address)) {
             return;
         }
 
-        level.getEnvelopeContext().getDeliveryManager().start(Delivery.of(new Mail(mailStack)), pigeon)
+        MailService.of(level).getDeliveryManager().start(Delivery.of(new Mail(mailStack)), pigeon)
               .ifPresent(delivery -> {
                   removeItem(SLOT_MAIL, 1);
                   removeItem(SLOT_FOOD, 1);

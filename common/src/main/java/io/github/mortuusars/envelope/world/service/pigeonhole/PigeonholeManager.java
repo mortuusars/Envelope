@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +84,7 @@ public class PigeonholeManager {
         @Nullable PigeonholeData removed = getPigeonholes().remove(address);
         if (removed != null) {
             removed.invalidate();
-            level.getEnvelopeContext().getPlayers().removeDefaultAddress(address);
+            MailService.of(level).getPlayers().removeDefaultAddress(address);
             setDirty();
             if (Envelope.debug()) LOGGER.info("Removed Pigeonhole '{}'@[{}]",
                   removed.getAddress().id(), removed.getPos().toShortString());
@@ -93,7 +94,7 @@ public class PigeonholeManager {
     public @NotNull PigeonholeData rename(PigeonholeData data, Address.Block suggestedAddress) {
         Address.Block newAddress = uniquifyIfKnown(suggestedAddress);
 
-        level.getEnvelopeContext().getPlayers().renameDefaultAddress(data.getAddress(), newAddress);
+        MailService.of(level).getPlayers().renameDefaultAddress(data.getAddress(), newAddress);
 
         PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail());
 
@@ -152,13 +153,13 @@ public class PigeonholeManager {
     // --
 
     protected boolean inUseAsPlayerOrEntity(Address.Block address) {
-        AllAddresses knownAddresses = level.getEnvelopeContext().addresses().getAll();
+        AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
               || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
     }
 
     protected Address.Block uniquifyIfKnown(Address.Block address) {
-        AllAddresses knownAddresses = level.getEnvelopeContext().addresses().getAll();
+        AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         if (!knownAddresses.isKnown(address)) {
             return address;
         }

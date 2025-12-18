@@ -1,69 +1,77 @@
 package io.github.mortuusars.envelope.world.service;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressHelper;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailService;
-import io.github.mortuusars.envelope.world.mail.entity.VillagerMailEntity;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
+import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailServiceEntity;
 import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EnvelopeContext {
+public class MailService {
     protected final ServerLevel level;
+
     protected final PigeonholeManager pigeonholeManager;
     protected final MailEntities mailEntities;
-    protected final AddressHelper addressHelper;
-    protected final MailService mailService;
+    protected final MailServiceEntity mailServiceEntity;
     protected final DeliveryManager deliveryManager;
 
     protected @Nullable Players players;
     protected @Nullable BackgroundDelivery backgroundDelivery;
 
-    public EnvelopeContext(ServerLevel level) {
+    private MailService(ServerLevel level) {
         Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "EnvelopeContext can exist only on overworld level.");
         this.level = level;
         this.pigeonholeManager = new PigeonholeManager(level);
         this.mailEntities = new MailEntities();
-        this.addressHelper = new AddressHelper(this);
-        this.mailService = new MailService(this);
+        this.mailServiceEntity = new MailServiceEntity(this);
         this.deliveryManager = new DeliveryManager(this);
 
-        this.mailEntities.register(mailService);
-        this.mailEntities.register(new VillagerMailEntity(new Address.Entity("Villager"), 1500));
+        this.mailEntities.register(mailServiceEntity);
     }
 
-    public static EnvelopeContext of(ServerLevel level) {
-        return level.getEnvelopeContext();
+    /**
+     * It's intended to be created only once for a level. Use {@link MailService#of} to get the instance.
+     */
+    @ApiStatus.Internal
+    public static MailService create(ServerLevel level) {
+        return new MailService(level);
     }
 
-    public static EnvelopeContext of(ServerPlayer player) {
-        return player.serverLevel().getEnvelopeContext();
+    public static MailService of(ServerLevel level) {
+        return level.getEnvelopeMailService();
     }
+
+    // --
 
     public ServerLevel getLevel() {
         return level;
@@ -77,8 +85,8 @@ public class EnvelopeContext {
         return mailEntities;
     }
 
-    public MailService getMailService() {
-        return mailService;
+    public MailServiceEntity getMailService() {
+        return mailServiceEntity;
     }
 
     public @NotNull Players getPlayers() {
@@ -97,8 +105,70 @@ public class EnvelopeContext {
         return deliveryManager;
     }
 
-    public AddressHelper addresses() {
-        return addressHelper;
+    // -- Address
+
+    public AllAddresses getKnownAddresses() {
+        return new AllAddresses(
+              getPigeonholeManager().getAllAddresses(),
+              getPlayers().getDefaultAddresses().keySet(),
+              getMailEntities().getAllAddresses()
+        );
+    }
+
+    public AllAddresses getKnownAddressesOfType(@Nullable Address.Type type) {
+        if (type == null) {
+            return getKnownAddresses();
+        }
+        return switch (type) {
+            case BLOCK -> AllAddresses.pigeonholes(getPigeonholeManager().getAllAddresses());
+            case PLAYER -> AllAddresses.players(getPlayers().getDefaultAddresses().keySet());
+            case ENTITY -> AllAddresses.entities(getMailEntities().getAllAddresses());
+        };
+    }
+
+    public Optional<Address.Block> getPlayerDefaultAddress(Address.Player playerAddress) {
+        return Optional.ofNullable(getPlayers().getDefaultAddresses().get(playerAddress));
+    }
+
+    /**
+     * @return "final" address. Mostly for getting default pigeonhole address of a player.
+     */
+    public Address resolve(Address address) {
+        if (address instanceof Address.Player playerAddress) {
+            return getPlayerDefaultAddress(playerAddress).map(Address.class::cast).orElse(address);
+        }
+        return address;
+    }
+
+    public boolean canDeliverMailTo(Address address) {
+        if (address.equals(Address.UNKNOWN)) {
+            return false;
+        }
+        address = resolve(address);
+        return getKnownAddresses().isKnown(address);
+    }
+
+    public Optional<BlockPos> getPositionOf(Address address) {
+        return Position.ofAddress(level, address);
+    }
+
+    public Optional<Integer> getDistanceBetween(Address first, Address second) {
+        if (second instanceof Address.Entity entity) {
+            return MailService.of(level).getMailEntities().byAddress(entity).map(MailEntity::getDistance);
+        }
+
+        Optional<BlockPos> firstPos = Position.ofAddress(level, first);
+        Optional<BlockPos> secondPos = Position.ofAddress(level, second);
+
+        if (firstPos.isEmpty() || secondPos.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of((int) Math.sqrt(firstPos.get().distSqr(secondPos.get())));
+    }
+
+    public int getDistanceBetweenOrDefault(Address first, Address second) {
+        return getDistanceBetween(first, second).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
     }
 
     // --
@@ -149,7 +219,7 @@ public class EnvelopeContext {
 
               ChatFormatting.GRAY +
               (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
-              addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
+              getDistanceBetween(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
               " | ⌚" + delivery.getTravelDuration().seconds() + "s" +
               ChatFormatting.RESET +
 

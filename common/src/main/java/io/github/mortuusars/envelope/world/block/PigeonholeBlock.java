@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAd
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.service.MailService;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
@@ -134,7 +135,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.getBlock().equals(newState.getBlock())) {
             if (level instanceof ServerLevel serverLevel) {
-                PigeonholeManager pigeonholeManager = serverLevel.getEnvelopeContext().getPigeonholeManager();
+                PigeonholeManager pigeonholeManager = MailService.of(serverLevel).getPigeonholeManager();
                 @Nullable PigeonholeData data = pigeonholeManager.getDataAt(pos);
                 if (data != null) {
                     NonNullList<ItemStack> itemsToDrop = data.extractAllMail().stream()
@@ -250,7 +251,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeContext().addresses().getAll();
+                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeMailService().getKnownAddresses();
                 Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
             }
             return ItemInteractionResult.SUCCESS;
@@ -311,7 +312,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return;
         }
 
-        AddressValidation.forPigeonhole(level.getEnvelopeContext().addresses().getAll(), player)
+        AddressValidation.forPigeonhole(MailService.of(level).getKnownAddresses(), player)
               .test(addressId)
               .ifPresentOrElse(
                     id -> {
@@ -320,7 +321,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                         blockEntity.setOwner(player.getUUID());
                         level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
 
-                        level.getEnvelopeContext().getPigeonholeManager().getOrRegister(address, pos);
+                        MailService.of(level).getPigeonholeManager().getOrRegister(address, pos);
 
                         if (!player.isCreative()) {
                             player.getInventory().getItem(slot).shrink(1);

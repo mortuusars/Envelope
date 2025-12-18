@@ -25,9 +25,9 @@ public class DeliveryManager {
           "Mail is empty.",
           "error.envelope.delivery.no_mail"));
 
-    private final EnvelopeContext context;
+    private final MailService context;
 
-    public DeliveryManager(EnvelopeContext context) {
+    public DeliveryManager(MailService context) {
         this.context = context;
     }
 

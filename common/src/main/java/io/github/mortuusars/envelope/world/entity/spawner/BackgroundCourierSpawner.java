@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.TransitionableCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -17,7 +18,7 @@ import java.util.List;
 public class BackgroundCourierSpawner implements CustomSpawner {
     @Override
     public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
-        BackgroundDelivery backgroundDelivery = level.getEnvelopeContext().getBackgroundDelivery();
+        BackgroundDelivery backgroundDelivery = MailService.of(level).getBackgroundDelivery();
 
         List<BackgroundCourier> spawnableCouriers = backgroundDelivery.getCouriers()
               .stream()
@@ -56,7 +57,7 @@ public class BackgroundCourierSpawner implements CustomSpawner {
             courier.onAppeared(level);
             courier.continueDelivery(level, delivery);
 
-            level.getEnvelopeContext().getBackgroundDelivery().removeCourier(backgroundCourier);
+            MailService.of(level).getBackgroundDelivery().removeCourier(backgroundCourier);
         }
     }
 }

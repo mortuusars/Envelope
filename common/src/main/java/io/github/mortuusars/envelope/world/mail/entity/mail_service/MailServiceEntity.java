@@ -5,26 +5,26 @@ import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
-import io.github.mortuusars.envelope.world.service.EnvelopeContext;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-public class MailService extends MailEntity {
+public class MailServiceEntity extends MailEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final EnvelopeContext context;
+    private final MailService context;
     private final MailServicePaybackDepartment paybackDepartment;
     private @Nullable MailServiceData data;
 
-    public MailService(EnvelopeContext context) {
+    public MailServiceEntity(MailService context) {
         super(Address.MAIL_SERVICE, 1500);
         this.context = context;
         this.paybackDepartment = new MailServicePaybackDepartment(context, this, this::getData);
     }
 
-    public EnvelopeContext getContext() {
+    public MailService getContext() {
         return context;
     }
 
