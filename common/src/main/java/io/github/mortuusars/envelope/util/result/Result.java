@@ -84,6 +84,13 @@ public class Result<T> {
         return this;
     }
 
+    public Result<T> ifError(Consumer<Error> consumer) {
+        if (isError()) {
+            consumer.accept(error);
+        }
+        return this;
+    }
+
     public Result<T> filter(Function<T, Result<T>> filter) {
         return getValue().map(filter).orElse(this);
     }

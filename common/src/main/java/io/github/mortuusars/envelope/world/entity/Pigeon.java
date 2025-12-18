@@ -104,6 +104,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected PigeonDeliverMailGoal deliverMailGoal;
 
     protected @Nullable Delivery delivery;
+    protected @Nullable CourierOrigin origin;
 
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
@@ -115,11 +116,38 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     // -- Spawn
 
-    public static boolean checkPigeonSpawnRules(EntityType<Pigeon> pigeon, LevelAccessor level,
-                                                MobSpawnType spawnType, BlockPos pos, RandomSource random) {
+    public static boolean checkSpawnRules(EntityType<Pigeon> pigeon, LevelAccessor level,
+                                          MobSpawnType spawnType, BlockPos pos, RandomSource random) {
         return Config.Server.PIGEON_SPAWNS_NATURALLY.get()
               && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON)
               && isBrightEnoughToSpawn(level, pos);
+    }
+
+    public static Pigeon createService(ServerLevel level) {
+        Pigeon pigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
+              "Failed to create an entity. This should not happen.");
+        pigeon.setVariant(Variant.getRandom(level.getRandom()));
+        pigeon.setOrigin(CourierOrigin.service());
+        return pigeon;
+    }
+
+    public static Courier spawnServiceCourier(ServerLevel level, Delivery delivery) {
+        Pigeon pigeon = createService(level);
+        pigeon.startDelivery(delivery);
+        Optional<BlockPos> spawnPos = delivery.getRoute().senderPos().map(p -> Position.aboveGround(level, p, 1));
+        return spawnPos.filter(pos -> Position.isInSimulationDistance(level, pos))
+              .map(pos -> {
+                  pigeon.moveTo(
+                        (double) pos.getX() + 0.5,
+                        (double) pos.getY() + 0.5,
+                        (double) pos.getZ() + 0.5,
+                        Mth.wrapDegrees(level.random.nextFloat() * 360.0F),
+                        0.0F);
+                  level.addFreshEntity(pigeon);
+                  pigeon.onAppeared(level);
+                  return (Courier) pigeon;
+              })
+              .orElseGet(() -> pigeon.transitionToBackground(level));
     }
 
     @Nullable
@@ -187,9 +215,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         // It's a good place to check if courier should be transitioned to background
         if (level() instanceof ServerLevel level && isDelivering() && !Position.isInSimulationDistance(level, this)) {
             transitionToBackground(level);
-        } else {
-            super.checkDespawn();
+            return;
         }
+
+        super.checkDespawn();
     }
 
     protected void calculateFlapping() {
@@ -248,7 +277,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 //        }
 
         if (!delivery.getMail().isEmpty()) {
-            //TODO: COD mail should not drop probably
             spawnAtLocation(delivery.getMail().getItemCopy());
             delivery.setMail(Mail.EMPTY);
         }
@@ -485,12 +513,16 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         TransitionableCourier.super.continueDelivery(level, delivery);
     }
 
-    public void startDelivery(Delivery delivery) {
+    public Courier startDelivery(Delivery delivery) {
         if (this.delivery != null && this.delivery != delivery) {
             LOGGER.warn("Starting new delivery when pigeon is already delivering. This might be an error.");
         }
+        if (origin == null || !origin.isService()) {
+            setOrigin(CourierOrigin.regular(blockPosition()));
+        }
         stopRiding();
         setDelivery(delivery);
+        return this;
     }
 
     public Optional<Delivery> getDelivery() {
@@ -514,6 +546,18 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
     }
 
+    public @NotNull CourierOrigin getOrigin() {
+        if (origin == null) {
+            LOGGER.warn("Origin of a Pigeon was not set properly. Current position will be used as origin instead.");
+            origin = CourierOrigin.regular(blockPosition());
+        }
+        return origin;
+    }
+
+    public void setOrigin(@Nullable CourierOrigin origin) {
+        this.origin = origin;
+    }
+
     @Override
     public SpawnableEntityData toSpawnableData() {
         return SpawnableEntityData.of(this, IGNORED_TAGS);
@@ -533,6 +577,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                   .resultOrPartial(LOGGER::error)
                   .ifPresent(value -> tag.put("Delivery", value));
         }
+        if (origin != null) {
+            CourierOrigin.CODEC.encodeStart(NbtOps.INSTANCE, origin)
+                  .resultOrPartial(LOGGER::error)
+                  .ifPresent(value -> tag.put("Origin", value));
+        }
     }
 
     @Override
@@ -547,6 +596,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                   .resultOrPartial(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag.getCompound("Delivery"), e))
                   .orElse(null)
             );
+        }
+
+        if (tag.contains("Origin")) {
+            origin = CourierOrigin.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("Origin"))
+                  .resultOrPartial(e -> LOGGER.error("Cannot parse CourierOrigin from tag '{}': {}", tag.getCompound("Origin"), e))
+                  .orElse(null);
         }
 
         setDelivering(delivery != null);

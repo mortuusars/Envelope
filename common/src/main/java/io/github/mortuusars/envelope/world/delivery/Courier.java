@@ -7,6 +7,7 @@ import java.util.Optional;
 public interface Courier {
     Optional<Delivery> getDelivery();
     DeliveryHandler getDeliveryHandler();
+    CourierOrigin getOrigin();
 
     default void continueDelivery(ServerLevel level, Delivery delivery) {
         delivery.getProgress().update(getDeliveryHandler().getPhaseDuration(level, delivery, delivery.getCurrentPhase()));

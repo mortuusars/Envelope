@@ -1,11 +1,8 @@
 package io.github.mortuusars.envelope.world.service;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
@@ -21,14 +18,11 @@ import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +30,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,6 +39,7 @@ public class EnvelopeContext {
     protected final MailEntities mailEntities;
     protected final AddressHelper addressHelper;
     protected final MailService mailService;
+    protected final DeliveryManager deliveryManager;
 
     protected @Nullable Players players;
     protected @Nullable BackgroundDelivery backgroundDelivery;
@@ -58,6 +51,7 @@ public class EnvelopeContext {
         this.mailEntities = new MailEntities();
         this.addressHelper = new AddressHelper(this);
         this.mailService = new MailService(this);
+        this.deliveryManager = new DeliveryManager(this);
 
         this.mailEntities.register(mailService);
         this.mailEntities.register(new VillagerMailEntity(new Address.Entity("Villager"), 1500));
@@ -99,6 +93,10 @@ public class EnvelopeContext {
               : backgroundDelivery;
     }
 
+    public DeliveryManager getDeliveryManager() {
+        return deliveryManager;
+    }
+
     public AddressHelper addresses() {
         return addressHelper;
     }
@@ -108,33 +106,6 @@ public class EnvelopeContext {
     public Mail receiveMail(ServerLevel level, Address address, Mail mail) {
         if (mail.isEmpty()) return Mail.EMPTY;
         return address.map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
-    }
-
-    public Courier startServiceDelivery(Delivery delivery) {
-        Pigeon deliveringPigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
-              "Failed to create an entity. This should not happen.");
-
-        Optional<BlockPos> spawnPos = delivery.getRoute().senderPos().map(p -> Position.aboveGround(level, p, 1));
-
-        deliveringPigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos.orElse(BlockPos.ZERO)),
-              MobSpawnType.EVENT, null);
-
-        deliveringPigeon.startDelivery(delivery);
-
-        return spawnPos
-              .filter(pos -> Position.isInSimulationDistance(level, pos))
-              .map(pos -> {
-                  deliveringPigeon.moveTo(
-                        (double) pos.getX() + 0.5,
-                        (double) pos.getY() + 0.5,
-                        (double) pos.getZ() + 0.5,
-                        Mth.wrapDegrees(level.random.nextFloat() * 360.0F),
-                        0.0F);
-                  level.addFreshEntity(deliveringPigeon);
-                  deliveringPigeon.onAppeared(level);
-                  return (Courier) deliveringPigeon;
-              })
-              .orElseGet(() -> deliveringPigeon.transitionToBackground(level));
     }
 
     // --
@@ -180,7 +151,6 @@ public class EnvelopeContext {
               (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
               addresses().getDistanceTo(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
               " | ⌚" + delivery.getTravelDuration().seconds() + "s" +
-              (delivery.getOrigin().isService() ? " | Service" : "") +
               ChatFormatting.RESET +
 
               " // " + delivery.getCurrentPhase().toPrettyString() +

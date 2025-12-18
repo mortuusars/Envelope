@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.0.2
+  
+
 ## 0.4.0.1
 [Some existing envelope world data might disappear when updating to this version]
 

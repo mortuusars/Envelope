@@ -10,7 +10,6 @@ import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.Payback;
@@ -64,21 +63,16 @@ public class EnvelopeCommand {
         ServerLevel level = context.getSource().getLevel();
         ItemStack mail = item.createItemStack(1, false);
 
-        try {
-            Delivery.create(level, new Mail(mail), DeliveryOrigin.service()).ifPresentOrElse(
-                  delivery -> {
-                      level.getEnvelopeContext().startServiceDelivery(delivery);
-                      Component message = Component.literal("Mail sent to ")
-                            .append(delivery.getRecipient().format().asRecipient().toComponent());
-                      context.getSource().sendSuccess(() -> message, true);
-                  },
-                  error -> {
-                      error.log(Envelope.LOGGER);
-                      context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()));
-                  });
-        } catch (Exception e) {
-            context.getSource().sendFailure(Component.literal("Cannot send: " + e.getMessage()));
-        }
+        level.getEnvelopeContext().getDeliveryManager()
+              .startService(Delivery.of(new Mail(mail)))
+              .ifPresentOrElse(
+                    delivery -> {
+                        Component message = Component.literal("Mail sent to ")
+                              .append(delivery.delivery().getRecipient().format().asRecipient().toComponent());
+                        context.getSource().sendSuccess(() -> message, true);
+                    },
+                    error -> context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()))
+              );
 
         return 0;
     }

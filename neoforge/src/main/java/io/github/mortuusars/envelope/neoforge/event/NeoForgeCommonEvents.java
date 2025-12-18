@@ -105,7 +105,7 @@ public class NeoForgeCommonEvents {
         @SubscribeEvent
         public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
             event.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
-                    Pigeon::checkPigeonSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+                    Pigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         }
 
         @SubscribeEvent

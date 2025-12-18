@@ -8,10 +8,11 @@ import net.minecraft.server.level.ServerLevel;
 
 import java.util.Optional;
 
-public record BackgroundCourier(SpawnableEntityData entityData, Delivery delivery) implements Courier, DeliveryHandler {
+public record BackgroundCourier(SpawnableEntityData entityData, Delivery delivery, CourierOrigin origin) implements Courier, DeliveryHandler {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::entityData),
-          Delivery.CODEC.fieldOf("delivery").forGetter(BackgroundCourier::delivery)
+          Delivery.CODEC.fieldOf("delivery").forGetter(BackgroundCourier::delivery),
+          CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::origin)
     ).apply(instance, BackgroundCourier::new));
 
     @Override
@@ -25,10 +26,15 @@ public record BackgroundCourier(SpawnableEntityData entityData, Delivery deliver
     }
 
     @Override
+    public CourierOrigin getOrigin() {
+        return origin;
+    }
+
+    @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
-        if (delivery.getOrigin().isLocal()) {
+        if (origin.isRegular()) {
             FinishedBackgroundCourier courier = new FinishedBackgroundCourier(
-                  entityData(), delivery.getOrigin().getPos(), delivery.getMail().getItemForReading());
+                  entityData(), origin.getPos(), delivery.getMail().getItemForReading());
             level.getEnvelopeContext().getBackgroundDelivery().addFinishedCourier(courier);
         }
     }

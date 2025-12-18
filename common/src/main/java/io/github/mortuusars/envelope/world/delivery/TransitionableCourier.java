@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -14,16 +13,13 @@ public interface TransitionableCourier extends Courier {
     SpawnableEntityData toSpawnableData();
 
     default BackgroundCourier transitionToBackground(ServerLevel level) {
-        return getDelivery()
-              .map(delivery -> {
-                  BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableData(), delivery);
-                  level.getEnvelopeContext().getBackgroundDelivery().addCourier(backgroundCourier);
-                  backgroundCourier.continueDelivery(level, backgroundCourier.delivery());
-                  onVanished(level);
-                  ((Entity) this).discard();
-                  return backgroundCourier;
-              })
-              .orElseThrow(() -> new IllegalStateException("Cannot transition: courier is not delivering."));
+        Delivery delivery = getDelivery().orElseThrow(() -> new IllegalStateException("Cannot transition: courier is not delivering."));
+        BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableData(), delivery, getOrigin());
+        level.getEnvelopeContext().getBackgroundDelivery().addCourier(backgroundCourier);
+        backgroundCourier.continueDelivery(level, backgroundCourier.delivery());
+        onVanished(level);
+        ((Entity) this).discard();
+        return backgroundCourier;
     }
 
     default void onAppeared(ServerLevel level) {

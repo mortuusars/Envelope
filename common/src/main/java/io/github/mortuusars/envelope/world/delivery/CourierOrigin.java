@@ -12,18 +12,18 @@ import java.util.Optional;
  * Real entities will have it set to spawn there after delivery (if delivery is finished in the background).
  * @param pos Spawn position.
  */
-public record DeliveryOrigin(Optional<BlockPos> pos) {
-    public static final Codec<DeliveryOrigin> CODEC = BlockPos.CODEC.optionalFieldOf("pos")
-          .xmap(DeliveryOrigin::new, DeliveryOrigin::pos)
+public record CourierOrigin(Optional<BlockPos> pos) {
+    public static final Codec<CourierOrigin> CODEC = BlockPos.CODEC.optionalFieldOf("pos")
+          .xmap(CourierOrigin::new, CourierOrigin::pos)
           .codec();
 
-    private static final DeliveryOrigin SERVICE = new DeliveryOrigin(Optional.empty());
+    private static final CourierOrigin SERVICE = new CourierOrigin(Optional.empty());
 
-    public static DeliveryOrigin local(BlockPos homePos) {
-        return new DeliveryOrigin(Optional.ofNullable(homePos));
+    public static CourierOrigin regular(BlockPos homePos) {
+        return new CourierOrigin(Optional.ofNullable(homePos));
     }
 
-    public static DeliveryOrigin service() {
+    public static CourierOrigin service() {
         return SERVICE;
     }
 
@@ -31,15 +31,15 @@ public record DeliveryOrigin(Optional<BlockPos> pos) {
 
     public @NotNull BlockPos getPos() throws IllegalStateException {
         Preconditions.checkState(pos.isPresent(),
-              "Cannot get position of a service origin. Should check with isLocal/isService first.");
+              "Cannot get position of a service origin. Should check with isRegular/isService first.");
         return pos.orElseThrow();
     }
 
-    public boolean isLocal() {
+    public boolean isRegular() {
         return pos.isPresent();
     }
 
     public boolean isService() {
-        return !isLocal();
+        return !isRegular();
     }
 }

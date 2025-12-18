@@ -15,20 +15,20 @@ public class MailService extends MailEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final EnvelopeContext context;
-    private final PaybackHandlingDepartment paybackDepartment;
+    private final MailServicePaybackDepartment paybackDepartment;
     private @Nullable MailServiceData data;
 
     public MailService(EnvelopeContext context) {
         super(Address.MAIL_SERVICE, 1500);
         this.context = context;
-        this.paybackDepartment = new PaybackHandlingDepartment(context, this, this::getData);
+        this.paybackDepartment = new MailServicePaybackDepartment(context, this, this::getData);
     }
 
     public EnvelopeContext getContext() {
         return context;
     }
 
-    public PaybackHandlingDepartment getPaybackDepartment() {
+    public MailServicePaybackDepartment getPaybackDepartment() {
         return paybackDepartment;
     }
 

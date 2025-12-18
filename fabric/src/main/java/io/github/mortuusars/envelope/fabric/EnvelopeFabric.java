@@ -86,7 +86,7 @@ public class EnvelopeFabric implements ModInitializer {
                 MobCategory.CREATURE, Envelope.EntityTypes.PIGEON.get(), 2, 4, 6);
 
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING, Pigeon::checkPigeonSpawnRules);
+                Heightmap.Types.MOTION_BLOCKING, Pigeon::checkSpawnRules);
 
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PAPER_BOX.get(), 15, 50);
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 15, 50);

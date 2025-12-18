@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNew
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.delivery.Courier;
-import io.github.mortuusars.envelope.world.delivery.DeliveryOrigin;
+import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.StoredMail;
@@ -405,34 +405,28 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     protected void tryStartDelivery(ServerLevel level, Pigeon pigeon) {
-        if (this.address == null || pigeon.isDelivering() || getItem(SLOT_FOOD).isEmpty()) {
+        if (this.address == null || pigeon.isDelivering()) {
             return;
         }
 
-        ItemStack mail = getItem(SLOT_MAIL);
-        if (mail.isEmpty() || !mail.has(Envelope.DataComponents.RECIPIENT)) {
+        ItemStack mailStack = getItem(SLOT_MAIL);
+        if (mailStack.isEmpty() || !mailStack.has(Envelope.DataComponents.RECIPIENT)) {
             return;
         }
 
-        mail = mail.copyWithCount(1);
+        mailStack = mailStack.copyWithCount(1);
+        mailStack.set(Envelope.DataComponents.SENDER, address);
 
-        mail.set(Envelope.DataComponents.SENDER, address);
-
-        Address recipient = mail.getOrDefault(Envelope.DataComponents.RECIPIENT, Address.UNKNOWN);
-
+        Address recipient = mailStack.getOrDefault(Envelope.DataComponents.RECIPIENT, Address.UNKNOWN);
         if (level.getEnvelopeContext().addresses().resolve(recipient).matches(this.address)) {
             return;
         }
 
-        Delivery.create(level, new Mail(mail), DeliveryOrigin.local(getBlockPos()))
-              .ifPresentOrElse(
-                    delivery -> {
-                        pigeon.startDelivery(delivery);
-                        removeItem(SLOT_MAIL, 1);
-                        removeItem(SLOT_FOOD, 1);
-                    },
-                    error -> error.log(Envelope.LOGGER)
-              );
+        level.getEnvelopeContext().getDeliveryManager().start(Delivery.of(new Mail(mailStack)), pigeon)
+              .ifPresent(delivery -> {
+                  removeItem(SLOT_MAIL, 1);
+                  removeItem(SLOT_FOOD, 1);
+              });
     }
 
     @Override
