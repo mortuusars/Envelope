@@ -1,7 +1,9 @@
 # Changelog
 
 ## 0.4.0.2
-  
+- Added recipe for Payback Tag
+- Changed Address Tag recipe: it's now shapeless, requires only one sign and gives one tag.
+- Payback timeout config option is now in minutes instead of seconds. Config will update automatically as it's name changed as well. 
 
 ## 0.4.0.1
 [Some existing envelope world data might disappear when updating to this version]

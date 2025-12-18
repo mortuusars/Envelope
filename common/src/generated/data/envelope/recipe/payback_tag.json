@@ -7,10 +7,13 @@
     },
     {
       "tag": "minecraft:signs"
+    },
+    {
+      "tag": "c:dyes/red"
     }
   ],
   "result": {
     "count": 1,
-    "id": "envelope:address_tag"
+    "id": "envelope:payback_tag"
   }
 }

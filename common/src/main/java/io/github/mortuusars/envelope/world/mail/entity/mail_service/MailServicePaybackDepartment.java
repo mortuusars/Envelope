@@ -65,7 +65,7 @@ public class MailServicePaybackDepartment {
     }
 
     protected long getPaybackTimeoutTickFor(Mail mail) {
-        return Ticks.fromSeconds(Config.Server.DELIVERY_PAYBACK_TIMEOUT_SECONDS.get());
+        return Ticks.fromMinutes(Config.Server.DELIVERY_PAYBACK_TIMEOUT_MINUTES.get());
     }
 
     // --
@@ -154,16 +154,18 @@ public class MailServicePaybackDepartment {
         //TODO: It would be a good idea to consider performance here.
         // Depending on mail counts this could get laggy, especially if multiple returns occur at the same time.
 
-        boolean removed = getData().getMailAwaitingPayback().entrySet().removeIf(entry -> {
-            if (entry.getValue().timeoutTick() <= getContext().getGameTime()) {
-                returnTimedOutPaybackMail(entry.getValue().mail());
-                return true;
-            }
-            return false;
-        });
+        if (getContext().getGameTime() % 1200 == 0) { // Check every minute
+            boolean removed = getData().getMailAwaitingPayback().entrySet().removeIf(entry -> {
+                if (entry.getValue().timeoutTick() <= getContext().getGameTime()) {
+                    returnTimedOutPaybackMail(entry.getValue().mail());
+                    return true;
+                }
+                return false;
+            });
 
-        if (removed) {
-            getData().setDirty();
+            if (removed) {
+                getData().setDirty();
+            }
         }
     }
 

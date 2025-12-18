@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "envelope:address_tag"
+        "recipe": "envelope:payback_tag"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "envelope:address_tag"
+      "envelope:payback_tag"
     ]
   }
 }

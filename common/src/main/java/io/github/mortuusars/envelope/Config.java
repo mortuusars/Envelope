@@ -29,7 +29,7 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
-        public static final ModConfigSpec.IntValue DELIVERY_PAYBACK_TIMEOUT_SECONDS;
+        public static final ModConfigSpec.IntValue DELIVERY_PAYBACK_TIMEOUT_MINUTES;
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -95,9 +95,9 @@ public abstract class Config {
                 DELIVERY_TRAVEL_DURATION_DISTANCE_CAP = builder
                       .comment("Distance (in blocks) after which travel duration stops increasing and stays at maximum value.")
                       .defineInRange("travel_duration_distance_cap", 5000, 1, Integer.MAX_VALUE);
-                DELIVERY_PAYBACK_TIMEOUT_SECONDS = builder
-                      .comment("How long (in seconds) Mail Service will wait for payment before returning the mail back to sender.")
-                      .defineInRange("payback_timeout_ticks", 1800, 1, Integer.MAX_VALUE);
+                DELIVERY_PAYBACK_TIMEOUT_MINUTES = builder
+                      .comment("How long (in minutes) Mail Service will wait for payment before returning the mail back to sender.")
+                      .defineInRange("payback_timeout_minutes", 60, 1, Integer.MAX_VALUE);
                 builder.pop();
             }
 
