@@ -14,18 +14,18 @@ import org.slf4j.Logger;
 public class MailServiceEntity extends MailEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final MailService context;
+    private final MailService mailService;
     private final MailServicePaybackDepartment paybackDepartment;
     private @Nullable MailServiceData data;
 
-    public MailServiceEntity(MailService context) {
+    public MailServiceEntity(MailService mailService) {
         super(Address.MAIL_SERVICE, 1500);
-        this.context = context;
-        this.paybackDepartment = new MailServicePaybackDepartment(context, this, this::getData);
+        this.mailService = mailService;
+        this.paybackDepartment = new MailServicePaybackDepartment(mailService, this::getData);
     }
 
-    public MailService getContext() {
-        return context;
+    public MailService getMailService() {
+        return mailService;
     }
 
     public MailServicePaybackDepartment getPaybackDepartment() {
@@ -34,7 +34,7 @@ public class MailServiceEntity extends MailEntity {
 
     public @NotNull MailServiceData getData() {
         if (data == null) {
-            data = MailServiceData.get(getContext().getLevel(), "envelope_mail_service_data");
+            data = MailServiceData.get(getMailService().getLevel(), "envelope_mail_service_data");
         }
         return data;
     }

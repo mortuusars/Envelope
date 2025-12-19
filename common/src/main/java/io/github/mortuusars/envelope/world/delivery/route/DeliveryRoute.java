@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
@@ -46,8 +47,9 @@ public class DeliveryRoute {
     }
 
     public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient) {
-        Optional<BlockPos> senderPos = Position.ofAddress(level, sender);
-        Optional<BlockPos> recipientPos = Position.ofAddress(level, recipient);
+        MailService mailService = MailService.of(level);
+        Optional<BlockPos> senderPos = mailService.getPositionOf(sender);
+        Optional<BlockPos> recipientPos = mailService.getPositionOf(recipient);
         int ascendDistance = Position.getDistanceBetween(senderPos, recipientPos)
               .map(distance -> Math.min(DEFAULT_ASCEND_DISTANCE, distance / 2))
               .orElse(DEFAULT_ASCEND_DISTANCE);

@@ -24,16 +24,16 @@ import java.util.function.Supplier;
 public class MailServicePaybackDepartment {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final MailService context;
+    private final MailService mailService;
     private final Supplier<PaybackDepartmentData> data;
 
-    public MailServicePaybackDepartment(MailService context, MailServiceEntity mailServiceEntity, Supplier<PaybackDepartmentData> data) {
-        this.context = context;
+    public MailServicePaybackDepartment(MailService context, Supplier<PaybackDepartmentData> data) {
+        this.mailService = context;
         this.data = data;
     }
 
-    public MailService getContext() {
-        return context;
+    public MailService getMailService() {
+        return mailService;
     }
 
     public PaybackDepartmentData getData() {
@@ -55,10 +55,10 @@ public class MailServicePaybackDepartment {
 
     protected MailId awaitPayback(Mail mail, long timeoutTicks) {
         mail = mail.writeToLog(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE)
-              .at(getContext().getGameTime())
+              .at(getMailService().getGameTime())
               .message(DeliveryRecord.Message.WAITING_FOR_PAYMENT));
         MailId id = MailId.createRandom();
-        MailAwaitingPayback mailAwaitingPayback = new MailAwaitingPayback(mail, getContext().getGameTime() + timeoutTicks);
+        MailAwaitingPayback mailAwaitingPayback = new MailAwaitingPayback(mail, getMailService().getGameTime() + timeoutTicks);
         getData().getMailAwaitingPayback().put(id, mailAwaitingPayback);
         getData().setDirty();
         return id;
@@ -81,6 +81,7 @@ public class MailServicePaybackDepartment {
             if (sendPaybackPackingBoxToBuyer(mail, subjectId)) {
                 return Mail.EMPTY;
             } else {
+                getData().getMailAwaitingPayback().remove(subjectId);
                 return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                       .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
             }
@@ -112,9 +113,9 @@ public class MailServicePaybackDepartment {
             paymentPackage.set(Envelope.DataComponents.SENDER, mail.getSender());
             paymentPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
 
-            DeliveryLog log = mail.getLog().append(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE).at(getContext().getGameTime()));
+            DeliveryLog log = mail.getLog().append(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE).at(getMailService().getGameTime()));
 
-            getContext().getDeliveryManager()
+            return getMailService().getDeliveryManager()
                   .startService(Delivery.of(new Mail(paymentPackage, log)).from(Address.MAIL_SERVICE).to(mail.getRecipient()))
                   .map(
                         delivery -> {
@@ -143,7 +144,7 @@ public class MailServicePaybackDepartment {
         box.set(Envelope.DataComponents.SENDER, mailAwaitingPayback.getSender());
         box.set(Envelope.DataComponents.RECIPIENT, mailAwaitingPayback.getRecipient());
 
-        return getContext().getDeliveryManager()
+        return getMailService().getDeliveryManager()
               .startService(Delivery.of(new Mail(box)).from(Address.MAIL_SERVICE).to(mailAwaitingPayback.getRecipient()))
               .isSuccess();
     }
@@ -154,26 +155,37 @@ public class MailServicePaybackDepartment {
         //TODO: It would be a good idea to consider performance here.
         // Depending on mail counts this could get laggy, especially if multiple returns occur at the same time.
 
-        if (getContext().getGameTime() % 1200 == 0) { // Check every minute
-            boolean removed = getData().getMailAwaitingPayback().entrySet().removeIf(entry -> {
-                if (entry.getValue().timeoutTick() <= getContext().getGameTime()) {
-                    returnTimedOutPaybackMail(entry.getValue().mail());
+        if (getMailService().getGameTime() % 200 == 0) { // Check every minute
+            getData().getMailAwaitingPayback().entrySet().removeIf(entry -> {
+                if (entry.getValue().timeoutTick() <= getMailService().getGameTime()) {
+                    returnAsTimedOut(entry.getValue().mail());
+                    getData().setDirty();
                     return true;
                 }
                 return false;
             });
-
-            if (removed) {
-                getData().setDirty();
-            }
         }
     }
 
-    protected void returnTimedOutPaybackMail(Mail mail) {
-        mail = mail.writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
-              .at(getContext().getGameTime())
+    public int returnAllAwaitingAsTimedOut() {
+        int count = 0;
+        for (MailAwaitingPayback mail : getData().getMailAwaitingPayback().values()) {
+            if (returnAsTimedOut(mail.mail())) {
+                count++;
+            }
+        }
+        getData().getMailAwaitingPayback().clear();
+        getData().setDirty();
+        return count;
+    }
+
+    public boolean returnAsTimedOut(Mail mail) {
+        mail = mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+              .at(getMailService().getGameTime())
               .message(DeliveryRecord.Message.PAYBACK_IS_TIMED_OUT));
 
-        getContext().getDeliveryManager().startService(Delivery.of(mail).from(Address.MAIL_SERVICE).to(mail.getSender()));
+        return getMailService().getDeliveryManager()
+              .startService(Delivery.of(mail).from(Address.MAIL_SERVICE).to(mail.getSender()))
+              .isSuccess();
     }
 }

@@ -17,7 +17,7 @@ public class EnvelopeBuggerPage implements BuggerPage {
 
     @Override
     public List<String> getLeftLines() {
-        return Bugger.ENVELOPE.get()
+        return Bugger.MAIL_SERVICE.get()
               .map(tag -> {
                   int realPigeons = tag.getInt("delivering_pigeons");
                   int backgroundPigeons = tag.getInt("background_delivering_pigeons");

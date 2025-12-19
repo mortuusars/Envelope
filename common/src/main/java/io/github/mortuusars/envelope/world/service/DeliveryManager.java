@@ -15,15 +15,15 @@ import java.util.function.Function;
 public class DeliveryManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Result<StartedDelivery> ERROR_SAME_ADDRESSES = Result.error(new Error(
+    private static final Error ERROR_SAME_ADDRESSES = new Error(
           "Recipient address cannot be the same as sender address.",
-          "error.envelope.delivery.same_addresses"));
-    private static final Result<StartedDelivery> ERROR_RECIPIENT_UNKNOWN = Result.error(new Error(
+          "error.envelope.delivery.same_addresses");
+    private static final Error ERROR_RECIPIENT_UNKNOWN = new Error(
           "Cannot deliver to unknown address.",
-          "error.envelope.delivery.unknown_address"));
-    private static final Result<StartedDelivery> ERROR_NO_MAIL = Result.error(new Error(
+          "error.envelope.delivery.unknown_address");
+    private static final Error ERROR_NO_MAIL = new Error(
           "Mail is empty.",
-          "error.envelope.delivery.no_mail"));
+          "error.envelope.delivery.no_mail");
 
     private final MailService context;
 
@@ -32,8 +32,7 @@ public class DeliveryManager {
     }
 
     public Result<StartedDelivery> start(Delivery delivery, Pigeon pigeon) {
-        return start(delivery, pigeon::startDelivery)
-              .ifError(e -> LOGGER.error(e.getMessage()));
+        return start(delivery, pigeon::startDelivery);
     }
 
     public Result<StartedDelivery> start(Delivery.Builder deliveryBuilder, Pigeon pigeon) {
@@ -41,8 +40,7 @@ public class DeliveryManager {
     }
 
     public Result<StartedDelivery> startService(Delivery delivery) {
-        return start(delivery, validDelivery -> Pigeon.spawnServiceCourier(context.getLevel(), validDelivery))
-              .ifError(e -> LOGGER.error(e.getMessage()));
+        return start(delivery, validDelivery -> Pigeon.spawnServiceCourier(context.getLevel(), validDelivery));
     }
 
     public Result<StartedDelivery> startService(Delivery.Builder deliveryBuilder) {
@@ -50,11 +48,22 @@ public class DeliveryManager {
     }
 
     protected Result<StartedDelivery> start(Delivery delivery, Function<Delivery, Courier> courier) {
-        if (delivery.getRecipient().matches(Address.UNKNOWN)) return ERROR_RECIPIENT_UNKNOWN;
-        if (delivery.getSender().matches(delivery.getRecipient())) return ERROR_SAME_ADDRESSES;
-        if (delivery.getCurrentPhase() == DeliveryPhase.STARTED && delivery.getMail().isEmpty()) return ERROR_NO_MAIL;
+        if (delivery.getRecipient().matches(Address.UNKNOWN)
+              || (!delivery.getMail().isEmpty() && delivery.getMail().getRecipient().matches(Address.UNKNOWN))) {
+            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
+            return Result.error(ERROR_RECIPIENT_UNKNOWN);
+        }
+        if (delivery.getSender().matches(delivery.getRecipient())) {
+            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
+            return Result.error(ERROR_SAME_ADDRESSES);
+        }
+        if (delivery.getCurrentPhase() == DeliveryPhase.STARTED && delivery.getMail().isEmpty()) {
+            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_NO_MAIL.getMessage(), delivery);
+            return Result.error(ERROR_NO_MAIL);
+        }
         return Result.success(new StartedDelivery(courier.apply(delivery), delivery));
     }
 
-    public record StartedDelivery(Courier courier, Delivery delivery) {}
+    public record StartedDelivery(Courier courier, Delivery delivery) {
+    }
 }

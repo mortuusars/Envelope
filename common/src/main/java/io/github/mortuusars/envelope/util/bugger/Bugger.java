@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.data.EntityData;
 import io.github.mortuusars.envelope.util.bugger.data.OptionalEntityData;
 import io.github.mortuusars.envelope.util.bugger.data.NbtData;
+import io.github.mortuusars.envelope.util.bugger_data.MailServiceBuggerData;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
@@ -26,7 +27,7 @@ public class Bugger {
 
     // --
 
-    public static final NbtData ENVELOPE = new NbtData(Envelope.resource("envelope"));
+    public static final MailServiceBuggerData MAIL_SERVICE = new MailServiceBuggerData();
 
     public static final EntityData<PigeonholeHandler> PIGEON_PIGEONHOLE_HANDLER =
           new EntityData<>(Envelope.resource("pigeon_pigeonhole_handler"), PigeonholeHandler.CODEC)

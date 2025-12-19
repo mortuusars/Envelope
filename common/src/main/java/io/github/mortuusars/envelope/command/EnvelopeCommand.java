@@ -3,17 +3,9 @@ package io.github.mortuusars.envelope.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
-import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
-import io.github.mortuusars.envelope.util.bugger.test.TestResults;
-import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.inventory.RequestedItem;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.component.Payback;
-import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
@@ -28,10 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 import java.util.*;
 
@@ -51,9 +40,7 @@ public class EnvelopeCommand {
                           .then(Commands.argument("address", AddressArgument.pigeonhole())
                                 .suggests(AddressSuggestions.pigeonhole())
                                 .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address"))))))
-              .then(Commands.literal("debug")
-                    .then(Commands.literal("tests")
-                          .executes(EnvelopeCommand::runBuggerTests)))
+              .then(EnvelopeDebugCommand.commands())
               .then(Commands.literal("test")
                     .executes(EnvelopeCommand::test)));
     }
@@ -156,51 +143,24 @@ public class EnvelopeCommand {
 
     // --
 
-    private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
-        TestResults testResults = new BuggerTests()
-              .add(new RequestedItemTests(context.getSource().getServer()))
-              .run(count -> context.getSource().sendSuccess(() ->
-                    Component.literal("Running " + count + " bugger tests."), true));
-
-        context.getSource().sendSuccess(() -> Component.literal("Bugger tests finished:"), true);
-
-        if (testResults.failed().isEmpty()) {
-            context.getSource().sendSuccess(() -> Component.literal("All tests are passed!")
-                  .withStyle(ChatFormatting.GREEN), true);
-        } else {
-            context.getSource().sendSuccess(() -> Component.literal("Passed: " + testResults.passed().size() + "\n"), true);
-            context.getSource().sendSuccess(() -> Component.literal("Failed: " + testResults.failed().size() + ":")
-                  .withStyle(ChatFormatting.RED), true);
-
-            testResults.failed().forEach(failedTest -> {
-                context.getSource().sendSuccess(() -> Component.literal(" " + failedTest.name() + ": " + failedTest.error())
-                      .withStyle(ChatFormatting.RED), true);
-            });
-        }
-
-        return 0;
-    }
-
-    // --
-
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
-        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
-        pkg.set(Envelope.DataComponents.SENDER, new Address.Block("Original-Sender"));
-        pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Block("Base"));
-        pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
-              new RequestedItem(Items.EMERALD, 3), new RequestedItem(ItemTags.LOGS, 13))));
-
-        Mail mail = new Mail(pkg);
-
-        ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
-        paybackPackage.set(Envelope.DataComponents.PAYBACK_SUBJECT, new StoredItemStack(mail.getItemCopy()));
-        paybackPackage.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
-        paybackPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
-
-        Containers.dropItemStack(context.getSource().getLevel(), player.getX(), player.getY(), player.getZ(), paybackPackage);
+//        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
+//        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
+//        pkg.set(Envelope.DataComponents.SENDER, new Address.Block("Original-Sender"));
+//        pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Block("Base"));
+//        pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
+//              new RequestedItem(Items.EMERALD, 3), new RequestedItem(ItemTags.LOGS, 13))));
+//
+//        Mail mail = new Mail(pkg);
+//
+//        ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
+//        paybackPackage.set(Envelope.DataComponents.PAYBACK_SUBJECT, new StoredItemStack(mail.getItemCopy()));
+//        paybackPackage.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
+//        paybackPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
+//
+//        Containers.dropItemStack(context.getSource().getLevel(), player.getX(), player.getY(), player.getZ(), paybackPackage);
 
         return 0;
     }

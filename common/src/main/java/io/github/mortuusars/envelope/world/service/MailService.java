@@ -2,13 +2,8 @@ package io.github.mortuusars.envelope.world.service;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Config;
-import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
-import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -19,23 +14,15 @@ import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.entity.EntityTypeTest;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.OptionalInt;
 
 public class MailService {
     protected final ServerLevel level;
@@ -49,7 +36,7 @@ public class MailService {
     protected @Nullable BackgroundDelivery backgroundDelivery;
 
     private MailService(ServerLevel level) {
-        Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "EnvelopeContext can exist only on overworld level.");
+        Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "MailService can exist only on overworld level.");
         this.level = level;
         this.pigeonholeManager = new PigeonholeManager(level);
         this.mailEntities = new MailEntities();
@@ -131,7 +118,7 @@ public class MailService {
     }
 
     /**
-     * @return "final" address. Mostly for getting default pigeonhole address of a player.
+     * @return "final" address. Mostly for getting default block address of a player.
      */
     public Address resolve(Address address) {
         if (address instanceof Address.Player playerAddress) {
@@ -140,25 +127,50 @@ public class MailService {
         return address;
     }
 
-    public boolean canDeliverMailTo(Address address) {
-        if (address.equals(Address.UNKNOWN)) {
+    public boolean canDeliverTo(Address address) {
+        if (address.matches(Address.UNKNOWN)) {
             return false;
         }
-        address = resolve(address);
-        return getKnownAddresses().isKnown(address);
+
+        Address resolvedAddress = resolve(address);
+
+        if (resolvedAddress instanceof Address.Player) {
+            // Player doesn't have default address
+            return false;
+        }
+
+        return getKnownAddresses().isKnown(resolvedAddress);
     }
 
     public Optional<BlockPos> getPositionOf(Address address) {
-        return Position.ofAddress(level, address);
+        return address.map(
+              block -> getPigeonholeManager().getPositionOf(block),
+              player -> getPlayers().getDefaultAddressOf(player).flatMap(this::getPositionOf),
+              entity -> Optional.empty());
     }
 
     public Optional<Integer> getDistanceBetween(Address first, Address second) {
-        if (second instanceof Address.Entity entity) {
-            return MailService.of(level).getMailEntities().byAddress(entity).map(MailEntity::getDistance);
+        //TODO: this is quite verbose for simply getting distance involving entity address
+        if (first instanceof Address.Entity firstEntity && second instanceof Address.Entity secondEntity) {
+            Optional<Integer> firstDistance = getMailEntities().byAddress(firstEntity).map(MailEntity::getDistance);
+            Optional<Integer> secondDistance = getMailEntities().byAddress(secondEntity).map(MailEntity::getDistance);
+
+            if (firstDistance.isPresent() && secondDistance.isPresent()) {
+                return Optional.of(Math.max(firstDistance.get(), secondDistance.get()));
+            }
+            return firstDistance.or(() -> secondDistance);
         }
 
-        Optional<BlockPos> firstPos = Position.ofAddress(level, first);
-        Optional<BlockPos> secondPos = Position.ofAddress(level, second);
+        if (first instanceof Address.Entity entityAddress) {
+            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
+        }
+
+        if (second instanceof Address.Entity entityAddress) {
+            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
+        }
+
+        Optional<BlockPos> firstPos = getPositionOf(first);
+        Optional<BlockPos> secondPos = getPositionOf(second);
 
         if (firstPos.isEmpty() || secondPos.isEmpty()) {
             return Optional.empty();
@@ -184,50 +196,7 @@ public class MailService {
         getBackgroundDelivery().tick(level);
         getMailService().tick();
 
-        if (level.getGameTime() % 20 == 0) {
-            Bugger.ENVELOPE.sendValues(this::collectDebugInfo);
-        }
-    }
-
-    // --
-
-    private void collectDebugInfo(CompoundTag tag) {
-        List<? extends Pigeon> pigeons = level.getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
-        List<BackgroundCourier> backgroundCouriers = getBackgroundDelivery().getCouriers();
-
-        tag.putInt("pigeonholes", getPigeonholeManager().getAllAddresses().size());
-        tag.putInt("delivering_pigeons", pigeons.size());
-        tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
-        tag.putInt("background_finished_pigeons", getBackgroundDelivery().getFinishedCouriers().size());
-
-        tag.putInt("mail_awaiting_payback", getMailService().getPaybackDepartment().getMailAwaitingPaybackCount());
-
-        ListTag deliveries = Stream.concat(
-                    pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
-                    backgroundCouriers.stream().map(BackgroundCourier::delivery))
-              .sorted(Comparator.comparingInt(Delivery::hashCode))
-              .map(delivery -> StringTag.valueOf(formDeliveryString(delivery)))
-              .collect(Collectors.toCollection(ListTag::new));
-
-        tag.put("deliveries", deliveries);
-    }
-
-    private @NotNull String formDeliveryString(Delivery delivery) {
-        return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
-              " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
-              ChatFormatting.GREEN + delivery.getRecipient().format().withIcon().toString() + ChatFormatting.RESET +
-
-              ChatFormatting.GRAY +
-              (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
-              getDistanceBetween(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
-              " | ⌚" + delivery.getTravelDuration().seconds() + "s" +
-              ChatFormatting.RESET +
-
-              " // " + delivery.getCurrentPhase().toPrettyString() +
-
-              ChatFormatting.GRAY +
-              " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
-              ChatFormatting.RESET;
+        if (level.getGameTime() % 20 == 0) Bugger.MAIL_SERVICE.collectAndSendData(this);
     }
 
     // --

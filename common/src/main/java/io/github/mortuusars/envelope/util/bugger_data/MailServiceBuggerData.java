@@ -1,0 +1,71 @@
+package io.github.mortuusars.envelope.util.bugger_data;
+
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.EnvelopeSymbols;
+import io.github.mortuusars.envelope.util.bugger.data.NbtData;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.service.MailService;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class MailServiceBuggerData extends NbtData {
+    public MailServiceBuggerData() {
+        super(Envelope.resource("mail_service"));
+    }
+
+    public void collectAndSendData(MailService mailService) {
+        sendValues(tag -> writeDebugInfo(mailService, tag));
+    }
+
+    // --
+
+    private void writeDebugInfo(MailService mailService, CompoundTag tag) {
+        List<? extends Pigeon> pigeons = mailService.getLevel().getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
+        List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getCouriers();
+
+        tag.putInt("pigeonholes", mailService.getPigeonholeManager().getAllAddresses().size());
+        tag.putInt("delivering_pigeons", pigeons.size());
+        tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
+        tag.putInt("background_finished_pigeons", mailService.getBackgroundDelivery().getFinishedCouriers().size());
+
+        tag.putInt("mail_awaiting_payback", mailService.getMailService().getPaybackDepartment().getMailAwaitingPaybackCount());
+
+        ListTag deliveries = Stream.concat(
+                    pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
+                    backgroundCouriers.stream().map(BackgroundCourier::delivery))
+              .sorted(Comparator.comparingInt(Delivery::hashCode))
+              .map(delivery -> StringTag.valueOf(formDeliveryString(mailService, delivery)))
+              .collect(Collectors.toCollection(ListTag::new));
+
+        tag.put("deliveries", deliveries);
+    }
+
+    private @NotNull String formDeliveryString(MailService mailService, Delivery delivery) {
+        return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
+              " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
+              ChatFormatting.GREEN + delivery.getRecipient().format().withIcon().toString() + ChatFormatting.RESET +
+
+              ChatFormatting.GRAY +
+              (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
+              mailService.getDistanceBetween(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
+              " | ⌚" + delivery.getTravelDuration().seconds() + "s" +
+              ChatFormatting.RESET +
+
+              " // " + delivery.getCurrentPhase().toPrettyString() +
+
+              ChatFormatting.GRAY +
+              " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
+              ChatFormatting.RESET;
+    }
+}

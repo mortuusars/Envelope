@@ -54,7 +54,7 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
     }
 
     public static Builder returnedFrom(Address address) {
-        return new Builder(Status.ARRIVED, address);
+        return new Builder(Status.RETURNED, address);
     }
 
     // --

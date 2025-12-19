@@ -49,4 +49,16 @@ public record PaybackTagContents(List<ItemStack> items) implements TooltipCompon
     public ItemStack getItemForReading(int index) {
         return index < size() ? items.get(index) : ItemStack.EMPTY;
     }
+
+    @SuppressWarnings("deprecation")
+    public boolean equals(Object another) {
+        return this == another ||
+              (another instanceof PaybackTagContents contents
+                    && ItemStack.listMatches(this.items, contents.items));
+    }
+
+    @SuppressWarnings("deprecation")
+    public int hashCode() {
+        return ItemStack.hashStackList(this.items);
+    }
 }

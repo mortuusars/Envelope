@@ -34,4 +34,9 @@ public class Error {
     public <T> DataResult<T> asDataResult() {
         return DataResult.error(this::getMessage);
     }
+
+    @Override
+    public String toString() {
+        return getMessage();
+    }
 }

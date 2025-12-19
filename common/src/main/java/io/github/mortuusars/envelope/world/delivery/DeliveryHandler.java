@@ -14,7 +14,7 @@ public interface DeliveryHandler {
 
     default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
         if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT) {
-            if (!MailService.of(level).canDeliverMailTo(delivery.getRecipient())) {
+            if (!MailService.of(level).canDeliverTo(delivery.getRecipient())) {
                 delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                       .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
                 return DeliveryPhase.APPROACHING_SENDER;

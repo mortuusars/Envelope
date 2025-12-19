@@ -48,15 +48,12 @@ public class Delivery {
         this.mail = mail;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static Builder of(Mail mail) {
         return new Builder()
               .deliver(mail)
               .from(mail.getSender())
-              .to(mail.getRecipient());
+              .to(mail.shouldBeHandledByMailService() ? Address.MAIL_SERVICE : mail.getRecipient());
+        //TODO: setting MAIL_SERVICE here may not be the best idea, can get lost potentially - and cause bugs
     }
 
     public Address getSender() {
@@ -151,6 +148,15 @@ public class Delivery {
             return Optional.of(BlockPos.containing(pos));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public String toString() {
+        return "Delivery{" +
+              "sender=" + sender +
+              ", recipient=" + recipient +
+              ", mail=" + mail +
+              '}';
     }
 
     // --
