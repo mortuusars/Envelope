@@ -4,20 +4,41 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.delivery.*;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
-import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.Optional;
 
-public record BackgroundCourier(SpawnableEntityData entityData, Delivery delivery, CourierOrigin origin) implements Courier, DeliveryHandler {
+public class BackgroundCourier implements Courier, DeliveryHandler {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::entityData),
-          Delivery.CODEC.fieldOf("delivery").forGetter(BackgroundCourier::delivery),
-          CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::origin)
+          SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::getEntityData),
+          CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::getOrigin),
+          Delivery.CODEC.fieldOf("delivery").forGetter(BackgroundCourier::getDelivery)
     ).apply(instance, BackgroundCourier::new));
 
+    private final SpawnableEntityData entityData;
+    private final Delivery delivery;
+    private final CourierOrigin origin;
+
+    public BackgroundCourier(SpawnableEntityData entityData, CourierOrigin origin, Delivery delivery) {
+        this.entityData = entityData;
+        this.delivery = delivery;
+        this.origin = origin;
+    }
+
+    public SpawnableEntityData getEntityData() {
+        return entityData;
+    }
+
+    public CourierOrigin getOrigin() {
+        return origin;
+    }
+
+    public Delivery getDelivery() {
+        return delivery;
+    }
+
     @Override
-    public Optional<Delivery> getDelivery() {
+    public Optional<Delivery> getCurrentDelivery() {
         return Optional.ofNullable(delivery);
     }
 
@@ -26,23 +47,9 @@ public record BackgroundCourier(SpawnableEntityData entityData, Delivery deliver
         return this;
     }
 
-    @Override
-    public CourierOrigin getOrigin() {
-        return origin;
-    }
-
-    @Override
-    public void endDelivery(ServerLevel level, Delivery delivery) {
-        if (origin.isRegular()) {
-            FinishedBackgroundCourier courier = new FinishedBackgroundCourier(
-                  entityData(), origin.getPos(), delivery.getMail().getItemForReading());
-            MailService.of(level).getBackgroundDelivery().addFinishedCourier(courier);
-        }
-    }
-
     // --
 
     public void tick(ServerLevel level) {
-        delivery().tick(level, this);
+        tickDelivery(level, getDelivery());
     }
 }

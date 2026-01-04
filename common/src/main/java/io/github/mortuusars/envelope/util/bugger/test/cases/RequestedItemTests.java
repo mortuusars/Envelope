@@ -58,19 +58,19 @@ public class RequestedItemTests extends BuggerTests {
 
     private void componentMatching() {
         RequestedItem requestedItem = new RequestedItem(Items.FEATHER, 3, DataComponentPredicate.builder()
-              .expect(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE)
+              .expect(Envelope.DataComponents.SENDER_ADDRESS, Address.MAIL_SERVICE)
               .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
               .expect(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5)
               .build());
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
-        stack.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
+        stack.set(Envelope.DataComponents.SENDER_ADDRESS, Address.MAIL_SERVICE);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
         stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5);
         add("RequestedItem_componentMatching", Test.isTrue(() -> requestedItem.matches(stack)));
 
         ItemStack stack2 = stack.copy();
-        stack2.remove(Envelope.DataComponents.SENDER);
+        stack2.remove(Envelope.DataComponents.SENDER_ADDRESS);
         add("RequestedItem_componentMatching_failsWhenMissing", Test.isFalse(() -> requestedItem.matches(stack2)));
     }
 
@@ -88,11 +88,11 @@ public class RequestedItemTests extends BuggerTests {
                 "count": 3,
                 "components": {
                   "envelope:letter_tattered": {},
-                  "envelope:sender": {
+                  "envelope:sender_address": {
                       "type": "entity",
                       "id": "Mail Service"
                   },
-                  "envelope:recipient": {
+                  "envelope:address_tag": {
                       "type": "block",
                       "id": "Mortuusars Laboratory"
                   }
@@ -103,8 +103,8 @@ public class RequestedItemTests extends BuggerTests {
               Test.isTrue(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-                  stack.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
-                  stack.set(Envelope.DataComponents.RECIPIENT, new Address.Block("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.SENDER_ADDRESS, Address.MAIL_SERVICE);
+                  stack.set(Envelope.DataComponents.ADDRESS_TAG, new Address.Block("Mortuusars Laboratory"));
                   return decodeFromJson(json).matches(stack);
               }));
     }

@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
 import io.github.mortuusars.envelope.world.item.component.Payback;
 import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,7 +36,7 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected void init() {
         this.paybackSubject = getBoxStack().getOrDefault(Envelope.DataComponents.PAYBACK_SUBJECT, StoredItemStack.EMPTY);
-        this.payback = Objects.requireNonNull(paybackSubject.getForReading().get(Envelope.DataComponents.PAYBACK));
+        this.payback = Objects.requireNonNull(paybackSubject.getForReading().get(Envelope.DataComponents.PAYBACK_TAG));
         super.init();
         addSlot(new PreviewSlot(paybackSubject.getForReading(), 0, 21, 42));
     }
@@ -80,8 +81,8 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
-        stack.remove(Envelope.DataComponents.SENDER);
-        stack.set(Envelope.DataComponents.RECIPIENT, getPaybackSubject().getForReading().get(Envelope.DataComponents.SENDER));
+        Address sender = stack.remove(Envelope.DataComponents.SENDER_ADDRESS);
+        stack.set(Envelope.DataComponents.ADDRESS_TAG, sender);
         return stack;
     }
 }

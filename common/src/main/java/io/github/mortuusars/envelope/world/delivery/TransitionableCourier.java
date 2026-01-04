@@ -13,11 +13,12 @@ import net.minecraft.world.phys.Vec3;
 public interface TransitionableCourier extends Courier {
     SpawnableEntityData toSpawnableData();
 
+    void setDelivery(Delivery delivery);
+
     default BackgroundCourier transitionToBackground(ServerLevel level) {
-        Delivery delivery = getDelivery().orElseThrow(() -> new IllegalStateException("Cannot transition: courier is not delivering."));
-        BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableData(), delivery, getOrigin());
+        Delivery delivery = getCurrentDelivery().orElseThrow(() -> new IllegalStateException("Cannot transition: courier is not delivering."));
+        BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableData(), getOrigin(), delivery);
         MailService.of(level).getBackgroundDelivery().addCourier(backgroundCourier);
-        backgroundCourier.continueDelivery(level, backgroundCourier.delivery());
         onVanished(level);
         ((Entity) this).discard();
         return backgroundCourier;

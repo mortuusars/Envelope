@@ -99,7 +99,15 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     // -- Owner
 
-    public Optional<Player> getOwner() {
+    public @Nullable UUID getOwner() {
+        return owner;
+    }
+
+    public void setOwner(@Nullable UUID owner) {
+        this.owner = owner;
+    }
+
+    public Optional<Player> getOwnerPlayer() {
         if (owner == null || level == null) return Optional.empty();
         for (Player player : level.players()) {
             if (player.getUUID().equals(owner)) {
@@ -107,10 +115,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             }
         }
         return Optional.empty();
-    }
-
-    public void setOwner(@Nullable UUID owner) {
-        this.owner = owner;
     }
 
     // -- Mail
@@ -147,7 +151,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
                             Packets.sendToClient(new PigeonholeMenuMailRemovedS2CP(mail.getId()), player);
                         });
                         setChanged();
-                        return mail.getItemCopy();
+                        return mail.getItem().copy();
                     })
                     .orElse(ItemStack.EMPTY))
               .orElse(ItemStack.EMPTY);
@@ -159,7 +163,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
             NonNullList<ItemStack> itemsToDrop = allMail.stream()
                   .filter(this::isExtractable)
-                  .map(Mail::getItemCopy)
+                  .map(mail -> mail.getItem().copy())
                   .collect(Collectors.toCollection(NonNullList::create));
 
             Containers.dropContents(level, getBlockPos(), itemsToDrop);
@@ -212,14 +216,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         address = null;
-
-//        ifAddressed((level, address, data) -> {
-//            dropOrReturnAllMail();
-//            level.getEnvelopeContext().getPigeonholeManager().remove(address);
-//            data.invalidate();
-//            this.data = null;
-//            this.address = null;
-//        });
     }
 
     @Override
@@ -280,7 +276,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     @Override
     public @NotNull ItemStack getItem(int slot) {
         if (slot == SLOT_INBOX) {
-            return getFirstAvailableMailToExtract().getItemForReading();
+            return getFirstAvailableMailToExtract().getItem();
         }
         return super.getItem(slot);
     }
@@ -410,19 +406,23 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         ItemStack mailStack = getItem(SLOT_MAIL);
-        if (mailStack.isEmpty() || !mailStack.has(Envelope.DataComponents.RECIPIENT)) {
+        if (mailStack.isEmpty() || !mailStack.has(Envelope.DataComponents.ADDRESS_TAG)) {
             return;
         }
 
         mailStack = mailStack.copyWithCount(1);
-        mailStack.set(Envelope.DataComponents.SENDER, address);
 
-        Address recipient = mailStack.getOrDefault(Envelope.DataComponents.RECIPIENT, Address.UNKNOWN);
+        Address recipient = mailStack.getOrDefault(Envelope.DataComponents.ADDRESS_TAG, Address.UNKNOWN);
         if (MailService.of(level).resolve(recipient).matches(this.address)) {
             return;
         }
 
-        MailService.of(level).getDeliveryManager().start(Delivery.of(new Mail(mailStack)), pigeon)
+        MailService.of(level).getDeliveryManager()
+              .start(pigeon, Delivery.builder()
+                    .deliver(new Mail(mailStack))
+                    .from(address)
+                    .to(recipient)
+                    .owner(getOwner()))
               .ifPresent(delivery -> {
                   removeItem(SLOT_MAIL, 1);
                   removeItem(SLOT_FOOD, 1);

@@ -358,7 +358,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
         guiGraphics.blitSprite(REGULAR_MAIL_BUTTON_SPRITES.get(true, isHovered), x, y, 0, 117, 18);
 
-        guiGraphics.renderItem(mail.getItemForReading(), x + 2, y + 1);
+        guiGraphics.renderItem(mail.getItem(), x + 2, y + 1);
 
         WidgetSprites iconSprites = getMailIconSprites(mail);
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
@@ -423,8 +423,8 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, StoredMail hoveredMail) {
         if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail.getItemForReading()),
-                  hoveredMail.getItemForReading().getTooltipImage(), x, y);
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail.getItem()),
+                  hoveredMail.getItem().getTooltipImage(), x, y);
             return;
         }
 
@@ -461,7 +461,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         } else {
             if (!deliveryLog.isEmpty()) {
                 tooltip.add(Component.translatable("gui.envelope.delivery.log"));
-                for (DeliveryRecord record : deliveryLog.records()) {
+                for (DeliveryRecord record : deliveryLog.getRecords()) {
                     tooltip.add(record.translate(Minecrft.level().getGameTime()));
                 }
             }
@@ -625,7 +625,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     protected Address getDisplayedSender(StoredMail mail) {
         return mail.getLog().getLastExceptionRecord()
               .map(DeliveryRecord::address)
-              .orElse(mail.getSender());
+              .orElse(mail.getSenderAddress());
     }
 
     protected WidgetSprites getMailIconSprites(StoredMail mail) {
@@ -637,7 +637,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                   default -> throw new IllegalStateException("Unexpected value: " + record.status());
               })
               .orElseGet(() -> {
-                  Address sender = mail.getOrDefault(Envelope.DataComponents.SENDER, Address.UNKNOWN);
+                  Address sender = mail.getSenderAddress();
                   if (sender == Address.UNKNOWN) return ICON_ADDRESS_UNKNOWN_SPRITES;
                   if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
                   if (sender.type() == Address.Type.BLOCK) return ICON_ADDRESS_PIGEONHOLE_SPRITES;

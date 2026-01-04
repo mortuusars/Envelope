@@ -229,7 +229,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     }
 
     protected boolean moveMailToInventory(Player player, int index) {
-        ItemStack mail = getMail().get(index).getItemCopy();
+        ItemStack mail = getMail().get(index).getItem().copy();
 
         if (!PlayerInventoryUtil.canAddWholeStack(player, mail)) {
             return false;

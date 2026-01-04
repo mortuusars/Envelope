@@ -9,7 +9,7 @@ import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
-import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTooltip;
+import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -74,7 +74,7 @@ public class EnvelopeClient {
     public static class TooltipComponents {
         public static ClientTooltipComponent create(TooltipComponent component) {
             return switch (component) {
-                case MailAddressTooltip mailAddress -> new MailAddressTooltipComponent(mailAddress.sender(), mailAddress.recipient());
+                case MailAddressTagTooltip mailAddress -> new MailAddressTagTooltipComponent(mailAddress.address());
                 case PackageContents packageContents -> new PackageTooltipComponent(packageContents);
                 case Payback payback -> new PaybackTooltipComponent(payback);
                 case PaybackTagContents paybackTagContents -> new PaybackTagContentsTooltipComponent(paybackTagContents);
@@ -91,8 +91,8 @@ public class EnvelopeClient {
             if (stack.is(Envelope.Tags.Items.MAILABLE)) {
                 return CompositeTooltip.of(
                       original,
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.PAYBACK)),
-                      Optional.ofNullable(MailAddressTooltip.of(stack))
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.PAYBACK_TAG)),
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.ADDRESS_TAG)).map(MailAddressTagTooltip::new)
                 );
             }
 

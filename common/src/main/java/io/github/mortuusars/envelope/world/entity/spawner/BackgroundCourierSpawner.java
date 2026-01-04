@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.TransitionableCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -22,7 +23,7 @@ public class BackgroundCourierSpawner implements CustomSpawner {
 
         List<BackgroundCourier> spawnableCouriers = backgroundDelivery.getCouriers()
               .stream()
-              .filter(courier -> !courier.delivery().isFinished() && !courier.delivery().getCurrentPhase().isTraveling())
+              .filter(this::isSpawnable)
               .toList();
 
         if (spawnableCouriers.isEmpty()) {
@@ -36,7 +37,7 @@ public class BackgroundCourierSpawner implements CustomSpawner {
     }
 
     protected void trySpawn(ServerLevel level, BackgroundCourier backgroundCourier) {
-        Delivery delivery = backgroundCourier.delivery();
+        Delivery delivery = backgroundCourier.getDelivery();
 
         @Nullable BlockPos spawnPos = delivery.estimateCurrentPos()
               .filter(level::isLoaded)
@@ -48,16 +49,21 @@ public class BackgroundCourierSpawner implements CustomSpawner {
             return;
         }
 
-        @Nullable Entity entity = backgroundCourier.entityData().createEntity(level);
+        @Nullable Entity entity = backgroundCourier.getEntityData().createEntity(level);
         if (entity instanceof TransitionableCourier courier) {
             entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
 
             level.addFreshEntityWithPassengers(entity);
 
             courier.onAppeared(level);
-            courier.continueDelivery(level, delivery);
+            courier.setDelivery(delivery);
 
             MailService.of(level).getBackgroundDelivery().removeCourier(backgroundCourier);
         }
+    }
+
+    protected boolean isSpawnable(BackgroundCourier courier) {
+        return !courier.getDelivery().getPhase().isTraveling()
+              && courier.getDelivery().getPhase() != DeliveryPhase.FINISHED;
     }
 }

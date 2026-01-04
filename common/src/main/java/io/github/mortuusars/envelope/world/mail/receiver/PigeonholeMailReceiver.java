@@ -23,18 +23,18 @@ public class PigeonholeMailReceiver implements MailReceiver {
         PigeonholeManager pigeonholeManager = MailService.of(level).getPigeonholeManager();
 
         if (mail.isEmpty()) {
-            return Mail.EMPTY;
+            return mail;
         }
 
         return pigeonholeManager.getBlockEntityOf(address)
               .map(blockEntity -> {
                   blockEntity.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
-                  return Mail.EMPTY;
+                  return Mail.empty();
               })
               .orElseGet(() -> pigeonholeManager.getData(address)
                     .map(data -> {
                         data.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
-                        return Mail.EMPTY;
+                        return Mail.empty();
                     })
                     .orElseGet(() -> {
                         LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);

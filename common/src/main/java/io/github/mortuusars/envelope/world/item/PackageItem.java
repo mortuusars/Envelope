@@ -45,9 +45,7 @@ public class PackageItem extends BlockItem implements Sealable {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         stack = stack.transmuteCopy(Envelope.Items.PACKING_BOX.get());
-        stack.remove(Envelope.DataComponents.PAYBACK);
-        stack.remove(Envelope.DataComponents.SENDER);
-        stack.remove(Envelope.DataComponents.RECIPIENT);
+        stack.remove(Envelope.DataComponents.SENDER_ADDRESS);
 
         player.setItemInHand(hand, stack);
 

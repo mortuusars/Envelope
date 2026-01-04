@@ -1,9 +1,7 @@
 package io.github.mortuusars.envelope.world.delivery;
 
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
@@ -13,48 +11,51 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 public class Delivery {
     public static final Codec<Delivery> CODEC = RecordCodecBuilder.create(i -> i.group(
           Address.CODEC.fieldOf("sender").forGetter(Delivery::getSender),
           Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
-          TravelDuration.CODEC.fieldOf("travel_duration").forGetter(Delivery::getTravelDuration),
+          DeliveryMetadata.CODEC.optionalFieldOf("metadata", DeliveryMetadata.EMPTY).forGetter(Delivery::getMetadata),
+          Mail.CODEC.fieldOf("mail").forGetter(Delivery::getMail),
           DeliveryRoute.CODEC.fieldOf("route").forGetter(Delivery::getRoute),
-          DeliveryProgress.CODEC.fieldOf("progress").forGetter(Delivery::getProgress),
-          Mail.CODEC.fieldOf("mail").forGetter(Delivery::getMail)
+          DeliveryPhase.CODEC.optionalFieldOf("phase", DeliveryPhase.STARTED).forGetter(Delivery::getPhase),
+          Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("phase_progress", 0).forGetter(Delivery::getPhaseProgress),
+          Codec.BOOL.optionalFieldOf("ended", false).forGetter(Delivery::isEnded)
     ).apply(i, Delivery::new));
-
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Address sender;
     private final Address recipient;
-    private TravelDuration travelDuration;
-    private DeliveryRoute route;
-    private DeliveryProgress progress;
+    private DeliveryMetadata metadata;
     private Mail mail;
+    private DeliveryRoute route;
+    private DeliveryPhase phase;
+    private int phaseProgress;
+    private boolean ended;
 
-    protected Delivery(Address sender, Address recipient, TravelDuration travelDuration,
-                       DeliveryRoute route, DeliveryProgress progress, Mail mail) {
+    public Delivery(Address sender, Address recipient, DeliveryMetadata metadata, Mail mail,
+                    DeliveryRoute route, DeliveryPhase phase, int phaseProgress, boolean ended) {
         this.sender = sender;
         this.recipient = recipient;
-        this.travelDuration = travelDuration;
-        this.progress = progress;
-        this.route = route;
+        this.metadata = metadata;
         this.mail = mail;
+        this.route = route;
+        this.phase = phase;
+        this.phaseProgress = phaseProgress;
+        this.ended = ended;
     }
 
-    public static Builder of(Mail mail) {
-        return new Builder()
-              .deliver(mail)
-              .from(mail.getSender())
-              .to(mail.shouldBeHandledByMailService() ? Address.MAIL_SERVICE : mail.getRecipient());
-        //TODO: setting MAIL_SERVICE here may not be the best idea, can get lost potentially - and cause bugs
+    public static Builder builder() {
+        return new Builder();
     }
+
+    // --
 
     public Address getSender() {
         return sender;
@@ -64,34 +65,18 @@ public class Delivery {
         return recipient;
     }
 
-    public TravelDuration getTravelDuration() {
-        return travelDuration;
+    public DeliveryMetadata getMetadata() {
+        return metadata;
     }
 
-    public Delivery setTravelDuration(TravelDuration travelDuration) {
-        this.travelDuration = travelDuration;
+    public Delivery setMetadata(DeliveryMetadata metadata) {
+        this.metadata = metadata;
         return this;
     }
 
-    public DeliveryRoute getRoute() {
-        return route;
-    }
-
-    public void setRoute(DeliveryRoute route) {
-        this.route = route;
-    }
-
-    public DeliveryProgress getProgress() {
-        return progress;
-    }
-
-    public Delivery setProgress(DeliveryProgress progress) {
-        this.progress = progress;
+    public Delivery updateMetadata(UnaryOperator<DeliveryMetadata> updater) {
+        this.metadata = updater.apply(this.metadata);
         return this;
-    }
-
-    public DeliveryPhase getCurrentPhase() {
-        return getProgress().getPhase();
     }
 
     public Mail getMail() {
@@ -107,44 +92,57 @@ public class Delivery {
         setMail(updater.apply(getMail()));
     }
 
-    // --
-
-    public boolean isFinished() {
-        return getProgress().getPhase() == DeliveryPhase.FINISHED && getProgress().isDone();
+    public DeliveryRoute getRoute() {
+        return route;
     }
 
-    public void tick(ServerLevel level, DeliveryHandler handler) {
-        if (isFinished()) return;
+    public void setRoute(DeliveryRoute route) {
+        this.route = route;
+    }
 
-        if (getProgress().getTicks() == 0) {
-            setRoute(DeliveryRoute.build(level, sender, recipient));
-            handler.phaseStarted(level, this, getCurrentPhase());
-        }
+    public void updateRoute(ServerLevel level) {
+        setRoute(DeliveryRoute.build(level, getSender(), getRecipient()));
+    }
 
-        getProgress().tick();
+    public DeliveryPhase getPhase() {
+        return phase;
+    }
 
-        if (getProgress().isDone()) {
-            handler.phaseCompleted(level, this, getCurrentPhase());
+    public void setPhase(DeliveryPhase currentPhase, int progress) {
+        this.phase = currentPhase;
+        setPhaseProgress(progress);
+    }
 
-            if (getCurrentPhase() == DeliveryPhase.FINISHED) {
-                if (Bugger.isEnabled()) {
-                    LOGGER.info("Delivery '{} > {}' is finished.", getSender(), getRecipient());
-                }
-                handler.endDelivery(level, this);
-            } else {
-                DeliveryPhase nextPhase = handler.advancePhase(level, this, getCurrentPhase());
-                int nextPhaseDuration = handler.getPhaseDuration(level, this, nextPhase);
-                getProgress().advance(nextPhase, nextPhaseDuration);
-            }
-        } else {
-            handler.phaseTicked(level, this, getCurrentPhase());
-        }
+    public void setPhaseAndResetProgress(DeliveryPhase currentPhase) {
+        this.phase = currentPhase;
+        setPhaseProgress(0);
+    }
+
+    public int getPhaseProgress() {
+        return phaseProgress;
+    }
+
+    public void setPhaseProgress(int progress) {
+        this.phaseProgress = Math.max(0, progress);
+    }
+
+    public void incrementCurrentPhaseProgress() {
+        phaseProgress++;
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    public void end() {
+        this.ended = true;
     }
 
     public Optional<BlockPos> estimateCurrentPos() {
-        DeliveryRoute.Segment segment = getRoute().getSegment(getCurrentPhase());
+        DeliveryRoute.Segment segment = getRoute().getSegment(getPhase());
         if (segment.startPos().isPresent() && segment.endPos().isPresent()) {
-            Vec3 pos = Position.lerp(segment.startPos().get(), segment.endPos().get(), getProgress().getCompleteness());
+            //TODO: simplify and move to Segment class
+            Vec3 pos = Position.lerp(segment.startPos().get(), segment.endPos().get(), getPhaseProgress());
             return Optional.of(BlockPos.containing(pos));
         }
         return Optional.empty();
@@ -156,17 +154,19 @@ public class Delivery {
               "sender=" + sender +
               ", recipient=" + recipient +
               ", mail=" + mail +
+              ", phase=" + phase +
+              ", progress=" + phaseProgress +
               '}';
     }
 
     // --
 
     public static class Builder {
-        private Mail mail = Mail.EMPTY;
         private Address sender = Address.UNKNOWN;
         private Address recipient = Address.UNKNOWN;
-        private TravelDuration.Supplier travelDuration = TravelDuration.basedOnSenderToRecipientDistance();
-        private DeliveryProgress progress = DeliveryProgress.start();
+        private @Nullable UUID owner = null;
+        private Mail mail = Mail.empty();
+        private DeliveryPhase phase = DeliveryPhase.STARTED;
 
         public Builder deliver(@NotNull Mail mail) {
             this.mail = Objects.requireNonNull(mail);
@@ -183,25 +183,20 @@ public class Delivery {
             return this;
         }
 
-        public Builder travelDuration(@NotNull TravelDuration.Supplier supplier) {
-            this.travelDuration = Objects.requireNonNull(supplier);
+        public Builder owner(@Nullable UUID owner) {
+            this.owner = owner;
             return this;
         }
 
-        public Builder withProgress(@NotNull DeliveryProgress progress) {
-            this.progress = Objects.requireNonNull(progress);
-            return this;
-        }
-
-        public Builder atPhase(@NotNull DeliveryPhase phase, int duration) {
-            this.progress = new DeliveryProgress(Objects.requireNonNull(phase), duration, 0);
+        public Builder atPhase(@NotNull DeliveryPhase phase) {
+            this.phase = phase;
             return this;
         }
 
         public Delivery create(ServerLevel level) {
-            TravelDuration travelDuration = this.travelDuration.get(level, sender, recipient);
             DeliveryRoute route = DeliveryRoute.build(level, sender, recipient);
-            return new Delivery(sender, recipient, travelDuration, route, progress, mail);
+            DeliveryMetadata metadata = DeliveryMetadata.EMPTY.withOwner(owner);
+            return new Delivery(sender, recipient, metadata, mail, route, phase, 0, false);
         }
     }
 }

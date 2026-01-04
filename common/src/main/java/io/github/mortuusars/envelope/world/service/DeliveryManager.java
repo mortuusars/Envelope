@@ -25,31 +25,30 @@ public class DeliveryManager {
           "Mail is empty.",
           "error.envelope.delivery.no_mail");
 
-    private final MailService context;
+    private final MailService mailService;
 
-    public DeliveryManager(MailService context) {
-        this.context = context;
+    public DeliveryManager(MailService mailService) {
+        this.mailService = mailService;
     }
 
-    public Result<StartedDelivery> start(Delivery delivery, Pigeon pigeon) {
-        return start(delivery, pigeon::startDelivery);
+    public Result<StartedDelivery> start(Pigeon pigeon, Delivery delivery) {
+        return tryStart(delivery, pigeon::startDelivery);
     }
 
-    public Result<StartedDelivery> start(Delivery.Builder deliveryBuilder, Pigeon pigeon) {
-        return start(deliveryBuilder.create(context.getLevel()), pigeon);
+    public Result<StartedDelivery> start(Pigeon pigeon, Delivery.Builder deliveryBuilder) {
+        return start(pigeon, deliveryBuilder.create(mailService.getLevel()));
     }
 
     public Result<StartedDelivery> startService(Delivery delivery) {
-        return start(delivery, validDelivery -> Pigeon.spawnServiceCourier(context.getLevel(), validDelivery));
+        return tryStart(delivery, validDelivery -> Pigeon.spawnServiceCourier(mailService.getLevel(), validDelivery));
     }
 
     public Result<StartedDelivery> startService(Delivery.Builder deliveryBuilder) {
-        return startService(deliveryBuilder.create(context.getLevel()));
+        return startService(deliveryBuilder.create(mailService.getLevel()));
     }
 
-    protected Result<StartedDelivery> start(Delivery delivery, Function<Delivery, Courier> courier) {
-        if (delivery.getRecipient().matches(Address.UNKNOWN)
-              || (!delivery.getMail().isEmpty() && delivery.getMail().getRecipient().matches(Address.UNKNOWN))) {
+    protected Result<StartedDelivery> tryStart(Delivery delivery, Function<Delivery, Courier> courier) {
+        if (delivery.getRecipient().matches(Address.UNKNOWN)) {
             LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
             return Result.error(ERROR_RECIPIENT_UNKNOWN);
         }
@@ -57,10 +56,13 @@ public class DeliveryManager {
             LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
             return Result.error(ERROR_SAME_ADDRESSES);
         }
-        if (delivery.getCurrentPhase() == DeliveryPhase.STARTED && delivery.getMail().isEmpty()) {
+        if (delivery.getPhase() == DeliveryPhase.STARTED && delivery.getMail().isEmpty()) {
             LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_NO_MAIL.getMessage(), delivery);
             return Result.error(ERROR_NO_MAIL);
         }
+
+        delivery.updateMetadata(data -> data.withTimestampIfMissing(mailService.getGameTime()));
+
         return Result.success(new StartedDelivery(courier.apply(delivery), delivery));
     }
 

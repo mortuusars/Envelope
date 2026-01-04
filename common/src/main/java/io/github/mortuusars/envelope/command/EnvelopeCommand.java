@@ -49,10 +49,11 @@ public class EnvelopeCommand {
 
     private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item) throws CommandSyntaxException {
         ServerLevel level = context.getSource().getLevel();
-        ItemStack mail = item.createItemStack(1, false);
+        ItemStack mailStack = item.createItemStack(1, false);
 
+        Mail mail = new Mail(mailStack);
         MailService.of(level).getDeliveryManager()
-              .startService(Delivery.of(new Mail(mail)))
+              .startService(Delivery.builder().deliver(mail).from(mail.getSenderAddress()).to(mail.getRecipient()))
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")

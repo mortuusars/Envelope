@@ -101,6 +101,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected float nextFlap = 1.0F;
 
     protected PigeonholeHandler pigeonholeHandler;
+    protected PigeonDeliveryHandler deliveryHandler;
     protected PigeonDeliverMailGoal deliverMailGoal;
 
     protected @Nullable Delivery delivery;
@@ -111,6 +112,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         moveControl = new FlyingMoveControl(this, 10, false);
         pigeonholeHandler = new PigeonholeHandler();
         pigeonholeHandler.setDefaultWantCooldown();
+        deliveryHandler = new PigeonDeliveryHandler(this);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
 
@@ -242,8 +244,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     protected float getDescendRate() {
         if (delivery != null) {
-            if (delivery.getCurrentPhase().isDescending()) return 0.9f;
-            if (delivery.getCurrentPhase().isAscending()) return 0.5f;
+            if (delivery.getPhase().isDescending()) return 0.9f;
+            if (delivery.getPhase().isAscending()) return 0.5f;
         }
         return 0.75f;
     }
@@ -256,7 +258,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         String message = damageSource.getLocalizedDeathMessage(this).getString();
         String carriedItem = !delivery.getMail().isEmpty()
-              ? " a " + delivery.getMail().getItemForReading().getHoverName().getString()
+              ? " a " + delivery.getMail().getItem().getHoverName().getString()
               : "";
         String addresses = delivery.getSender().getName() + " to " + delivery.getRecipient().getName();
 
@@ -277,8 +279,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 //        }
 
         if (!delivery.getMail().isEmpty()) {
-            spawnAtLocation(delivery.getMail().getItemCopy());
-            delivery.setMail(Mail.EMPTY);
+            spawnAtLocation(delivery.getMail().getItem().copy());
+            delivery.setMail(Mail.empty());
         }
     }
 
@@ -504,13 +506,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public DeliveryHandler getDeliveryHandler() {
-        return deliverMailGoal;
-    }
-
-    @Override
-    public void continueDelivery(ServerLevel level, Delivery delivery) {
-        setDelivery(delivery);
-        TransitionableCourier.super.continueDelivery(level, delivery);
+        return deliveryHandler;
     }
 
     public Courier startDelivery(Delivery delivery) {
@@ -525,7 +521,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         return this;
     }
 
-    public Optional<Delivery> getDelivery() {
+    public Optional<Delivery> getCurrentDelivery() {
         return Optional.ofNullable(delivery);
     }
 

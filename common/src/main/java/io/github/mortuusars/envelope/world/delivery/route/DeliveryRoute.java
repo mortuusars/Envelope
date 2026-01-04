@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.delivery.route;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.delivery.TravelDuration;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -24,26 +25,31 @@ public class DeliveryRoute {
           BlockPos.CODEC.optionalFieldOf("sender_pos").forGetter(DeliveryRoute::senderPos),
           BlockPos.CODEC.optionalFieldOf("sender_ascend_pos").forGetter(DeliveryRoute::senderAscendPos),
           BlockPos.CODEC.optionalFieldOf("recipient_ascend_pos").forGetter(DeliveryRoute::recipientAscendPos),
-          BlockPos.CODEC.optionalFieldOf("recipient_pos").forGetter(DeliveryRoute::recipientPos)
+          BlockPos.CODEC.optionalFieldOf("recipient_pos").forGetter(DeliveryRoute::recipientPos),
+          TravelDuration.CODEC.optionalFieldOf("travel_duration", TravelDuration.DEFAULT).forGetter(DeliveryRoute::travelDuration)
     ).apply(i, DeliveryRoute::new));
 
     public static final int DEFAULT_ASCEND_DISTANCE = 12;
 
-    public static final DeliveryRoute EMPTY = new DeliveryRoute(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    public static final DeliveryRoute EMPTY = new DeliveryRoute(
+          Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), TravelDuration.DEFAULT);
 
     private final Optional<BlockPos> senderPos;
     private final Optional<BlockPos> senderAscendPos;
     private final Optional<BlockPos> recipientAscendPos;
     private final Optional<BlockPos> recipientPos;
+    private final TravelDuration travelDuration;
 
     private @Nullable Map<DeliveryPhase, Segment> segments;
 
     public DeliveryRoute(Optional<BlockPos> senderPos, Optional<BlockPos> senderAscendPos,
-                         Optional<BlockPos> recipientAscendPos, Optional<BlockPos> recipientPos) {
+                         Optional<BlockPos> recipientAscendPos, Optional<BlockPos> recipientPos,
+                         TravelDuration travelDuration) {
         this.senderPos = senderPos;
         this.senderAscendPos = senderAscendPos;
         this.recipientAscendPos = recipientAscendPos;
         this.recipientPos = recipientPos;
+        this.travelDuration = travelDuration;
     }
 
     public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient) {
@@ -56,7 +62,8 @@ public class DeliveryRoute {
         // Address#hashCode is used as seed, to make random direction (if pos is unknown) of a specific address be always the same
         Optional<BlockPos> senderAscendPos = Position.ascendTowards(level, senderPos, recipientPos, ascendDistance, recipient.hashCode());
         Optional<BlockPos> recipientAscendPos = Position.ascendTowards(level, recipientPos, senderPos, ascendDistance, sender.hashCode());
-        return new DeliveryRoute(senderPos, senderAscendPos, recipientAscendPos, recipientPos);
+        TravelDuration travelDuration = TravelDuration.basedOnSenderToRecipientDistance().get(level, sender, recipient);
+        return new DeliveryRoute(senderPos, senderAscendPos, recipientAscendPos, recipientPos, travelDuration);
     }
 
     // --
@@ -77,6 +84,10 @@ public class DeliveryRoute {
         return recipientPos;
     }
 
+    public TravelDuration travelDuration() {
+        return travelDuration;
+    }
+
     // --
 
     public Optional<Integer> getDistance() {
@@ -94,12 +105,13 @@ public class DeliveryRoute {
         Map<DeliveryPhase, Segment> map = new HashMap<>();
         map.put(DeliveryPhase.STARTED, new Segment(senderPos, senderPos));
         map.put(DeliveryPhase.DEPARTING_SENDER, new Segment(senderPos, senderAscendPos));
-        map.put(DeliveryPhase.LOCATING_RECIPIENT, new Segment(senderAscendPos, Optional.empty()));
+        map.put(DeliveryPhase.TRAVELING_TO_MAIL_HUB, new Segment(senderAscendPos, Optional.empty()));
+        map.put(DeliveryPhase.DISPATCHING, Segment.EMPTY);
         map.put(DeliveryPhase.TRAVELING_TO_RECIPIENT, new Segment(Optional.empty(), recipientAscendPos));
         map.put(DeliveryPhase.APPROACHING_RECIPIENT, new Segment(recipientAscendPos, recipientPos));
         map.put(DeliveryPhase.HANDLING_DELIVERY, new Segment(recipientPos, recipientPos));
         map.put(DeliveryPhase.DEPARTING_RECIPIENT, new Segment(recipientPos, recipientAscendPos));
-        map.put(DeliveryPhase.TRAVELING_TO_SENDER, new Segment(recipientAscendPos, senderAscendPos));
+        map.put(DeliveryPhase.RETURNING_TO_SENDER, new Segment(recipientAscendPos, senderAscendPos));
         map.put(DeliveryPhase.APPROACHING_SENDER, new Segment(senderAscendPos, senderPos));
         map.put(DeliveryPhase.HANDLING_RETURN, new Segment(senderPos, senderPos));
         map.put(DeliveryPhase.FINISHED, new Segment(senderPos, senderPos));

@@ -1,72 +1,110 @@
 package io.github.mortuusars.envelope.world.delivery;
 
+import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
 public interface DeliveryHandler {
-    void endDelivery(ServerLevel level, Delivery delivery);
+    default void tickDelivery(ServerLevel level, Delivery delivery) {
+        if (delivery.isEnded()) {
+            return;
+        }
 
-    default DeliveryPhase advancePhase(ServerLevel level, Delivery delivery, DeliveryPhase currentPhase) {
-        if (currentPhase == DeliveryPhase.LOCATING_RECIPIENT) {
-            if (!MailService.of(level).canDeliverTo(delivery.getRecipient())) {
-                delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                      .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
-                return DeliveryPhase.APPROACHING_SENDER;
+        if (delivery.getPhaseProgress() == 0) {
+            phaseStarted(level, delivery);
+        }
+
+        delivery.incrementCurrentPhaseProgress();
+        phaseTicked(level, delivery);
+
+        if (delivery.getPhaseProgress() >= getPhaseDuration(level, delivery, delivery.getPhase())) {
+            phaseCompleted(level, delivery);
+
+            if (delivery.getPhase() == DeliveryPhase.FINISHED) {
+                Preconditions.checkState(!delivery.isEnded(), "Delivery is already ended.");
+                delivery.end();
+                endDelivery(level, delivery);
+                if (Bugger.isEnabled()) {
+                    Envelope.LOGGER.info("Delivery '{} > {}' is finished.", delivery.getSender(), delivery.getRecipient());
+                }
+            } else {
+                advancePhase(level, delivery);
+            }
+        }
+    }
+
+    /**
+     * Handles next phase selection.<br>
+     * Jumping to phases non-linearly should be done here. (to return early, etc.)
+     */
+    default void advancePhase(ServerLevel level, Delivery delivery) {
+        if (delivery.getPhase() == DeliveryPhase.DISPATCHING) {
+            MailService mailService = MailService.of(level);
+
+            if (!mailService.canDeliverTo(delivery.getRecipient())) {
+                delivery.getMail().writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                      .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+                delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+                return;
+            }
+
+            if (mailService.getMailService().getPaybackDepartment().shouldHandle(delivery.getMail())) {
+                mailService.getMailService().getPaybackDepartment().handle(delivery.getMail());
+                delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+                return;
             }
         }
 
-        return currentPhase.next(canSkipTraveling(level, delivery));
-    }
-
-    default boolean canSkipTraveling(ServerLevel level, Delivery delivery) {
-        if (delivery.getMail().has(Envelope.DataComponents.PAYBACK)) {
-            return false;
-        }
-
-        return delivery.getRoute().getDistance()
-              .map(distance -> distance < DeliveryRoute.DEFAULT_ASCEND_DISTANCE * 2)
-              .orElse(false);
+        DeliveryPhase nextPhase = delivery.getPhase().next(false);
+        delivery.setPhaseAndResetProgress(nextPhase);
     }
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> (int)Ticks.fromSeconds(5);
-            case LOCATING_RECIPIENT, TRAVELING_TO_RECIPIENT -> delivery.getTravelDuration().ticks() / 2;
-            case TRAVELING_TO_SENDER -> delivery.getTravelDuration().ticks();
-            case HANDLING_DELIVERY, HANDLING_RETURN -> (int)Ticks.fromSeconds(0.20f);
             case STARTED, FINISHED -> 1;
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
+            case TRAVELING_TO_MAIL_HUB, TRAVELING_TO_RECIPIENT, RETURNING_TO_SENDER -> delivery.getRoute().travelDuration().ticks();
+            case DISPATCHING -> 20;
+            case HANDLING_DELIVERY, HANDLING_RETURN -> 5;
         };
     }
 
-    default void phaseStarted(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
-        if (phase == DeliveryPhase.STARTED) {
-            delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.sentFrom(delivery.getSender())
-                  .at(level.getGameTime())));
+    default void phaseStarted(ServerLevel level, Delivery delivery) {
+        if (!delivery.getPhase().isTraveling()) {
+            delivery.updateRoute(level);
+        }
+
+        if (delivery.getPhase() == DeliveryPhase.STARTED) {
+            delivery.getMail().writeToLog(DeliveryRecord.sentFrom(delivery.getSender()).at(level.getGameTime()));
         }
     }
 
-    default void phaseTicked(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
+    default void phaseTicked(ServerLevel level, Delivery delivery) {
 
     }
 
-    default void phaseCompleted(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
+    default void phaseCompleted(ServerLevel level, Delivery delivery) {
         if (delivery.getMail().isEmpty()) {
             return;
         }
 
-        switch (phase) {
+        switch (delivery.getPhase()) {
+
             case HANDLING_DELIVERY -> {
-                delivery.updateMail(mail -> MailService.of(level).receiveMail(level, delivery.getRecipient(), mail));
+                delivery.updateMail(mail -> MailService.of(level).deliverMail(level, delivery.getRecipient(), mail));
             }
             case HANDLING_RETURN -> {
-                delivery.updateMail(mail -> MailService.of(level).receiveMail(level, delivery.getSender(), mail));
+                delivery.updateMail(mail -> MailService.of(level).deliverMail(level, delivery.getSender(), mail));
             }
         }
+    }
+
+    default void endDelivery(ServerLevel level, Delivery delivery) {
     }
 }

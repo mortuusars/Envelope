@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
+import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryHandlerTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.ChatFormatting;
@@ -39,6 +40,7 @@ public class EnvelopeDebugCommand {
     private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
         TestResults testResults = new BuggerTests()
               .add(new RequestedItemTests(context.getSource().getServer()))
+              .add(new DeliveryHandlerTests(context.getSource().getServer()))
               .run(count -> context.getSource().sendSuccess(() ->
                     Component.literal("Running " + count + " bugger tests."), true));
 

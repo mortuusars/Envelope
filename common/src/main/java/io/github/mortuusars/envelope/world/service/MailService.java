@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public class MailService {
     protected final ServerLevel level;
@@ -185,8 +184,8 @@ public class MailService {
 
     // --
 
-    public Mail receiveMail(ServerLevel level, Address address, Mail mail) {
-        if (mail.isEmpty()) return Mail.EMPTY;
+    public Mail deliverMail(ServerLevel level, Address address, Mail mail) {
+        if (mail.isEmpty()) return mail;
         return address.map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }
 

@@ -139,7 +139,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 @Nullable PigeonholeData data = pigeonholeManager.getDataAt(pos);
                 if (data != null) {
                     NonNullList<ItemStack> itemsToDrop = data.extractAllMail().stream()
-                          .map(Mail::getItemCopy)
+                          .map(mail -> mail.getItem().copy())
                           .collect(Collectors.toCollection(NonNullList::create));
 
                     Containers.dropContents(level, pos, itemsToDrop);

@@ -23,6 +23,8 @@ public record TravelDuration(int ticks) {
     public static final StreamCodec<ByteBuf, TravelDuration> STREAM_CODEC =
           ByteBufCodecs.INT.map(TravelDuration::new, TravelDuration::ticks);
 
+    public static final TravelDuration DEFAULT = new TravelDuration(1200); // 60 sec
+
     public int seconds() {
         return ticks / SharedConstants.TICKS_PER_SECOND;
     }

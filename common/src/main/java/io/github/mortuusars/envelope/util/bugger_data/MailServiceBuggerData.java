@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.util.bugger_data;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.data.NbtData;
+import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -41,31 +42,33 @@ public class MailServiceBuggerData extends NbtData {
 
         tag.putInt("mail_awaiting_payback", mailService.getMailService().getPaybackDepartment().getMailAwaitingPaybackCount());
 
-        ListTag deliveries = Stream.concat(
-                    pigeons.stream().map(p -> p.getDelivery().orElseThrow()),
-                    backgroundCouriers.stream().map(BackgroundCourier::delivery))
-              .sorted(Comparator.comparingInt(Delivery::hashCode))
-              .map(delivery -> StringTag.valueOf(formDeliveryString(mailService, delivery)))
+        ListTag deliveries = Stream.concat(pigeons.stream(), backgroundCouriers.stream())
+              .sorted(Comparator.comparingLong(courier -> courier.getCurrentDelivery().orElseThrow().getMetadata().timestamp()))
+              .map(courier -> formDeliveryString(mailService, courier))
+              .map(StringTag::valueOf)
               .collect(Collectors.toCollection(ListTag::new));
 
         tag.put("deliveries", deliveries);
     }
 
-    private @NotNull String formDeliveryString(MailService mailService, Delivery delivery) {
+    private @NotNull String formDeliveryString(MailService mailService, Courier courier) {
+        Delivery delivery = courier.getCurrentDelivery().orElseThrow();
+        int phaseDuration = courier.getDeliveryHandler().getPhaseDuration(mailService.getLevel(), delivery, delivery.getPhase());
+
         return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
               " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
               ChatFormatting.GREEN + delivery.getRecipient().format().withIcon().toString() + ChatFormatting.RESET +
 
               ChatFormatting.GRAY +
-              (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItemForReading().getHoverName().getString() : "") +
+              (!delivery.getMail().isEmpty() ? " " + delivery.getMail().getItem().getHoverName().getString() : "") +
               mailService.getDistanceBetween(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
-              " | ⌚" + delivery.getTravelDuration().seconds() + "s" +
+              " | ⌚" + delivery.getRoute().travelDuration().seconds() + "s" +
               ChatFormatting.RESET +
 
-              " // " + delivery.getCurrentPhase().toPrettyString() +
+              " // " + delivery.getPhase().toPrettyString() +
 
               ChatFormatting.GRAY +
-              " ⌛" + (delivery.getProgress().getDuration() - delivery.getProgress().getTicks()) / 20 +
+              " ⌛" + (phaseDuration - delivery.getPhaseProgress()) / 20 +
               ChatFormatting.RESET;
     }
 }

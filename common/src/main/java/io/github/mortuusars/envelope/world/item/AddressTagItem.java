@@ -52,17 +52,17 @@ public class AddressTagItem extends Item implements ApplicatorItem {
         if (!slot.allowModification(player)) return false;
         if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
-        if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.RECIPIENT))) return true; // Do nothing
+        if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.ADDRESS_TAG))) return true; // Do nothing
 
         if (address == null) {
-            slot.getItem().remove(Envelope.DataComponents.RECIPIENT);
+            slot.getItem().remove(Envelope.DataComponents.ADDRESS_TAG);
         } else {
-            slot.getItem().set(Envelope.DataComponents.RECIPIENT, address);
+            slot.getItem().set(Envelope.DataComponents.ADDRESS_TAG, address);
             stack.shrink(1);
         }
 
         // Having old sender with new recipient address may confuse someone
-        slot.getItem().remove(Envelope.DataComponents.SENDER);
+        slot.getItem().remove(Envelope.DataComponents.SENDER_ADDRESS);
 
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
         return true;

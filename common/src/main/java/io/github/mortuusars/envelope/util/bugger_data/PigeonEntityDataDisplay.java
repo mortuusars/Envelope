@@ -14,13 +14,13 @@ public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataD
     public void addLines(Entity entity, ArrayList<Component> lines) {
         if (!(entity instanceof Pigeon pigeon)) return;
 
-        if (pigeon.getDelivery().isPresent()) {
-            Delivery delivery = pigeon.getDelivery().get();
+        if (pigeon.getCurrentDelivery().isPresent()) {
+            Delivery delivery = pigeon.getCurrentDelivery().get();
             lines.add(Component.empty()
                   .append(delivery.getSender().getName())
                   .append(" → ")
                   .append(delivery.getRecipient().getName()));
-            lines.add(line(delivery.getCurrentPhase().toPrettyString()));
+            lines.add(line(delivery.getPhase().toPrettyString()));
         } else {
             PigeonholeHandler handler = pigeon.getPigeonholeHandler();
             if (handler.wantsToEnterPigeonhole(entity.level())) {

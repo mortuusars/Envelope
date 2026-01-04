@@ -69,7 +69,15 @@ public class BackgroundDelivery extends SavedData {
     public void tick(ServerLevel level) {
         couriers.removeIf(courier -> {
             courier.tick(level);
-            return courier.delivery().isFinished();
+
+            boolean ended = courier.getDelivery().isEnded();
+            if (ended && courier.getOrigin().isRegular()) {
+                FinishedBackgroundCourier finishedCourier = new FinishedBackgroundCourier(
+                      courier.getEntityData(), courier.getOrigin().getPos(), courier.getDelivery().getMail().getItem());
+                addFinishedCourier(finishedCourier);
+            }
+
+            return ended;
         });
         processPendingCouriers();
     }
