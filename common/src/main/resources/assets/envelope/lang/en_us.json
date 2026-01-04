@@ -85,6 +85,7 @@
 
   "gui.envelope.mail.sender": "Sender",
   "gui.envelope.mail.recipient": "Recipient",
+  "gui.envelope.mail.from": "From",
 
   "gui.envelope.delivery.log": "§7Delivery Log",
 

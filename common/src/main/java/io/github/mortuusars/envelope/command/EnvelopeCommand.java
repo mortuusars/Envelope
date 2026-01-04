@@ -14,9 +14,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,16 +33,20 @@ public class EnvelopeCommand {
               .requires((stack) -> stack.hasPermission(2))
               .then(Commands.literal("send")
                     .then(Commands.argument("mail", ItemArgument.item(context))
-                          .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail")))))
+                          .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
+                          .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
+                                .executes(c -> sendMail(c,
+                                      ItemArgument.getItem(c, "mail"),
+                                      parseAddress(CompoundTagArgument.getCompoundTag(c, "sender")))))))
               .then(Commands.literal("pigeonhole")
                     .then(Commands.literal("list")
                           .executes(EnvelopeCommand::listAllPigeonholes)
                           .then(Commands.literal("default")
                                 .executes(EnvelopeCommand::listDefaultPigeonholes)))
                     .then(Commands.literal("position")
-                          .then(Commands.argument("address", AddressArgument.pigeonhole())
+                          .then(Commands.argument("address", AddressArgument.block())
                                 .suggests(AddressSuggestions.pigeonhole())
-                                .executes(c -> pigeonholePosition(c, AddressArgument.getPigeonhole(c, "address"))))))
+                                .executes(c -> pigeonholePosition(c, AddressArgument.getBlock(c, "address"))))))
               .then(EnvelopeDebugCommand.commands())
               .then(Commands.literal("test")
                     .executes(EnvelopeCommand::test)));
@@ -47,13 +54,13 @@ public class EnvelopeCommand {
 
     // -- Mail
 
-    private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item) throws CommandSyntaxException {
+    private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item, Address sender) throws CommandSyntaxException {
         ServerLevel level = context.getSource().getLevel();
         ItemStack mailStack = item.createItemStack(1, false);
 
         Mail mail = new Mail(mailStack);
         MailService.of(level).getDeliveryManager()
-              .startService(Delivery.builder().deliver(mail).from(mail.getSenderAddress()).to(mail.getRecipient()))
+              .startService(Delivery.builder().deliver(mail).from(sender).to(mail.getRecipient()))
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")
@@ -64,6 +71,10 @@ public class EnvelopeCommand {
               );
 
         return 0;
+    }
+
+    private static Address parseAddress(CompoundTag tag) {
+        return Address.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow();
     }
 
     // -- Pigeonhole

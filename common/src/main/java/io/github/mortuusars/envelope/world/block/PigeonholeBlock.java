@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.*;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 public class AddressFormatter {
-    public static final int NEUTRAL_COLOR = 0xFFD7C6B3;
+    public static final int NEUTRAL_COLOR = 0xFFE6CB98;
     public static final int SENDER_COLOR = 0xFF9DB8D9;
     public static final int RECIPIENT_COLOR = 0xFFE9B68B;
 
@@ -34,6 +34,13 @@ public class AddressFormatter {
     }
 
     // --
+
+    public AddressFormatter asNeutral() {
+        return this
+              .withIcon()
+              .withIconColor(NEUTRAL_COLOR)
+              .withColor(NEUTRAL_COLOR);
+    }
 
     public AddressFormatter asSender() {
         return this

@@ -134,7 +134,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     public void insertMail(Mail mail) {
         ifAddressed((level, address, data) -> {
-            data.insertMail(mail);
+            data.insertMail(mail.asDeliveryResult());
             level.playSound(null, getBlockPos(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
             PigeonholeMenu.playersWithMenu(level, address).forEach(player ->
                   Packets.sendToClient(PigeonholeHasNewMailS2CP.INSTANCE, player));
@@ -159,7 +159,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     public void dropOrReturnAllMail() {
         ifAddressed((level, address, data) -> {
-            List<Mail> allMail = data.extractAllMail();
+            List<StoredMail> allMail = data.extractAllMail();
 
             NonNullList<ItemStack> itemsToDrop = allMail.stream()
                   .filter(this::isExtractable)
@@ -291,7 +291,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     public @NotNull ItemStack removeItem(int slot, int amount) {
         if (slot == SLOT_INBOX) {
             StoredMail mail = getFirstAvailableMailToExtract();
-            return !mail.isEmpty() ? extractMail(mail.getId()) : ItemStack.EMPTY;
+            return mail != StoredMail.EMPTY ? extractMail(mail.getId()) : ItemStack.EMPTY;
         }
         return super.removeItem(slot, amount);
     }
@@ -313,7 +313,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         return stack.is(Envelope.Tags.Items.MAILABLE);
     }
 
-    public boolean isExtractable(Mail stack) {
+    public boolean isExtractable(StoredMail stack) {
         //TODO: C.O.D, etc
         return true;
     }

@@ -95,7 +95,6 @@ public interface DeliveryHandler {
         }
 
         switch (delivery.getPhase()) {
-
             case HANDLING_DELIVERY -> {
                 delivery.updateMail(mail -> MailService.of(level).deliverMail(level, delivery.getRecipient(), mail));
             }

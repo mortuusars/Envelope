@@ -5,11 +5,7 @@ import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.Test;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
-import io.github.mortuusars.envelope.world.delivery.DeliveryMetadata;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
-import io.github.mortuusars.envelope.world.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.Util;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -26,8 +22,7 @@ public class DeliveryHandlerTests extends BuggerTests {
 
     private DataResult<Boolean> testCallbacks() {
         TestDeliveryHandler handler = new TestDeliveryHandler();
-        Delivery delivery = new Delivery(new Address.Block("A"), new Address.Block("B"), DeliveryMetadata.EMPTY, Mail.empty(),
-              DeliveryRoute.EMPTY, DeliveryPhase.STARTED, 0, false);
+        Delivery delivery = Delivery.builder().create();
 
         while (!delivery.isEnded()) {
             handler.tickDelivery(server.overworld(), delivery);

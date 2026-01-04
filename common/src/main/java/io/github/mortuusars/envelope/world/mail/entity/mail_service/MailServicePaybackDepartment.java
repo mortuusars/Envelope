@@ -78,7 +78,7 @@ public class MailServicePaybackDepartment {
             MailId subjectId = awaitPayback(mail, getPaybackTimeoutTicksFor(mail));
 
             if (sendPaybackPackingBoxToBuyer(mail, subjectId)) {
-                return Mail.empty();
+                return Mail.EMPTY;
             } else {
                 getData().getMailAwaitingPayback().remove(subjectId);
                 return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)

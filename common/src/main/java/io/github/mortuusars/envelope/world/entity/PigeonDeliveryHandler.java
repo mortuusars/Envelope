@@ -62,7 +62,7 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
         if (!delivery.getMail().isEmpty()) {
             pigeon().spawnAtLocation(delivery.getMail().getItem().copy());
             Pigeon.LOGGER.info("{} has dropped undelivered mail on the ground.", pigeon().getName().getString());
-            delivery.setMail(Mail.empty());
+            delivery.setMail(Mail.EMPTY);
         }
 
         pigeon().setDelivery(null);

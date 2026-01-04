@@ -24,7 +24,7 @@ public class AddressArgument implements ArgumentType<Address> {
         return new AddressArgument(null);
     }
 
-    public static AddressArgument pigeonhole() {
+    public static AddressArgument block() {
         return new AddressArgument(Address.Type.BLOCK);
     }
 
@@ -36,7 +36,7 @@ public class AddressArgument implements ArgumentType<Address> {
         return new AddressArgument(Address.Type.ENTITY);
     }
 
-    public static Address.Block getPigeonhole(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
+    public static Address.Block getBlock(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
         Address address = context.getArgument(name, Address.class);
         if (address instanceof Address.Block block) {
             return block;

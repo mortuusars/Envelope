@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.*;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.mail.Mail;
@@ -279,8 +280,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 //        }
 
         if (!delivery.getMail().isEmpty()) {
-            spawnAtLocation(delivery.getMail().getItem().copy());
-            delivery.setMail(Mail.empty());
+            ItemStack droppedMail = delivery.getPhase().ordinal() >= DeliveryPhase.TRAVELING_TO_RECIPIENT.ordinal()
+                                    && delivery.getPhase().ordinal() <= DeliveryPhase.DEPARTING_RECIPIENT.ordinal()
+                  ? delivery.getMail().asDeliveryResult().getItem()
+                  : delivery.getMail().getItem().copy();
+            spawnAtLocation(droppedMail);
+            delivery.setMail(Mail.EMPTY);
         }
     }
 

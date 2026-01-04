@@ -19,7 +19,7 @@ import java.util.Optional;
 public class Mail implements DataComponentHolder {
     public static final Codec<Mail> CODEC = RecordCodecBuilder.create(i -> i.group(
           ItemStack.OPTIONAL_CODEC.optionalFieldOf("item", ItemStack.EMPTY).forGetter(Mail::getItem),
-          DeliveryLog.CODEC.optionalFieldOf("log", DeliveryLog.empty()).forGetter(Mail::getLog)
+          DeliveryLog.CODEC.optionalFieldOf("log", DeliveryLog.EMPTY).forGetter(Mail::getLog)
     ).apply(i, Mail::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Mail> STREAM_CODEC = StreamCodec.composite(
@@ -27,6 +27,8 @@ public class Mail implements DataComponentHolder {
           DeliveryLog.STREAM_CODEC, Mail::getLog,
           Mail::new
     );
+
+    public static final Mail EMPTY = new Mail(ItemStack.EMPTY, DeliveryLog.EMPTY);
 
     private final ItemStack stack;
     private final DeliveryLog log;
@@ -38,11 +40,7 @@ public class Mail implements DataComponentHolder {
 
     public Mail(ItemStack stack) {
         this.stack = stack;
-        this.log = DeliveryLog.empty();
-    }
-
-    public static Mail empty() {
-        return new Mail(ItemStack.EMPTY, DeliveryLog.empty());
+        this.log = new DeliveryLog();
     }
 
     public ItemStack getItem() {
@@ -81,13 +79,29 @@ public class Mail implements DataComponentHolder {
     }
 
     public Mail writeToLog(DeliveryRecord record) {
-        getLog().append(record);
+        if (!isEmpty()) {
+            getLog().append(record);
+        }
         return this;
     }
 
     public Mail writeToLog(DeliveryRecord.Builder recordBuilder) {
-        getLog().append(recordBuilder);
+        if (!isEmpty()) {
+            getLog().append(recordBuilder);
+        }
         return this;
+    }
+
+    /**
+     * "Finalizes" mail by removing sending data and adding data that recipient should see.
+     * @return Copied instance with changed components.
+     */
+    public Mail asDeliveryResult() {
+        ItemStack stack = getItem().copy();
+        stack.remove(Envelope.DataComponents.ADDRESS_TAG);
+        stack.remove(Envelope.DataComponents.PAYBACK_TAG);
+        getLog().getFirstSender().ifPresent(sender -> stack.set(Envelope.DataComponents.SENDER_ADDRESS, sender));
+        return new Mail(stack, getLog().copy());
     }
 
     // --

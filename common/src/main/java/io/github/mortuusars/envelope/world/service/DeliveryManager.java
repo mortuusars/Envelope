@@ -36,7 +36,7 @@ public class DeliveryManager {
     }
 
     public Result<StartedDelivery> start(Pigeon pigeon, Delivery.Builder deliveryBuilder) {
-        return start(pigeon, deliveryBuilder.create(mailService.getLevel()));
+        return start(pigeon, deliveryBuilder.create());
     }
 
     public Result<StartedDelivery> startService(Delivery delivery) {
@@ -44,7 +44,7 @@ public class DeliveryManager {
     }
 
     public Result<StartedDelivery> startService(Delivery.Builder deliveryBuilder) {
-        return startService(deliveryBuilder.create(mailService.getLevel()));
+        return startService(deliveryBuilder.create());
     }
 
     protected Result<StartedDelivery> tryStart(Delivery delivery, Function<Delivery, Courier> courier) {

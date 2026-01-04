@@ -262,6 +262,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     }
 
     protected boolean rejectMail(Player player, int index) {
+        //TODO: Remove rejection?
         throw new NotImplementedException("C.O.D. and rejection of C.O.D. mail is not implemented yet.");
     }
 

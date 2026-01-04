@@ -23,8 +23,8 @@ public class Delivery {
           Address.CODEC.fieldOf("sender").forGetter(Delivery::getSender),
           Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
           DeliveryMetadata.CODEC.optionalFieldOf("metadata", DeliveryMetadata.EMPTY).forGetter(Delivery::getMetadata),
-          Mail.CODEC.fieldOf("mail").forGetter(Delivery::getMail),
-          DeliveryRoute.CODEC.fieldOf("route").forGetter(Delivery::getRoute),
+          Mail.CODEC.optionalFieldOf("mail", Mail.EMPTY).forGetter(Delivery::getMail),
+          DeliveryRoute.CODEC.optionalFieldOf("route", DeliveryRoute.EMPTY).forGetter(Delivery::getRoute),
           DeliveryPhase.CODEC.optionalFieldOf("phase", DeliveryPhase.STARTED).forGetter(Delivery::getPhase),
           Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("phase_progress", 0).forGetter(Delivery::getPhaseProgress),
           Codec.BOOL.optionalFieldOf("ended", false).forGetter(Delivery::isEnded)
@@ -165,7 +165,7 @@ public class Delivery {
         private Address sender = Address.UNKNOWN;
         private Address recipient = Address.UNKNOWN;
         private @Nullable UUID owner = null;
-        private Mail mail = Mail.empty();
+        private Mail mail = Mail.EMPTY;
         private DeliveryPhase phase = DeliveryPhase.STARTED;
 
         public Builder deliver(@NotNull Mail mail) {
@@ -193,10 +193,9 @@ public class Delivery {
             return this;
         }
 
-        public Delivery create(ServerLevel level) {
-            DeliveryRoute route = DeliveryRoute.build(level, sender, recipient);
+        public Delivery create() {
             DeliveryMetadata metadata = DeliveryMetadata.EMPTY.withOwner(owner);
-            return new Delivery(sender, recipient, metadata, mail, route, phase, 0, false);
+            return new Delivery(sender, recipient, metadata, mail, DeliveryRoute.EMPTY, phase, 0, false);
         }
     }
 }

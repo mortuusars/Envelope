@@ -56,7 +56,7 @@ public class PigeonholeData {
     public void insertMail(Mail mail) {
         //TODO: add overload to accept mail with known id. might be useful in some cases
         if (!mail.isEmpty()) {
-            StoredMail storedMail = new StoredMail(mail.getItem().copy(), mail.getLog(), MailId.createRandom());
+            StoredMail storedMail = new StoredMail(MailId.createRandom(), mail.getItem().copy(), mail.getLog());
             getMail().add(storedMail);
             setDirty();
         }
@@ -76,12 +76,12 @@ public class PigeonholeData {
         return Optional.empty();
     }
 
-    public List<Mail> extractAllMail() {
+    public List<StoredMail> extractAllMail() {
         if (!hasMail()) {
             return Collections.emptyList();
         }
 
-        List<Mail> mail = new ArrayList<>(getMail());
+        List<StoredMail> mail = new ArrayList<>(getMail());
         getMail().clear();
         setDirty();
         return mail;

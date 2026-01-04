@@ -1,6 +1,8 @@
 package io.github.mortuusars.envelope.world.delivery.log;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -8,23 +10,36 @@ import net.minecraft.network.codec.StreamCodec;
 import java.util.*;
 import java.util.function.Predicate;
 
-public final class DeliveryLog {
+public class DeliveryLog {
     public static final Codec<DeliveryLog> CODEC = DeliveryRecord.CODEC.listOf(0, 64).xmap(DeliveryLog::new, DeliveryLog::getRecords);
     public static final StreamCodec<RegistryFriendlyByteBuf, DeliveryLog> STREAM_CODEC =
           DeliveryRecord.STREAM_CODEC.apply(ByteBufCodecs.list(64)).map(DeliveryLog::new, DeliveryLog::getRecords);
 
+    public static final DeliveryLog EMPTY = new DeliveryLog();
+
     private final List<DeliveryRecord> records;
 
     public DeliveryLog(List<DeliveryRecord> records) {
-        this.records = new ArrayList<>(records);
+        this.records = new ArrayList<>(records); // Make sure it's mutable
     }
 
-    public static DeliveryLog empty() {
-        return new DeliveryLog(Collections.emptyList());
+    public DeliveryLog() {
+        this.records = new ArrayList<>();
+    }
+
+    public List<DeliveryRecord> getRecords() {
+        return records;
     }
 
     public boolean isEmpty() {
         return records.isEmpty();
+    }
+
+    public Optional<Address> getFirstSender() {
+        return getRecords().stream()
+              .filter(r -> r.status() == DeliveryRecord.Status.SENT)
+              .findFirst()
+              .map(DeliveryRecord::address);
     }
 
     public Optional<DeliveryRecord> getLastRecord(Predicate<DeliveryRecord> predicate) {
@@ -52,17 +67,19 @@ public final class DeliveryLog {
     // --
 
     public DeliveryLog append(DeliveryRecord record) {
+        Preconditions.checkState(this != EMPTY, "Cannot append to constant EMPTY log.");
         records.add(record);
         return this;
     }
 
     public DeliveryLog append(DeliveryRecord.Builder recordBuilder) {
+        Preconditions.checkState(this != EMPTY, "Cannot append to constant EMPTY log.");
         records.add(recordBuilder.build());
         return this;
     }
 
-    public List<DeliveryRecord> getRecords() {
-        return records;
+    public DeliveryLog copy() {
+        return new DeliveryLog(records);
     }
 
     @Override
