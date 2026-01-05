@@ -54,6 +54,11 @@ public class PigeonholeData {
     }
 
     public void insertMail(Mail mail) {
+        if (mail.getLog().getLastExceptionRecord().isEmpty()) {
+            //TODO: not the best place for it
+            mail = mail.asDeliveryResult();
+        }
+
         //TODO: add overload to accept mail with known id. might be useful in some cases
         if (!mail.isEmpty()) {
             StoredMail storedMail = new StoredMail(MailId.createRandom(), mail.getItem().copy(), mail.getLog());

@@ -2,8 +2,12 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
-import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
+import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -12,9 +16,12 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class PaybackPackingBoxItem extends Item implements PackingBox {
     public PaybackPackingBoxItem(Properties properties) {
@@ -24,6 +31,16 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
     @Override
     public boolean canFitInsideContainerItems() {
         return false;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
+        if (subject != null && !subject.mail().isEmpty()) {
+            tooltipComponents.add(Component.translatable("gui.envelope.time.remaining")
+                  .append(PrettyGameTime.durationLargest(subject.timeoutTick() - Minecrft.level().getGameTime()))
+                  .withStyle(ChatFormatting.RED));
+        }
     }
 
     // --
@@ -38,8 +55,8 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
     }
 
     public boolean openPackingGui(Player player, InteractionHand hand, ItemStack stack) {
-        @Nullable StoredItemStack subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
-        if (subject == null || subject.isEmpty() || !subject.getForReading().has(Envelope.DataComponents.PAYBACK_TAG)) {
+        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
+        if (subject == null || subject.mail().isEmpty() || !subject.mail().getItem().has(Envelope.DataComponents.REQUESTED_PAYBACK)) {
             return false;
         }
 

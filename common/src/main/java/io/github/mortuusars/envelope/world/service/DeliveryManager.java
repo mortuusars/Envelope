@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -31,6 +32,12 @@ public class DeliveryManager {
         this.mailService = mailService;
     }
 
+    public MailService getMailService() {
+        return mailService;
+    }
+
+    // --
+
     public Result<StartedDelivery> start(Pigeon pigeon, Delivery delivery) {
         return tryStart(delivery, pigeon::startDelivery);
     }
@@ -40,7 +47,7 @@ public class DeliveryManager {
     }
 
     public Result<StartedDelivery> startService(Delivery delivery) {
-        return tryStart(delivery, validDelivery -> Pigeon.spawnServiceCourier(mailService.getLevel(), validDelivery));
+        return tryStart(delivery, validDelivery -> Pigeon.spawnServiceCourier(getMailService().getLevel(), validDelivery));
     }
 
     public Result<StartedDelivery> startService(Delivery.Builder deliveryBuilder) {
@@ -61,11 +68,45 @@ public class DeliveryManager {
             return Result.error(ERROR_NO_MAIL);
         }
 
-        delivery.updateMetadata(data -> data.withTimestampIfMissing(mailService.getGameTime()));
+        delivery.updateMetadata(data -> data.withTimestampIfMissing(getMailService().getGameTime()));
+
+        LOGGER.debug("Starting delivery {}", delivery);
 
         return Result.success(new StartedDelivery(courier.apply(delivery), delivery));
     }
 
     public record StartedDelivery(Courier courier, Delivery delivery) {
+    }
+
+    // --
+
+    public boolean canDeliverTo(Address address) {
+        if (address.matches(Address.UNKNOWN)) {
+            return false;
+        }
+
+        Address resolvedAddress = getMailService().resolve(address);
+
+        if (resolvedAddress instanceof Address.Player) {
+            // Player doesn't have default address
+            return false;
+        }
+
+        return getMailService().getKnownAddresses().isKnown(resolvedAddress);
+    }
+
+    public void dispatch(Delivery delivery) {
+        if (!canDeliverTo(delivery.getRecipient())) {
+            delivery.getMail().writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                  .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+            delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            return;
+        }
+
+        if (getMailService().getPaybackDepartment().tryHandle(delivery)) {
+            return;
+        }
+
+        delivery.setPhaseAndResetProgress(delivery.getPhase().next()); // Continue normally
     }
 }

@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
@@ -45,38 +45,26 @@ public interface DeliveryHandler {
      */
     default void advancePhase(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.DISPATCHING) {
-            MailService mailService = MailService.of(level);
-
-            if (!mailService.canDeliverTo(delivery.getRecipient())) {
-                delivery.getMail().writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                      .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
-                delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
-                return;
-            }
-
-            if (mailService.getMailService().getPaybackDepartment().shouldHandle(delivery.getMail())) {
-                mailService.getMailService().getPaybackDepartment().handle(delivery.getMail());
-                delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
-                return;
-            }
+            MailService.of(level).getDeliveryManager().dispatch(delivery);
+        } else {
+            DeliveryPhase nextPhase = delivery.getPhase().next();
+            delivery.setPhaseAndResetProgress(nextPhase);
         }
-
-        DeliveryPhase nextPhase = delivery.getPhase().next(false);
-        delivery.setPhaseAndResetProgress(nextPhase);
     }
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
             case STARTED, FINISHED -> 1;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
-            case TRAVELING_TO_MAIL_HUB, TRAVELING_TO_RECIPIENT, RETURNING_TO_SENDER -> delivery.getRoute().travelDuration().ticks();
+            case TRAVELING_TO_MAIL_HUB, TRAVELING_TO_RECIPIENT -> delivery.getRoute().travelDuration().ticks() / 2;
+            case RETURNING_TO_SENDER -> delivery.getRoute().travelDuration().ticks();
             case DISPATCHING -> 20;
             case HANDLING_DELIVERY, HANDLING_RETURN -> 5;
         };
     }
 
     default void phaseStarted(ServerLevel level, Delivery delivery) {
-        if (!delivery.getPhase().isTraveling()) {
+        if (!delivery.getPhase().isTraveling() || delivery.getRoute() == DeliveryRoute.EMPTY) {
             delivery.updateRoute(level);
         }
 

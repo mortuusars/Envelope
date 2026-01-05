@@ -4,8 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
-import io.github.mortuusars.envelope.world.item.component.Payback;
-import io.github.mortuusars.envelope.world.item.component.StoredItemStack;
+import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
@@ -16,10 +15,11 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class PaybackPackingMenu extends PackingMenu {
-    protected Payback payback;
-    protected StoredItemStack paybackSubject;
+    protected RequestedPayback requestedPayback;
+    protected ItemStack paybackSubject;
 
     protected PaybackPackingMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
         super(menuType, containerId, playerInventory, hand);
@@ -35,10 +35,12 @@ public class PaybackPackingMenu extends PackingMenu {
 
     @Override
     protected void init() {
-        this.paybackSubject = getBoxStack().getOrDefault(Envelope.DataComponents.PAYBACK_SUBJECT, StoredItemStack.EMPTY);
-        this.payback = Objects.requireNonNull(paybackSubject.getForReading().get(Envelope.DataComponents.PAYBACK_TAG));
+        this.paybackSubject = Optional.ofNullable(getBoxStack().get(Envelope.DataComponents.PAYBACK_SUBJECT))
+              .map(subject -> subject.mail().getItem())
+              .orElse(ItemStack.EMPTY);
+        this.requestedPayback = Objects.requireNonNull(paybackSubject.get(Envelope.DataComponents.REQUESTED_PAYBACK));
         super.init();
-        addSlot(new PreviewSlot(paybackSubject.getForReading(), 0, 21, 42));
+        addSlot(new PreviewSlot(paybackSubject, 0, 21, 42));
     }
 
     // --
@@ -65,11 +67,11 @@ public class PaybackPackingMenu extends PackingMenu {
 
     // --
 
-    public Payback getPayback() {
-        return payback;
+    public RequestedPayback getPayback() {
+        return requestedPayback;
     }
 
-    public StoredItemStack getPaybackSubject() {
+    public ItemStack getPaybackSubject() {
         return paybackSubject;
     }
 
@@ -82,7 +84,7 @@ public class PaybackPackingMenu extends PackingMenu {
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
         Address sender = stack.remove(Envelope.DataComponents.SENDER_ADDRESS);
-        stack.set(Envelope.DataComponents.ADDRESS_TAG, sender);
+        stack.set(Envelope.DataComponents.RECIPIENT_ADDRESS, sender);
         return stack;
     }
 }

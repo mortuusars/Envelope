@@ -25,7 +25,7 @@ public class EnvelopeDebugCommand {
     private static int timeoutAllPaybackMail(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
         MailService service = MailService.of(level);
-        int returnedCount = service.getMailService().getPaybackDepartment().returnAllAwaitingAsTimedOut();
+        int returnedCount = service.getPaybackDepartment().returnAllAwaitingAsTimedOut();
 
         if (returnedCount > 0) {
             context.getSource().sendSuccess(() -> Component.literal("Returned " +

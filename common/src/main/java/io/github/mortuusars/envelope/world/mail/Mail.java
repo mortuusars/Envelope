@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.core.component.DataComponentMap;
@@ -52,11 +52,11 @@ public class Mail implements DataComponentHolder {
     }
 
     public Address getRecipient() {
-        return getOrDefault(Envelope.DataComponents.ADDRESS_TAG, Address.UNKNOWN);
+        return getOrDefault(Envelope.DataComponents.RECIPIENT_ADDRESS, Address.UNKNOWN);
     }
 
-    public Optional<Payback> getPayback() {
-        return Optional.ofNullable(get(Envelope.DataComponents.PAYBACK_TAG));
+    public Optional<RequestedPayback> getPayback() {
+        return Optional.ofNullable(get(Envelope.DataComponents.REQUESTED_PAYBACK));
     }
 
     public Address getSenderAddress() {
@@ -75,7 +75,7 @@ public class Mail implements DataComponentHolder {
     }
 
     public boolean hasPayback() {
-        return has(Envelope.DataComponents.PAYBACK_TAG);
+        return has(Envelope.DataComponents.REQUESTED_PAYBACK);
     }
 
     public Mail writeToLog(DeliveryRecord record) {
@@ -98,8 +98,8 @@ public class Mail implements DataComponentHolder {
      */
     public Mail asDeliveryResult() {
         ItemStack stack = getItem().copy();
-        stack.remove(Envelope.DataComponents.ADDRESS_TAG);
-        stack.remove(Envelope.DataComponents.PAYBACK_TAG);
+        stack.remove(Envelope.DataComponents.RECIPIENT_ADDRESS);
+        stack.remove(Envelope.DataComponents.REQUESTED_PAYBACK);
         getLog().getFirstSender().ifPresent(sender -> stack.set(Envelope.DataComponents.SENDER_ADDRESS, sender));
         return new Mail(stack, getLog().copy());
     }

@@ -75,8 +75,8 @@ public class LetterCloningRecipe extends CustomRecipe {
 			result.remove(Envelope.DataComponents.LETTER_TATTERED);
 			//TODO: keep some of the properties?
 			result.remove(Envelope.DataComponents.SENDER_ADDRESS);
-			result.remove(Envelope.DataComponents.ADDRESS_TAG);
-			result.remove(Envelope.DataComponents.PAYBACK_TAG);
+			result.remove(Envelope.DataComponents.RECIPIENT_ADDRESS);
+			result.remove(Envelope.DataComponents.REQUESTED_PAYBACK);
 			return result;
 		}
 

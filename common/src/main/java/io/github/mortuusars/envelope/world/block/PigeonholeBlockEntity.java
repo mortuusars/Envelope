@@ -23,8 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -134,7 +133,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     public void insertMail(Mail mail) {
         ifAddressed((level, address, data) -> {
-            data.insertMail(mail.asDeliveryResult());
+            data.insertMail(mail);
             level.playSound(null, getBlockPos(), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 1, 1);
             PigeonholeMenu.playersWithMenu(level, address).forEach(player ->
                   Packets.sendToClient(PigeonholeHasNewMailS2CP.INSTANCE, player));
@@ -406,13 +405,13 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         }
 
         ItemStack mailStack = getItem(SLOT_MAIL);
-        if (mailStack.isEmpty() || !mailStack.has(Envelope.DataComponents.ADDRESS_TAG)) {
+        if (mailStack.isEmpty() || !mailStack.has(Envelope.DataComponents.RECIPIENT_ADDRESS)) {
             return;
         }
 
         mailStack = mailStack.copyWithCount(1);
 
-        Address recipient = mailStack.getOrDefault(Envelope.DataComponents.ADDRESS_TAG, Address.UNKNOWN);
+        Address recipient = mailStack.getOrDefault(Envelope.DataComponents.RECIPIENT_ADDRESS, Address.UNKNOWN);
         if (MailService.of(level).resolve(recipient).matches(this.address)) {
             return;
         }
@@ -496,6 +495,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     // -- Save/Load
+
+    private List<StoredMail> mail = new ArrayList<>();
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {

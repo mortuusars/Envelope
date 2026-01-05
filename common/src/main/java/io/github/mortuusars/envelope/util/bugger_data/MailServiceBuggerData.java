@@ -40,7 +40,7 @@ public class MailServiceBuggerData extends NbtData {
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
         tag.putInt("background_finished_pigeons", mailService.getBackgroundDelivery().getFinishedCouriers().size());
 
-        tag.putInt("mail_awaiting_payback", mailService.getMailService().getPaybackDepartment().getMailAwaitingPaybackCount());
+        tag.putInt("mail_awaiting_payback", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
 
         ListTag deliveries = Stream.concat(pigeons.stream(), backgroundCouriers.stream())
               .sorted(Comparator.comparingLong(courier -> courier.getCurrentDelivery().orElseThrow().getMetadata().timestamp()))

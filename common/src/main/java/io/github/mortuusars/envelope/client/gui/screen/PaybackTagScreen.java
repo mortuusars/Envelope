@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
-import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -118,7 +118,7 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
             return true;
         }
 
-        if (hoveredSlot != null && hoveredSlot.index < Payback.SLOTS) {
+        if (hoveredSlot != null && hoveredSlot.index < RequestedPayback.SLOTS) {
             boolean decreasing = scrollY < 0;
             boolean fast = Screen.hasShiftDown();
             changeRequestedItemCount(decreasing, fast);
@@ -134,7 +134,7 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
             return true;
         }
 
-        if (hoveredSlot != null && hoveredSlot.index < Payback.SLOTS) {
+        if (hoveredSlot != null && hoveredSlot.index < RequestedPayback.SLOTS) {
             if (keyCode == InputConstants.KEY_ADD || keyCode == InputConstants.KEY_EQUALS) {
                 changeRequestedItemCount(false, Screen.hasShiftDown());
                 return true;
@@ -152,7 +152,7 @@ public class PaybackTagScreen extends AbstractContainerScreen<PaybackTagMenu> {
     protected void changeRequestedItemCount(boolean decreasing, boolean fast) {
         if (hoveredSlot == null) return;
         int startId = decreasing ? PaybackTagMenu.DECREASE_COUNT_START_BUTTON_ID : PaybackTagMenu.INCREASE_COUNT_START_BUTTON_ID;
-        int id = startId + hoveredSlot.index + (fast ? Payback.SLOTS : 0);
+        int id = startId + hoveredSlot.index + (fast ? RequestedPayback.SLOTS : 0);
         getMenu().clickMenuButton(getMenu().getPlayer(), id);
         Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, id);
     }

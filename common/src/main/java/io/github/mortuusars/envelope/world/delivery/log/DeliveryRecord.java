@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.delivery.log;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.util.PrettyGameTime;
@@ -45,15 +46,18 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
 
     // --
 
-    public static Builder sentFrom(Address address) {
+    public static Builder sentFrom(@NotNull Address address) {
+        Preconditions.checkNotNull(address);
         return new Builder(Status.SENT, address);
     }
 
-    public static Builder arrivedTo(Address address) {
+    public static Builder arrivedTo(@NotNull Address address) {
+        Preconditions.checkNotNull(address);
         return new Builder(Status.ARRIVED, address);
     }
 
-    public static Builder returnedFrom(Address address) {
+    public static Builder returnedFrom(@NotNull Address address) {
+        Preconditions.checkNotNull(address);
         return new Builder(Status.RETURNED, address);
     }
 

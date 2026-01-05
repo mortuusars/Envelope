@@ -12,7 +12,6 @@ import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
-import io.github.mortuusars.envelope.world.mail.MailId;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -21,6 +20,7 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
+import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -222,10 +222,10 @@ public class Envelope {
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
         // -- Mail
-        public static final DataComponentType<Address> ADDRESS_TAG = Register.dataComponentType("address_tag", b ->
+        public static final DataComponentType<Address> RECIPIENT_ADDRESS = Register.dataComponentType("recipient_address", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<Payback> PAYBACK_TAG = Register.dataComponentType("payback_tag",
-              b -> b.persistent(Payback.CODEC).networkSynchronized(Payback.STREAM_CODEC));
+        public static final DataComponentType<RequestedPayback> REQUESTED_PAYBACK = Register.dataComponentType("requested_payback",
+              b -> b.persistent(RequestedPayback.CODEC).networkSynchronized(RequestedPayback.STREAM_CODEC));
         public static final DataComponentType<Address> SENDER_ADDRESS = Register.dataComponentType("sender_address", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
@@ -259,10 +259,8 @@ public class Envelope {
 
         public static final DataComponentType<PaybackTagContents> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
               b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
-        public static final DataComponentType<StoredItemStack> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
-              b -> b.persistent(StoredItemStack.CODEC).networkSynchronized(StoredItemStack.STREAM_CODEC));
-        public static final DataComponentType<MailId> PAYBACK_SUBJECT_ID = Register.dataComponentType("payback_subject_id",
-              b -> b.persistent(MailId.CODEC).networkSynchronized(MailId.STREAM_CODEC));
+        public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
+              b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC));
 
         // -- Misc
 

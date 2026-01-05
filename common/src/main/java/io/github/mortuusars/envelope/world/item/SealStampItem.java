@@ -34,7 +34,9 @@ public class SealStampItem extends Item implements ApplicatorItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (tooltipFlag.isAdvanced()) {
-            ResourceLocation texture = getImpressionOrDefault(stack, Minecrft.registryAccess(), Minecrft.player()).value().textureId();
+            //TODO: Something is wrong with getting impressions here. Server is crashing due to client class loading.
+            // Maybe use context.registries() here? Or just extract into inner class.
+            ResourceLocation texture = getImpressionOrDefault(stack, Minecrft.registryAccess(), null).value().textureId();
             tooltipComponents.add(Component.literal("Impression:").withStyle(ChatFormatting.DARK_GRAY)
                   .append(CommonComponents.SPACE)
                   .append(Component.literal(texture.toString()).withStyle(ChatFormatting.GRAY)));

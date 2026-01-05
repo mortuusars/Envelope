@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailServiceEntity;
+import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
 import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
@@ -29,6 +30,7 @@ public class MailService {
     protected final PigeonholeManager pigeonholeManager;
     protected final MailEntities mailEntities;
     protected final MailServiceEntity mailServiceEntity;
+    protected final PaybackDepartment paybackDepartment;
     protected final DeliveryManager deliveryManager;
 
     protected @Nullable Players players;
@@ -40,6 +42,7 @@ public class MailService {
         this.pigeonholeManager = new PigeonholeManager(level);
         this.mailEntities = new MailEntities();
         this.mailServiceEntity = new MailServiceEntity(this);
+        this.paybackDepartment = new PaybackDepartment(this);
         this.deliveryManager = new DeliveryManager(this);
 
         this.mailEntities.register(mailServiceEntity);
@@ -73,6 +76,10 @@ public class MailService {
 
     public MailServiceEntity getMailService() {
         return mailServiceEntity;
+    }
+
+    public PaybackDepartment getPaybackDepartment() {
+        return paybackDepartment;
     }
 
     public @NotNull Players getPlayers() {
@@ -124,21 +131,6 @@ public class MailService {
             return getPlayerDefaultAddress(playerAddress).map(Address.class::cast).orElse(address);
         }
         return address;
-    }
-
-    public boolean canDeliverTo(Address address) {
-        if (address.matches(Address.UNKNOWN)) {
-            return false;
-        }
-
-        Address resolvedAddress = resolve(address);
-
-        if (resolvedAddress instanceof Address.Player) {
-            // Player doesn't have default address
-            return false;
-        }
-
-        return getKnownAddresses().isKnown(resolvedAddress);
     }
 
     public Optional<BlockPos> getPositionOf(Address address) {
@@ -193,7 +185,7 @@ public class MailService {
 
     public void tick() {
         getBackgroundDelivery().tick(level);
-        getMailService().tick();
+        getPaybackDepartment().tick();
 
         if (level.getGameTime() % 20 == 0) Bugger.MAIL_SERVICE.collectAndSendData(this);
     }

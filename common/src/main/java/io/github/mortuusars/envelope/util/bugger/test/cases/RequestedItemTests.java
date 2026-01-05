@@ -104,7 +104,7 @@ public class RequestedItemTests extends BuggerTests {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.SENDER_ADDRESS, Address.MAIL_SERVICE);
-                  stack.set(Envelope.DataComponents.ADDRESS_TAG, new Address.Block("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.RECIPIENT_ADDRESS, new Address.Block("Mortuusars Laboratory"));
                   return decodeFromJson(json).matches(stack);
               }));
     }

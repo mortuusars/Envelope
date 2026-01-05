@@ -3,21 +3,21 @@ package io.github.mortuusars.envelope.client.gui.tooltip;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.RequestedItemDisplay;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
-import io.github.mortuusars.envelope.world.item.component.Payback;
+import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public record PaybackTooltipComponent(Payback payback) implements ClientTooltipComponent {
+public record PaybackTooltipComponent(RequestedPayback requestedPayback) implements ClientTooltipComponent {
     public static final ResourceLocation SLOT_SPRITE = Envelope.resource("tooltip/payback/slot");
 
     private static final ItemStack PAYBACK_TAG = new ItemStack(Envelope.Items.PAYBACK_TAG.get());
 
     @Override
     public int getWidth(Font font) {
-        return 16 + (18 * payback().items().size()) + 5;
+        return 16 + (18 * requestedPayback().items().size()) + 5;
     }
 
     @Override
@@ -29,10 +29,10 @@ public record PaybackTooltipComponent(Payback payback) implements ClientTooltipC
     public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
         guiGraphics.renderFakeItem(PAYBACK_TAG, x - 1, y + 3, 0);
 
-        int slots = payback().items().size();
+        int slots = requestedPayback().items().size();
 
         for (int i = 0; i < slots; i++) {
-            RequestedItem requestedItem = payback().items().get(i);
+            RequestedItem requestedItem = requestedPayback().items().get(i);
             RequestedItemDisplay display = new RequestedItemDisplay(requestedItem);
             ItemStack stack = display.getDisplayedItem();
 

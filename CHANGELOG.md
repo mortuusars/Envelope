@@ -4,6 +4,11 @@
 - Added recipe for Payback Tag
 - Changed Address Tag recipe: it's now shapeless, requires only one sign and gives one tag.
 - Payback timeout config option is now in minutes instead of seconds. Config will update automatically as it's name changed as well. 
+- Delivered mail no longer keeps sending data (recipient and payback).
+- Traveling mail no longer shows sender address from the start. It will be added when delivered (or dropped near recipient).
+- Changed some internal systems. Renamed several item components.
+  - Some existing stuff will likely disappear from the world again.
+- Improvements to delivery system to make it more robust.
 
 ## 0.4.0.1
 [Some existing envelope world data might disappear when updating to this version]

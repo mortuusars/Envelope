@@ -114,6 +114,7 @@
 
   "gui.envelope.letter.subject": "Subject: ",
 
+  "gui.envelope.time.remaining": "Remaining: ",
   "gui.envelope.time.years": "%sy",
   "gui.envelope.time.months": "%smo",
   "gui.envelope.time.weeks": "%sw",

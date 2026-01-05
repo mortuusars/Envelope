@@ -59,7 +59,7 @@ public class DeliveryHandlerTests extends BuggerTests {
 
         @Override
         public void advancePhase(ServerLevel level, Delivery delivery) {
-            DeliveryPhase nextPhase = delivery.getPhase().next(false);
+            DeliveryPhase nextPhase = delivery.getPhase().next();
             delivery.setPhaseAndResetProgress(nextPhase);
         }
 

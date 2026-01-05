@@ -14,26 +14,26 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.Optional;
 
-public record Payback(List<RequestedItem> items) implements TooltipComponent {
+public record RequestedPayback(List<RequestedItem> items) implements TooltipComponent {
     public static final int SLOTS = 6;
-    public static final Payback DEFAULT = new Payback(List.of(RequestedItem.DEFAULT));
+    public static final RequestedPayback DEFAULT = new RequestedPayback(List.of(RequestedItem.DEFAULT));
 
-    public static final Codec<Payback> CODEC =
-          Codec.list(RequestedItem.CODEC, 1, 6).xmap(Payback::new, Payback::items);
+    public static final Codec<RequestedPayback> CODEC =
+          Codec.list(RequestedItem.CODEC, 1, 6).xmap(RequestedPayback::new, RequestedPayback::items);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, Payback> STREAM_CODEC =
-          RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(Payback::new, Payback::items);
+    public static final StreamCodec<RegistryFriendlyByteBuf, RequestedPayback> STREAM_CODEC =
+          RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(RequestedPayback::new, RequestedPayback::items);
 
-    public Payback {
+    public RequestedPayback {
         Preconditions.checkArgument(!items.isEmpty(), "Payback must have at least one requested item.");
     }
 
-    public static Optional<Payback> create(List<RequestedItem> items) {
-        return !items.isEmpty() ? Optional.of(new Payback(items)) : Optional.empty();
+    public static Optional<RequestedPayback> create(List<RequestedItem> items) {
+        return !items.isEmpty() ? Optional.of(new RequestedPayback(items)) : Optional.empty();
     }
 
-    public static Payback createOrDefault(List<RequestedItem> items) {
-        return !items.isEmpty() ? new Payback(items) : DEFAULT;
+    public static RequestedPayback createOrDefault(List<RequestedItem> items) {
+        return !items.isEmpty() ? new RequestedPayback(items) : DEFAULT;
     }
 
     // --

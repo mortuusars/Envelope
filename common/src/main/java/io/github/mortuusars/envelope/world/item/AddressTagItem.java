@@ -52,12 +52,12 @@ public class AddressTagItem extends Item implements ApplicatorItem {
         if (!slot.allowModification(player)) return false;
         if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
-        if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.ADDRESS_TAG))) return true; // Do nothing
+        if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.RECIPIENT_ADDRESS))) return true; // Do nothing
 
         if (address == null) {
-            slot.getItem().remove(Envelope.DataComponents.ADDRESS_TAG);
+            slot.getItem().remove(Envelope.DataComponents.RECIPIENT_ADDRESS);
         } else {
-            slot.getItem().set(Envelope.DataComponents.ADDRESS_TAG, address);
+            slot.getItem().set(Envelope.DataComponents.RECIPIENT_ADDRESS, address);
             stack.shrink(1);
         }
 

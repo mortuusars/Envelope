@@ -83,10 +83,11 @@ public class EnvelopeClient {
             return switch (component) {
                 case MailAddressTagTooltip mailAddress -> new MailAddressTagTooltipComponent(mailAddress.address());
                 case PackageContents packageContents -> new PackageTooltipComponent(packageContents);
-                case Payback payback -> new PaybackTooltipComponent(payback);
+                case RequestedPayback requestedPayback -> new PaybackTooltipComponent(requestedPayback);
                 case PaybackTagContents paybackTagContents -> new PaybackTagContentsTooltipComponent(paybackTagContents);
                 case Seal seal -> new SealTooltipComponent(seal);
-                case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die -> new SealDieTooltipComponent(die.impression());
+                case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die ->
+                      new SealDieTooltipComponent(die.impression());
                 case CompositeTooltip composite -> new CompositeTooltipComponent(
                       composite.components().stream().map(ClientTooltipComponent::create).toList()
                 );
@@ -98,8 +99,8 @@ public class EnvelopeClient {
             if (stack.is(Envelope.Tags.Items.MAILABLE)) {
                 return CompositeTooltip.of(
                       original,
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.ADDRESS_TAG)).map(MailAddressTagTooltip::new),
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.PAYBACK_TAG))
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.RECIPIENT_ADDRESS)).map(MailAddressTagTooltip::new),
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.REQUESTED_PAYBACK))
                 );
             }
 
@@ -108,13 +109,11 @@ public class EnvelopeClient {
 
         public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
                                               Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag) {
-            if (stack.is(Envelope.Tags.Items.MAILABLE)) {
-                Address senderAddress = stack.get(Envelope.DataComponents.SENDER_ADDRESS);
-                if (senderAddress != null) {
-                    consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
-                          .append(": ").withStyle(ChatFormatting.GRAY)
-                          .append(senderAddress.format().asNeutral().toComponent()));
-                }
+            Address senderAddress = stack.get(Envelope.DataComponents.SENDER_ADDRESS);
+            if (senderAddress != null) {
+                consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
+                      .append(": ").withStyle(ChatFormatting.GRAY)
+                      .append(senderAddress.format().asNeutral().toComponent()));
             }
         }
     }
