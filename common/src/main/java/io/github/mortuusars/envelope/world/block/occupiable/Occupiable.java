@@ -14,6 +14,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +91,7 @@ public interface Occupiable {
 
         CompoundTag tag = new CompoundTag();
         entity.save(tag);
-        cleanupEntityTag(tag);
+        cleanupOccupantEntityTag(tag);
         getOccupants().add(new Occupant(CustomData.of(tag), getFirstFreeSlotForOccupant(),
               getMinimumTicksInsideForOccupant(entity), 0).toMutable());
 
@@ -138,7 +139,7 @@ public interface Occupiable {
 
     default @Nullable Entity createEntityFromOccupant(Level level, Occupant occupant, BlockPos pos) {
         CompoundTag tag = occupant.entityData().copyTag();
-        cleanupEntityTag(tag);
+        cleanupOccupantEntityTag(tag);
 
         @Nullable Entity entity = EntityType.loadEntityRecursive(tag, level, Function.identity());
         if (entity == null || !canBeOccupiedBy(entity)) {
@@ -167,7 +168,6 @@ public interface Occupiable {
     }
 
     default void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
-
     }
 
     default void updateEntityAfterRelease(Entity entity, int ticksInside) {
@@ -189,21 +189,27 @@ public interface Occupiable {
     }
 
     default void tickOccupants(Level level, BlockPos pos, BlockState state) {
+        if (!getOccupants().isEmpty()
+              && (level.getGameTime() + pos.hashCode()) % 20 == 0
+              && CampfireBlock.isSmokeyPos(level, pos)) {
+            releaseAllOccupants(level, pos, state, ReleaseReason.EMERGENCY);
+        }
+
         if (getOccupants().removeIf(occupant -> occupant.tick()
-              && releaseOccupant(level, pos, state, occupant.toImmutable(), ReleaseReason.RELEASED).isPresent())) {
+              && releaseOccupant(level, pos, state, occupant.toImmutable(), ReleaseReason.DEFAULT).isPresent())) {
             onOccupantsChanged();
         }
 
-        getOccupants().forEach(occupant -> {
-            if (level.getRandom().nextDouble() < 0.005) {
+        if (!getOccupants().isEmpty()) {
+            if (level.getRandom().nextDouble() < 0.004 * getOccupants().size()) {
                 playSound(getOccupantWorkSound(), 0.5F, 1.0F);
             }
-        });
+        }
     }
 
     // -- Save / Load
 
-    default void cleanupEntityTag(CompoundTag tag) {
+    default void cleanupOccupantEntityTag(CompoundTag tag) {
         IGNORED_OCCUPANT_TAGS.forEach(tag::remove);
     }
 
@@ -242,7 +248,7 @@ public interface Occupiable {
     }
 
     enum ReleaseReason {
-        RELEASED,
+        DEFAULT,
         EMERGENCY;
     }
 }

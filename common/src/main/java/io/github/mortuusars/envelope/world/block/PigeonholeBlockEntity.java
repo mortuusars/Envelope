@@ -1,11 +1,12 @@
 package io.github.mortuusars.envelope.world.block;
 
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeHasNewMailS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailRemovedS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
+import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.block.occupiable.PigeonOccupiable;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.Mail;
@@ -13,7 +14,6 @@ import io.github.mortuusars.envelope.world.mail.StoredMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
-import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.service.MailService;
 import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -40,8 +40,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.CampfireBlock;
-import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -55,7 +54,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements Occupiable {
+public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements PigeonOccupiable {
     public static final int SLOTS = 2;
     public static final int SLOT_FOOD = 0;
     public static final int SLOT_MAIL = 1;
@@ -188,13 +187,12 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
             updatedAfterLoading = true;
         }
 
-        if (!getOccupants().isEmpty()
-              && (level.getGameTime() + pos.hashCode()) % 20 == 0
-              && CampfireBlock.isSmokeyPos(level, pos)) {
-            releaseAllOccupants(level, pos, state, ReleaseReason.EMERGENCY);
-        }
-
         tickOccupants(level, pos, state);
+    }
+
+    @Override
+    public void tickOccupants(Level level, BlockPos pos, BlockState state) {
+        PigeonOccupiable.super.tickOccupants(level, pos, state);
 
         // Make some nearby pigeons prioritize this pigeonhole to pick up and deliver mail
         if (getOccupants().isEmpty() && !getItem(SLOT_MAIL).isEmpty() && !getItem(SLOT_FOOD).isEmpty()) {
@@ -219,7 +217,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
 
     @Override
     public void setChanged() {
-        if (isFireNearby()) {
+        if (Position.isFireNearby(level, getBlockPos())) {
             releaseAllOccupants(getLevel(), getBlockPos(), getBlockState(), ReleaseReason.EMERGENCY);
         }
 
@@ -227,7 +225,7 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         super.setChanged();
 
         if (level instanceof ServerLevel serverLevel && !PigeonholeMenu.playersWithMenu(serverLevel, address).isEmpty()) {
-            serverLevel.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+            serverLevel.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
     }
 
@@ -351,35 +349,8 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     // -- Occupiable
 
     @Override
-    public boolean canBeOccupiedBy(Entity entity) {
-        return entity.getType().is(Envelope.Tags.EntityTypes.PIGEONHOLE_INHABITORS);
-    }
-
-    @Override
     public List<Occupant.Mutable> getOccupants() {
         return occupants;
-    }
-
-    @Override
-    public SoundEvent getOccupantEnterSound(Entity entity) {
-        return SoundEvents.BEEHIVE_ENTER;
-    }
-
-    @Override
-    public SoundEvent getOccupantExitSound(Entity entity) {
-        return SoundEvents.BEEHIVE_EXIT;
-    }
-
-    @Override
-    public SoundEvent getOccupantWorkSound() {
-        return Envelope.SoundEvents.PIGEON_AMBIENT.get();
-    }
-
-    @Override
-    public int getMinimumTicksInsideForOccupant(Entity entity) {
-        return entity instanceof Pigeon
-              ? Config.Server.PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE.get()
-              : Occupiable.super.getMinimumTicksInsideForOccupant(entity);
     }
 
     @Override
@@ -433,28 +404,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
         setChanged();
     }
 
-    @Override
-    public String getSerializedOccupantsName() {
-        return "pigeons";
-    }
-
-    @Override
-    public void cleanupEntityTag(CompoundTag tag) {
-        Pigeon.IGNORED_TAGS.forEach(tag::remove);
-    }
-
-    public boolean isFireNearby() {
-        if (level == null) return false;
-
-        for (BlockPos blockPos : BlockPos.betweenClosed(this.worldPosition.offset(-1, -1, -1), this.worldPosition.offset(1, 1, 1))) {
-            if (level.getBlockState(blockPos).getBlock() instanceof FireBlock) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     protected float getWasteIncreaseChanceOnRelease(Entity releasedEntity) {
         return releasedEntity instanceof Courier courier && courier.isDelivering() ? 1f : 0.2f;
     }
@@ -495,8 +444,6 @@ public class PigeonholeBlockEntity extends BaseContainerBlockEntity implements O
     }
 
     // -- Save/Load
-
-    private List<StoredMail> mail = new ArrayList<>();
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {

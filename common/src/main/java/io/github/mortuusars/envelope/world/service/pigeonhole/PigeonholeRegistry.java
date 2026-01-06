@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.world.service.pigeonhole;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
@@ -38,10 +37,6 @@ public class PigeonholeRegistry extends SavedData {
 
     // -- Save / Load
 
-    public static PigeonholeRegistry get(ServerLevel level, String name) {
-        return level.getDataStorage().computeIfAbsent(factory(), name);
-    }
-
     @Override
     public boolean isDirty() {
         return super.isDirty() || getPigeonholes().values().stream().anyMatch(PigeonholeData::isDirty);
@@ -55,24 +50,22 @@ public class PigeonholeRegistry extends SavedData {
         }
     }
 
+    public static PigeonholeRegistry get(ServerLevel level) {
+        return level.getDataStorage().computeIfAbsent(factory(), "envelope_pigeonholes");
+    }
+
+    public static @NotNull Factory<PigeonholeRegistry> factory() {
+        return new Factory<>(
+              PigeonholeRegistry::new,
+              (tag, provider) -> CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), tag)
+                    .resultOrPartial(e -> Envelope.LOGGER.error("Cannot load PigeonholeRegistry: {}", e))
+                    .orElse(null),
+              null);
+    }
+
     public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> Envelope.LOGGER.error("Cannot save PigeonholeSavedData: {}", e.message()))
-              .result()
-              .filter(t -> t instanceof CompoundTag)
-              .map(t -> ((CompoundTag) t))
+        return (CompoundTag) CODEC.encode(this, registries.createSerializationContext(NbtOps.INSTANCE), tag)
+              .resultOrPartial(e -> Envelope.LOGGER.error("Cannot save PigeonholeRegistry: {}", e))
               .orElse(tag);
-    }
-
-    private static PigeonholeRegistry load(CompoundTag tag, HolderLookup.Provider registries) {
-        return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> Envelope.LOGGER.error("Cannot load PigeonholeSavedData: {}", e.message()))
-              .result()
-              .map(Pair::getFirst)
-              .orElseGet(PigeonholeRegistry::new);
-    }
-
-    private static Factory<PigeonholeRegistry> factory() {
-        return new Factory<>(PigeonholeRegistry::new, PigeonholeRegistry::load, null);
     }
 }

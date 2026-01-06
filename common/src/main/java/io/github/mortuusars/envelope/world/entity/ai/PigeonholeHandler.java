@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity.ai;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -123,7 +124,9 @@ public class PigeonholeHandler {
     }
 
     protected boolean isPigeonholeNearFire(Level level) {
-        return getPigeonholeAtCurrentPos(level).map(PigeonholeBlockEntity::isFireNearby).orElse(false);
+        return getPigeonholeAtCurrentPos(level)
+              .map(blockEntity -> Position.isFireNearby(level, blockEntity.getBlockPos()))
+              .orElse(false);
     }
 
     public boolean isPigeonholeValid(Level level, BlockPos entityPos) {

@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -116,5 +117,17 @@ public class Position {
     public static Optional<Integer> getDistanceBetween(Optional<BlockPos> a, Optional<BlockPos> b) {
         if (a.isEmpty() || b.isEmpty()) return Optional.empty();
         return Optional.of((int) Math.sqrt(a.get().distSqr(b.get())));
+    }
+
+    public static boolean isFireNearby(Level level, BlockPos pos) {
+        if (level == null) return false;
+
+        for (BlockPos blockPos : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
+            if (level.getBlockState(blockPos).getBlock() instanceof FireBlock) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

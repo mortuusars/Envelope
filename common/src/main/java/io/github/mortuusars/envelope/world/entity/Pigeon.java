@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.delivery.*;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
@@ -406,10 +407,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         this.pigeonholeHandler = handler;
     }
 
-    public void releasedFromPigeonhole(BlockPos pos, BlockState state, PigeonholeBlockEntity.ReleaseReason releaseReason) {
+    public void releasedFromPigeonhole(BlockPos pos, BlockState state, Occupiable.ReleaseReason releaseReason) {
         getPigeonholeHandler().setCurrentPos(pos);
         getPigeonholeHandler().setLastReleasePos(pos);
         getPigeonholeHandler().setDefaultWantCooldown();
+
+        if (releaseReason == Occupiable.ReleaseReason.EMERGENCY) {
+            getPigeonholeHandler().setEnterCooldown(200);
+        }
     }
 
     public boolean pathfindDirectlyTowards(BlockPos pos) {

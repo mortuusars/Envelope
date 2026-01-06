@@ -27,7 +27,7 @@ public class PigeonholeManager {
 
     protected @NotNull PigeonholeRegistry data() {
         if (data == null) {
-            data = PigeonholeRegistry.get(level, "envelope_pigeonholes");
+            data = PigeonholeRegistry.get(level);
         }
         return data;
     }
