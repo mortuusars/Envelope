@@ -35,10 +35,10 @@ public class PaybackPackingMenu extends PackingMenu {
 
     @Override
     protected void init() {
-        this.paybackSubject = Optional.ofNullable(getBoxStack().get(Envelope.DataComponents.PAYBACK_SUBJECT))
+        this.paybackSubject = Optional.ofNullable(getBoxStack().get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT))
               .map(subject -> subject.mail().getItem())
               .orElse(ItemStack.EMPTY);
-        this.requestedPayback = Objects.requireNonNull(paybackSubject.get(Envelope.DataComponents.REQUESTED_PAYBACK));
+        this.requestedPayback = Objects.requireNonNull(paybackSubject.get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK));
         super.init();
         addSlot(new PreviewSlot(paybackSubject, 0, 21, 42));
     }
@@ -83,8 +83,8 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
-        Address sender = stack.remove(Envelope.DataComponents.SENDER_ADDRESS);
-        stack.set(Envelope.DataComponents.RECIPIENT_ADDRESS, sender);
+        Address sender = stack.remove(Envelope.DataComponents.MAIL_SENDER);
+        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, sender);
         return stack;
     }
 }

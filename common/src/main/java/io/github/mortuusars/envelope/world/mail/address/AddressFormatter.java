@@ -15,8 +15,8 @@ import java.util.function.Function;
 
 public class AddressFormatter {
     public static final int NEUTRAL_COLOR = 0xFFE6CB98;
-    public static final int SENDER_COLOR = 0xFF9DB8D9;
-    public static final int RECIPIENT_COLOR = 0xFFE9B68B;
+    public static final int SENDER_COLOR = 0xFF7AB5E1;
+    public static final int RECIPIENT_COLOR = 0xFFE8AD77;
 
     protected final Address address;
     protected boolean icon = false;

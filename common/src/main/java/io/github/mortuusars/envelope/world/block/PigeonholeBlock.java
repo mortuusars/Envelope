@@ -3,8 +3,10 @@ package io.github.mortuusars.envelope.world.block;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuSetInboxS2CP;
+import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.*;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
@@ -144,7 +146,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
                     Containers.dropContents(level, pos, itemsToDrop);
 
                     PigeonholeMenu.playersWithMenu(serverLevel, data.getAddress()).forEach(player ->
-                          Packets.sendToClient(new PigeonholeMenuMailS2CP(Collections.emptyList()), player));
+                          Packets.sendToClient(new PigeonholeMenuSetInboxS2CP(new Inbox(Collections.emptyList())), player));
 
                     pigeonholeManager.remove(data.getAddress());
                 }
@@ -256,22 +258,22 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        /* Not decided on yet
+        // Not decided on yet
         if (stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.RECIPIENT) instanceof Address.Block block
+              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block block
               && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
               && blockEntity.getAddress().map(a -> a.equals(block)).orElse(false)) {
             if (level instanceof ServerLevel serverLevel) {
-                if (!stack.has(Envelope.DataComponents.SENDER)) {
-                    stack.set(Envelope.DataComponents.SENDER, new Address.Player(player));
+                if (!stack.has(Envelope.DataComponents.MAIL_SENDER)) {
+                    stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
                 }
 
-                Mail result = blockEntity.getAddress().orElseThrow().receiveMail(serverLevel, new Mail(stack));
+                Mail result = MailService.of(serverLevel).deliverMail(block, new Mail(stack));
 
-                player.setItemInHand(hand, result.getItemCopy());
+                player.setItemInHand(hand, result.getItem().copy());
             }
             return ItemInteractionResult.SUCCESS;
-        }*/
+        }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }

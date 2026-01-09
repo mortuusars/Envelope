@@ -156,8 +156,8 @@ public class PaybackDepartment {
 
     protected boolean sendPaybackPackingBoxToBuyer(Delivery subjectDelivery, PaybackSubject paybackSubject) {
         ItemStack packingBox = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
-        packingBox.set(Envelope.DataComponents.PAYBACK_SUBJECT, paybackSubject);
-        packingBox.set(Envelope.DataComponents.RECIPIENT_ADDRESS, subjectDelivery.getRecipient());
+        packingBox.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, paybackSubject);
+        packingBox.set(Envelope.DataComponents.MAIL_RECIPIENT, subjectDelivery.getRecipient());
 
         return getMailService().getDeliveryManager()
               .startService(Delivery.builder()
@@ -176,7 +176,7 @@ public class PaybackDepartment {
         Mail packingBox = paybackDelivery.getMail();
         packingBox.writeToLog(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE).at(getMailService().getGameTime()));
 
-        @Nullable PaybackSubject paybackSubject = packingBox.get(Envelope.DataComponents.PAYBACK_SUBJECT);
+        @Nullable PaybackSubject paybackSubject = packingBox.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
         if (paybackSubject == null) {
             packingBox.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND));
@@ -192,7 +192,7 @@ public class PaybackDepartment {
             return;
         }
 
-        RequestedPayback requestedPayback = paybackSubject.mail().getOrDefault(Envelope.DataComponents.REQUESTED_PAYBACK, RequestedPayback.DEFAULT);
+        RequestedPayback requestedPayback = paybackSubject.mail().getOrDefault(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK, RequestedPayback.DEFAULT);
         PackageContents packageContents = PackageContents.of(packingBox.getItem());
         if (!requestedPayback.matches(packageContents)) {
             packingBox.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
@@ -218,7 +218,7 @@ public class PaybackDepartment {
     protected boolean sendPaymentPackageToSeller(Delivery paybackDelivery, PackageContents packageContents, Mail packingBox) {
         ItemStack collectedPaybackPackage = new ItemStack(Envelope.Items.PACKAGE.get());
         collectedPaybackPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, packageContents);
-        collectedPaybackPackage.set(Envelope.DataComponents.RECIPIENT_ADDRESS, packingBox.getRecipient());
+        collectedPaybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, packingBox.getRecipient());
 
         Mail mail = new Mail(collectedPaybackPackage, packingBox.getLog()
               .copy() // Transferring log from incoming mail

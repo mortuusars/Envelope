@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.util.PrettyGameTime;
+import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.ChatFormatting;
@@ -35,10 +35,10 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
+        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
         if (subject != null && !subject.mail().isEmpty()) {
             tooltipComponents.add(Component.translatable("gui.envelope.time.remaining")
-                  .append(PrettyGameTime.durationLargest(subject.timeoutTick() - Minecrft.level().getGameTime()))
+                  .append(GameTime.formatLargest(subject.timeoutTick() - Minecrft.level().getGameTime(), false))
                   .withStyle(ChatFormatting.RED));
         }
     }
@@ -55,8 +55,8 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
     }
 
     public boolean openPackingGui(Player player, InteractionHand hand, ItemStack stack) {
-        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
-        if (subject == null || subject.mail().isEmpty() || !subject.mail().getItem().has(Envelope.DataComponents.REQUESTED_PAYBACK)) {
+        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
+        if (subject == null || subject.mail().isEmpty() || !subject.mail().getItem().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK)) {
             return false;
         }
 

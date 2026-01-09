@@ -176,7 +176,7 @@ public class MailService {
 
     // --
 
-    public Mail deliverMail(ServerLevel level, Address address, Mail mail) {
+    public Mail deliverMail(Address address, Mail mail) {
         if (mail.isEmpty()) return mail;
         return address.map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }

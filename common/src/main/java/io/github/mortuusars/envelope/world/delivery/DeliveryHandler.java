@@ -84,10 +84,10 @@ public interface DeliveryHandler {
 
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                delivery.updateMail(mail -> MailService.of(level).deliverMail(level, delivery.getRecipient(), mail));
+                delivery.updateMail(mail -> MailService.of(level).deliverMail(delivery.getRecipient(), mail));
             }
             case HANDLING_RETURN -> {
-                delivery.updateMail(mail -> MailService.of(level).deliverMail(level, delivery.getSender(), mail));
+                delivery.updateMail(mail -> MailService.of(level).deliverMail(delivery.getSender(), mail));
             }
         }
     }

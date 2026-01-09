@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.delivery.log;
+package io.github.mortuusars.envelope.world.item.component.mail;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
@@ -20,28 +20,28 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record DeliveryRecord(Status status, Address address, Optional<Long> timestamp, Optional<Component> message) {
-    public static final Codec<DeliveryRecord> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          Status.CODEC.fieldOf("status").forGetter(DeliveryRecord::status),
-          Address.CODEC.fieldOf("address").forGetter(DeliveryRecord::address),
-          Codec.LONG.optionalFieldOf("timestamp").forGetter(DeliveryRecord::timestamp),
-          ComponentSerialization.CODEC.optionalFieldOf("message").forGetter(DeliveryRecord::message)
-    ).apply(instance, DeliveryRecord::new));
+public record MailDeliveryRecord(Status status, Address address, Optional<Long> timestamp, Optional<Component> message) {
+    public static final Codec<MailDeliveryRecord> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          Status.CODEC.fieldOf("status").forGetter(MailDeliveryRecord::status),
+          Address.CODEC.fieldOf("address").forGetter(MailDeliveryRecord::address),
+          Codec.LONG.optionalFieldOf("timestamp").forGetter(MailDeliveryRecord::timestamp),
+          ComponentSerialization.CODEC.optionalFieldOf("message").forGetter(MailDeliveryRecord::message)
+    ).apply(instance, MailDeliveryRecord::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, DeliveryRecord> STREAM_CODEC = StreamCodec.composite(
-          Status.STREAM_CODEC, DeliveryRecord::status,
-          Address.STREAM_CODEC, DeliveryRecord::address,
-          ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), DeliveryRecord::timestamp,
-          ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), DeliveryRecord::message,
-          DeliveryRecord::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, MailDeliveryRecord> STREAM_CODEC = StreamCodec.composite(
+          Status.STREAM_CODEC, MailDeliveryRecord::status,
+          Address.STREAM_CODEC, MailDeliveryRecord::address,
+          ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), MailDeliveryRecord::timestamp,
+          ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), MailDeliveryRecord::message,
+          MailDeliveryRecord::new
     );
 
-    public DeliveryRecord atTime(long timestamp) {
-        return new DeliveryRecord(status, address, Optional.of(timestamp), message);
+    public MailDeliveryRecord atTime(long timestamp) {
+        return new MailDeliveryRecord(status, address, Optional.of(timestamp), message);
     }
 
-    public DeliveryRecord withMessage(Component message) {
-        return new DeliveryRecord(status, address, timestamp, Optional.of(message));
+    public MailDeliveryRecord withMessage(Component message) {
+        return new MailDeliveryRecord(status, address, timestamp, Optional.of(message));
     }
 
     // --
@@ -115,8 +115,8 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
             return this;
         }
 
-        public DeliveryRecord build() {
-            return new DeliveryRecord(status, address, timestamp, message);
+        public MailDeliveryRecord build() {
+            return new MailDeliveryRecord(status, address, timestamp, message);
         }
     }
 

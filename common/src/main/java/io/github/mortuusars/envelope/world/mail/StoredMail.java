@@ -51,7 +51,7 @@ public class StoredMail {
     }
 
     public Address getSenderAddress() {
-        return item.getOrDefault(Envelope.DataComponents.SENDER_ADDRESS, Address.UNKNOWN);
+        return item.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);
     }
 
     public boolean matches(MailId id) {

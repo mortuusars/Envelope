@@ -74,9 +74,9 @@ public class LetterCloningRecipe extends CustomRecipe {
 			ItemStack result = sourceStack.copyWithCount(copies);
 			result.remove(Envelope.DataComponents.LETTER_TATTERED);
 			//TODO: keep some of the properties?
-			result.remove(Envelope.DataComponents.SENDER_ADDRESS);
-			result.remove(Envelope.DataComponents.RECIPIENT_ADDRESS);
-			result.remove(Envelope.DataComponents.REQUESTED_PAYBACK);
+			result.remove(Envelope.DataComponents.MAIL_SENDER);
+			result.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+			result.remove(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
 			return result;
 		}
 

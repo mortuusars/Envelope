@@ -46,19 +46,19 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
         if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
 
         PaybackTagContents contents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.EMPTY);
-        @Nullable RequestedPayback existingRequestedPayback = slot.getItem().get(Envelope.DataComponents.REQUESTED_PAYBACK);
+        @Nullable RequestedPayback existingRequestedPayback = slot.getItem().get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
 
         if (contents.isEmpty()) {
             if (existingRequestedPayback == null) {
                 return true; // do nothing
             }
-            slot.getItem().remove(Envelope.DataComponents.REQUESTED_PAYBACK);
+            slot.getItem().remove(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
         } else {
             RequestedPayback requestedPayback = createPayback(player.level(), stack);
             if (existingRequestedPayback != null && existingRequestedPayback.equals(requestedPayback)) {
                 return true; // do nothing
             }
-            slot.getItem().set(Envelope.DataComponents.REQUESTED_PAYBACK, requestedPayback);
+            slot.getItem().set(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK, requestedPayback);
         }
 
         slot.setChanged();

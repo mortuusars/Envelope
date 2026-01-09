@@ -3,7 +3,8 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.world.mail.MailId;
+import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.NewMail;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
@@ -15,13 +16,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Updates the client when mail is removed from the storage by hopper or something.
  */
-public record PigeonholeMenuMailRemovedS2CP(MailId id) implements Packet {
+public record PigeonholeMenuMailRemovedS2CP(Id id) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("pigeonhole_menu_mail_removed");
     public static final Type<PigeonholeMenuMailRemovedS2CP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeMenuMailRemovedS2CP> STREAM_CODEC = StreamCodec.composite(
-            MailId.STREAM_CODEC, PigeonholeMenuMailRemovedS2CP::id,
-            PigeonholeMenuMailRemovedS2CP::new
+          Id.STREAM_CODEC, PigeonholeMenuMailRemovedS2CP::id,
+          PigeonholeMenuMailRemovedS2CP::new
     );
 
     @Override
@@ -36,7 +37,7 @@ public record PigeonholeMenuMailRemovedS2CP(MailId id) implements Packet {
             return false;
         }
 
-        pigeonholeMenu.getMail().removeIf(storedMail -> storedMail.matches(id));
+        pigeonholeMenu.getMail().removeIf(storedMail -> id.equals(NewMail.getId(storedMail)));
         return true;
     }
 }

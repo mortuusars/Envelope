@@ -2,16 +2,15 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.StoredMail;
+import io.github.mortuusars.envelope.world.item.component.NewMail;
+import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.PigeonholeMenuMailActionC2SP;
-import io.github.mortuusars.envelope.util.PrettyGameTime;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
@@ -29,7 +28,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -38,6 +36,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -54,13 +53,13 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/mail_button"));
 
-    public static final WidgetSprites ICON_ADDRESS_PIGEONHOLE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_pigeonhole"));
+    public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_pigeonhole"));
     public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_player"));
-    public static final WidgetSprites ICON_ADDRESS_NPC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_npc"));
+    public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_npc"));
     public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_mail_service"));
     public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_unknown"));
-    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_rejected"));
     public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_returned"));
+    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_rejected"));
     public static final WidgetSprites ICON_UNCLAIMED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_unclaimed"));
 
     public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("pigeonhole/new_mail_indicator"));
@@ -84,7 +83,7 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
     ));
 
     @Nullable
-    protected StoredMail hoveredMail;
+    protected ItemStack hoveredMail;
 
     protected ImageButton addressButton;
     protected ImageButton addressAttentionButton;
@@ -276,14 +275,14 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         // Right
         guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos, 303, imageHeight, 5, 15, 512, 256);
 
-        List<StoredMail> mail = getMenu().getMail();
+        List<ItemStack> mail = getMenu().getMail();
         hoveredMail = null;
         scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
 
         for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
             int index = i + scroll;
 
-            StoredMail item = mail.get(index);
+            ItemStack item = mail.get(index);
             int x = 8;
             int y = 33 + 18 * i;
             boolean isHovering = isHovering(x + 1, y + 1, 115, 16, mouseX, mouseY);
@@ -353,14 +352,14 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
 
-    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, StoredMail mail, int x, int y) {
+    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, ItemStack mail, int x, int y) {
         boolean isHovered = hoveredMail == mail;
 
         guiGraphics.blitSprite(REGULAR_MAIL_BUTTON_SPRITES.get(true, isHovered), x, y, 0, 117, 18);
 
-        guiGraphics.renderItem(mail.getItem(), x + 2, y + 1);
+        guiGraphics.renderItem(mail, x + 2, y + 1);
 
-        WidgetSprites iconSprites = getMailIconSprites(mail);
+        WidgetSprites iconSprites = getDisplayedIcon(mail);
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
 
@@ -421,15 +420,20 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
         }
     }
 
-    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, StoredMail hoveredMail) {
+    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, ItemStack hoveredMail) {
         if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail.getItem()),
-                  hoveredMail.getItem().getTooltipImage(), x, y);
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail), hoveredMail.getTooltipImage(), x, y);
+            return;
+        }
+
+        if (x >= leftPos + 31 && x < leftPos + 41 && y >= topPos + 37 && y < topPos + 47) {
+            guiGraphics.renderTooltip(font, getDisplayedIconName(hoveredMail), x, y);
             return;
         }
 
         List<Component> tooltip = new ArrayList<>();
 
+        // Show full sender address if it doesn't fit on the widget
         Address sender = getDisplayedSender(hoveredMail);
         if (font.width(sender.toString()) > 76) {
             tooltip.add(AddressFormatter.of(sender)
@@ -439,31 +443,11 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
                   .toComponent());
         }
 
-        DeliveryLog deliveryLog = hoveredMail.getLog();
-
-        if (!Screen.hasShiftDown() || deliveryLog.isEmpty()) {
-            deliveryLog.getLastExceptionRecord().ifPresent(record -> {
-                int color = switch (record.status()) {
-                    case RETURNED -> 0xFFD47F46;
-                    case REJECTED -> 0xFFD7503E;
-                    case UNCLAIMED -> 0xFFDDC649;
-                    default -> throw new IllegalStateException("Unexpected value: " + record.status());
-                };
-                tooltip.add(record.status().translate().withStyle(Style.EMPTY.withColor(color)));
-            });
-
-            deliveryLog.getLastRecordOfType(DeliveryRecord.Status.ARRIVED)
-                  .flatMap(DeliveryRecord::timestamp)
-                  .ifPresent(arrivedAt -> {
-                      long ageTicks = Minecrft.level().getGameTime() - arrivedAt;
-                      tooltip.add(Component.translatable("gui.envelope.time.elapsed", PrettyGameTime.durationLargest(ageTicks)));
-                  });
-        } else {
-            if (!deliveryLog.isEmpty()) {
-                tooltip.add(Component.translatable("gui.envelope.delivery.log"));
-                for (DeliveryRecord record : deliveryLog.getRecords()) {
-                    tooltip.add(record.translate(Minecrft.level().getGameTime()));
-                }
+        MailDeliveryLog deliveryLog = NewMail.getLog(hoveredMail);
+        if (!deliveryLog.isEmpty()) {
+            tooltip.add(Component.translatable("gui.envelope.delivery.log"));
+            for (MailDeliveryRecord record : deliveryLog.records()) {
+                tooltip.add(record.translate(Minecrft.level().getGameTime()));
             }
         }
 
@@ -622,30 +606,42 @@ public class PigeonholeScreen extends AbstractContainerScreen<PigeonholeMenu> {
 
     // --
 
-    protected Address getDisplayedSender(StoredMail mail) {
-        return mail.getLog().getLastExceptionRecord()
-              .map(DeliveryRecord::address)
-              .orElse(mail.getSenderAddress());
+    protected WidgetSprites getDisplayedIcon(ItemStack mail) {
+        return switch (NewMail.getStatus(mail)) {
+            case RETURNED -> ICON_RETURNED_SPRITES;
+            case REGULAR -> {
+                Address sender = NewMail.getSender(mail);
+                if (sender == Address.UNKNOWN) yield ICON_ADDRESS_UNKNOWN_SPRITES;
+                if (sender == Address.MAIL_SERVICE) yield ICON_ADDRESS_MAIL_SERVICE_SPRITES;
+                if (sender.type() == Address.Type.BLOCK) yield ICON_ADDRESS_BLOCK_SPRITES;
+                if (sender.type() == Address.Type.PLAYER) yield ICON_ADDRESS_PLAYER_SPRITES;
+                if (sender.type() == Address.Type.ENTITY) yield ICON_ADDRESS_ENTITY_SPRITES;
+                yield ICON_ADDRESS_UNKNOWN_SPRITES;
+            }
+        };
     }
 
-    protected WidgetSprites getMailIconSprites(StoredMail mail) {
-        return mail.getLog().getLastExceptionRecord()
-              .map(record -> switch (record.status()) {
-                  case RETURNED -> ICON_RETURNED_SPRITES;
-                  case REJECTED -> ICON_REJECTED_SPRITES;
-                  case UNCLAIMED -> ICON_UNCLAIMED_SPRITES;
-                  default -> throw new IllegalStateException("Unexpected value: " + record.status());
-              })
-              .orElseGet(() -> {
-                  Address sender = mail.getSenderAddress();
-                  if (sender == Address.UNKNOWN) return ICON_ADDRESS_UNKNOWN_SPRITES;
-                  if (sender == Address.MAIL_SERVICE) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
-                  if (sender.type() == Address.Type.BLOCK) return ICON_ADDRESS_PIGEONHOLE_SPRITES;
-                  if (sender.type() == Address.Type.PLAYER) return ICON_ADDRESS_PLAYER_SPRITES;
-                  if (sender.type() == Address.Type.ENTITY) return ICON_ADDRESS_NPC_SPRITES;
-                  return ICON_ADDRESS_UNKNOWN_SPRITES;
-              });
+    protected Component getDisplayedIconName(ItemStack hoveredMail) {
+        return switch (NewMail.getStatus(hoveredMail)) {
+            case RETURNED -> Component.translatable("gui.envelope.mail.status.returned");
+            case REGULAR -> {
+                Address address = NewMail.getSender(hoveredMail);
+                if (address.equals(Address.UNKNOWN)) yield Component.translatable("address.envelope.unknown");
+                if (address.equals(Address.MAIL_SERVICE)) yield Component.translatable("address.envelope.mail_service");
+                yield switch (address.type()) {
+                    case BLOCK -> Component.translatable("address.envelope.type.block");
+                    case PLAYER -> Component.translatable("address.envelope.type.player");
+                    case ENTITY -> Component.translatable("address.envelope.type.entity");
+                };
+            }
+        };
     }
+
+    protected Address getDisplayedSender(ItemStack mail) {
+        return NewMail.getSender(mail);
+    }
+
+    // --
 
     protected boolean isMouseOver(Rect2i rect, double mouseX, double mouseY) {
         return mouseX >= rect.getX() && mouseX < rect.getX() + rect.getWidth()

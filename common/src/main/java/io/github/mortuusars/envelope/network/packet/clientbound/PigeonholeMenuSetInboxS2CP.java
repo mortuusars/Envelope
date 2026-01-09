@@ -2,10 +2,9 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
+import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.world.mail.StoredMail;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -13,15 +12,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+public record PigeonholeMenuSetInboxS2CP(Inbox inbox) implements Packet {
+    public static final ResourceLocation ID = Envelope.resource("pigeonhole_menu_set_inbox");
+    public static final Type<PigeonholeMenuSetInboxS2CP> TYPE = new Type<>(ID);
 
-public record PigeonholeMenuMailS2CP(List<StoredMail> mail) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("pigeonhole_menu_mail");
-    public static final Type<PigeonholeMenuMailS2CP> TYPE = new Type<>(ID);
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeMenuMailS2CP> STREAM_CODEC = StreamCodec.composite(
-            StoredMail.STREAM_CODEC.apply(ByteBufCodecs.list()), PigeonholeMenuMailS2CP::mail,
-            PigeonholeMenuMailS2CP::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeMenuSetInboxS2CP> STREAM_CODEC = StreamCodec.composite(
+            Inbox.STREAM_CODEC, PigeonholeMenuSetInboxS2CP::inbox,
+            PigeonholeMenuSetInboxS2CP::new
     );
 
     @Override
@@ -36,7 +33,7 @@ public record PigeonholeMenuMailS2CP(List<StoredMail> mail) implements Packet {
             return false;
         }
 
-        pigeonholeMenu.setMail(mail);
+        pigeonholeMenu.setInbox(inbox);
 
         return true;
     }

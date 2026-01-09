@@ -1,12 +1,12 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.StoredMail;
+import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
+import io.github.mortuusars.envelope.world.item.component.NewMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuMailS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuSetInboxS2CP;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
-import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -20,13 +20,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class PigeonholeMenu extends AbstractContainerMenu {
     public static final int ADDRESS_BUTTON_ID = 0;
@@ -41,11 +40,12 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     protected final Address.Block address;
     protected final PigeonholeBlockEntity blockEntity;
 
-    protected List<StoredMail> mail;
+    protected Inbox inbox;
+    protected List<ItemStack> mail;
     protected boolean hasNewMail;
 
     protected PigeonholeMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
-                             BlockPos pigeonholePos, List<StoredMail> mail, Address.Block address) {
+                             BlockPos pigeonholePos, Inbox inbox, Address.Block address) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -55,7 +55,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             throw new IllegalStateException("PigeonholeBlockEntity is not available at " + pigeonholePos);
         }
         this.blockEntity = be;
-        this.mail = new ArrayList<>(mail.reversed());
+        setInbox(inbox);
 
         addSlot(new Slot(be, PigeonholeBlockEntity.SLOT_FOOD, 227, 62) {
             @Override
@@ -76,19 +76,15 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         updateIsDefault();
     }
 
-    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, List<StoredMail> mail, Address.Block address) {
-        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pigeonholePos, mail, address);
+    public PigeonholeMenu(int id, Inventory playerInventory, BlockPos pigeonholePos, Inbox inbox, Address.Block address) {
+        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pigeonholePos, inbox, address);
     }
 
     public static PigeonholeMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
-        List<StoredMail> mail = new ArrayList<>();
-        int mailCount = buffer.readVarInt();
-        for (int i = 0; i < mailCount; i++) {
-            mail.add(StoredMail.STREAM_CODEC.decode(buffer));
-        }
+        Inbox inbox = Inbox.STREAM_CODEC.decode(buffer);
         Address.Block address = Address.Block.STREAM_CODEC.decode(buffer);
-        return new PigeonholeMenu(id, inventory, mailboxPos, mail, address);
+        return new PigeonholeMenu(id, inventory, mailboxPos, inbox, address);
     }
 
     @Override
@@ -144,12 +140,13 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         }
     }
 
-    public List<StoredMail> getMail() {
+    public List<ItemStack> getMail() {
         return mail;
     }
 
-    public void setMail(List<StoredMail> mail) {
-        this.mail = new ArrayList<>(mail.reversed());
+    public void setInbox(Inbox inbox) {
+        this.inbox = inbox;
+        this.mail = new ArrayList<>(inbox.getMail().reversed());
         setHasNewMail(false);
     }
 
@@ -212,7 +209,6 @@ public class PigeonholeMenu extends AbstractContainerMenu {
             case PICK_UP -> pickUpMail(player, index);
             case MOVE_TO_INVENTORY -> moveMailToInventory(player, index);
             case MOVE_ALL_TO_INVENTORY -> moveAllMailToInventory(player);
-            case REJECT -> rejectMail(player, index);
         };
     }
 
@@ -229,7 +225,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     }
 
     protected boolean moveMailToInventory(Player player, int index) {
-        ItemStack mail = getMail().get(index).getItem().copy();
+        ItemStack mail = getMail().get(index).copy();
 
         if (!PlayerInventoryUtil.canAddWholeStack(player, mail)) {
             return false;
@@ -257,13 +253,9 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     }
 
     protected ItemStack extractMail(ServerLevel level, int index) {
-        StoredMail mail = getMail().get(index);
-        return getBlockEntity().extractMail(mail.getId());
-    }
-
-    protected boolean rejectMail(Player player, int index) {
-        //TODO: Remove rejection?
-        throw new NotImplementedException("C.O.D. and rejection of C.O.D. mail is not implemented yet.");
+        return Optional.ofNullable(NewMail.getId(getMail().get(index)))
+              .map(id -> getBlockEntity().extractMail(id))
+              .orElse(ItemStack.EMPTY);
     }
 
     // --
@@ -278,9 +270,9 @@ public class PigeonholeMenu extends AbstractContainerMenu {
         }
 
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            List<StoredMail> mail = getBlockEntity().getData().map(PigeonholeData::getMail).orElse(Collections.emptyList());
-            setMail(mail);
-            Packets.sendToClient(new PigeonholeMenuMailS2CP(mail), serverPlayer);
+            Inbox inbox = getBlockEntity().getInbox();
+            setInbox(inbox);
+            Packets.sendToClient(new PigeonholeMenuSetInboxS2CP(inbox), serverPlayer);
             return true;
         }
 
@@ -298,8 +290,7 @@ public class PigeonholeMenu extends AbstractContainerMenu {
     public enum MailAction {
         PICK_UP,
         MOVE_TO_INVENTORY,
-        MOVE_ALL_TO_INVENTORY,
-        REJECT;
+        MOVE_ALL_TO_INVENTORY;
 
         public static final StreamCodec<ByteBuf, MailAction> STREAM_CODEC = ByteBufCodecs.idMapper(
               ByIdMap.continuous(MailAction::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO), MailAction::ordinal);

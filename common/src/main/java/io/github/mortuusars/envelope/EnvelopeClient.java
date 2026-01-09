@@ -99,8 +99,8 @@ public class EnvelopeClient {
             if (stack.is(Envelope.Tags.Items.MAILABLE)) {
                 return CompositeTooltip.of(
                       original,
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.RECIPIENT_ADDRESS)).map(MailAddressTagTooltip::new),
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.REQUESTED_PAYBACK))
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_RECIPIENT)).map(MailAddressTagTooltip::new),
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK))
                 );
             }
 
@@ -109,7 +109,7 @@ public class EnvelopeClient {
 
         public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
                                               Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag) {
-            Address senderAddress = stack.get(Envelope.DataComponents.SENDER_ADDRESS);
+            Address senderAddress = stack.get(Envelope.DataComponents.MAIL_SENDER);
             if (senderAddress != null) {
                 consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
                       .append(": ").withStyle(ChatFormatting.GRAY)

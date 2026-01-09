@@ -28,6 +28,8 @@ public class ModelsDatagen extends BlockStateProvider {
             itemModels().simpleBlockItem(block.get());
         });
 
+        itemModels().simpleBlockItem(Envelope.Blocks.MAILBOX.get());
+
         horizontalBlock(Envelope.Blocks.PACKAGE.get(), models().getExistingFile(modLoc("block/package")));
         horizontalBlock(Envelope.Blocks.SEALED_PACKAGE.get(), models().getExistingFile(modLoc("block/sealed_package")));
 

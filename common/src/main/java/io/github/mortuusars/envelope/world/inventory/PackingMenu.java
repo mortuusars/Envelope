@@ -215,7 +215,7 @@ public class PackingMenu extends AbstractContainerMenu {
 
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PACKAGE.get());
-        stack.remove(Envelope.DataComponents.SENDER_ADDRESS);
+        stack.remove(Envelope.DataComponents.MAIL_SENDER);
         return stack;
     }
 

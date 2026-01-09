@@ -5,9 +5,12 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
+import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.MailStatus;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
@@ -123,6 +126,12 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
 
+        public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
+              () -> new MailboxBlock(BlockBehaviour.Properties.of()
+                    .strength(2f)
+                    .sound(SoundType.WOOD)
+                    .mapColor(MapColor.WOOD)));
+
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
@@ -207,6 +216,9 @@ public class Envelope {
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
 
+        public static final Supplier<BlockItem> MAILBOX = Register.item("mailbox",
+              () -> new BlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
+
         private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
             Supplier<BlockItem> item = Register.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
             PIGEONHOLES.add(item);
@@ -222,11 +234,18 @@ public class Envelope {
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
         // -- Mail
-        public static final DataComponentType<Address> RECIPIENT_ADDRESS = Register.dataComponentType("recipient_address", b ->
+
+        public static final DataComponentType<Id> MAIL_ID = Register.dataComponentType("mail_id", b ->
+              b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
+        public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<RequestedPayback> REQUESTED_PAYBACK = Register.dataComponentType("requested_payback",
+        public static final DataComponentType<RequestedPayback> MAIL_REQUESTED_PAYBACK = Register.dataComponentType("mail_requested_payback",
               b -> b.persistent(RequestedPayback.CODEC).networkSynchronized(RequestedPayback.STREAM_CODEC));
-        public static final DataComponentType<Address> SENDER_ADDRESS = Register.dataComponentType("sender_address", b ->
+        public static final DataComponentType<MailDeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
+              b.persistent(MailDeliveryLog.CODEC).networkSynchronized(MailDeliveryLog.STREAM_CODEC));
+        public static final DataComponentType<MailStatus> MAIL_STATUS = Register.dataComponentType("mail_status", b ->
+              b.persistent(MailStatus.CODEC).networkSynchronized(MailStatus.STREAM_CODEC));
+        public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
         // -- Letter
@@ -259,7 +278,7 @@ public class Envelope {
 
         public static final DataComponentType<PaybackTagContents> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
               b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
-        public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
+        public static final DataComponentType<PaybackSubject> PAYBACK_PACKAGE_SUBJECT = Register.dataComponentType("payback_package_subject",
               b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC));
 
         // -- Misc

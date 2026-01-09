@@ -52,15 +52,15 @@ public class Mail implements DataComponentHolder {
     }
 
     public Address getRecipient() {
-        return getOrDefault(Envelope.DataComponents.RECIPIENT_ADDRESS, Address.UNKNOWN);
+        return getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
     }
 
     public Optional<RequestedPayback> getPayback() {
-        return Optional.ofNullable(get(Envelope.DataComponents.REQUESTED_PAYBACK));
+        return Optional.ofNullable(get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK));
     }
 
     public Address getSenderAddress() {
-        return getOrDefault(Envelope.DataComponents.SENDER_ADDRESS, Address.UNKNOWN);
+        return getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Mail implements DataComponentHolder {
     }
 
     public boolean hasPayback() {
-        return has(Envelope.DataComponents.REQUESTED_PAYBACK);
+        return has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
     }
 
     public Mail writeToLog(DeliveryRecord record) {
@@ -98,9 +98,9 @@ public class Mail implements DataComponentHolder {
      */
     public Mail asDeliveryResult() {
         ItemStack stack = getItem().copy();
-        stack.remove(Envelope.DataComponents.RECIPIENT_ADDRESS);
-        stack.remove(Envelope.DataComponents.REQUESTED_PAYBACK);
-        getLog().getFirstSender().ifPresent(sender -> stack.set(Envelope.DataComponents.SENDER_ADDRESS, sender));
+        stack.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+        stack.remove(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
+        getLog().getFirstSender().ifPresent(sender -> stack.set(Envelope.DataComponents.MAIL_SENDER, sender));
         return new Mail(stack, getLog().copy());
     }
 

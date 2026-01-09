@@ -68,12 +68,10 @@
   "gui.envelope.pigeonhole.mail.tooltip.age": "§7Received: §c%s §fago",
   "gui.envelope.pigeonhole.mail.tooltip.status": "§7Status: %s",
 
-  "gui.envelope.time.elapsed": "%s ago",
+  "gui.envelope.time.past": "%s ago",
 
   "gui.envelope.mail.status.regular": "Regular",
   "gui.envelope.mail.status.returned": "Returned",
-  "gui.envelope.mail.status.rejected": "Rejected",
-  "gui.envelope.mail.status.unclaimed": "Unclaimed",
 
   "gui.envelope.pigeonhole.address": "Set as Default Address",
   "gui.envelope.pigeonhole.address.tooltip": "§7Mail sent to your name will be delivered to this Pigeonhole",
@@ -124,6 +122,7 @@
   "gui.envelope.time.seconds": "%ss",
   "gui.envelope.time.less_than_one_hour": "<1h",
   "gui.envelope.time.less_than_one_minute": "<1min",
+  "gui.envelope.time.less_than_one_second": "<1s",
 
   "gui.envelope.fill_recipient.tooltip.title": "Recipient",
   "gui.envelope.fill_recipient.tooltip.lclick_last_recipient": "§8[§7Click§8] - last recipient",
@@ -155,8 +154,8 @@
   "address.envelope.mail_service": "Mail Service",
   "address.envelope.unknown": "Unknown",
 
-  "address.envelope.type.pigeonhole": "Pigeonhole",
-  "address.envelope.type.player": "Personal",
+  "address.envelope.type.block": "Block",
+  "address.envelope.type.player": "Player",
   "address.envelope.type.entity": "Entity",
 
   "subtitle.envelope.paper.crackle": "Paper crackles",
