@@ -1,70 +1,61 @@
 {
-	"parent": "minecraft:block/block",
+	"parent": "block/block",
 	"textures": {
-		"side": "envelope:block/mailbox_side",
 		"front": "envelope:block/mailbox_front",
+		"side": "envelope:block/mailbox_side",
+		"base": "envelope:block/mailbox_base",
 		"roof": "envelope:block/mailbox_roof",
-		"flag": "envelope:block/mailbox_flag",
 		"particle": "envelope:block/mailbox_side"
 	},
 	"elements": [
 		{
-			"from": [0, 0, 0],
-			"to": [16, 14, 16],
+			"name": "body",
+			"from": [3, 2, 3],
+			"to": [13, 12, 13],
 			"faces": {
-				"north": {"uv": [0, 2, 16, 16], "texture": "#front"},
-				"east": {"uv": [0, 2, 16, 16], "texture": "#side"},
-				"south": {"uv": [0, 2, 16, 16], "texture": "#side"},
-				"west": {"uv": [0, 2, 16, 16], "texture": "#side"},
-				"down": {"uv": [0, 0, 16, 16], "texture": "#side", "cullface": "down"}
+				"north": {"uv": [3, 4, 13, 14], "texture": "#front"},
+				"east": {"uv": [3, 4, 13, 14], "texture": "#side"},
+				"south": {"uv": [3, 4, 13, 14], "texture": "#side"},
+				"west": {"uv": [3, 4, 13, 14], "texture": "#side"}
 			}
 		},
 		{
-			"from": [-2.8, 14.4, -1],
-			"to": [8.2, 17.4, 17],
-			"rotation": {"angle": 22.5, "axis": "z", "origin": [8.2, 17.4, 0]},
+			"name": "base",
+			"from": [2, 0, 2],
+			"to": [14, 2, 14],
 			"faces": {
-				"north": {"uv": [0, 0, 11, 3], "texture": "#roof"},
-				"south": {"uv": [0, 0, 11, 3], "texture": "#roof"},
-				"west": {"uv": [0, 0, 16, 3], "texture": "#roof"},
-				"up": {"uv": [0, 0, 11, 16], "texture": "#roof"},
-				"down": {"uv": [0, 0, 11, 16], "texture": "#roof"}
+				"north": {"uv": [2, 14, 14, 16], "texture": "#side"},
+				"east": {"uv": [2, 14, 14, 16], "texture": "#side"},
+				"south": {"uv": [2, 14, 14, 16], "texture": "#side"},
+				"west": {"uv": [2, 14, 14, 16], "texture": "#side"},
+				"up": {"uv": [14, 14, 2, 2], "texture": "#base"},
+				"down": {"uv": [14, 2, 2, 14], "texture": "#base"}
 			}
 		},
 		{
-			"from": [7.8, 14.4, -1],
-			"to": [18.8, 17.4, 17],
-			"rotation": {"angle": -22.5, "axis": "z", "origin": [7.8, 17.4, 0]},
+			"name": "roof-1",
+			"from": [8, 12.15, 1],
+			"to": [16, 14.15, 15],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [8, 14.15, 8]},
 			"faces": {
-				"north": {"uv": [0, 0, 11, 3], "texture": "#roof"},
-				"east": {"uv": [0, 1, 16, 4], "texture": "#roof"},
-				"south": {"uv": [0, 0, 11, 3], "texture": "#roof"},
-				"up": {"uv": [0, 0, 11, 16], "rotation": 180, "texture": "#roof"},
-				"down": {"uv": [0, 0, 11, 16], "texture": "#roof"}
+				"north": {"uv": [12, 0, 14, 8], "rotation": 90, "texture": "#roof"},
+				"east": {"uv": [0, 0, 2, 14], "rotation": 270, "texture": "#roof"},
+				"south": {"uv": [14, 0, 12, 8], "rotation": 270, "texture": "#roof"},
+				"up": {"uv": [10, 14, 2, 0], "texture": "#roof"},
+				"down": {"uv": [10, 0, 2, 14], "texture": "#roof"}
 			}
 		},
 		{
-			"from": [5.9, 12.5, -1.9],
-			"to": [10.1, 17.5, 17.9],
+			"name": "roof-2",
+			"from": [0, 12.15, 1],
+			"to": [8, 14.15, 15],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [8, 14.15, 8]},
 			"faces": {
-				"north": {"uv": [1, 1, 5, 6], "texture": "#roof"},
-				"east": {"uv": [0, 0, 16, 5], "texture": "#roof"},
-				"south": {"uv": [1, 1, 5, 6], "texture": "#roof"},
-				"west": {"uv": [0, 0, 16, 5], "texture": "#roof"},
-				"up": {"uv": [1, 0, 5, 16], "texture": "#roof"},
-				"down": {"uv": [0, 0, 4, 16], "texture": "#roof"}
-			}
-		},
-		{
-			"from": [3.5, 16, -0.7],
-			"to": [8.5, 22, -0.7],
-			"faces": {
-				"north": {"uv": [0, 0, 5, 6], "texture": "#flag"},
-				"east": {"uv": [0, 0, 0, 6], "texture": "#flag"},
-				"south": {"uv": [5, 0, 0, 6], "texture": "#flag"},
-				"west": {"uv": [0, 0, 0, 6], "texture": "#flag"},
-				"up": {"uv": [0, 5, 0, 0], "rotation": 90, "texture": "#flag"},
-				"down": {"uv": [0, 0, 0, 5], "rotation": 270, "texture": "#flag"}
+				"north": {"uv": [14, 0, 12, 8], "rotation": 270, "texture": "#roof"},
+				"south": {"uv": [14, 8, 12, 0], "rotation": 270, "texture": "#roof"},
+				"west": {"uv": [0, 0, 2, 14], "rotation": 270, "texture": "#roof"},
+				"up": {"uv": [10, 14, 2, 0], "texture": "#roof"},
+				"down": {"uv": [10, 0, 2, 14], "texture": "#roof"}
 			}
 		}
 	]

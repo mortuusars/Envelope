@@ -1,10 +1,10 @@
 {
 	"parent": "envelope:block/mailbox",
 	"textures": {
-		"side": "envelope:block/mailbox_side",
 		"front": "envelope:block/mailbox_front_open",
+		"side": "envelope:block/mailbox_side",
+		"base": "envelope:block/mailbox_base",
 		"roof": "envelope:block/mailbox_roof",
-		"flag": "envelope:block/mailbox_flag",
 		"particle": "envelope:block/mailbox_side"
 	}
 }
