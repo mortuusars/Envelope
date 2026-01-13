@@ -8,7 +8,7 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.PigeonholeAddressTagApplyC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.MailboxAddressTagApplyC2SP;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
@@ -117,7 +117,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
         if (!isCurrentIdSameAsExistingAddress()) {
             Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
             int slot = this.hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
-            Packets.sendToServer(new PigeonholeAddressTagApplyC2SP(slot, getCurrentAddressId().trim(), pos));
+            Packets.sendToServer(new MailboxAddressTagApplyC2SP(slot, getCurrentAddressId().trim(), pos));
         }
         close();
         return true;
@@ -146,7 +146,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
     protected void renderExperienceCost(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (isCurrentIdSameAsExistingAddress() || player.isCreative()) return;
 
-        int cost = Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get();
+        int cost = Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get();
         if (cost <= 0) return;
 
         boolean hasEnough = player.experienceLevel >= cost;

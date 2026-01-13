@@ -17,7 +17,7 @@ public record AllAddresses(Set<Address.Block> blocks, Set<Address.Player> player
 
     public static final AllAddresses EMPTY = new AllAddresses(Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
 
-    public static AllAddresses pigeonholes(Set<Address.Block> addresses) {
+    public static AllAddresses blocks(Set<Address.Block> addresses) {
         return new AllAddresses(addresses, Collections.emptySet(), Collections.emptySet());
     }
 

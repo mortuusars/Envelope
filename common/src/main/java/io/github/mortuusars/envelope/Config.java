@@ -17,7 +17,7 @@ public abstract class Config {
 
         // Pigeonhole
         public static final ModConfigSpec.BooleanValue PIGEONHOLE_DISPENSER_WASTE_SCOOPING;
-        public static final ModConfigSpec.IntValue PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST;
+        public static final ModConfigSpec.IntValue MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST;
 
         // Letter
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
@@ -62,7 +62,12 @@ public abstract class Config {
                       .comment("Waste from Pigeonhole can be scooped with dispenser that has a shovel (#envelope:waste_scoopable).",
                             " Default: true.")
                       .define("dispenser_waste_scooping", true);
-                PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST = builder
+                builder.pop();
+            }
+
+            {
+                builder.push("mailbox");
+                MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST = builder
                       .comment("Levels of experience needed to set or change an address.")
                       .defineInRange("address_experience_levels_cost", 5, 0, 128);
                 builder.pop();

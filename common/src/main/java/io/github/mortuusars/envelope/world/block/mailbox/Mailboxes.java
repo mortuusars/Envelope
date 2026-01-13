@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.service.pigeonhole;
+package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
@@ -15,96 +15,96 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
-public class PigeonholeManager {
+public class Mailboxes {
     protected static final Logger LOGGER = LogUtils.getLogger();
 
     private final ServerLevel level;
-    private @Nullable PigeonholeRegistry data;
+    private @Nullable MailboxesSavedData data;
 
-    public PigeonholeManager(ServerLevel level) {
+    public Mailboxes(ServerLevel level) {
         this.level = level;
     }
 
-    protected @NotNull PigeonholeRegistry data() {
+    protected @NotNull MailboxesSavedData data() {
         if (data == null) {
-            data = PigeonholeRegistry.get(level);
+            data = MailboxesSavedData.get(level);
         }
         return data;
     }
 
-    protected Map<Address.Block, PigeonholeData> getPigeonholes() {
-        return data().getPigeonholes();
+    protected Map<Address.Block, RegisteredMailbox> getMailboxes() {
+        return data().getMailboxes();
     }
 
     protected void setDirty() {
         data().setDirty();
     }
 
-    // -- Pigeonhole
-
     public Set<Address.Block> getAllAddresses() {
-        return getPigeonholes().keySet();
+        return getMailboxes().keySet();
     }
 
     /**
      * Ensures that address is properly registered at current block position.<br>
-     * If suggestedAddress is already in use elsewhere - it will be uniquified and registered properly.
+     * If suggestedAddress is already in use elsewhere - it will be uniquified.
      */
-    public @NotNull PigeonholeData getOrRegister(Address.Block suggestedAddress, BlockPos pos) {
-        @Nullable PigeonholeData dataAtPos = getDataAt(pos);
-        if (dataAtPos != null) {
-            // inUseAsPlayerOrEntity check is to handle the case when new player joins, or new mail entity is added with the same address id
-            if (dataAtPos.getAddress().equals(suggestedAddress) && !inUseAsPlayerOrEntity(dataAtPos.getAddress())) {
-                dataAtPos.setValid(true);
-                return dataAtPos;
+    public @NotNull Address.Block correctOrRegisterIfNeeded(Address.Block suggestedAddress, BlockPos pos) {
+        @Nullable RegisteredMailbox registeredAtPos = getAtPosition(pos);
+        if (registeredAtPos != null) {
+            // inUseAsPlayerOrEntity check is to handle the case when new player joins,
+            // or new mail entity is added with the same address id
+            if (registeredAtPos.getAddress().equals(suggestedAddress) && !inUseAsPlayerOrEntity(registeredAtPos.getAddress())) {
+                return suggestedAddress;
             }
 
-            return rename(dataAtPos, suggestedAddress);
+            // Renaming will uniquify the address
+            return rename(registeredAtPos, suggestedAddress).getAddress();
         }
 
         Address.Block address = uniquifyIfKnown(suggestedAddress);
 
-        getPigeonholes().entrySet().removeIf(entry -> {
+        getMailboxes().entrySet().removeIf(entry -> {
             if (entry.getValue().getPos().equals(pos)) {
-                LOGGER.warn("Removing registered Pigeonhole '{}'@[{}] because new Pigeonhole '{}' is being registered at the same blockpos.",
+                LOGGER.info("Removing mailbox '{}'@[{}] because new mailbox '{}' is being registered at the same blockpos.",
                       entry.getValue().getAddress().id(), entry.getValue().getPos().toShortString(), address.id());
                 return true;
             }
             return false;
         });
 
-        PigeonholeData data = new PigeonholeData(address, pos);
-        getPigeonholes().put(address, data);
-        if (Envelope.debug()) LOGGER.info("Registered new Pigeonhole '{}'@[{}]", address.id(), pos.toShortString());
+        RegisteredMailbox data = new RegisteredMailbox(address, pos);
+        getMailboxes().put(address, data);
+        if (Envelope.debug()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.id(), pos.toShortString());
         setDirty();
-        return data;
+        return address;
     }
 
     public void remove(Address.Block address) {
-        @Nullable PigeonholeData removed = getPigeonholes().remove(address);
+        @Nullable RegisteredMailbox removed = getMailboxes().remove(address);
         if (removed != null) {
-            removed.invalidate();
             MailService.of(level).getPlayers().removeDefaultAddress(address);
             setDirty();
-            if (Envelope.debug()) LOGGER.info("Removed Pigeonhole '{}'@[{}]",
+            if (Envelope.debug()) LOGGER.info("Removed mailbox '{}'@[{}]",
                   removed.getAddress().id(), removed.getPos().toShortString());
         }
     }
 
-    public @NotNull PigeonholeData rename(PigeonholeData data, Address.Block suggestedAddress) {
+    public void remove(BlockPos pos) {
+        Optional.ofNullable(getAtPosition(pos)).ifPresent(data -> remove(data.getAddress()));
+    }
+
+    public @NotNull RegisteredMailbox rename(RegisteredMailbox data, Address.Block suggestedAddress) {
         Address.Block newAddress = uniquifyIfKnown(suggestedAddress);
 
         MailService.of(level).getPlayers().renameDefaultAddress(data.getAddress(), newAddress);
 
-        PigeonholeData newData = new PigeonholeData(newAddress, data.getPos(), data.getMail());
+        RegisteredMailbox newData = new RegisteredMailbox(newAddress, data.getPos());
 
-        data.invalidate(); // Force users to re-query
-
-        getPigeonholes().remove(data.getAddress());
-        getPigeonholes().put(newAddress, newData);
+        getMailboxes().remove(data.getAddress());
+        getMailboxes().put(newAddress, newData);
 
         if (Envelope.debug()) {
-            LOGGER.info("Renamed Pigeonhole '{}'@[{}] to '{}'", data.getAddress().id(), data.getPos().toShortString(), newAddress.id());
+            LOGGER.info("Renamed mailbox '{}'@[{}] to '{}'", data.getAddress().id(), data.getPos().toShortString(), newAddress.id());
         }
 
         setDirty();
@@ -113,34 +113,30 @@ public class PigeonholeManager {
     }
 
     public void rename(Address.Block oldAddress, Address.Block suggestedAddress) {
-        getData(oldAddress).ifPresent(data -> rename(data, suggestedAddress));
+        getByAddress(oldAddress).ifPresent(data -> rename(data, suggestedAddress));
     }
 
     public boolean exists(Address.Block block) {
-        return getPigeonholes().containsKey(block);
+        return getMailboxes().containsKey(block);
     }
 
     // --
 
-    public Optional<PigeonholeData> getData(Address.Block address) {
-        @Nullable PigeonholeData value = getPigeonholes().get(address);
-        if (value != null) {
-            value.setValid(true);
-        }
-        return Optional.ofNullable(value);
+    public Optional<RegisteredMailbox> getByAddress(Address.Block address) {
+        return Optional.ofNullable(getMailboxes().get(address));
     }
 
-    public @Nullable PigeonholeData getDataAt(BlockPos pos) {
-        for (PigeonholeData pigeonhole : getPigeonholes().values()) {
-            if (pigeonhole.getPos().equals(pos)) {
-                return pigeonhole;
+    public @Nullable RegisteredMailbox getAtPosition(BlockPos pos) {
+        for (RegisteredMailbox mailbox : getMailboxes().values()) {
+            if (mailbox.getPos().equals(pos)) {
+                return mailbox;
             }
         }
         return null;
     }
 
     public Optional<BlockPos> getPositionOf(Address.Block address) {
-        return getData(address).map(PigeonholeData::getPos);
+        return getByAddress(address).map(RegisteredMailbox::getPos);
     }
 
     public Optional<PigeonholeBlockEntity> getBlockEntityOf(Address.Block address) {
@@ -152,13 +148,13 @@ public class PigeonholeManager {
 
     // --
 
-    protected boolean inUseAsPlayerOrEntity(Address.Block address) {
+    private boolean inUseAsPlayerOrEntity(Address.Block address) {
         AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
               || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
     }
 
-    protected Address.Block uniquifyIfKnown(Address.Block address) {
+    private Address.Block uniquifyIfKnown(Address.Block address) {
         AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         if (!knownAddresses.isKnown(address)) {
             return address;

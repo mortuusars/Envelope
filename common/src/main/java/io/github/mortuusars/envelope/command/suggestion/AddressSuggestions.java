@@ -25,7 +25,7 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
         return new AddressSuggestions(null);
     }
 
-    public static AddressSuggestions pigeonhole() {
+    public static AddressSuggestions block() {
         return new AddressSuggestions(Address.Type.BLOCK);
     }
 
@@ -40,7 +40,8 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         MailService mailService = context.getSource().getLevel().getEnvelopeMailService();
-        Stream<String> addresses = mailService.getKnownAddressesOfType(type).stream().map(Address::id);
+        Stream<String> addresses = mailService.getKnownAddressesOfType(type).stream()
+              .map(address -> address.id().indexOf(" ") > 0 ? "\"" + address.id() + "\"" : address.id());
         return SharedSuggestionProvider.suggest(addresses, builder);
     }
 }

@@ -88,11 +88,11 @@ public class RequestedItemTests extends BuggerTests {
                 "count": 3,
                 "components": {
                   "envelope:letter_tattered": {},
-                  "envelope:sender_address": {
+                  "envelope:mail_sender": {
                       "type": "entity",
                       "id": "Mail Service"
                   },
-                  "envelope:address_tag": {
+                  "envelope:mail_recipient": {
                       "type": "block",
                       "id": "Mortuusars Laboratory"
                   }

@@ -1,363 +1,93 @@
 {
   "variants": {
-    "facing=east,has_address=false,has_mail=false,waste_level=0": {
+    "facing=east,waste_level=0": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 90
     },
-    "facing=east,has_address=false,has_mail=false,waste_level=1": {
+    "facing=east,waste_level=1": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 90
     },
-    "facing=east,has_address=false,has_mail=false,waste_level=2": {
+    "facing=east,waste_level=2": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 90
     },
-    "facing=east,has_address=false,has_mail=false,waste_level=3": {
+    "facing=east,waste_level=3": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 90
     },
-    "facing=east,has_address=false,has_mail=false,waste_level=4": {
+    "facing=east,waste_level=4": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 90
     },
-    "facing=east,has_address=false,has_mail=false,waste_level=5": {
+    "facing=east,waste_level=5": {
       "model": "envelope:block/oak_pigeonhole_waste",
       "y": 90
     },
-    "facing=east,has_address=false,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 90
-    },
-    "facing=east,has_address=false,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 90
-    },
-    "facing=east,has_address=false,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 90
-    },
-    "facing=east,has_address=false,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 90
-    },
-    "facing=east,has_address=false,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 90
-    },
-    "facing=east,has_address=false,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=false,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=false,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=false,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=false,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=false,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=false,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 90
-    },
-    "facing=east,has_address=true,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address_mail",
-      "y": 90
-    },
-    "facing=north,has_address=false,has_mail=false,waste_level=0": {
+    "facing=north,waste_level=0": {
       "model": "envelope:block/oak_pigeonhole"
     },
-    "facing=north,has_address=false,has_mail=false,waste_level=1": {
+    "facing=north,waste_level=1": {
       "model": "envelope:block/oak_pigeonhole"
     },
-    "facing=north,has_address=false,has_mail=false,waste_level=2": {
+    "facing=north,waste_level=2": {
       "model": "envelope:block/oak_pigeonhole"
     },
-    "facing=north,has_address=false,has_mail=false,waste_level=3": {
+    "facing=north,waste_level=3": {
       "model": "envelope:block/oak_pigeonhole"
     },
-    "facing=north,has_address=false,has_mail=false,waste_level=4": {
+    "facing=north,waste_level=4": {
       "model": "envelope:block/oak_pigeonhole"
     },
-    "facing=north,has_address=false,has_mail=false,waste_level=5": {
+    "facing=north,waste_level=5": {
       "model": "envelope:block/oak_pigeonhole_waste"
     },
-    "facing=north,has_address=false,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole"
-    },
-    "facing=north,has_address=false,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole"
-    },
-    "facing=north,has_address=false,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole"
-    },
-    "facing=north,has_address=false,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole"
-    },
-    "facing=north,has_address=false,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole"
-    },
-    "facing=north,has_address=false,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste"
-    },
-    "facing=north,has_address=true,has_mail=false,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address"
-    },
-    "facing=north,has_address=true,has_mail=false,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address"
-    },
-    "facing=north,has_address=true,has_mail=false,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address"
-    },
-    "facing=north,has_address=true,has_mail=false,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address"
-    },
-    "facing=north,has_address=true,has_mail=false,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address"
-    },
-    "facing=north,has_address=true,has_mail=false,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address"
-    },
-    "facing=north,has_address=true,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address_mail"
-    },
-    "facing=north,has_address=true,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address_mail"
-    },
-    "facing=north,has_address=true,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address_mail"
-    },
-    "facing=north,has_address=true,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address_mail"
-    },
-    "facing=north,has_address=true,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address_mail"
-    },
-    "facing=north,has_address=true,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address_mail"
-    },
-    "facing=south,has_address=false,has_mail=false,waste_level=0": {
+    "facing=south,waste_level=0": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 180
     },
-    "facing=south,has_address=false,has_mail=false,waste_level=1": {
+    "facing=south,waste_level=1": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 180
     },
-    "facing=south,has_address=false,has_mail=false,waste_level=2": {
+    "facing=south,waste_level=2": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 180
     },
-    "facing=south,has_address=false,has_mail=false,waste_level=3": {
+    "facing=south,waste_level=3": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 180
     },
-    "facing=south,has_address=false,has_mail=false,waste_level=4": {
+    "facing=south,waste_level=4": {
       "model": "envelope:block/oak_pigeonhole",
       "y": 180
     },
-    "facing=south,has_address=false,has_mail=false,waste_level=5": {
+    "facing=south,waste_level=5": {
       "model": "envelope:block/oak_pigeonhole_waste",
       "y": 180
     },
-    "facing=south,has_address=false,has_mail=true,waste_level=0": {
+    "facing=west,waste_level=0": {
       "model": "envelope:block/oak_pigeonhole",
-      "y": 180
+      "y": 270
     },
-    "facing=south,has_address=false,has_mail=true,waste_level=1": {
+    "facing=west,waste_level=1": {
       "model": "envelope:block/oak_pigeonhole",
-      "y": 180
+      "y": 270
     },
-    "facing=south,has_address=false,has_mail=true,waste_level=2": {
+    "facing=west,waste_level=2": {
       "model": "envelope:block/oak_pigeonhole",
-      "y": 180
+      "y": 270
     },
-    "facing=south,has_address=false,has_mail=true,waste_level=3": {
+    "facing=west,waste_level=3": {
       "model": "envelope:block/oak_pigeonhole",
-      "y": 180
+      "y": 270
     },
-    "facing=south,has_address=false,has_mail=true,waste_level=4": {
+    "facing=west,waste_level=4": {
       "model": "envelope:block/oak_pigeonhole",
-      "y": 180
+      "y": 270
     },
-    "facing=south,has_address=false,has_mail=true,waste_level=5": {
+    "facing=west,waste_level=5": {
       "model": "envelope:block/oak_pigeonhole_waste",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=false,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=false,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=false,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=false,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=false,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=false,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 180
-    },
-    "facing=south,has_address=true,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address_mail",
-      "y": 180
-    },
-    "facing=west,has_address=false,has_mail=false,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=false,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=false,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=false,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=false,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=false,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole",
-      "y": 270
-    },
-    "facing=west,has_address=false,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=false,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=false,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=false,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=false,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=false,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=false,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=true,waste_level=0": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=true,waste_level=1": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=true,waste_level=2": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=true,waste_level=3": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=true,waste_level=4": {
-      "model": "envelope:block/oak_pigeonhole_address_mail",
-      "y": 270
-    },
-    "facing=west,has_address=true,has_mail=true,waste_level=5": {
-      "model": "envelope:block/oak_pigeonhole_waste_address_mail",
       "y": 270
     }
   }

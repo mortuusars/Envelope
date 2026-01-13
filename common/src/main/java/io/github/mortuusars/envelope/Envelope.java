@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
+import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
@@ -22,7 +23,7 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
+import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -147,6 +148,10 @@ public class Envelope {
     }
 
     public static class BlockEntityTypes {
+        public static final Supplier<BlockEntityType<MailboxBlockEntity>> MAILBOX =
+              Register.blockEntityType("mailbox", () -> Register.newBlockEntityType(
+                    MailboxBlockEntity::new, Blocks.MAILBOX.get()));
+
         public static final Supplier<BlockEntityType<PigeonholeBlockEntity>> PIGEONHOLE =
               Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(
                     PigeonholeBlockEntity::new, getPigeonholeBlocks()));
@@ -303,8 +308,8 @@ public class Envelope {
     }
 
     public static class MenuTypes {
-        public static final Supplier<MenuType<PigeonholeMenu>> PIGEONHOLE =
-              Register.menuType("pigeonhole", PigeonholeMenu::fromNetwork);
+        public static final Supplier<MenuType<MailboxMenu>> PIGEONHOLE =
+              Register.menuType("pigeonhole", MailboxMenu::fromNetwork);
 
         public static final Supplier<MenuType<PackingMenu>> PACKAGE =
               Register.menuType("package", PackingMenu::fromNetwork);

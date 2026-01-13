@@ -5,35 +5,35 @@ import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
-import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
+import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import net.minecraft.server.level.ServerLevel;
 import org.slf4j.Logger;
 
-public class PigeonholeMailReceiver implements MailReceiver {
+public class BlockMailReceiver implements MailReceiver {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Address.Block address;
 
-    public PigeonholeMailReceiver(Address.Block address) {
+    public BlockMailReceiver(Address.Block address) {
         this.address = address;
     }
 
     @Override
     public Mail receiveMail(ServerLevel level, Mail mail) {
-        PigeonholeManager pigeonholeManager = MailService.of(level).getPigeonholeManager();
+        Mailboxes mailboxes = MailService.of(level).mailboxes();
 
         if (mail.isEmpty()) {
             return mail;
         }
 
-        return pigeonholeManager.getBlockEntityOf(address)
+        return mailboxes.getBlockEntityOf(address)
               .map(blockEntity -> {
-                  blockEntity.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
+//                  blockEntity.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
                   return Mail.EMPTY;
               })
-              .orElseGet(() -> pigeonholeManager.getData(address)
+              .orElseGet(() -> mailboxes.getByAddress(address)
                     .map(data -> {
-                        data.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
+//                        data.insertMail(mail.writeToLog(DeliveryRecord.arrivedTo(address).at(level.getGameTime())));
                         return Mail.EMPTY;
                     })
                     .orElseGet(() -> {

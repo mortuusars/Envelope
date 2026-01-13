@@ -12,9 +12,9 @@ import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailServiceEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
 import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
-import io.github.mortuusars.envelope.world.mail.receiver.PigeonholeMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.BlockMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
-import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
+import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -27,7 +27,7 @@ import java.util.Optional;
 public class MailService {
     protected final ServerLevel level;
 
-    protected final PigeonholeManager pigeonholeManager;
+    protected final Mailboxes mailboxes;
     protected final MailEntities mailEntities;
     protected final MailServiceEntity mailServiceEntity;
     protected final PaybackDepartment paybackDepartment;
@@ -39,7 +39,7 @@ public class MailService {
     private MailService(ServerLevel level) {
         Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "MailService can exist only on overworld level.");
         this.level = level;
-        this.pigeonholeManager = new PigeonholeManager(level);
+        this.mailboxes = new Mailboxes(level);
         this.mailEntities = new MailEntities();
         this.mailServiceEntity = new MailServiceEntity(this);
         this.paybackDepartment = new PaybackDepartment(this);
@@ -66,8 +66,8 @@ public class MailService {
         return level;
     }
 
-    public PigeonholeManager getPigeonholeManager() {
-        return pigeonholeManager;
+    public Mailboxes mailboxes() {
+        return mailboxes;
     }
 
     public MailEntities getMailEntities() {
@@ -102,7 +102,7 @@ public class MailService {
 
     public AllAddresses getKnownAddresses() {
         return new AllAddresses(
-              getPigeonholeManager().getAllAddresses(),
+              mailboxes().getAllAddresses(),
               getPlayers().getDefaultAddresses().keySet(),
               getMailEntities().getAllAddresses()
         );
@@ -113,7 +113,7 @@ public class MailService {
             return getKnownAddresses();
         }
         return switch (type) {
-            case BLOCK -> AllAddresses.pigeonholes(getPigeonholeManager().getAllAddresses());
+            case BLOCK -> AllAddresses.blocks(mailboxes().getAllAddresses());
             case PLAYER -> AllAddresses.players(getPlayers().getDefaultAddresses().keySet());
             case ENTITY -> AllAddresses.entities(getMailEntities().getAllAddresses());
         };
@@ -135,7 +135,7 @@ public class MailService {
 
     public Optional<BlockPos> getPositionOf(Address address) {
         return address.map(
-              block -> getPigeonholeManager().getPositionOf(block),
+              block -> mailboxes().getPositionOf(block),
               player -> getPlayers().getDefaultAddressOf(player).flatMap(this::getPositionOf),
               entity -> Optional.empty());
     }
@@ -178,7 +178,7 @@ public class MailService {
 
     public Mail deliverMail(Address address, Mail mail) {
         if (mail.isEmpty()) return mail;
-        return address.map(PigeonholeMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
+        return address.map(BlockMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }
 
     // --

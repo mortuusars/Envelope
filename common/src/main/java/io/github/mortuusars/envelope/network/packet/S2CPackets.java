@@ -10,13 +10,13 @@ import java.util.List;
 public class S2CPackets {
     public static List<CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload>> getDefinitions() {
         return List.of(
-                new CustomPacketPayload.TypeAndCodec<>(PigeonholeHasNewMailS2CP.TYPE, PigeonholeHasNewMailS2CP.STREAM_CODEC),
-                new CustomPacketPayload.TypeAndCodec<>(PigeonholeMenuSetInboxS2CP.TYPE, PigeonholeMenuSetInboxS2CP.STREAM_CODEC),
-                new CustomPacketPayload.TypeAndCodec<>(PigeonholeMenuMailRemovedS2CP.TYPE, PigeonholeMenuMailRemovedS2CP.STREAM_CODEC),
+                new CustomPacketPayload.TypeAndCodec<>(MailboxHasNewMailS2CP.TYPE, MailboxHasNewMailS2CP.STREAM_CODEC),
+                new CustomPacketPayload.TypeAndCodec<>(MailboxMenuSetInboxS2CP.TYPE, MailboxMenuSetInboxS2CP.STREAM_CODEC),
+                new CustomPacketPayload.TypeAndCodec<>(MailboxMenuMailRemovedS2CP.TYPE, MailboxMenuMailRemovedS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenLetterEditScreenS2CP.TYPE, OpenLetterEditScreenS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenLetterViewScreenS2CP.TYPE, OpenLetterViewScreenS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenAddressTagScreenS2CP.TYPE, OpenAddressTagScreenS2CP.STREAM_CODEC),
-                new CustomPacketPayload.TypeAndCodec<>(OpenPigeonholeAddressTagScreenS2CP.TYPE, OpenPigeonholeAddressTagScreenS2CP.STREAM_CODEC),
+                new CustomPacketPayload.TypeAndCodec<>(OpenMailboxAddressTagScreenS2CP.TYPE, OpenMailboxAddressTagScreenS2CP.STREAM_CODEC),
 
                 new CustomPacketPayload.TypeAndCodec<>(BuggerDataS2CP.TYPE, BuggerDataS2CP.STREAM_CODEC)
         );

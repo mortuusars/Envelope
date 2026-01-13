@@ -1,35 +1,17 @@
 package io.github.mortuusars.envelope.world.block;
 
 import com.mojang.serialization.MapCodec;
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.network.packet.clientbound.PigeonholeMenuSetInboxS2CP;
-import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
-import io.github.mortuusars.envelope.world.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.*;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenPigeonholeAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.item.AddressTagItem;
-import io.github.mortuusars.envelope.world.service.MailService;
-import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeData;
-import io.github.mortuusars.envelope.world.service.pigeonhole.PigeonholeManager;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.EnchantmentTags;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,7 +19,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.entity.vehicle.MinecartTNT;
@@ -53,7 +34,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -62,27 +42,21 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PigeonholeBlock extends BaseEntityBlock {
-    public static final MapCodec<BeehiveBlock> CODEC = simpleCodec(BeehiveBlock::new);
+    public static final MapCodec<PigeonholeBlock> CODEC = simpleCodec(PigeonholeBlock::new);
 
     public static final int MAX_WASTE_LEVEL = 5;
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty WASTE_LEVEL = IntegerProperty.create("waste_level", 0, MAX_WASTE_LEVEL);
-    public static final BooleanProperty HAS_ADDRESS = BooleanProperty.create("has_address");
-    public static final BooleanProperty HAS_MAIL = BooleanProperty.create("has_mail");
 
     public PigeonholeBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
               .setValue(FACING, Direction.NORTH)
-              .setValue(WASTE_LEVEL, 0)
-              .setValue(HAS_ADDRESS, false)
-              .setValue(HAS_MAIL, false));
+              .setValue(WASTE_LEVEL, 0));
     }
 
     @Override
@@ -92,7 +66,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, WASTE_LEVEL, HAS_ADDRESS, HAS_MAIL);
+        builder.add(FACING, WASTE_LEVEL);
     }
 
     @Override
@@ -124,48 +98,48 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-              && blockEntity.mapAddressed((serverLevel, address, data) -> data.hasMail()).orElse(false)) {
-            return 15;
-        }
+//        if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+//              && blockEntity.mapAddressed((serverLevel, address, data) -> data.hasMail()).orElse(false)) {
+//            return 15;
+//        }
 
         return state.getValue(WASTE_LEVEL);
     }
 
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.getBlock().equals(newState.getBlock())) {
-            if (level instanceof ServerLevel serverLevel) {
-                PigeonholeManager pigeonholeManager = MailService.of(serverLevel).getPigeonholeManager();
-                @Nullable PigeonholeData data = pigeonholeManager.getDataAt(pos);
-                if (data != null) {
-                    NonNullList<ItemStack> itemsToDrop = data.extractAllMail().stream()
-                          .map(mail -> mail.getItem().copy())
-                          .collect(Collectors.toCollection(NonNullList::create));
-
-                    Containers.dropContents(level, pos, itemsToDrop);
-
-                    PigeonholeMenu.playersWithMenu(serverLevel, data.getAddress()).forEach(player ->
-                          Packets.sendToClient(new PigeonholeMenuSetInboxS2CP(new Inbox(Collections.emptyList())), player));
-
-                    pigeonholeManager.remove(data.getAddress());
-                }
-            }
-
-            if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                blockEntity.onBlockRemoved();
-            }
-        }
-
-        super.onRemove(state, level, pos, newState, movedByPiston);
-    }
+//    @Override
+//    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+//        if (!state.getBlock().equals(newState.getBlock())) {
+//            if (level instanceof ServerLevel serverLevel) {
+//                PigeonholeManager pigeonholeManager = MailService.of(serverLevel).getPigeonholeManager();
+//                @Nullable PigeonholeData data = pigeonholeManager.getDataAt(pos);
+//                if (data != null) {
+//                    NonNullList<ItemStack> itemsToDrop = data.extractAllMail().stream()
+//                          .map(mail -> mail.getItem().copy())
+//                          .collect(Collectors.toCollection(NonNullList::create));
+//
+//                    Containers.dropContents(level, pos, itemsToDrop);
+//
+//                    MailboxMenu.playersWithMenu(serverLevel, data.getAddress()).forEach(player ->
+//                          Packets.sendToClient(new PigeonholeMenuSetInboxS2CP(new Inbox(Collections.emptyList())), player));
+//
+//                    pigeonholeManager.remove(data.getAddress());
+//                }
+//            }
+//
+//            if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+//                blockEntity.onBlockRemoved();
+//            }
+//        }
+//
+//        super.onRemove(state, level, pos, newState, movedByPiston);
+//    }
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        if (blockEntity instanceof PigeonholeBlockEntity pigeonholeBlockEntity) {
+        if (blockEntity instanceof PigeonholeBlockEntity be) {
             if (!EnchantmentHelper.hasTag(tool, EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING)) {
-                pigeonholeBlockEntity.releaseAllOccupants(level, pos, state, Occupiable.ReleaseReason.EMERGENCY);
+                be.releaseAllOccupants(level, pos, state, Occupiable.ReleaseReason.EMERGENCY);
                 level.updateNeighbourForOutputSignal(pos, this);
             }
         }
@@ -244,104 +218,104 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        if (!isValidDimension(level)) {
-            Envelope.LOGGER.error("Pigeonhole cannot work in {}", level.dimension().location());
-            player.displayClientMessage(Component.literal("Environment is not suitable for deliveries").withStyle(ChatFormatting.RED), true);
-            return ItemInteractionResult.FAIL;
-        }
-
-        if (stack.getItem() instanceof AddressTagItem) {
-            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeMailService().getKnownAddresses();
-                Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
-
-        // Not decided on yet
-        if (stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block block
-              && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-              && blockEntity.getAddress().map(a -> a.equals(block)).orElse(false)) {
-            if (level instanceof ServerLevel serverLevel) {
-                if (!stack.has(Envelope.DataComponents.MAIL_SENDER)) {
-                    stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
-                }
-
-                Mail result = MailService.of(serverLevel).deliverMail(block, new Mail(stack));
-
-                player.setItemInHand(hand, result.getItem().copy());
-            }
-            return ItemInteractionResult.SUCCESS;
-        }
+//        if (!isValidDimension(level)) {
+//            Envelope.LOGGER.error("Pigeonhole cannot work in {}", level.dimension().location());
+//            player.displayClientMessage(Component.literal("Environment is not suitable for deliveries").withStyle(ChatFormatting.RED), true);
+//            return ItemInteractionResult.FAIL;
+//        }
+//
+//        if (stack.getItem() instanceof AddressTagItem) {
+//            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
+//                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeMailService().getKnownAddresses();
+//                Packets.sendToClient(new OpenPigeonholeAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
+//            }
+//            return ItemInteractionResult.SUCCESS;
+//        }
+//
+//        // Not decided on yet
+//        if (stack.is(Envelope.Tags.Items.MAILABLE)
+//              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block block
+//              && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+//              && blockEntity.getAddress().map(a -> a.equals(block)).orElse(false)) {
+//            if (level instanceof ServerLevel serverLevel) {
+//                if (!stack.has(Envelope.DataComponents.MAIL_SENDER)) {
+//                    stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
+//                }
+//
+//                Mail result = MailService.of(serverLevel).deliverMail(block, new Mail(stack));
+//
+//                player.setItemInHand(hand, result.getItem().copy());
+//            }
+//            return ItemInteractionResult.SUCCESS;
+//        }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
-    @Override
-    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
-                                                        Player player, BlockHitResult hitResult) {
-        if (state.getValue(HAS_ADDRESS)) {
-            if (player instanceof ServerPlayer serverPlayer
-                  && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-                  && !blockEntity.openMenu(serverPlayer)) {
-                return InteractionResult.FAIL;
-            }
+//    @Override
+//    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+//                                                        Player player, BlockHitResult hitResult) {
+//        if (state.getValue(HAS_ADDRESS)) {
+//            if (player instanceof ServerPlayer serverPlayer
+//                  && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+//                  && !blockEntity.openMenu(serverPlayer)) {
+//                return InteractionResult.FAIL;
+//            }
+//
+//            return InteractionResult.SUCCESS;
+//        }
 
-            return InteractionResult.SUCCESS;
-        }
+//        return super.useWithoutItem(state, level, pos, player, hitResult);
+//    }
 
-        return super.useWithoutItem(state, level, pos, player, hitResult);
-    }
+//    public void applyAddress(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
+//        if (!(player.level() instanceof ServerLevel level)) {
+//            return;
+//        }
+//
+//        if (!(level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity)) {
+//            Envelope.LOGGER.error("Cannot apply address: be at pos [{}] is not PigeonholeBlockEntity", pos.toShortString());
+//            return;
+//        }
+//
+//        if (!isValidDimension(level)) {
+//            Envelope.LOGGER.error("Cannot apply an address in {}", level.dimension().location());
+//            return;
+//        }
+//
+//        if (blockEntity.getAddress().filter(address -> address.matches(addressId)).isPresent()) {
+//            return;
+//        }
+//
+//        AddressValidation.forPigeonhole(MailService.of(level).getKnownAddresses(), player)
+//              .test(addressId)
+//              .ifPresentOrElse(
+//                    id -> {
+//                        Address.Block address = new Address.Block(addressId);
+//                        blockEntity.setAddress(address);
+//                        blockEntity.setOwner(player.getUUID());
+//                        level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
+//
+//                        MailService.of(level).getPigeonholeManager().getOrRegister(address, pos);
+//
+//                        if (!player.isCreative()) {
+//                            player.getInventory().getItem(slot).shrink(1);
+//                            player.giveExperienceLevels(-Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get());
+//                            level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1, 1);
+//                        }
+//
+//                        player.swing(slot == Inventory.SLOT_OFFHAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+//                        level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
+//                    },
+//                    error -> {
+//                        player.displayClientMessage(error.getTranslation(), true);
+//                        level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+//                    });
+//    }
 
-    public void applyAddress(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
-        if (!(player.level() instanceof ServerLevel level)) {
-            return;
-        }
-
-        if (!(level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity)) {
-            Envelope.LOGGER.error("Cannot apply address: be at pos [{}] is not PigeonholeBlockEntity", pos.toShortString());
-            return;
-        }
-
-        if (!isValidDimension(level)) {
-            Envelope.LOGGER.error("Cannot apply an address in {}", level.dimension().location());
-            return;
-        }
-
-        if (blockEntity.getAddress().filter(address -> address.matches(addressId)).isPresent()) {
-            return;
-        }
-
-        AddressValidation.forPigeonhole(MailService.of(level).getKnownAddresses(), player)
-              .test(addressId)
-              .ifPresentOrElse(
-                    id -> {
-                        Address.Block address = new Address.Block(addressId);
-                        blockEntity.setAddress(address);
-                        blockEntity.setOwner(player.getUUID());
-                        level.setBlock(pos, state.setValue(PigeonholeBlock.HAS_ADDRESS, true), PigeonholeBlock.UPDATE_ALL);
-
-                        MailService.of(level).getPigeonholeManager().getOrRegister(address, pos);
-
-                        if (!player.isCreative()) {
-                            player.getInventory().getItem(slot).shrink(1);
-                            player.giveExperienceLevels(-Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get());
-                            level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1, 1);
-                        }
-
-                        player.swing(slot == Inventory.SLOT_OFFHAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
-                        level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 1, 1);
-                    },
-                    error -> {
-                        player.displayClientMessage(error.getTranslation(), true);
-                        level.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
-                    });
-    }
-
-    public boolean isValidDimension(Level level) {
-        return level.dimension() == Level.OVERWORLD;
-    }
+//    public boolean isValidDimension(Level level) {
+//        return level.dimension() == Level.OVERWORLD;
+//    }
 
     @Nullable
     @Override
@@ -354,6 +328,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
               ? null
-              : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(), PigeonholeBlockEntity::serverTick);
+              : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(),
+              (lvl, blockPos, blockState, blockEntity) -> blockEntity.serverTick(((ServerLevel) lvl), blockPos, state));
     }
 }

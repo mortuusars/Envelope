@@ -27,7 +27,7 @@ public interface AddressValidation {
     static Validator<String> forPigeonhole(AllAddresses addresses, Player player) {
         return id()
               .and(isNotTaken(addresses))
-              .and(hasEnoughXp(player, Config.Server.PIGEONHOLE_ADDRESS_EXPERIENCE_LEVELS_COST.get()));
+              .and(hasEnoughXp(player, Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get()));
     }
 
     // --

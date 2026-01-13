@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackPackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
-import io.github.mortuusars.envelope.client.gui.screen.PigeonholeScreen;
+import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.model.PigeonBackpackModel;
 import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
 import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
@@ -31,7 +31,7 @@ public class NeoForgeClientEvents {
 
         @SubscribeEvent
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
-            event.register(Envelope.MenuTypes.PIGEONHOLE.get(), PigeonholeScreen::new);
+            event.register(Envelope.MenuTypes.PIGEONHOLE.get(), MailboxScreen::new);
             event.register(Envelope.MenuTypes.PACKAGE.get(), PackingScreen::new);
             event.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackingScreen::new);
             event.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);

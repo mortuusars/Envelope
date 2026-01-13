@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.world.inventory.PigeonholeMenu;
+import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.NewMail;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -16,13 +16,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Updates the client when mail is removed from the storage by hopper or something.
  */
-public record PigeonholeMenuMailRemovedS2CP(Id id) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("pigeonhole_menu_mail_removed");
-    public static final Type<PigeonholeMenuMailRemovedS2CP> TYPE = new Type<>(ID);
+public record MailboxMenuMailRemovedS2CP(Id id) implements Packet {
+    public static final ResourceLocation ID = Envelope.resource("mailbox_menu_mail_removed");
+    public static final Type<MailboxMenuMailRemovedS2CP> TYPE = new Type<>(ID);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, PigeonholeMenuMailRemovedS2CP> STREAM_CODEC = StreamCodec.composite(
-          Id.STREAM_CODEC, PigeonholeMenuMailRemovedS2CP::id,
-          PigeonholeMenuMailRemovedS2CP::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, MailboxMenuMailRemovedS2CP> STREAM_CODEC = StreamCodec.composite(
+          Id.STREAM_CODEC, MailboxMenuMailRemovedS2CP::id,
+          MailboxMenuMailRemovedS2CP::new
     );
 
     @Override
@@ -32,12 +32,12 @@ public record PigeonholeMenuMailRemovedS2CP(Id id) implements Packet {
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        if (!(player.containerMenu instanceof PigeonholeMenu pigeonholeMenu)) {
-            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have PigeonholeMenu open.", ID, player);
+        if (!(player.containerMenu instanceof MailboxMenu mailboxMenu)) {
+            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
             return false;
         }
 
-        pigeonholeMenu.getMail().removeIf(storedMail -> id.equals(NewMail.getId(storedMail)));
+        mailboxMenu.getMail().removeIf(storedMail -> id.equals(NewMail.getId(storedMail)));
         return true;
     }
 }

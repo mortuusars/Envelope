@@ -135,12 +135,12 @@ public class ModelsDatagen extends BlockStateProvider {
         getVariantBuilder(block).forAllStates(state -> {
             Direction facing = state.getValue(PigeonholeBlock.FACING);
             int waste = state.getValue(PigeonholeBlock.WASTE_LEVEL);
-            boolean hasAddress = state.getValue(PigeonholeBlock.HAS_ADDRESS);
-            boolean hasMail = state.getValue(PigeonholeBlock.HAS_MAIL);
+//            boolean hasAddress = state.getValue(PigeonholeBlock.HAS_ADDRESS);
+//            boolean hasMail = state.getValue(PigeonholeBlock.HAS_MAIL);
 
             String suffix = (waste >= PigeonholeBlock.MAX_WASTE_LEVEL ? "_waste" : "")
-                  + (hasAddress ? "_address" : "")
-                  + (hasMail && hasAddress ? "_mail" : "");
+                  /*+ (hasAddress ? "_address" : "")
+                  + (hasMail && hasAddress ? "_mail" : "")*/;
 
             ModelFile model = models().orientableWithBottom(baseName + suffix,
                   Envelope.resource("block/" + baseName + "_side"),

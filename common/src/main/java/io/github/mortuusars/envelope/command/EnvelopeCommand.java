@@ -38,15 +38,15 @@ public class EnvelopeCommand {
                                 .executes(c -> sendMail(c,
                                       ItemArgument.getItem(c, "mail"),
                                       parseAddress(CompoundTagArgument.getCompoundTag(c, "sender")))))))
-              .then(Commands.literal("pigeonhole")
+              .then(Commands.literal("mailbox")
                     .then(Commands.literal("list")
-                          .executes(EnvelopeCommand::listAllPigeonholes)
+                          .executes(EnvelopeCommand::listAllMailboxes)
                           .then(Commands.literal("default")
-                                .executes(EnvelopeCommand::listDefaultPigeonholes)))
+                                .executes(EnvelopeCommand::listDefaultMailboxes)))
                     .then(Commands.literal("position")
                           .then(Commands.argument("address", AddressArgument.block())
-                                .suggests(AddressSuggestions.pigeonhole())
-                                .executes(c -> pigeonholePosition(c, AddressArgument.getBlock(c, "address"))))))
+                                .suggests(AddressSuggestions.block())
+                                .executes(c -> mailboxPosition(c, AddressArgument.getBlock(c, "address"))))))
               .then(EnvelopeDebugCommand.commands())
               .then(Commands.literal("test")
                     .executes(EnvelopeCommand::test)));
@@ -77,26 +77,26 @@ public class EnvelopeCommand {
         return Address.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow();
     }
 
-    // -- Pigeonhole
+    // -- Mailbox
 
-    private static int listAllPigeonholes(CommandContext<CommandSourceStack> context) {
+    private static int listAllMailboxes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
-        Set<Address.Block> addresses = MailService.of(level).getPigeonholeManager().getAllAddresses();
+        Set<Address.Block> addresses = MailService.of(level).mailboxes().getAllAddresses();
 
         if (!addresses.isEmpty()) {
-            context.getSource().sendSuccess(() -> Component.literal("All pigeonholes:"), true);
+            context.getSource().sendSuccess(() -> Component.literal("All mailboxes:"), true);
             for (Address.Block address : addresses) {
                 context.getSource().sendSuccess(() -> copyableAddressAndPos(address,
-                      MailService.of(level).getPigeonholeManager().getPositionOf(address)), true);
+                      MailService.of(level).mailboxes().getPositionOf(address)), true);
             }
         } else {
             context.getSource().sendSuccess(() ->
-                  Component.literal("There are no addressed pigeonholes."), true);
+                  Component.literal("There are no known mailboxes."), true);
         }
         return 0;
     }
 
-    private static int listDefaultPigeonholes(CommandContext<CommandSourceStack> context) {
+    private static int listDefaultMailboxes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
 
         Map<Address.Player, Address.Block> defaultAddresses = MailService.of(level).getPlayers().getDefaultAddresses();
@@ -105,27 +105,27 @@ public class EnvelopeCommand {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
 
             defaultAddresses.forEach((playerAddress, address) -> {
-                Optional<BlockPos> position = MailService.of(level).getPigeonholeManager().getPositionOf(address);
+                Optional<BlockPos> position = MailService.of(level).mailboxes().getPositionOf(address);
                 context.getSource().sendSuccess(() -> Component.literal(playerAddress.toString())
                       .append(" - ")
                       .append(copyableAddressAndPos(address, position)), true);
             });
         } else {
             context.getSource().sendSuccess(() ->
-                  Component.literal("There are no default pigeonholes."), true);
+                  Component.literal("There are no default mailboxes."), true);
         }
 
         return 0;
     }
 
-    private static int pigeonholePosition(CommandContext<CommandSourceStack> context, Address.Block address) {
+    private static int mailboxPosition(CommandContext<CommandSourceStack> context, Address.Block address) {
         ServerLevel level = context.getSource().getLevel();
-        if (!MailService.of(level).getPigeonholeManager().exists(address)) {
+        if (!MailService.of(level).mailboxes().exists(address)) {
             context.getSource().sendFailure(address.getName().append(" does not exist."));
             return 1;
         }
 
-        MailService.of(level).getPigeonholeManager().getPositionOf(address)
+        MailService.of(level).mailboxes().getPositionOf(address)
               .ifPresentOrElse(
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
                     () -> context.getSource().sendFailure(address.getName()

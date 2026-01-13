@@ -29,7 +29,7 @@
 
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
 
-  "container.envelope.pigeonhole": "Pigeonhole",
+  "container.envelope.mailbox": "Mailbox",
   "container.envelope.payback_tag": "Payback",
 
   "gui.envelope.pigeonhole_address.rename_warning.inbox": "§6• Mail in inbox will be dropped on the ground.",

@@ -35,7 +35,7 @@ public class MailServiceBuggerData extends NbtData {
         List<? extends Pigeon> pigeons = mailService.getLevel().getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
         List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getCouriers();
 
-        tag.putInt("pigeonholes", mailService.getPigeonholeManager().getAllAddresses().size());
+        tag.putInt("pigeonholes", mailService.mailboxes().getAllAddresses().size());
         tag.putInt("delivering_pigeons", pigeons.size());
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
         tag.putInt("background_finished_pigeons", mailService.getBackgroundDelivery().getFinishedCouriers().size());
