@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MailboxMenu extends AbstractContainerMenu {
     public static final int ADDRESS_BUTTON_ID = 0;
@@ -40,7 +41,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected boolean hasNewMail;
 
     protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
-                          BlockPos pos, Inbox inbox, Address.Block address) {
+                          BlockPos pos, Address.Block address, Inbox inbox) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -52,34 +53,34 @@ public class MailboxMenu extends AbstractContainerMenu {
         this.blockEntity = be;
         setInbox(inbox);
 
-        addSlot(new Slot(be, MailboxBlockEntity.SLOT_FOOD, 227, 62) {
+        addSlot(new Slot(be, MailboxBlockEntity.SLOT_FOOD, 201, 37) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return be.canPlaceItem(MailboxBlockEntity.SLOT_FOOD, stack);
             }
         });
-        addSlot(new Slot(be, MailboxBlockEntity.SLOT_MAIL, 248, 62) {
+        addSlot(new Slot(be, MailboxBlockEntity.SLOT_MAIL, 222, 37) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return be.canPlaceItem(MailboxBlockEntity.SLOT_MAIL, stack);
             }
         });
-        addPlayerSlots(playerInventory, 140, 121);
+        addPlayerSlots(playerInventory, 140, 88);
         addDataSlot(hasDefault);
         addDataSlot(isDefault);
         updateHasDefault();
         updateIsDefault();
     }
 
-    public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, Inbox inbox, Address.Block address) {
-        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pos, inbox, address);
+    public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, Address.Block address, Inbox inbox) {
+        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pos, address, inbox);
     }
 
     public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
-        Inbox inbox = Inbox.STREAM_CODEC.decode(buffer);
         Address.Block address = Address.Block.STREAM_CODEC.decode(buffer);
-        return new MailboxMenu(id, inventory, mailboxPos, inbox, address);
+        Inbox inbox = Inbox.STREAM_CODEC.decode(buffer);
+        return new MailboxMenu(id, inventory, mailboxPos, address, inbox);
     }
 
     @Override
@@ -141,6 +142,11 @@ public class MailboxMenu extends AbstractContainerMenu {
     public void setInbox(Inbox inbox) {
         this.inbox = inbox;
         this.mail = new ArrayList<>(inbox.mail().reversed());
+        for (int i = 0; i < 40; i++) {
+            ItemStack stack = new ItemStack(ThreadLocalRandom.current().nextBoolean() ? Envelope.Items.LETTER.get() : Envelope.Items.PACKAGE.get());
+            stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player("" + (i + 1)));
+            mail.add(stack);
+        }
         setHasNewMail(false);
     }
 

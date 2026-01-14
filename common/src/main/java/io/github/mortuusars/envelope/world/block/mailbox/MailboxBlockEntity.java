@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
@@ -16,6 +17,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
@@ -156,7 +158,18 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity {
     @Override
     protected @NotNull AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
         applyAddress();
-        return new MailboxMenu(containerId, inventory, getBlockPos(), new Inbox(inboxContainer.getMail()), getAddress());
+        return new MailboxMenu(containerId, inventory, getBlockPos(), getAddress(), new Inbox(inboxContainer.getMail()));
+    }
+
+    public void openMenu(Player player) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            applyAddress();
+            PlatformHelper.openMenu(serverPlayer, this, buffer -> {
+                buffer.writeBlockPos(getBlockPos());
+                Address.Block.STREAM_CODEC.encode(buffer, getAddress());
+                Inbox.STREAM_CODEC.encode(buffer, new Inbox(Collections.emptyList()));
+            });
+        }
     }
 
     // -- Events

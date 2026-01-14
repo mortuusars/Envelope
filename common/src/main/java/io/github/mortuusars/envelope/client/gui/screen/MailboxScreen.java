@@ -43,9 +43,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail_button"));
 
-    public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mailbox"));
+    public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_block"));
     public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
-    public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_npc"));
+    public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_entity"));
     public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mail_service"));
     public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unknown"));
     public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_returned"));
@@ -55,11 +55,11 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("mailbox/new_mail_indicator"));
 
     protected static final int SCROLL_THUMB_TOP_HEIGHT = 3;
-    protected static final int SCROLL_THUMB_MID_HEIGHT = 4;
+    protected static final int SCROLL_THUMB_MID_HEIGHT = 2;
     protected static final int SCROLL_THUMB_BOT_HEIGHT = 2;
-    protected static final int SCROLL_THUMB_HEIGHT = SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + SCROLL_THUMB_BOT_HEIGHT;
+    protected static final int SCROLL_THUMB_Y_OFFSET = SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + SCROLL_THUMB_BOT_HEIGHT;
 
-    protected static final int MAX_INBOX_MAIL_BUTTONS = 9;
+    protected static final int MAX_INBOX_MAIL_BUTTONS = 8;
 
     protected Component inboxLabel = Component.translatable("gui.envelope.mailbox.inbox");
     protected Component sendLabel = Component.translatable("gui.envelope.mailbox.send");
@@ -89,16 +89,16 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     @Override
     protected void init() {
         imageWidth = 308;
-        imageHeight = 203;
+        imageHeight = 170;
         titleLabelX = Math.max(17, (imageWidth / 2) - (font.width(title) / 2) + 5);
-        titleLabelY = 5;
+        titleLabelY = -10;
         inventoryLabelX = 140;
         inventoryLabelY = imageHeight - 94;
         super.init();
-        mailArea = new Rect2i(leftPos + 8, topPos + 32, 117, 162);
-        scrollBarArea = new Rect2i(leftPos + 128, topPos + 33, 6, 161);
+        mailArea = new Rect2i(leftPos + 8, topPos + 18, 117, 144);
+        scrollBarArea = new Rect2i(leftPos + 128, topPos + 18, 6, 144);
 
-        addressButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10,
+        addressButton = new ImageButton(leftPos + titleLabelX - 11, topPos - 11, 10, 10,
               ADDRESS_BUTTON_SPRITES,
               button -> setAsDefaultAddress(),
               Component.translatable("gui.envelope.mailbox.address"));
@@ -107,7 +107,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
               .append(Component.translatable("gui.envelope.mailbox.address.tooltip"))));
         addRenderableWidget(addressButton);
 
-        addressAttentionButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10,
+        addressAttentionButton = new ImageButton(leftPos + titleLabelX - 11, topPos - 11, 10, 10,
               ADDRESS_ATTENTION_BUTTON_SPRITES,
               button -> setAsDefaultAddress(),
               Component.translatable("gui.envelope.mailbox.address"));
@@ -116,7 +116,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
               .append(Component.translatable("gui.envelope.mailbox.address.tooltip"))));
         addRenderableWidget(addressAttentionButton);
 
-        addressDefaultButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10, ADDRESS_DEFAULT_BUTTON_SPRITES, btn -> {
+        addressDefaultButton = new ImageButton(leftPos + titleLabelX - 11, topPos - 11, 10, 10, ADDRESS_DEFAULT_BUTTON_SPRITES, btn -> {
         });
         addressDefaultButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.address.default")
               .append("\n")
@@ -124,7 +124,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         addressDefaultButton.active = false;
         addRenderableWidget(addressDefaultButton);
 
-        newMailButton = new ImageButton(leftPos + 7, topPos + 21, 8, 8,
+        newMailButton = new ImageButton(leftPos + 7, topPos + 6, 8, 8,
               NEW_MAIL_INDICATOR_SPRITES,
               button -> {
                   refreshMail();
@@ -211,11 +211,11 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         int addressBarX = titleLabelX - 18;
         int addressBarWidth = imageWidth - (addressBarX * 2);
         // Left
-        guiGraphics.blit(TEXTURE, leftPos + addressBarX, topPos, 0, imageHeight, 5, 15, 512, 256);
+        guiGraphics.blit(TEXTURE, leftPos + addressBarX, topPos - 15, 0, imageHeight, 5, 15, 512, 256);
         // Middle
-        guiGraphics.blit(TEXTURE, leftPos + addressBarX + 5, topPos, 5, imageHeight, addressBarWidth - 10, 15, 512, 256);
+        guiGraphics.blit(TEXTURE, leftPos + addressBarX + 5, topPos - 15, 5, imageHeight, addressBarWidth - 10, 15, 512, 256);
         // Right
-        guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos, 303, imageHeight, 5, 15, 512, 256);
+        guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos - 15, 303, imageHeight, 5, 15, 512, 256);
 
         List<ItemStack> mail = getMenu().getMail();
         hoveredMail = null;
@@ -226,7 +226,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
             ItemStack item = mail.get(index);
             int x = 8;
-            int y = 33 + 18 * i;
+            int y = 18 + 18 * i;
             boolean isHovering = isHovering(x + 1, y + 1, 115, 16, mouseX, mouseY);
             if (isHovering) {
                 hoveredMail = item;
@@ -234,11 +234,13 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
         }
 
-        if (!getMenu().getSlot(MailboxBlockEntity.SLOT_FOOD).hasItem()) {
-            guiGraphics.blit(TEXTURE, leftPos + 227, topPos + 62, 314, 0, 16, 16, 512, 256);
+        Slot foodSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_FOOD);
+        if (!foodSlot.hasItem()) {
+            guiGraphics.blit(TEXTURE, leftPos + foodSlot.x, topPos + foodSlot.y, 314, 0, 16, 16, 512, 256);
         }
-        if (!getMenu().getSlot(MailboxBlockEntity.SLOT_MAIL).hasItem()) {
-            guiGraphics.blit(TEXTURE, leftPos + 247, topPos + 61, 330, 0, 18, 18, 512, 256);
+        Slot mailSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_MAIL);
+        if (!mailSlot.hasItem()) {
+            guiGraphics.blit(TEXTURE, leftPos + mailSlot.x - 1, topPos + mailSlot.y - 1, 330, 0, 18, 18, 512, 256);
         }
 
         renderScrollBar(guiGraphics, partialTick, mouseX, mouseY);
@@ -256,10 +258,10 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
               .append(")")
               .getVisualOrderText();
         int inboxLabelX = 71 - font.width(inbox) / 2;
-        guiGraphics.drawString(font, inbox, inboxLabelX, 21, 0x404040, false);
+        guiGraphics.drawString(font, inbox, inboxLabelX, 6, 0x404040, false);
 
         int sendLabelX = 220 - font.width(sendLabel) / 2;
-        guiGraphics.drawString(font, sendLabel, sendLabelX, 21, 0x404040, false);
+        guiGraphics.drawString(font, sendLabel, sendLabelX, 6, 0x404040, false);
 
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
@@ -294,7 +296,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
         // Top
         guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY(),
-              308, state * SCROLL_THUMB_HEIGHT, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT, 512, 256);
+              308, state * SCROLL_THUMB_Y_OFFSET, scrollThumb.getWidth(), SCROLL_THUMB_TOP_HEIGHT, 512, 256);
 
         // Middle
         int middlePartsCount = (scrollThumb.getHeight() - SCROLL_THUMB_TOP_HEIGHT - SCROLL_THUMB_BOT_HEIGHT) / SCROLL_THUMB_MID_HEIGHT;
@@ -302,23 +304,19 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         for (int i = 0; i < middlePartsCount; i++) {
             guiGraphics.blit(TEXTURE, scrollThumb.getX(),
                   scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + i * SCROLL_THUMB_MID_HEIGHT,
-                  308, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
+                  308, state * SCROLL_THUMB_Y_OFFSET + SCROLL_THUMB_TOP_HEIGHT,
                   scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT, 512, 256);
         }
 
+        // Bottom
+        guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT),
+              308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_Y_OFFSET,
+              scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
+
         if (!canScroll()) {
-            // Special case to allow full size scroll thumb fill all available area.
-            guiGraphics.blit(TEXTURE, scrollThumb.getX(),
-                  scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + middlePartsCount * SCROLL_THUMB_MID_HEIGHT - 1,
-                  308, state * SCROLL_THUMB_HEIGHT + SCROLL_THUMB_TOP_HEIGHT,
-                  scrollThumb.getWidth(), SCROLL_THUMB_MID_HEIGHT, 512, 256);
+            // Special case to make scroll thumb fill remaining gap in the bottom
             guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT) + 1,
-                  308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
-                  scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
-        } else {
-            // Bottom
-            guiGraphics.blit(TEXTURE, scrollThumb.getX(), scrollThumb.getY() + SCROLL_THUMB_TOP_HEIGHT + (middlePartsCount * SCROLL_THUMB_MID_HEIGHT),
-                  308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_HEIGHT,
+                  308, SCROLL_THUMB_TOP_HEIGHT + SCROLL_THUMB_MID_HEIGHT + state * SCROLL_THUMB_Y_OFFSET,
                   scrollThumb.getWidth(), SCROLL_THUMB_BOT_HEIGHT, 512, 256);
         }
     }
@@ -338,7 +336,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             return;
         }
 
-        if (x >= leftPos + 31 && x < leftPos + 41 && y >= topPos + 37 && y < topPos + 47) {
+        if (x >= leftPos + 31 && x < leftPos + 41) {
             guiGraphics.renderTooltip(font, getDisplayedIconName(hoveredMail), x, y);
             return;
         }
@@ -381,7 +379,6 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     public void scrollTo(int buttonIndex) {
         int maxScrollWhenAtEnd = Math.max(0, getMenu().getMail().size() - MAX_INBOX_MAIL_BUTTONS);
         scroll = Mth.clamp(buttonIndex, 0, maxScrollWhenAtEnd);
-        updateScrollThumb();
     }
 
     // -- Input

@@ -2,11 +2,9 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,7 +24,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,9 +34,7 @@ public class MailboxBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 
-    public static final VoxelShape SHAPE = Shapes.or(
-          Block.box(3, 2, 3, 13, 12, 13),
-          Block.box(2, 0, 2, 14, 2, 14));
+    public static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 14, 15);
 
     public MailboxBlock(Properties properties) {
         super(properties);
@@ -83,39 +78,41 @@ public class MailboxBlock extends BaseEntityBlock {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new MailboxBlockEntity(pos, state);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (placer != null && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
+            blockEntity.setOwner(placer.getUUID());
+        }
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        super.onRemove(state, level, pos, newState, movedByPiston);
+        if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
+            MailService.of(serverLevel).mailboxes().remove(pos);
+        }
+    }
+
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                                        Player player, BlockHitResult hitResult) {
+        if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
+            blockEntity.openMenu(player);
+        }
+        return InteractionResult.SUCCESS_NO_ITEM_USED;
     }
 
     public void applyAddressTag(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
 
     }
 
-    @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        if (level.getBlockEntity(pos) instanceof MailboxBlockEntity be) {
-            be.setAddress(new Address.Block(pos.toShortString()));
-        }
-    }
+    // --
 
+    @Nullable
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
-            MailService.of(serverLevel).mailboxes().remove(pos);
-        }
-
-        super.onRemove(state, level, pos, newState, movedByPiston);
-    }
-
-    @Override
-    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
-                                                        Player player, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof MailboxBlockEntity be) {
-            player.displayClientMessage(Component.literal("Address: ").append(be.getAddress().getName()), true);
-        }
-        return InteractionResult.SUCCESS_NO_ITEM_USED;
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new MailboxBlockEntity(pos, state);
     }
 
     @Nullable
