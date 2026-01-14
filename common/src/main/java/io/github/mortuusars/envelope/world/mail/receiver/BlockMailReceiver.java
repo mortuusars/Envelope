@@ -37,7 +37,7 @@ public class BlockMailReceiver implements MailReceiver {
                         return Mail.EMPTY;
                     })
                     .orElseGet(() -> {
-                        LOGGER.info("Cannot deliver mail to pigeonhole '{}': address not found. Returning to sender.", address);
+                        LOGGER.info("Cannot deliver mail to mailbox '{}': address not found. Returning to sender.", address);
                         return mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                               .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
                     }));

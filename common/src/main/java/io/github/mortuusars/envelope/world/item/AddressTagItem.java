@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
+import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -71,8 +71,8 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-        if (state.getBlock() instanceof PigeonholeBlock) {
-            return InteractionResult.FAIL; // Let pigeonhole handle the interaction
+        if (state.getBlock() instanceof MailboxBlock) {
+            return InteractionResult.FAIL; // Let mailbox handle the interaction
         }
 
         return super.useOn(context);

@@ -29,7 +29,7 @@ public record MailboxMenuSetInboxS2CP(Inbox inbox) implements Packet {
     @Override
     public boolean handle(PacketFlow direction, Player player) {
         if (!(player.containerMenu instanceof MailboxMenu mailboxMenu)) {
-            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have PigeonholeMenu open.", ID, player);
+            Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
             return false;
         }
 

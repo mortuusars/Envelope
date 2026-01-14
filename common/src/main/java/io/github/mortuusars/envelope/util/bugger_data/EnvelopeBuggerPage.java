@@ -24,7 +24,7 @@ public class EnvelopeBuggerPage implements BuggerPage {
                   int backgroundFinishedPigeons = tag.getInt("background_finished_pigeons");
 
                   List<String> lines = new ArrayList<>(List.of(
-                        "Pigeonholes: " + tag.getInt("pigeonholes"),
+                        "Mailboxes: " + tag.getInt("mailboxes"),
                         "",
                         "Couriers:",
                         "  Real: " + realPigeons,

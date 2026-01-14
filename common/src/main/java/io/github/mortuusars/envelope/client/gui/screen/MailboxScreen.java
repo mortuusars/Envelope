@@ -35,24 +35,24 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/pigeonhole.png");
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/mailbox.png");
 
-    public static final WidgetSprites ADDRESS_BUTTON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/address_button"));
-    public static final WidgetSprites ADDRESS_ATTENTION_BUTTON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/address_attention_button"), Envelope.resource("pigeonhole/address_button_highlighted"));
-    public static final WidgetSprites ADDRESS_DEFAULT_BUTTON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/address_default_button"));
+    public static final WidgetSprites ADDRESS_BUTTON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/address_button"));
+    public static final WidgetSprites ADDRESS_ATTENTION_BUTTON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/address_attention_button"), Envelope.resource("mailbox/address_button_highlighted"));
+    public static final WidgetSprites ADDRESS_DEFAULT_BUTTON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/address_default_button"));
 
-    public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("pigeonhole/mail_button"));
+    public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail_button"));
 
-    public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_pigeonhole"));
-    public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_player"));
-    public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_npc"));
-    public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_mail_service"));
-    public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_unknown"));
-    public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_returned"));
-    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_rejected"));
-    public static final WidgetSprites ICON_UNCLAIMED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("pigeonhole/icon_unclaimed"));
+    public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mailbox"));
+    public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
+    public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_npc"));
+    public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mail_service"));
+    public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unknown"));
+    public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_returned"));
+    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_rejected"));
+    public static final WidgetSprites ICON_UNCLAIMED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unclaimed"));
 
-    public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("pigeonhole/new_mail_indicator"));
+    public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("mailbox/new_mail_indicator"));
 
     protected static final int SCROLL_THUMB_TOP_HEIGHT = 3;
     protected static final int SCROLL_THUMB_MID_HEIGHT = 4;
@@ -61,8 +61,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     protected static final int MAX_INBOX_MAIL_BUTTONS = 9;
 
-    protected Component inboxLabel = Component.translatable("gui.envelope.pigeonhole.inbox");
-    protected Component sendLabel = Component.translatable("gui.envelope.pigeonhole.send");
+    protected Component inboxLabel = Component.translatable("gui.envelope.mailbox.inbox");
+    protected Component sendLabel = Component.translatable("gui.envelope.mailbox.send");
 
     @Nullable
     protected ItemStack hoveredMail;
@@ -101,26 +101,26 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         addressButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10,
               ADDRESS_BUTTON_SPRITES,
               button -> setAsDefaultAddress(),
-              Component.translatable("gui.envelope.pigeonhole.address"));
-        addressButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
+              Component.translatable("gui.envelope.mailbox.address"));
+        addressButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.address")
               .append("\n")
-              .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
+              .append(Component.translatable("gui.envelope.mailbox.address.tooltip"))));
         addRenderableWidget(addressButton);
 
         addressAttentionButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10,
               ADDRESS_ATTENTION_BUTTON_SPRITES,
               button -> setAsDefaultAddress(),
-              Component.translatable("gui.envelope.pigeonhole.address"));
-        addressAttentionButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address")
+              Component.translatable("gui.envelope.mailbox.address"));
+        addressAttentionButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.address")
               .append("\n")
-              .append(Component.translatable("gui.envelope.pigeonhole.address.tooltip"))));
+              .append(Component.translatable("gui.envelope.mailbox.address.tooltip"))));
         addRenderableWidget(addressAttentionButton);
 
         addressDefaultButton = new ImageButton(leftPos + titleLabelX - 11, topPos + 4, 10, 10, ADDRESS_DEFAULT_BUTTON_SPRITES, btn -> {
         });
-        addressDefaultButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.address.default")
+        addressDefaultButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.address.default")
               .append("\n")
-              .append(Component.translatable("gui.envelope.pigeonhole.address.default.tooltip"))));
+              .append(Component.translatable("gui.envelope.mailbox.address.default.tooltip"))));
         addressDefaultButton.active = false;
         addRenderableWidget(addressDefaultButton);
 
@@ -130,9 +130,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                   refreshMail();
                   scrollTo(0);
               });
-        newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail")
+        newMailButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.mailbox.mail.tooltip.new_mail")
               .append("\n")
-              .append(Component.translatable("gui.envelope.pigeonhole.mail.tooltip.new_mail.click_to_refresh"))));
+              .append(Component.translatable("gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh"))));
         addRenderableWidget(newMailButton);
 
         updateButtons();
@@ -251,7 +251,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         FormattedCharSequence inbox = Component.empty()
               .append(inboxLabel)
               .append(" (" + (getMenu().getMail().isEmpty()
-                    ? Component.translatable("gui.envelope.pigeonhole.empty").getString()
+                    ? Component.translatable("gui.envelope.mailbox.empty").getString()
                     : getMenu().getMail().size()))
               .append(")")
               .getVisualOrderText();
