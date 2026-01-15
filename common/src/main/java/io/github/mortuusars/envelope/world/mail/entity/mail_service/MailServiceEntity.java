@@ -1,12 +1,13 @@
 package io.github.mortuusars.envelope.world.mail.entity.mail_service;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.NewMail;
+import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
 public class MailServiceEntity extends MailEntity {
@@ -26,7 +27,7 @@ public class MailServiceEntity extends MailEntity {
     // --
 
     @Override
-    public Mail receiveMail(ServerLevel level, Mail mail) {
-        return mail.writeToLog(DeliveryRecord.returnedFrom(getAddress()));
+    public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
+        return NewMail.writeToLog(mail, MailDeliveryRecord.returnedFrom(getAddress()));
     }
 }

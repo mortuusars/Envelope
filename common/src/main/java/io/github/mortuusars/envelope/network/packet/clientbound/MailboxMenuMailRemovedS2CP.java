@@ -4,7 +4,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.NewMail;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
@@ -32,12 +31,12 @@ public record MailboxMenuMailRemovedS2CP(Id id) implements Packet {
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        if (!(player.containerMenu instanceof MailboxMenu mailboxMenu)) {
+        if (!(player.containerMenu instanceof MailboxMenu menu)) {
             Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
             return false;
         }
 
-        mailboxMenu.getMail().removeIf(storedMail -> id.equals(NewMail.getId(storedMail)));
+        menu.onMailRemoved(id);
         return true;
     }
 }

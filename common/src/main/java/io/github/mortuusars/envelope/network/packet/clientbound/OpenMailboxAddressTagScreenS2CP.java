@@ -40,7 +40,7 @@ public record OpenMailboxAddressTagScreenS2CP(InteractionHand hand,
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        ClientPacketsHandler.openPigeonholeAddressTagScreen(this);
+        ClientPacketsHandler.openMailboxAddressTagScreen(this);
         return true;
     }
 }

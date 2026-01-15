@@ -10,7 +10,6 @@ import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.MailboxAddressTagApplyC2SP;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,28 +22,31 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class PigeonholeAddressTagScreen extends AddressTagScreen {
+public class MailboxAddressTagScreen extends AddressTagScreen {
     protected final LocalPlayer player;
     protected final BlockPos pos;
     protected final BlockState state;
+    protected final BlockEntity blockEntity;
     protected CachedValidator<String> addressValidator;
 
-    public PigeonholeAddressTagScreen(InteractionHand hand, AllAddresses knownAddresses,
-                                      BlockPos pos, Optional<Address.Block> existingAddress,
-                                      Component title) {
+    public MailboxAddressTagScreen(InteractionHand hand, AllAddresses knownAddresses,
+                                   BlockPos pos, Optional<Address.Block> existingAddress,
+                                   Component title) {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
         this.pos = pos;
-        this.state = Minecrft.level().getBlockState(pos);
+        this.state = player.level().getBlockState(pos);
+        this.blockEntity = player.level().getBlockEntity(pos);
         this.existingAddress = existingAddress.map(Address.class::cast);
         this.addressValidator = AddressValidation.forPigeonhole(knownAddresses, player).cached();
     }
@@ -91,10 +93,10 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
 
         if (isRenaming() && !isCurrentIdSameAsExistingAddress()) {
             confirmTooltip.append("\n")
-                  .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.inbox")
+                  .append(Component.translatable("gui.envelope.mailbox_address.rename_warning.inbox")
                         .withStyle(Style.EMPTY.withColor(0xFFE76A6A)))
                   .append("\n")
-                  .append(Component.translatable("gui.envelope.pigeonhole_address.rename_warning.traveling")
+                  .append(Component.translatable("gui.envelope.mailbox_address.rename_warning.traveling")
                         .withStyle(Style.EMPTY.withColor(0xFFE76A6A)));
         }
         confirmButton.setTooltip(Tooltip.create(confirmTooltip));
@@ -182,8 +184,7 @@ public class PigeonholeAddressTagScreen extends AddressTagScreen {
 
     protected boolean stillValid() {
         return player.getItemInHand(hand).getItem() instanceof AddressTagItem
-              && player.level().getBlockState(pos).getBlock() instanceof PigeonholeBlock
-              && player.distanceToSqr(Vec3.atCenterOf(pos)) <= 64.0D;
+              && Container.stillValidBlockEntity(blockEntity, player);
     }
 
     // -- Validation

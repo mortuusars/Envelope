@@ -28,12 +28,12 @@ public class MailboxHasNewMailS2CP implements Packet {
 
     @Override
     public boolean handle(PacketFlow flow, Player player) {
-        if (!(player.containerMenu instanceof MailboxMenu mailboxMenu)) {
+        if (!(player.containerMenu instanceof MailboxMenu menu)) {
             Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
             return false;
         }
 
-        mailboxMenu.setHasNewMail(true);
+        menu.setHasNewMail(true);
         player.level().playSound(player, player, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.MASTER, 0.75f, 1f);
         return true;
     }

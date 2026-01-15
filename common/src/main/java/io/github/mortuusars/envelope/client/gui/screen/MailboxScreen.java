@@ -25,7 +25,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -218,20 +217,26 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos - 15, 303, imageHeight, 5, 15, 512, 256);
 
         List<ItemStack> mail = getMenu().getMail();
-        hoveredMail = null;
-        scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
 
-        for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
-            int index = i + scroll;
+        if (!mail.isEmpty()) {
+            hoveredMail = null;
+            scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
 
-            ItemStack item = mail.get(index);
-            int x = 8;
-            int y = 18 + 18 * i;
-            boolean isHovering = isHovering(x + 1, y + 1, 115, 16, mouseX, mouseY);
-            if (isHovering) {
-                hoveredMail = item;
+            for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
+                int index = i + scroll;
+
+                ItemStack item = mail.get(index);
+                int x = 8;
+                int y = 18 + 18 * i;
+                boolean isHovering = isHovering(x + 1, y + 1, 115, 16, mouseX, mouseY);
+                if (isHovering) {
+                    hoveredMail = item;
+                }
+                renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
             }
-            renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
+        } else if (this.hashCode() % 16 == 0) {
+            // Sad face
+            guiGraphics.blit(TEXTURE, leftPos + 59, topPos + 92, 348, 0, 17, 9, 512, 256);
         }
 
         Slot foodSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_FOOD);
@@ -250,15 +255,14 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
 
-        FormattedCharSequence inbox = Component.empty()
-              .append(inboxLabel)
-              .append(" (" + (getMenu().getMail().isEmpty()
-                    ? Component.translatable("gui.envelope.mailbox.empty").getString()
-                    : getMenu().getMail().size()))
-              .append(")")
-              .getVisualOrderText();
-        int inboxLabelX = 71 - font.width(inbox) / 2;
-        guiGraphics.drawString(font, inbox, inboxLabelX, 6, 0x404040, false);
+        int inboxLabelX = 68 - font.width(inboxLabel) / 2;
+        guiGraphics.drawString(font, inboxLabel, inboxLabelX, 6, 0x404040, false);
+
+        if (getMenu().getMail().isEmpty()) {
+            Component empty = Component.translatable("gui.envelope.mailbox.empty");
+            int emptyLabelX = 68 - font.width(empty) / 2;
+            guiGraphics.drawString(font, empty, emptyLabelX, 80, 0x606060, false);
+        }
 
         int sendLabelX = 220 - font.width(sendLabel) / 2;
         guiGraphics.drawString(font, sendLabel, sendLabelX, 6, 0x404040, false);

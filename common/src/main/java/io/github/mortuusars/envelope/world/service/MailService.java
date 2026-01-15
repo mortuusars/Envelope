@@ -17,10 +17,12 @@ import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Optional;
 
@@ -176,7 +178,7 @@ public class MailService {
 
     // --
 
-    public Mail deliverMail(Address address, Mail mail) {
+    public ItemStack deliverMail(Address address, ItemStack mail) {
         if (mail.isEmpty()) return mail;
         return address.map(BlockMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }

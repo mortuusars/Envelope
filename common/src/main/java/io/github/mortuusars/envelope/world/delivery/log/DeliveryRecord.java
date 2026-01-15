@@ -157,6 +157,7 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
 
     public interface Message {
         Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery.log.message.recipient_not_found");
+        Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery.log.message.recipient_inbox_is_full");
         Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery.log.message.unable_to_reach");
 
         Component WAITING_FOR_PAYMENT = Component.translatable("gui.envelope.delivery.log.message.waiting_for_payment");

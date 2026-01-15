@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -10,15 +9,18 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public record MailboxMenuSetInboxS2CP(Inbox inbox) implements Packet {
-    public static final ResourceLocation ID = Envelope.resource("mailbox_menu_set_inbox");
-    public static final Type<MailboxMenuSetInboxS2CP> TYPE = new Type<>(ID);
+import java.util.List;
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, MailboxMenuSetInboxS2CP> STREAM_CODEC = StreamCodec.composite(
-            Inbox.STREAM_CODEC, MailboxMenuSetInboxS2CP::inbox,
-            MailboxMenuSetInboxS2CP::new
+public record MailboxMenuSetMailS2CP(List<ItemStack> mail) implements Packet {
+    public static final ResourceLocation ID = Envelope.resource("mailbox_menu_set_mail");
+    public static final Type<MailboxMenuSetMailS2CP> TYPE = new Type<>(ID);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, MailboxMenuSetMailS2CP> STREAM_CODEC = StreamCodec.composite(
+            ItemStack.LIST_STREAM_CODEC, MailboxMenuSetMailS2CP::mail,
+            MailboxMenuSetMailS2CP::new
     );
 
     @Override
@@ -28,12 +30,12 @@ public record MailboxMenuSetInboxS2CP(Inbox inbox) implements Packet {
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        if (!(player.containerMenu instanceof MailboxMenu mailboxMenu)) {
+        if (!(player.containerMenu instanceof MailboxMenu menu)) {
             Envelope.LOGGER.error("Cannot handle '{}' packet: Player '{}' does not have MailboxMenu open.", ID, player);
             return false;
         }
 
-        mailboxMenu.setInbox(inbox);
+        menu.setMail(mail);
 
         return true;
     }

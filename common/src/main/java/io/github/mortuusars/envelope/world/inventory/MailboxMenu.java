@@ -1,8 +1,12 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailRemovedS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuSetMailS2CP;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.NewMail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -21,7 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class MailboxMenu extends AbstractContainerMenu {
     public static final int ADDRESS_BUTTON_ID = 0;
@@ -36,12 +41,11 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected final Address.Block address;
     protected final MailboxBlockEntity blockEntity;
 
-    protected Inbox inbox;
     protected List<ItemStack> mail;
     protected boolean hasNewMail;
 
     protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
-                          BlockPos pos, Address.Block address, Inbox inbox) {
+                          BlockPos pos, Address.Block address, List<ItemStack> mail) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -51,7 +55,7 @@ public class MailboxMenu extends AbstractContainerMenu {
             throw new IllegalStateException("MailboxBlockEntity is not available at " + pos);
         }
         this.blockEntity = be;
-        setInbox(inbox);
+        setMail(mail);
 
         addSlot(new Slot(be, MailboxBlockEntity.SLOT_FOOD, 201, 37) {
             @Override
@@ -72,15 +76,15 @@ public class MailboxMenu extends AbstractContainerMenu {
         updateIsDefault();
     }
 
-    public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, Address.Block address, Inbox inbox) {
-        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pos, address, inbox);
+    public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, Address.Block address, List<ItemStack> mail) {
+        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pos, address, mail);
     }
 
     public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
         Address.Block address = Address.Block.STREAM_CODEC.decode(buffer);
-        Inbox inbox = Inbox.STREAM_CODEC.decode(buffer);
-        return new MailboxMenu(id, inventory, mailboxPos, address, inbox);
+        List<ItemStack> mail = ItemStack.LIST_STREAM_CODEC.decode(buffer);
+        return new MailboxMenu(id, inventory, mailboxPos, address, mail);
     }
 
     @Override
@@ -139,14 +143,8 @@ public class MailboxMenu extends AbstractContainerMenu {
         return mail;
     }
 
-    public void setInbox(Inbox inbox) {
-        this.inbox = inbox;
-        this.mail = new ArrayList<>(inbox.mail().reversed());
-        for (int i = 0; i < 40; i++) {
-            ItemStack stack = new ItemStack(ThreadLocalRandom.current().nextBoolean() ? Envelope.Items.LETTER.get() : Envelope.Items.PACKAGE.get());
-            stack.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player("" + (i + 1)));
-            mail.add(stack);
-        }
+    public void setMail(List<ItemStack> mail) {
+        this.mail = new ArrayList<>(mail.reversed());
         setHasNewMail(false);
     }
 
@@ -253,10 +251,9 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     protected ItemStack extractMail(ServerLevel level, int index) {
-//        return Optional.ofNullable(NewMail.getId(getMail().get(index)))
-//              .map(id -> getBlockEntity().extractMail(id))
-//              .orElse(ItemStack.EMPTY);
-        return ItemStack.EMPTY;
+        return Optional.ofNullable(NewMail.getId(getMail().get(index)))
+              .map(id -> getBlockEntity().removeMail(id))
+              .orElse(ItemStack.EMPTY);
     }
 
     // --
@@ -271,9 +268,9 @@ public class MailboxMenu extends AbstractContainerMenu {
         }
 
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-//            Inbox inbox = getBlockEntity().getInbox();
-//            setInbox(inbox);
-//            Packets.sendToClient(new PigeonholeMenuSetInboxS2CP(inbox), serverPlayer);
+            List<ItemStack> mail = getBlockEntity().getAllMail();
+            setMail(mail);
+            Packets.sendToClient(new MailboxMenuSetMailS2CP(mail), serverPlayer);
             return true;
         }
 
@@ -284,6 +281,17 @@ public class MailboxMenu extends AbstractContainerMenu {
         return level.players().stream()
               .filter(pl -> pl.containerMenu instanceof MailboxMenu menu && menu.getAddress().equals(address))
               .toList();
+    }
+
+    public static void executeForPlayersWithMenu(ServerLevel level, @Nullable Address.Block address, BiConsumer<ServerPlayer, MailboxMenu> action) {
+        playersWithMenu(level, address).forEach(pl -> action.accept(pl, ((MailboxMenu) pl.containerMenu)));
+    }
+
+    public void onMailRemoved(Id id) {
+        getMail().removeIf(m -> id.equals(NewMail.getId(m)));
+        if (player instanceof ServerPlayer serverPlayer) {
+            Packets.sendToClient(new MailboxMenuMailRemovedS2CP(id), serverPlayer);
+        }
     }
 
     // --

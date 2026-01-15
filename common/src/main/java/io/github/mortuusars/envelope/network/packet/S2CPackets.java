@@ -11,7 +11,7 @@ public class S2CPackets {
     public static List<CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload>> getDefinitions() {
         return List.of(
                 new CustomPacketPayload.TypeAndCodec<>(MailboxHasNewMailS2CP.TYPE, MailboxHasNewMailS2CP.STREAM_CODEC),
-                new CustomPacketPayload.TypeAndCodec<>(MailboxMenuSetInboxS2CP.TYPE, MailboxMenuSetInboxS2CP.STREAM_CODEC),
+                new CustomPacketPayload.TypeAndCodec<>(MailboxMenuSetMailS2CP.TYPE, MailboxMenuSetMailS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(MailboxMenuMailRemovedS2CP.TYPE, MailboxMenuMailRemovedS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenLetterEditScreenS2CP.TYPE, OpenLetterEditScreenS2CP.STREAM_CODEC),
                 new CustomPacketPayload.TypeAndCodec<>(OpenLetterViewScreenS2CP.TYPE, OpenLetterViewScreenS2CP.STREAM_CODEC),

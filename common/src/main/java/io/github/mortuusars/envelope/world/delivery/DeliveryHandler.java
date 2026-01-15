@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 
@@ -84,10 +85,10 @@ public interface DeliveryHandler {
 
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                delivery.updateMail(mail -> MailService.of(level).deliverMail(delivery.getRecipient(), mail));
+                delivery.updateMail(mail -> new Mail(MailService.of(level).deliverMail(delivery.getRecipient(), mail.getItem())));
             }
             case HANDLING_RETURN -> {
-                delivery.updateMail(mail -> MailService.of(level).deliverMail(delivery.getSender(), mail));
+                delivery.updateMail(mail -> new Mail(MailService.of(level).deliverMail(delivery.getSender(), mail.getItem())));
             }
         }
     }

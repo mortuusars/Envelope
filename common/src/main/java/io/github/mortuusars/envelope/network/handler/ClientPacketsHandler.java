@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.network.handler;
 import io.github.mortuusars.envelope.client.gui.screen.AddressTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.LetterEditScreen;
 import io.github.mortuusars.envelope.client.gui.screen.LetterViewScreen;
-import io.github.mortuusars.envelope.client.gui.screen.PigeonholeAddressTagScreen;
+import io.github.mortuusars.envelope.client.gui.screen.MailboxAddressTagScreen;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterEditScreenS2CP;
@@ -36,10 +36,10 @@ public class ClientPacketsHandler {
         }
     }
 
-    public static void openPigeonholeAddressTagScreen(OpenMailboxAddressTagScreenS2CP packet) {
+    public static void openMailboxAddressTagScreen(OpenMailboxAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
-            Minecrft.get().setScreen(new PigeonholeAddressTagScreen(packet.hand(),
-                    packet.knownAddresses(), packet.pos(), packet.currentAddress(), Component.translatable("gui.envelope.pigeonhole_address_tag.title")));
+            Minecrft.get().setScreen(new MailboxAddressTagScreen(packet.hand(),
+                    packet.knownAddresses(), packet.pos(), packet.currentAddress(), Component.translatable("gui.envelope.mailbox_address_tag.title")));
         }
     }
 }

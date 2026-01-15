@@ -16,6 +16,10 @@ public final class NewMail {
 
     // -- Id
 
+    public static boolean hasId(ItemStack stack) {
+        return stack.has(Envelope.DataComponents.MAIL_ID);
+    }
+
     public static @Nullable Id getId(ItemStack stack) {
         return stack.get(Envelope.DataComponents.MAIL_ID);
     }

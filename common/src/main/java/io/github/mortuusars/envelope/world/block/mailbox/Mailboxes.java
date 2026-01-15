@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -139,9 +138,9 @@ public class Mailboxes {
         return getByAddress(address).map(RegisteredMailbox::getPos);
     }
 
-    public Optional<PigeonholeBlockEntity> getBlockEntityOf(Address.Block address) {
+    public Optional<MailboxBlockEntity> getBlockEntityOf(Address.Block address) {
         return getPositionOf(address)
-              .flatMap(pos -> level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
+              .flatMap(pos -> level.isLoaded(pos) && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                     ? Optional.of(blockEntity)
                     : Optional.empty());
     }

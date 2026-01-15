@@ -2,11 +2,14 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -14,7 +17,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -88,10 +90,43 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
+            MailService.of(serverLevel).mailboxes().remove(pos);
+
+            if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
+                blockEntity.onBlockRemoved(level, pos, state, newState);
+            }
+        }
+
         super.onRemove(state, level, pos, newState, movedByPiston);
+
         if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
             MailService.of(serverLevel).mailboxes().remove(pos);
         }
+    }
+
+    @Override
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (stack.is(Envelope.Tags.Items.MAILABLE)
+              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block recipientAddress
+              && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
+              && blockEntity.getAddress().equals(recipientAddress)) {
+            if (level instanceof ServerLevel serverLevel) {
+                ItemStack mail = stack.split(1);
+                if (!mail.has(Envelope.DataComponents.MAIL_SENDER)) {
+                    mail.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
+                }
+
+                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, mail);
+                if (player.getItemInHand(hand).isEmpty()) {
+                    player.setItemInHand(hand, result.copy());
+                } else if (!player.addItem(result)) {
+                    player.drop(result, false);
+                }
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
@@ -111,13 +146,13 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new MailboxBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+    public <T extends net.minecraft.world.level.block.entity.BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
               ? null
               : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.MAILBOX.get(),

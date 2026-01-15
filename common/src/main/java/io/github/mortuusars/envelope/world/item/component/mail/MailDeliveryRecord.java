@@ -85,8 +85,7 @@ public record MailDeliveryRecord(Status status, Address address, Optional<Long> 
 
         timestamp.ifPresent(time -> {
             component.append(" ");
-            component.append(Component.translatable("gui.envelope.time.past",
-                  GameTime.formatLargest(gameTime - time, false)).withStyle(ChatFormatting.GRAY));
+            component.append(GameTime.formatLargest(gameTime - time, false)).withStyle(ChatFormatting.DARK_GRAY);
         });
 
         return component;
@@ -157,6 +156,7 @@ public record MailDeliveryRecord(Status status, Address address, Optional<Long> 
 
     public interface Message {
         Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery.log.message.recipient_not_found");
+        Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery.log.message.recipient_inbox_is_full");
         Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery.log.message.unable_to_reach");
 
         Component WAITING_FOR_PAYMENT = Component.translatable("gui.envelope.delivery.log.message.waiting_for_payment");

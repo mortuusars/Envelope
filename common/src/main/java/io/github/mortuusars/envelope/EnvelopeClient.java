@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.Nullable;
 
+import javax.management.monitor.CounterMonitor;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -114,6 +115,10 @@ public class EnvelopeClient {
                 consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
                       .append(": ").withStyle(ChatFormatting.GRAY)
                       .append(senderAddress.format().asNeutral().toComponent()));
+                Optional.ofNullable(NewMail.getId(stack)).ifPresent(id -> {
+                    consumer.accept(Component.literal("Id: " + id).withStyle(ChatFormatting.GRAY));
+
+                });
             }
         }
     }

@@ -103,13 +103,14 @@
   "gui.envelope.delivery.log.record.received": " §7Received at",
   "gui.envelope.delivery.log.record.message.by": "§7by %s",
 
-  "gui.envelope.delivery.log.message.recipient_not_found": "§7[Recipient Not Found]",
-  "gui.envelope.delivery.log.message.unable_to_reach": "§7[Unable To Reach]",
-  "gui.envelope.delivery.log.message.waiting_for_payment": "§7[Waiting For Payment]",
-  "gui.envelope.delivery.log.message.payback_subject_not_found": "§7[Payback Subject Not Found]",
-  "gui.envelope.delivery.log.message.payback_fulfilled": "§7[Payback Fulfilled]",
-  "gui.envelope.delivery.log.message.payback_is_not_valid": "§7[Payback Is Not Valid]",
-  "gui.envelope.delivery.log.message.payback_is_timed_out": "§7[Payback Is Timed Out]",
+  "gui.envelope.delivery.log.message.recipient_not_found": "Recipient Not Found",
+  "gui.envelope.delivery.log.message.recipient_inbox_is_full": "Recipient Inbox Is Full",
+  "gui.envelope.delivery.log.message.unable_to_reach": "Unable To Reach",
+  "gui.envelope.delivery.log.message.waiting_for_payment": "Waiting For Payment",
+  "gui.envelope.delivery.log.message.payback_subject_not_found": "Payback Subject Not Found",
+  "gui.envelope.delivery.log.message.payback_fulfilled": "Payback Fulfilled",
+  "gui.envelope.delivery.log.message.payback_is_not_valid": "Payback Is Not Valid",
+  "gui.envelope.delivery.log.message.payback_is_timed_out": "Payback Timed Out",
 
   "gui.envelope.letter.subject": "Subject: ",
 
