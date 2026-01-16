@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
@@ -172,8 +173,12 @@ public class Envelope {
         public static final ResourceKey<PoiType> PIGEONHOLE =
               ResourceKey.create(net.minecraft.core.registries.Registries.POINT_OF_INTEREST_TYPE, resource("pigeonhole"));
 
+        public static final ResourceKey<PoiType> MAILBOX =
+              ResourceKey.create(net.minecraft.core.registries.Registries.POINT_OF_INTEREST_TYPE, resource("mailbox"));
+
         static void init() {
             Register.poiType(PIGEONHOLE, 0, 1, PoiTypes::getPigeonholePoiBlockStates);
+            Register.poiType(MAILBOX, 0, 1, PoiTypes::getMailboxPoiBlockStates);
         }
 
         private static Set<BlockState> getPigeonholePoiBlockStates() {
@@ -182,6 +187,10 @@ public class Envelope {
                   .map(b -> b.getStateDefinition().getPossibleStates())
                   .flatMap(Collection::stream)
                   .collect(Collectors.toSet());
+        }
+
+        private static Set<BlockState> getMailboxPoiBlockStates() {
+            return Set.copyOf(Blocks.MAILBOX.get().getStateDefinition().getPossibleStates());
         }
     }
 

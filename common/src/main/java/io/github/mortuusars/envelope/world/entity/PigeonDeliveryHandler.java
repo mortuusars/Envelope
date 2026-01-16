@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.entity;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
@@ -72,9 +73,10 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
             pigeon().discard();
         } else {
             pigeon().setOrigin(null);
-            pigeon().getPigeonholeHandler().setCurrentPos(pigeon().getPigeonholeHandler().getLastReleasePos());
+            pigeon().getPigeonholeHandler().setTargetPos(pigeon().getPigeonholeHandler().getLastReleasePos());
             // Prevent Pigeon entering Pigeonhole immediately:
-            pigeon().getPigeonholeHandler().setWantCooldown(40);
+            pigeon().getPigeonholeHandler().setWantCooldown(20);
+            pigeon().setTiredTicks(Config.Server.PIGEON_TIRED_AFTER_DELIVERY_TICKS.get());
         }
     }
 

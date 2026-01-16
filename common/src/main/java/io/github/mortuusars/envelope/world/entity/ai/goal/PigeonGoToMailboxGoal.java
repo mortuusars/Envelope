@@ -1,43 +1,43 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
+import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.pathfinder.Path;
 import org.jetbrains.annotations.Nullable;
 
-public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
+public class PigeonGoToMailboxGoal extends AbstractGoToBlockGoal {
     @Nullable
     protected Path lastPath;
 
-    public PigeonGoToPigeonholeGoal(Pigeon pigeon) {
+    public PigeonGoToMailboxGoal(Pigeon pigeon) {
         super(pigeon);
     }
 
     @Override
     public @Nullable BlockPos getBlockPos() {
-        return pigeon.getPigeonholeHandler().getTargetPos();
+        return pigeon.getMailboxHandler().getTargetPos();
     }
 
     @Override
     public boolean canUse() {
-        return super.canUse()
-              && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon)
-              && pigeon.level().getBlockState(pigeon.getPigeonholeHandler().getTargetPos()).is(Envelope.Tags.Blocks.PIGEONHOLES)
-              && !Position.isFireNearby(pigeon.level(), pigeon.getPigeonholeHandler().getTargetPos());
+        return !pigeon.isDelivering()
+              && super.canUse()
+              && !pigeon.isTired()
+              && pigeon.level().getBlockEntity(getBlockPos()) instanceof MailboxBlockEntity blockEntity
+              && blockEntity.isAvailableForPickup();
     }
 
     @Override
     public void tick() {
-        PigeonholeHandler handler = pigeon.getPigeonholeHandler();
+        MailboxHandler handler = pigeon.getMailboxHandler();
 
         if (handler.getTargetPos() == null) return;
 
         travellingTicks++;
         if (travellingTicks > adjustedTickDelay(MAX_TRAVELLING_TICKS)) {
-            handler.dropAndBlacklistPigeonhole();
+            handler.dropAndBlacklistMailbox();
             return;
         }
 
@@ -47,18 +47,18 @@ public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
 
         if (!pigeon.closerThan(handler.getTargetPos(), 16)) {
             if (!pigeon.blockPosition().closerThan(handler.getTargetPos(), 32)) {
-                handler.dropPigeonhole();
+                handler.dropMailbox();
             } else {
                 pigeon.pathfindRandomlyTowards(handler.getTargetPos());
             }
         } else {
             boolean canReach = pigeon.pathfindDirectlyTowards(handler.getTargetPos());
             if (!canReach) {
-                handler.dropAndBlacklistPigeonhole();
+                handler.dropAndBlacklistMailbox();
             } else if (lastPath != null && lastPath.sameAs(pigeon.getNavigation().getPath())) {
                 ticksStuck++;
                 if (ticksStuck > TICKS_BEFORE_DROP) {
-                    handler.dropPigeonhole();
+                    handler.dropMailbox();
                     ticksStuck = 0;
                 }
             } else {

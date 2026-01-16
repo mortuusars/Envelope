@@ -12,7 +12,6 @@ import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PigeonLocatePigeonholeGoal extends Goal {
     protected final Pigeon pigeon;
@@ -24,8 +23,8 @@ public class PigeonLocatePigeonholeGoal extends Goal {
     @Override
     public boolean canUse() {
         return pigeon.getPigeonholeHandler().getLocateCooldown() == 0
-                && pigeon.getPigeonholeHandler().getCurrentPos() == null
-                && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon.level());
+              && pigeon.getPigeonholeHandler().getTargetPos() == null
+              && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon);
     }
 
     @Override
@@ -40,24 +39,25 @@ public class PigeonLocatePigeonholeGoal extends Goal {
         if (!pigeonholes.isEmpty()) {
             for (BlockPos pos : pigeonholes) {
                 if (!pigeon.getPigeonholeHandler().isTargetBlacklisted(pos)) {
-                    pigeon.getPigeonholeHandler().setCurrentPos(pos);
+                    pigeon.getPigeonholeHandler().setTargetPos(pos);
                     return;
                 }
             }
 
             pigeon.getPigeonholeHandler().clearBlacklist();
-            pigeon.getPigeonholeHandler().setCurrentPos(pigeonholes.getFirst());
+            pigeon.getPigeonholeHandler().setTargetPos(pigeonholes.getFirst());
         }
     }
 
     private List<BlockPos> findNearbyPigeonholesWithSpace() {
         BlockPos pos = pigeon.blockPosition();
         PoiManager poiManager = ((ServerLevel) pigeon.level()).getPoiManager();
-        Stream<PoiRecord> stream = poiManager.getInRange(holder ->
-                holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 20, PoiManager.Occupancy.ANY);
-        return stream.map(PoiRecord::getPos)
-                .filter(p -> pigeon.level().getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole && pigeonhole.hasSpaceForAnotherOccupant())
-                .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
-                .collect(Collectors.toList());
+        return poiManager.getInRange(holder ->
+                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 20, PoiManager.Occupancy.ANY)
+              .map(PoiRecord::getPos)
+              .filter(p -> pigeon.level().getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole
+                    && pigeonhole.hasSpaceForAnotherOccupant())
+              .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
+              .collect(Collectors.toList());
     }
 }

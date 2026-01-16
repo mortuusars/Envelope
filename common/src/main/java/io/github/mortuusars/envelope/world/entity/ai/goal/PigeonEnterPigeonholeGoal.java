@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
@@ -19,17 +20,18 @@ public class PigeonEnterPigeonholeGoal extends Goal {
             return false;
         }
 
-        @Nullable BlockPos pos = pigeon.getPigeonholeHandler().getCurrentPos();
+        @Nullable BlockPos pos = pigeon.getPigeonholeHandler().getTargetPos();
 
         if (pos != null
-              && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon.level())
+              && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon)
               && pos.closerToCenterThan(pigeon.position(), 2.0)
+              && !Position.isFireNearby(pigeon.level(), pos)
               && pigeon.level().getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
             if (blockEntity.hasSpaceForAnotherOccupant()) {
                 return true;
             }
 
-            pigeon.getPigeonholeHandler().setCurrentPos(null);
+            pigeon.getPigeonholeHandler().setTargetPos(null);
         }
 
         return false;

@@ -3,9 +3,12 @@ package io.github.mortuusars.envelope.world.entity.ai;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
-import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +21,7 @@ public class PigeonholeHandler {
     public static final int DEFAULT_LOCATE_COOLDOWN = 200;
 
     public static final Codec<PigeonholeHandler> CODEC = RecordCodecBuilder.create(i -> i.group(
-          BlockPos.CODEC.optionalFieldOf("current_pos").forGetter(o -> Optional.ofNullable(o.getCurrentPos())),
+          BlockPos.CODEC.optionalFieldOf("current_pos").forGetter(o -> Optional.ofNullable(o.getTargetPos())),
           BlockPos.CODEC.optionalFieldOf("last_release_pos").forGetter(o -> Optional.ofNullable(o.getLastReleasePos())),
           Codec.INT.optionalFieldOf("locate_cooldown", 0).forGetter(PigeonholeHandler::getLocateCooldown),
           Codec.INT.optionalFieldOf("want_cooldown", 0).forGetter(PigeonholeHandler::getWantCooldown),
@@ -27,15 +30,15 @@ public class PigeonholeHandler {
 
     protected final List<BlockPos> blacklistedPositions = new ArrayList<>();
 
-    protected @Nullable BlockPos currentPos;
+    protected @Nullable BlockPos targetPos;
     protected @Nullable BlockPos lastReleasePos;
     protected int locateCooldown;
     protected int wantCooldown;
     protected int enterCooldown;
 
-    public PigeonholeHandler(Optional<BlockPos> currentPos, Optional<BlockPos> lastReleasePos,
+    public PigeonholeHandler(Optional<BlockPos> targetPos, Optional<BlockPos> lastReleasePos,
                              int locateCooldown, int wantCooldown, int enterCooldown) {
-        this.currentPos = currentPos.orElse(null);
+        this.targetPos = targetPos.orElse(null);
         this.lastReleasePos = lastReleasePos.orElse(null);
         this.locateCooldown = locateCooldown;
         this.wantCooldown = wantCooldown;
@@ -46,12 +49,12 @@ public class PigeonholeHandler {
         this(Optional.empty(), Optional.empty(), 0, 0, 0);
     }
 
-    public @Nullable BlockPos getCurrentPos() {
-        return currentPos;
+    public @Nullable BlockPos getTargetPos() {
+        return targetPos;
     }
 
-    public void setCurrentPos(@Nullable BlockPos currentPos) {
-        this.currentPos = currentPos;
+    public void setTargetPos(@Nullable BlockPos targetPos) {
+        this.targetPos = targetPos;
     }
 
     public @Nullable BlockPos getLastReleasePos() {
@@ -80,7 +83,11 @@ public class PigeonholeHandler {
     }
 
     public void setDefaultWantCooldown() {
-        wantCooldown = Config.Server.PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE.get();
+        setWantCooldown(Config.Server.PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE.get());
+    }
+
+    public void setRandomWantCooldownUpToDefault(RandomSource random) {
+        setWantCooldown(random.nextInt(Config.Server.PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE.get()));
     }
 
     public int getLocateCooldown() {
@@ -97,40 +104,42 @@ public class PigeonholeHandler {
 
     // --
 
-    public void tick(Level level) {
+    public void tick(Pigeon pigeon, Level level) {
         if (wantCooldown > 0) {
             wantCooldown--;
         }
         if (locateCooldown > 0) {
             locateCooldown--;
         }
+
+        if (level instanceof ServerLevel && pigeon.tickCount % 20 == 0) {
+            if (!isPigeonholeValid(level, pigeon.blockPosition())) {
+                setTargetPos(null);
+            }
+            Bugger.PIGEON_PIGEONHOLE_HANDLER.send(pigeon.getId(), this);
+        }
     }
 
     // --
 
     public Optional<PigeonholeBlockEntity> getPigeonholeAtCurrentPos(Level level) {
-        @Nullable BlockPos pos = getCurrentPos();
+        @Nullable BlockPos pos = getTargetPos();
         if (pos != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
             return Optional.of(be);
         }
         return Optional.empty();
     }
 
-    public boolean wantsToEnterPigeonhole(Level level) {
+    public boolean wantsToEnterPigeonhole(Pigeon pigeon) {
         if (getEnterCooldown() > 0) return false;
+        Level level = pigeon.level();
         boolean wouldHateToBeOutside = level.isNight() || level.isRaining() || level.isThundering();
-        boolean tiredOfOutside = getWantCooldown() <= 0;
-        return (wouldHateToBeOutside || tiredOfOutside) && !isPigeonholeNearFire(level);
-    }
-
-    protected boolean isPigeonholeNearFire(Level level) {
-        return getPigeonholeAtCurrentPos(level)
-              .map(blockEntity -> Position.isFireNearby(level, blockEntity.getBlockPos()))
-              .orElse(false);
+        boolean tiredOfOutside = pigeon.isTired() || getWantCooldown() <= 0;
+        return (wouldHateToBeOutside || tiredOfOutside);
     }
 
     public boolean isPigeonholeValid(Level level, BlockPos entityPos) {
-        @Nullable BlockPos currentPos = getCurrentPos();
+        @Nullable BlockPos currentPos = getTargetPos();
         if (currentPos == null) return false;
         if (!entityPos.closerThan(currentPos, 32)) return false;
         return level.getBlockEntity(currentPos) instanceof PigeonholeBlockEntity;
@@ -153,22 +162,22 @@ public class PigeonholeHandler {
     }
 
     public void dropAndBlacklistPigeonhole() {
-        if (getCurrentPos() != null) {
-            blacklistTarget(getCurrentPos());
+        if (getTargetPos() != null) {
+            blacklistTarget(getTargetPos());
         }
 
         dropPigeonhole();
     }
 
     public void dropPigeonhole() {
-        setCurrentPos(null);
+        setTargetPos(null);
         resetLocateCooldown();
     }
 
     @Override
     public String toString() {
         return "PigeonholeHandler{" +
-              "currentPos=" + currentPos +
+              "currentPos=" + targetPos +
               ", lastReleasePos=" + lastReleasePos +
               ", locateCooldown=" + locateCooldown +
               ", wantCooldown=" + wantCooldown +

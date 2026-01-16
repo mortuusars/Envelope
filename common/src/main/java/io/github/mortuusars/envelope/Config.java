@@ -14,6 +14,7 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_SPAWNS_IN_VILLAGE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE;
+        public static final ModConfigSpec.IntValue PIGEON_TIRED_AFTER_DELIVERY_TICKS;
 
         // Pigeonhole
         public static final ModConfigSpec.BooleanValue PIGEONHOLE_DISPENSER_WASTE_SCOOPING;
@@ -40,19 +41,22 @@ public abstract class Config {
             {
                 builder.push("pigeon");
                 PIGEON_SPAWNS_NATURALLY = builder
-                      .comment("Pigeon can spawn naturally in '#envelope:allows_pigeon_spawns' biomes.",
+                      .comment("Pigeons can spawn naturally in '#envelope:allows_pigeon_spawns' biomes.",
                             " Default: true")
                       .define("spawns_naturally", true);
                 PIGEON_SPAWNS_IN_VILLAGE = builder
-                      .comment("Pigeon can spawn in the village (similar to Cats).",
+                      .comment("Pigeons can spawn in the village (similar to Cats).",
                             " Default: true")
                       .define("spawns_in_village", true);
                 PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE = builder
-                      .comment("Minimum time (in ticks) that a Pigeon will be sitting in the Pigeonhole after entering.")
-                      .defineInRange("min_ticks_inside_pigeonhole", 600, 1, Integer.MAX_VALUE);
+                      .comment("Minimum time (in ticks) that Pigeon will be sitting in a Pigeonhole after entering.")
+                      .defineInRange("min_ticks_inside_pigeonhole", 1200, 1, Integer.MAX_VALUE);
                 PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE = builder
-                      .comment("Minimum time (in ticks) that a Pigeon will spend outside of a Pigeonhole.")
-                      .defineInRange("min_ticks_outside_pigeonhole", 1200, 100, Integer.MAX_VALUE);
+                      .comment("Minimum time (in ticks) that Pigeon will spend outside of a Pigeonhole.")
+                      .defineInRange("min_ticks_outside_pigeonhole", 2400, 100, Integer.MAX_VALUE);
+                PIGEON_TIRED_AFTER_DELIVERY_TICKS = builder
+                      .comment("Time (in ticks) for which Pigeon will be tired after finishing a delivery.")
+                      .defineInRange("ticks_tired_after_delivery", 6000, 0, Integer.MAX_VALUE);
                 builder.pop();
             }
 

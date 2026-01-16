@@ -7,14 +7,18 @@ import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.component.NewMail;
+import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -37,6 +41,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -193,6 +198,11 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         return !stack.isEmpty() && stack.is(Envelope.Tags.Items.MAILABLE) && stack.has(Envelope.DataComponents.MAIL_RECIPIENT);
     }
 
+    public boolean isAvailableForPickup() {
+        if (level == null) return false;
+        return !getItem(SLOT_FOOD).isEmpty() && isSendable(getItem(SLOT_MAIL));
+    }
+
     @Override
     protected @NotNull AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
         applyAddress();
@@ -302,7 +312,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (!isRemoved() && level instanceof ServerLevel serverLevel) {
             BlockState state = getBlockState();
             boolean isOpen = state.getValue(MailboxBlock.OPEN);
-            boolean shouldBeOpen = !getItem(SLOT_FOOD).isEmpty() && isSendable(getItem(SLOT_MAIL));
+            boolean shouldBeOpen = isAvailableForPickup();
             if (isOpen != shouldBeOpen) {
                 serverLevel.setBlockAndUpdate(getBlockPos(), state.setValue(MailboxBlock.OPEN, shouldBeOpen));
                 playSound(shouldBeOpen ? SoundEvents.CHERRY_WOOD_TRAPDOOR_OPEN : SoundEvents.CHERRY_WOOD_TRAPDOOR_CLOSE,
@@ -349,5 +359,36 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (level != null) {
             level.playSound(null, getBlockPos(), soundEvent, SoundSource.BLOCKS, volume, pitch);
         }
+    }
+
+    public boolean tryStartDelivery(Pigeon pigeon) {
+        ServerLevel level = ((ServerLevel) pigeon.level());
+
+        if (pigeon.isDelivering()) return false;
+        ItemStack mailStack = getItem(SLOT_MAIL);
+        if (!isSendable(mailStack)) return false;
+
+        applyAddress();
+
+        mailStack = mailStack.copyWithCount(1);
+
+        return MailService.of(level).getDeliveryManager()
+              .start(pigeon, Delivery.builder()
+                    .deliver(new Mail(mailStack))
+                    .from(getAddress())
+                    .to(NewMail.getRecipient(mailStack))
+                    .owner(getOwner()))
+              .getValue()
+              .map(delivery -> {
+                  removeItem(SLOT_MAIL, 1);
+                  removeItem(SLOT_FOOD, 1);
+
+                  Vec3 pos = pigeon.position();
+                  level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
+                  level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
+
+                  return true;
+              })
+              .orElse(false);
     }
 }

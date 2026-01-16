@@ -81,6 +81,20 @@ public class MailboxBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
+              && !blockEntity.getAllMail().isEmpty()) {
+            return 15;
+        }
+        return 0;
+    }
+
+    @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (placer != null && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {

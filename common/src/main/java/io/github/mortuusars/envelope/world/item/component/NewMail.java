@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.MailStatus;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.UnaryOperator;
@@ -76,7 +77,11 @@ public final class NewMail {
 
     // --
 
-    public static Address getSender(ItemStack stack) {
+    public static @NotNull Address getSender(ItemStack stack) {
         return stack.getOrDefault(Envelope.DataComponents.MAIL_SENDER, Address.UNKNOWN);
+    }
+
+    public static @NotNull Address getRecipient(ItemStack stack) {
+        return stack.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
     }
 }

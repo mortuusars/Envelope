@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.util.bugger.data.NbtData;
 import io.github.mortuusars.envelope.util.bugger_data.MailServiceBuggerData;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import org.slf4j.Logger;
 
@@ -34,6 +35,14 @@ public class Bugger {
                 .handle(((entity, handler) -> {
                     if (entity instanceof Pigeon pigeon) {
                         pigeon.setPigeonholeHandler(handler);
+                    }
+                }));
+
+    public static final EntityData<MailboxHandler> PIGEON_MAILBOX_HANDLER =
+          new EntityData<>(Envelope.resource("pigeon_mailbox_handler"), MailboxHandler.CODEC)
+                .handle(((entity, handler) -> {
+                    if (entity instanceof Pigeon pigeon) {
+                        pigeon.setMailboxHandler(handler);
                     }
                 }));
 

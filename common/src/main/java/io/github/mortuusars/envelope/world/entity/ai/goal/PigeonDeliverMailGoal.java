@@ -1,8 +1,10 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.EnumSet;
 
@@ -46,16 +48,24 @@ public class PigeonDeliverMailGoal extends Goal {
 
             delivery.getRoute().getSegment(delivery.getPhase()).endPos()
                   .ifPresent(pos -> {
-                      if ((delivery.getPhase().isAscending() || delivery.getPhase().isDescending())
-                            && pigeon.hasReachedTarget(pos)) {
-                          delivery.setPhaseProgress(pigeon().getDeliveryHandler().getPhaseDuration(level, delivery, delivery.getPhase()));
-                      } else if (!pigeon.getNavigation().isInProgress() || !pos.equals(pigeon.getNavigation().getTargetPos())) {
-                          if (!pigeon.pathfindDirectlyTowards(pos)) {
-                              pigeon.pathfindRandomlyTowards(pos);
+                      if (delivery.getPhase().isDescending()) {
+                          BlockState state = level.getBlockState(pos);
+                          if (state.getBlock() instanceof MailboxBlock) {
+                              pos.relative(state.getValue(MailboxBlock.FACING));
                           }
                       }
-                  });
-            //TODO: orElse -> moveToRandomPos to simulate confusion
+
+                      if ((delivery.getPhase().isAscending() || delivery.getPhase().isDescending())
+                            && pigeon.hasReachedTarget(pos)) {
+                          // Complete the phase instantly
+                          delivery.setPhaseProgress(pigeon().getDeliveryHandler().getPhaseDuration(level, delivery, delivery.getPhase()));
+                          return;
+                      }
+
+                      if (!pigeon.getNavigation().isInProgress() || !pos.equals(pigeon.getNavigation().getTargetPos())) {
+                          pigeon.pathfindDirectlyTowards(pos);
+                      }
+                  }); //TODO: orElse -> moveToRandomPos to simulate confusion that it doesn't know where to go
         });
     }
 }

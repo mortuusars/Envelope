@@ -55,14 +55,14 @@ public class DeliveryManager {
     }
 
     protected Result<StartedDelivery> tryStart(Delivery delivery, Function<Delivery, Courier> courier) {
-        if (delivery.getRecipient().matches(Address.UNKNOWN)) {
-            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
-            return Result.error(ERROR_RECIPIENT_UNKNOWN);
-        }
-        if (delivery.getSender().matches(delivery.getRecipient())) {
-            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
-            return Result.error(ERROR_SAME_ADDRESSES);
-        }
+//        if (delivery.getSender().matches(Address.UNKNOWN) && delivery.getRecipient().matches(Address.UNKNOWN)) {
+//            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
+//            return Result.error(ERROR_RECIPIENT_UNKNOWN);
+//        }
+//        if (delivery.getSender().matches(delivery.getRecipient())) {
+//            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
+//            return Result.error(ERROR_SAME_ADDRESSES);
+//        }
         if (delivery.getPhase() == DeliveryPhase.STARTED && delivery.getMail().isEmpty()) {
             LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_NO_MAIL.getMessage(), delivery);
             return Result.error(ERROR_NO_MAIL);

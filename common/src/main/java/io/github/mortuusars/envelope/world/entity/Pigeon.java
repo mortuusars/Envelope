@@ -8,12 +8,13 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.delivery.*;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
+import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.mail.Mail;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -94,6 +95,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     private static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_TIRED = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
 
     public float flap;
     public float flapSpeed;
@@ -101,8 +103,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public float oFlap;
     protected float flapping = 1.0F;
     protected float nextFlap = 1.0F;
+    protected int tiredTicks;
 
     protected PigeonholeHandler pigeonholeHandler;
+    protected MailboxHandler mailboxHandler;
     protected PigeonDeliveryHandler deliveryHandler;
     protected PigeonDeliverMailGoal deliverMailGoal;
 
@@ -113,7 +117,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super(entityType, level);
         moveControl = new FlyingMoveControl(this, 10, false);
         pigeonholeHandler = new PigeonholeHandler();
-        pigeonholeHandler.setDefaultWantCooldown();
+        pigeonholeHandler.setRandomWantCooldownUpToDefault(level.getRandom());
+        mailboxHandler = new MailboxHandler();
         deliveryHandler = new PigeonDeliveryHandler(this);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
@@ -154,10 +159,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
               .orElseGet(() -> pigeon.transitionToBackground(level));
     }
 
-    @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                        MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+                                                 MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         setVariant(Variant.getRandom(random));
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
@@ -179,12 +183,15 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         deliverMailGoal = new PigeonDeliverMailGoal(this);
         goalSelector.addGoal(0, deliverMailGoal);
         goalSelector.addGoal(1, new PigeonEnterPigeonholeGoal(this));
+        goalSelector.addGoal(1, new PigeonStartDeliveryFromMailboxGoal(this));
         goalSelector.addGoal(2, new BreedGoal(this, 1.0));
         goalSelector.addGoal(3, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
         goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(5, new FollowParentGoal(this, 1.25));
         goalSelector.addGoal(5, new PigeonLocatePigeonholeGoal(this));
         goalSelector.addGoal(5, new PigeonGoToPigeonholeGoal(this));
+        goalSelector.addGoal(5, new PigeonLocateMailboxGoal(this));
+        goalSelector.addGoal(5, new PigeonGoToMailboxGoal(this));
         goalSelector.addGoal(6, new PigeonWanderGoal(this));
         goalSelector.addGoal(7, new FloatGoal(this));
     }
@@ -203,14 +210,15 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.aiStep();
         this.calculateFlapping();
 
-        getPigeonholeHandler().tick(level());
-
-        if (level() instanceof ServerLevel && tickCount % 20 == 0) {
-            if (!getPigeonholeHandler().isPigeonholeValid(level(), blockPosition())) {
-                getPigeonholeHandler().setCurrentPos(null);
+        if (tiredTicks > 0) {
+            setTiredTicks(tiredTicks - 1);
+            if (level() instanceof ServerLevel serverLevel && level().getRandom().nextFloat() < 0.1) {
+                serverLevel.sendParticles(ParticleTypes.SMOKE, position().x, position().y, position().z, 1, 0.2, 0.2, 0.2, 0);
             }
-            Bugger.PIGEON_PIGEONHOLE_HANDLER.send(getId(), getPigeonholeHandler());
         }
+
+        getPigeonholeHandler().tick(this, level());
+        getMailboxHandler().tick(this, level());
     }
 
     @Override
@@ -321,6 +329,18 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         entityData.set(DATA_HAS_MAIL, hasMail);
     }
 
+    public boolean isTired() {
+        if (!level().isClientSide) {
+            return tiredTicks > 0;
+        }
+        return entityData.get(DATA_TIRED);
+    }
+
+    public void setTiredTicks(int ticks) {
+        tiredTicks = ticks;
+        entityData.set(DATA_TIRED, tiredTicks > 0);
+    }
+
     public boolean hasFancyHat() {
         //TODO: supporters
         // return getOwnerUUID()
@@ -342,6 +362,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         builder.define(DATA_SITTING, false);
         builder.define(DATA_DELIVERING, false);
         builder.define(DATA_HAS_MAIL, false);
+        builder.define(DATA_TIRED, false);
     }
 
     @Nullable
@@ -397,26 +418,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         return pos.closerThan(blockPosition(), distance);
     }
 
-    // -- Pigeonhole
-
-    public @NotNull PigeonholeHandler getPigeonholeHandler() {
-        return pigeonholeHandler;
-    }
-
-    public void setPigeonholeHandler(PigeonholeHandler handler) {
-        this.pigeonholeHandler = handler;
-    }
-
-    public void releasedFromPigeonhole(BlockPos pos, BlockState state, Occupiable.ReleaseReason releaseReason) {
-        getPigeonholeHandler().setCurrentPos(pos);
-        getPigeonholeHandler().setLastReleasePos(pos);
-        getPigeonholeHandler().setDefaultWantCooldown();
-
-        if (releaseReason == Occupiable.ReleaseReason.EMERGENCY) {
-            getPigeonholeHandler().setEnterCooldown(200);
-        }
-    }
-
     public boolean pathfindDirectlyTowards(BlockPos pos) {
         getNavigation().setMaxVisitedNodesMultiplier(10.0F);
         getNavigation().moveTo(pos.getX(), pos.getY(), pos.getZ(), 2, 1);
@@ -447,6 +448,46 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             this.navigation.setMaxVisitedNodesMultiplier(1.0F);
             this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1);
         }
+    }
+
+    // -- Pigeonhole
+
+    public @NotNull PigeonholeHandler getPigeonholeHandler() {
+        return pigeonholeHandler;
+    }
+
+    public void setPigeonholeHandler(PigeonholeHandler handler) {
+        this.pigeonholeHandler = handler;
+    }
+
+    public void releasedFromPigeonhole(BlockPos pos, BlockState state, Occupiable.ReleaseReason releaseReason) {
+        getPigeonholeHandler().setTargetPos(pos);
+        getPigeonholeHandler().setLastReleasePos(pos);
+        getPigeonholeHandler().setDefaultWantCooldown();
+
+        if (releaseReason == Occupiable.ReleaseReason.EMERGENCY) {
+            getPigeonholeHandler().setEnterCooldown(200);
+        }
+
+        getMailboxHandler().setLocateCooldown(level().getRandom().nextInt(20, MailboxHandler.DEFAULT_LOCATE_COOLDOWN));
+
+        if (isTired()) {
+            setTiredTicks(0);
+            if (level() instanceof ServerLevel level) {
+                level.sendParticles(ParticleTypes.HAPPY_VILLAGER, position().x, position().y, position().z, 5, 0.25, 0.25, 0.25, 0);
+            }
+        }
+    }
+
+    // -- Mailbox
+
+    public MailboxHandler getMailboxHandler() {
+        return mailboxHandler;
+    }
+
+    public Pigeon setMailboxHandler(MailboxHandler mailboxHandler) {
+        this.mailboxHandler = mailboxHandler;
+        return this;
     }
 
     // -- Sound
@@ -575,8 +616,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, tag).getOrThrow());
+        tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, tag).getOrThrow());
         tag.putInt("Variant", getVariant().id);
         tag.putBoolean("Sitting", isSitting());
+        if (tiredTicks > 0) tag.putInt("TiredTicks", tiredTicks);
 
         if (delivery != null) {
             Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
@@ -594,8 +637,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         setPigeonholeHandler(PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler")).getOrThrow());
+        setMailboxHandler(MailboxHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("MailboxHandler")).getOrThrow());
         setVariant(Variant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
+        setTiredTicks(tag.getInt("TiredTicks"));
 
         if (tag.contains("Delivery")) {
             setDelivery(Delivery.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.getCompound("Delivery"))

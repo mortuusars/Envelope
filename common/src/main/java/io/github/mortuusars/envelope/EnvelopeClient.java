@@ -115,11 +115,10 @@ public class EnvelopeClient {
                 consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
                       .append(": ").withStyle(ChatFormatting.GRAY)
                       .append(senderAddress.format().asNeutral().toComponent()));
-                Optional.ofNullable(NewMail.getId(stack)).ifPresent(id -> {
-                    consumer.accept(Component.literal("Id: " + id).withStyle(ChatFormatting.GRAY));
-
-                });
             }
+            Optional.ofNullable(NewMail.getId(stack)).ifPresent(id -> {
+                consumer.accept(Component.literal("Id: " + id).withStyle(ChatFormatting.GRAY));
+            });
         }
     }
 }
