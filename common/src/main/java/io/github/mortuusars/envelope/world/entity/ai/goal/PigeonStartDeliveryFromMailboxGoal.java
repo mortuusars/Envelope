@@ -15,7 +15,7 @@ public class PigeonStartDeliveryFromMailboxGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (pigeon.isDelivering()) {
+        if (pigeon.isDelivering() || !pigeon.canStartDelivery()) {
             return false;
         }
 

@@ -28,9 +28,9 @@ public class PigeonLocateMailboxGoal extends Goal {
     @Override
     public boolean canUse() {
         return !pigeon.isDelivering()
+              && pigeon.canStartDelivery()
               && pigeon.getMailboxHandler().getLocateCooldown() <= 0
               && pigeon.getMailboxHandler().getTargetPos() == null
-              && !pigeon.isTired()
               && pigeon.level().getRandom().nextFloat() < 0.05;
     }
 

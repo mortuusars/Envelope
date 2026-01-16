@@ -560,6 +560,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         return deliveryHandler;
     }
 
+    public boolean canStartDelivery() {
+        return !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
+    }
+
     public Courier startDelivery(Delivery delivery) {
         if (this.delivery != null && this.delivery != delivery) {
             LOGGER.warn("Starting new delivery when pigeon is already delivering. This might be an error.");

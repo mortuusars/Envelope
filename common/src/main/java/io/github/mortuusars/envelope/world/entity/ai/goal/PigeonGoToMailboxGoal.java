@@ -23,8 +23,8 @@ public class PigeonGoToMailboxGoal extends AbstractGoToBlockGoal {
     @Override
     public boolean canUse() {
         return !pigeon.isDelivering()
+              && pigeon.canStartDelivery()
               && super.canUse()
-              && !pigeon.isTired()
               && pigeon.level().getBlockEntity(getBlockPos()) instanceof MailboxBlockEntity blockEntity
               && blockEntity.isAvailableForPickup();
     }

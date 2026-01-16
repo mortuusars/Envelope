@@ -17,7 +17,11 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue PIGEON_TIRED_AFTER_DELIVERY_TICKS;
 
         // Pigeonhole
+        public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
+        public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE_AFTER_DELIVERY;
         public static final ModConfigSpec.BooleanValue PIGEONHOLE_DISPENSER_WASTE_SCOOPING;
+
+        // Mailbox
         public static final ModConfigSpec.IntValue MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST;
 
         // Letter
@@ -62,6 +66,12 @@ public abstract class Config {
 
             {
                 builder.push("pigeonhole");
+                PIGEONHOLE_WASTE_INCREASE_CHANCE = builder
+                      .comment("Chance of waste level increasing when pigeon exits the block.")
+                      .defineInRange("waste_level_increase_chance", 0.2, 0.0, 1.0);
+                PIGEONHOLE_WASTE_INCREASE_CHANCE_AFTER_DELIVERY = builder
+                      .comment("Chance of waste level increasing when pigeon exits the block, if it was tired (finished a delivery before resting in a Pigeonhole).")
+                      .defineInRange("waste_level_increase_chance_after_delivery", 1.0, 0.0, 1.0);
                 PIGEONHOLE_DISPENSER_WASTE_SCOOPING = builder
                       .comment("Waste from Pigeonhole can be scooped with dispenser that has a shovel (#envelope:waste_scoopable).",
                             " Default: true.")

@@ -72,6 +72,10 @@ public class MailboxHandler {
         }
     }
 
+    public boolean canStartDelivery(Pigeon pigeon) {
+        return !pigeon.isTired();
+    }
+
     // --
 
     public Optional<MailboxBlockEntity> getMailboxAtCurrentPos(Level level) {

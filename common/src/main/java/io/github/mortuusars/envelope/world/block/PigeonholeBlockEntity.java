@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.block;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.PigeonOccupiable;
@@ -57,8 +58,8 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
     public void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
         if (reason == ReleaseReason.EMERGENCY) return;
 
-        float wasteChance = getWasteIncreaseChanceOnRelease(entity);
-        if (getBlockState().getBlock() instanceof PigeonholeBlock block && level.random.nextFloat() < wasteChance) {
+        double wasteChance = getWasteIncreaseChanceOnRelease(entity);
+        if (getBlockState().getBlock() instanceof PigeonholeBlock block && level.random.nextDouble() < wasteChance) {
             block.addWaste(level, getBlockPos(), getBlockState());
             setChanged();
         }
@@ -68,13 +69,15 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
         }
     }
 
+    protected double getWasteIncreaseChanceOnRelease(Entity releasedEntity) {
+        return releasedEntity instanceof Pigeon pigeon && pigeon.isTired()
+              ? Config.Server.PIGEONHOLE_WASTE_INCREASE_CHANCE_AFTER_DELIVERY.get()
+              : Config.Server.PIGEONHOLE_WASTE_INCREASE_CHANCE.get();
+    }
+
     @Override
     public void onOccupantsChanged() {
         setChanged();
-    }
-
-    protected float getWasteIncreaseChanceOnRelease(Entity releasedEntity) {
-        return releasedEntity instanceof Pigeon pigeon && pigeon.isTired() ? 1f : 0.2f;
     }
 
     // -- Component
