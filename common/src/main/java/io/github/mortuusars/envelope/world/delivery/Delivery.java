@@ -5,10 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
-import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ public class Delivery {
           Address.CODEC.fieldOf("sender").forGetter(Delivery::getSender),
           Address.CODEC.fieldOf("recipient").forGetter(Delivery::getRecipient),
           DeliveryMetadata.CODEC.optionalFieldOf("metadata", DeliveryMetadata.EMPTY).forGetter(Delivery::getMetadata),
-          Mail.CODEC.optionalFieldOf("mail", Mail.EMPTY).forGetter(Delivery::getMail),
+          ItemStack.OPTIONAL_CODEC.optionalFieldOf("mail", ItemStack.EMPTY).forGetter(Delivery::getMail),
           DeliveryRoute.CODEC.optionalFieldOf("route", DeliveryRoute.EMPTY).forGetter(Delivery::getRoute),
           DeliveryPhase.CODEC.optionalFieldOf("phase", DeliveryPhase.STARTED).forGetter(Delivery::getPhase),
           Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("phase_progress", 0).forGetter(Delivery::getPhaseProgress),
@@ -33,13 +33,13 @@ public class Delivery {
     private final Address sender;
     private final Address recipient;
     private DeliveryMetadata metadata;
-    private Mail mail;
+    private ItemStack mail;
     private DeliveryRoute route;
     private DeliveryPhase phase;
     private int phaseProgress;
     private boolean ended;
 
-    public Delivery(Address sender, Address recipient, DeliveryMetadata metadata, Mail mail,
+    public Delivery(Address sender, Address recipient, DeliveryMetadata metadata, ItemStack mail,
                     DeliveryRoute route, DeliveryPhase phase, int phaseProgress, boolean ended) {
         this.sender = sender;
         this.recipient = recipient;
@@ -79,17 +79,13 @@ public class Delivery {
         return this;
     }
 
-    public Mail getMail() {
+    public ItemStack getMail() {
         return mail;
     }
 
-    public Delivery setMail(Mail mail) {
+    public Delivery setMail(ItemStack mail) {
         this.mail = mail;
         return this;
-    }
-
-    public void updateMail(UnaryOperator<Mail> updater) {
-        setMail(updater.apply(getMail()));
     }
 
     public DeliveryRoute getRoute() {
@@ -165,10 +161,10 @@ public class Delivery {
         private Address sender = Address.UNKNOWN;
         private Address recipient = Address.UNKNOWN;
         private @Nullable UUID owner = null;
-        private Mail mail = Mail.EMPTY;
+        private ItemStack mail = ItemStack.EMPTY;
         private DeliveryPhase phase = DeliveryPhase.STARTED;
 
-        public Builder deliver(@NotNull Mail mail) {
+        public Builder deliver(@NotNull ItemStack mail) {
             this.mail = Objects.requireNonNull(mail);
             return this;
         }

@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
-import io.github.mortuusars.envelope.world.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
@@ -22,7 +21,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Optional;
 
@@ -126,7 +124,7 @@ public class MailService {
     }
 
     /**
-     * @return "final" address. Mostly for getting default block address of a player.
+     * @return "final" address. Mainly for getting default block address of a player.
      */
     public Address resolve(Address address) {
         if (address instanceof Address.Player playerAddress) {

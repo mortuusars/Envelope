@@ -4,11 +4,12 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 
 public class PigeonDeliveryHandler implements DeliveryHandler {
     private final Pigeon pigeon;
@@ -42,15 +43,15 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public void advancePhase(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                  .message(DeliveryRecord.Message.UNABLE_TO_REACH)));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                  .message(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.APPROACHING_SENDER);
             return;
         }
 
         if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
-            delivery.updateMail(mail -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                  .message(DeliveryRecord.Message.UNABLE_TO_REACH)));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                  .message(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.DEPARTING_RECIPIENT);
             return;
         }
@@ -61,9 +62,9 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
         if (!delivery.getMail().isEmpty()) {
-            pigeon().spawnAtLocation(delivery.getMail().getItem().copy());
+            pigeon().spawnAtLocation(delivery.getMail().copy());
             Pigeon.LOGGER.info("{} has dropped undelivered mail on the ground.", pigeon().getName().getString());
-            delivery.setMail(Mail.EMPTY);
+            delivery.setMail(ItemStack.EMPTY);
         }
 
         pigeon().setDelivery(null);

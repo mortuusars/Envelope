@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.delivery.log;
+package io.github.mortuusars.envelope.world.item.component.mail;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
@@ -85,8 +85,7 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
 
         timestamp.ifPresent(time -> {
             component.append(" ");
-            component.append(Component.translatable("gui.envelope.time.past",
-                  GameTime.formatLargest(gameTime - time, false)).withStyle(ChatFormatting.GRAY));
+            component.append(GameTime.formatLargest(gameTime - time, false)).withStyle(ChatFormatting.DARK_GRAY);
         });
 
         return component;

@@ -3,9 +3,9 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
-import io.github.mortuusars.envelope.world.item.component.NewMail;
-import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
@@ -357,10 +357,10 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                   .toComponent());
         }
 
-        MailDeliveryLog deliveryLog = NewMail.getLog(hoveredMail);
+        DeliveryLog deliveryLog = Mail.getLog(hoveredMail);
         if (!deliveryLog.isEmpty()) {
             tooltip.add(Component.translatable("gui.envelope.delivery.log"));
-            for (MailDeliveryRecord record : deliveryLog.records()) {
+            for (DeliveryRecord record : deliveryLog.records()) {
                 tooltip.add(record.translate(Minecrft.level().getGameTime()));
             }
         }
@@ -484,10 +484,10 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     // --
 
     protected WidgetSprites getDisplayedIcon(ItemStack mail) {
-        return switch (NewMail.getStatus(mail)) {
+        return switch (Mail.getStatus(mail)) {
             case RETURNED -> ICON_RETURNED_SPRITES;
             case REGULAR -> {
-                Address sender = NewMail.getSender(mail);
+                Address sender = Mail.getSender(mail);
                 if (sender == Address.UNKNOWN) yield ICON_ADDRESS_UNKNOWN_SPRITES;
                 if (sender == Address.MAIL_SERVICE) yield ICON_ADDRESS_MAIL_SERVICE_SPRITES;
                 if (sender.type() == Address.Type.BLOCK) yield ICON_ADDRESS_BLOCK_SPRITES;
@@ -499,10 +499,10 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     }
 
     protected Component getDisplayedIconName(ItemStack hoveredMail) {
-        return switch (NewMail.getStatus(hoveredMail)) {
+        return switch (Mail.getStatus(hoveredMail)) {
             case RETURNED -> Component.translatable("gui.envelope.mail.status.returned");
             case REGULAR -> {
-                Address address = NewMail.getSender(hoveredMail);
+                Address address = Mail.getSender(hoveredMail);
                 if (address.equals(Address.UNKNOWN)) yield Component.translatable("address.envelope.unknown");
                 if (address.equals(Address.MAIL_SERVICE)) yield Component.translatable("address.envelope.mail_service");
                 yield switch (address.type()) {
@@ -515,7 +515,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     }
 
     protected Address getDisplayedSender(ItemStack mail) {
-        return NewMail.getSender(mail);
+        return Mail.getSender(mail);
     }
 
     // --

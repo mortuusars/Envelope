@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailR
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuSetMailS2CP;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.NewMail;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -251,7 +251,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     protected ItemStack extractMail(ServerLevel level, int index) {
-        return Optional.ofNullable(NewMail.getId(getMail().get(index)))
+        return Optional.ofNullable(Mail.getId(getMail().get(index)))
               .map(id -> getBlockEntity().removeMail(id))
               .orElse(ItemStack.EMPTY);
     }
@@ -288,7 +288,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     public void onMailRemoved(Id id) {
-        getMail().removeIf(m -> id.equals(NewMail.getId(m)));
+        getMail().removeIf(m -> id.equals(Mail.getId(m)));
         if (player instanceof ServerPlayer serverPlayer) {
             Packets.sendToClient(new MailboxMenuMailRemovedS2CP(id), serverPlayer);
         }

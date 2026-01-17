@@ -2,6 +2,8 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
@@ -121,17 +123,13 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (stack.is(Envelope.Tags.Items.MAILABLE)
+        if (player.isCreative()
+              && stack.is(Envelope.Tags.Items.MAILABLE)
               && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block recipientAddress
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(recipientAddress)) {
             if (level instanceof ServerLevel serverLevel) {
-                ItemStack mail = stack.split(1);
-                if (!mail.has(Envelope.DataComponents.MAIL_SENDER)) {
-                    mail.set(Envelope.DataComponents.MAIL_SENDER, new Address.Player(player));
-                }
-
-                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, mail);
+                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, stack.split(1));
                 if (player.getItemInHand(hand).isEmpty()) {
                     player.setItemInHand(hand, result.copy());
                 } else if (!player.addItem(result)) {

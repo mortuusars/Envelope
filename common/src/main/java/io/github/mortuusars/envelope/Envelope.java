@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
@@ -11,7 +10,7 @@ import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
-import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.MailStatus;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
@@ -255,8 +254,8 @@ public class Envelope {
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<RequestedPayback> MAIL_REQUESTED_PAYBACK = Register.dataComponentType("mail_requested_payback",
               b -> b.persistent(RequestedPayback.CODEC).networkSynchronized(RequestedPayback.STREAM_CODEC));
-        public static final DataComponentType<MailDeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
-              b.persistent(MailDeliveryLog.CODEC).networkSynchronized(MailDeliveryLog.STREAM_CODEC));
+        public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
+              b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
         public static final DataComponentType<MailStatus> MAIL_STATUS = Register.dataComponentType("mail_status", b ->
               b.persistent(MailStatus.CODEC).networkSynchronized(MailStatus.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->

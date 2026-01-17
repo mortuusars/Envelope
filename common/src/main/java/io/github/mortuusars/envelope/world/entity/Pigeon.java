@@ -8,11 +8,10 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.delivery.*;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -268,7 +267,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         String message = damageSource.getLocalizedDeathMessage(this).getString();
         String carriedItem = !delivery.getMail().isEmpty()
-              ? " a " + delivery.getMail().getItem().getHoverName().getString()
+              ? " a " + delivery.getMail().getHoverName().getString()
               : "";
         String addresses = delivery.getSender().getName() + " to " + delivery.getRecipient().getName();
 
@@ -289,12 +288,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 //        }
 
         if (!delivery.getMail().isEmpty()) {
-            ItemStack droppedMail = delivery.getPhase().ordinal() >= DeliveryPhase.TRAVELING_TO_RECIPIENT.ordinal()
-                                    && delivery.getPhase().ordinal() <= DeliveryPhase.DEPARTING_RECIPIENT.ordinal()
-                  ? delivery.getMail().asDeliveryResult().getItem()
-                  : delivery.getMail().getItem().copy();
-            spawnAtLocation(droppedMail);
-            delivery.setMail(Mail.EMPTY);
+            ItemStack mail = Mail.createDeliveryResult(delivery, level);
+            spawnAtLocation(mail);
+            delivery.setMail(ItemStack.EMPTY);
         }
     }
 

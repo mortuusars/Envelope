@@ -56,7 +56,7 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
 
     public boolean openPackingGui(Player player, InteractionHand hand, ItemStack stack) {
         @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
-        if (subject == null || subject.mail().isEmpty() || !subject.mail().getItem().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK)) {
+        if (subject == null || subject.mail().isEmpty() || !subject.mail().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK)) {
             return false;
         }
 

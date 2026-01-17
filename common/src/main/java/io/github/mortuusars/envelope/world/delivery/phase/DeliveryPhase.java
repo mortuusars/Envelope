@@ -66,6 +66,10 @@ public enum DeliveryPhase implements StringRepresentable {
         return this == APPROACHING_RECIPIENT || this == APPROACHING_SENDER;
     }
 
+    public boolean isOnRecipientSide() {
+        return (this.ordinal() >= TRAVELING_TO_RECIPIENT.ordinal() && this.ordinal() <= DEPARTING_RECIPIENT.ordinal());
+    }
+
     public DeliveryPhase next() {
         Preconditions.checkState(!isLast(), "There is no next phase.");
         return values()[ordinal() + 1];

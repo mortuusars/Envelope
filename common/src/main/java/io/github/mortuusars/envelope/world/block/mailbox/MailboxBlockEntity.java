@@ -10,8 +10,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
-import io.github.mortuusars.envelope.world.item.component.NewMail;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -245,7 +244,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public void onMailRemoved(int slot, ItemStack mail) {
         Inbox.super.onMailRemoved(slot, mail);
         if (level instanceof ServerLevel serverLevel) {
-            Optional.ofNullable(NewMail.getId(mail)).ifPresent(id -> {
+            Optional.ofNullable(Mail.getId(mail)).ifPresent(id -> {
                 MailboxMenu.executeForPlayersWithMenu(serverLevel, getAddress(),
                       (player, menu) -> menu.onMailRemoved(id));
             });
@@ -374,9 +373,9 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
         return MailService.of(level).getDeliveryManager()
               .start(pigeon, Delivery.builder()
-                    .deliver(new Mail(mailStack))
+                    .deliver(mailStack)
                     .from(getAddress())
-                    .to(NewMail.getRecipient(mailStack))
+                    .to(Mail.getRecipient(mailStack))
                     .owner(getOwner()))
               .getValue()
               .map(delivery -> {

@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -56,11 +56,10 @@ public class EnvelopeCommand {
 
     private static int sendMail(CommandContext<CommandSourceStack> context, ItemInput item, Address sender) throws CommandSyntaxException {
         ServerLevel level = context.getSource().getLevel();
-        ItemStack mailStack = item.createItemStack(1, false);
+        ItemStack mail = item.createItemStack(1, false);
 
-        Mail mail = new Mail(mailStack);
         MailService.of(level).getDeliveryManager()
-              .startService(Delivery.builder().deliver(mail).from(sender).to(mail.getRecipient()))
+              .startService(Delivery.builder().deliver(mail).from(sender).to(Mail.getRecipient(mail)))
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")

@@ -1,17 +1,17 @@
 package io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department;
 
+import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryLog;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailId;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -56,7 +56,7 @@ public class PaybackDepartment {
         getData().setDirty();
     }
 
-    protected long getPaybackTimeoutTicksFor(Mail mail) {
+    protected long getPaybackTimeoutTicksFor(ItemStack mail) {
         return Ticks.fromMinutes(Config.Server.DELIVERY_PAYBACK_TIMEOUT_MINUTES.get());
     }
 
@@ -96,9 +96,9 @@ public class PaybackDepartment {
     }
 
     public boolean returnAsTimedOut(PaybackSubject subject) {
-        Mail mail = subject.mail();
+        ItemStack mail = subject.mail();
 
-        mail = mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+        Mail.writeToLog(mail, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
               .at(getMailService().getGameTime())
               .message(DeliveryRecord.Message.PAYBACK_IS_TIMED_OUT));
 
@@ -117,12 +117,12 @@ public class PaybackDepartment {
     // --
 
     public boolean tryHandle(Delivery delivery) {
-        if (delivery.getMail().hasPayback()) {
-            handlePaybackSubject(delivery);
+        if (delivery.getMail().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK)) {
+            handlePaybackSubject(delivery, delivery.getMail().get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK));
             return true;
         }
 
-        if (delivery.getMail().getItem().getItem() instanceof PaybackPackageItem) {
+        if (delivery.getMail().getItem() instanceof PaybackPackageItem) {
             handlePaybackPayment(delivery);
             return true;
         }
@@ -132,10 +132,10 @@ public class PaybackDepartment {
 
     // -- Payback Subject
 
-    protected void handlePaybackSubject(Delivery subjectDelivery) {
-        Mail subject = subjectDelivery.getMail();
+    protected void handlePaybackSubject(Delivery subjectDelivery, RequestedPayback requestedPayback) {
+        ItemStack subject = subjectDelivery.getMail();
 
-        subject.writeToLog(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE)
+        Mail.writeToLog(subject, DeliveryRecord.arrivedTo(Address.MAIL_SERVICE)
               .at(getMailService().getGameTime())
               .message(DeliveryRecord.Message.WAITING_FOR_PAYMENT));
 
@@ -145,9 +145,9 @@ public class PaybackDepartment {
 
         if (sendPaybackPackingBoxToBuyer(subjectDelivery, paybackSubject)) {
             awaitPayback(paybackSubject);
-            subjectDelivery.setMail(Mail.EMPTY);
+            subjectDelivery.setMail(ItemStack.EMPTY);
         } else {
-            subject.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(subject, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
         }
 
@@ -155,15 +155,14 @@ public class PaybackDepartment {
     }
 
     protected boolean sendPaybackPackingBoxToBuyer(Delivery subjectDelivery, PaybackSubject paybackSubject) {
-        ItemStack packingBox = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
-        packingBox.set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, paybackSubject);
-        packingBox.set(Envelope.DataComponents.MAIL_RECIPIENT, subjectDelivery.getRecipient());
+        ItemStack packingBox = Mail.createPaybackPackingBox(paybackSubject)
+              .setRecipient(subjectDelivery.getRecipient())
+              .writeToLog(DeliveryRecord.sentFrom(subjectDelivery.getSender()).at(mailService.getGameTime()))
+              .get();
 
         return getMailService().getDeliveryManager()
               .startService(Delivery.builder()
-                    .deliver(new Mail(packingBox, new DeliveryLog()
-                          .append(DeliveryRecord.sentFrom(subjectDelivery.getSender())
-                          .at(mailService.getGameTime()))))
+                    .deliver(packingBox)
                     .from(subjectDelivery.getSender())
                     .to(subjectDelivery.getRecipient())
                     .atPhase(DeliveryPhase.DISPATCHING))
@@ -173,12 +172,12 @@ public class PaybackDepartment {
     // -- Payback Payment
 
     protected void handlePaybackPayment(Delivery paybackDelivery) {
-        Mail packingBox = paybackDelivery.getMail();
-        packingBox.writeToLog(DeliveryRecord.arrivedTo(Address.MAIL_SERVICE).at(getMailService().getGameTime()));
+        ItemStack paybackPackage = paybackDelivery.getMail();
+        Mail.writeToLog(paybackPackage, DeliveryRecord.arrivedTo(Address.MAIL_SERVICE).at(getMailService().getGameTime()));
 
-        @Nullable PaybackSubject paybackSubject = packingBox.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
+        @Nullable PaybackSubject paybackSubject = paybackPackage.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
         if (paybackSubject == null) {
-            packingBox.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(paybackPackage, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
             return;
@@ -186,48 +185,47 @@ public class PaybackDepartment {
 
         paybackSubject = getPendingPaybackSubject(paybackSubject.id());
         if (paybackSubject == null) {
-            packingBox.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(paybackPackage, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
             return;
         }
 
         RequestedPayback requestedPayback = paybackSubject.mail().getOrDefault(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK, RequestedPayback.DEFAULT);
-        PackageContents packageContents = PackageContents.of(packingBox.getItem());
+        PackageContents packageContents = PackageContents.of(paybackPackage);
         if (!requestedPayback.matches(packageContents)) {
-            packingBox.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(paybackPackage, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
             return;
         }
 
-        if (sendPaymentPackageToSeller(paybackDelivery, packageContents, packingBox)) {
-            removePendingPaybackSubject(paybackSubject.id());
-            // Send the subject to buyer using same delivery and courier:
-            paybackDelivery.setMail(paybackSubject.mail().writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
-                  .at(mailService.getGameTime())
-                  .message(DeliveryRecord.Message.PAYBACK_FULFILLED)));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
-        } else {
-            packingBox.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+        if (!sendPaymentPackageToSeller(paybackDelivery, packageContents, paybackPackage)) {
+            Mail.writeToLog(paybackPackage, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            return;
         }
+
+        removePendingPaybackSubject(paybackSubject.id());
+        // Send the subject to buyer using same delivery and courier:
+        paybackDelivery.setMail(Mail.writeToLog(paybackSubject.mail(), DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
+              .at(mailService.getGameTime())
+              .message(DeliveryRecord.Message.PAYBACK_FULFILLED)));
+        paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
     }
 
-    protected boolean sendPaymentPackageToSeller(Delivery paybackDelivery, PackageContents packageContents, Mail packingBox) {
-        ItemStack collectedPaybackPackage = new ItemStack(Envelope.Items.PACKAGE.get());
-        collectedPaybackPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, packageContents);
-        collectedPaybackPackage.set(Envelope.DataComponents.MAIL_RECIPIENT, packingBox.getRecipient());
-
-        Mail mail = new Mail(collectedPaybackPackage, packingBox.getLog()
-              .copy() // Transferring log from incoming mail
-              .append(DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
+    protected boolean sendPaymentPackageToSeller(Delivery paybackDelivery, PackageContents packageContents, ItemStack paybackPackage) {
+        ItemStack paymentPackage = Mail.createPackage(packageContents)
+              .setRecipient(paybackDelivery.getRecipient())
+              .setLog(Mail.getLog(paybackPackage))
+              .writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE)
                     .at(mailService.getGameTime())
-                    .message(DeliveryRecord.Message.PAYBACK_FULFILLED)));
+                    .message(DeliveryRecord.Message.PAYBACK_FULFILLED))
+              .get();
 
         return getMailService().getDeliveryManager().startService(Delivery.builder()
-                    .deliver(mail)
+                    .deliver(paymentPackage)
                     .from(paybackDelivery.getSender())
                     .to(paybackDelivery.getRecipient())
                     .atPhase(DeliveryPhase.DISPATCHING))

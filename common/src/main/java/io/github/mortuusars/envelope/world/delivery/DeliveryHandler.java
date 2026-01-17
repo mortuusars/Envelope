@@ -4,12 +4,13 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
-import io.github.mortuusars.envelope.world.mail.Mail;
+import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 
 public interface DeliveryHandler {
     default void tickDelivery(ServerLevel level, Delivery delivery) {
@@ -70,7 +71,7 @@ public interface DeliveryHandler {
         }
 
         if (delivery.getPhase() == DeliveryPhase.STARTED) {
-            delivery.getMail().writeToLog(DeliveryRecord.sentFrom(delivery.getSender()).at(level.getGameTime()));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()).at(level.getGameTime()));
         }
     }
 
@@ -85,10 +86,12 @@ public interface DeliveryHandler {
 
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                delivery.updateMail(mail -> new Mail(MailService.of(level).deliverMail(delivery.getRecipient(), mail.getItem())));
+                ItemStack result = MailService.of(level).deliverMail(delivery.getRecipient(), delivery.getMail());
+                delivery.setMail(result);
             }
             case HANDLING_RETURN -> {
-                delivery.updateMail(mail -> new Mail(MailService.of(level).deliverMail(delivery.getSender(), mail.getItem())));
+                ItemStack result = MailService.of(level).deliverMail(delivery.getSender(), delivery.getMail());
+                delivery.setMail(result);
             }
         }
     }

@@ -7,7 +7,6 @@ import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.CustomSpawner;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +49,7 @@ public class FinishedBackgroundCourierSpawner implements CustomSpawner {
         level.addFreshEntityWithPassengers(entity);
 
         if (!courier.undeliveredMail().isEmpty()) {
-            Containers.dropItemStack(level, entity.getX(), entity.getY(), entity.getZ(), courier.undeliveredMail());
+            entity.spawnAtLocation(courier.undeliveredMail());
         }
 
         backgroundDelivery.removeFinishedCourier(courier);

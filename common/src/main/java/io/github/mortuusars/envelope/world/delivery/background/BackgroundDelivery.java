@@ -73,7 +73,7 @@ public class BackgroundDelivery extends SavedData {
             boolean ended = courier.getDelivery().isEnded();
             if (ended && courier.getOrigin().isRegular()) {
                 FinishedBackgroundCourier finishedCourier = new FinishedBackgroundCourier(
-                      courier.getEntityData(), courier.getOrigin().getPos(), courier.getDelivery().getMail().getItem());
+                      courier.getEntityData(), courier.getOrigin().getPos(), courier.getDelivery().getMail());
                 addFinishedCourier(finishedCourier);
             }
 

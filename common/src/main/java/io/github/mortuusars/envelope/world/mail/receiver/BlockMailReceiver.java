@@ -5,8 +5,8 @@ import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.block.mailbox.Inboxes;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.NewMail;
-import io.github.mortuusars.envelope.world.item.component.mail.MailDeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
@@ -39,13 +39,17 @@ public class BlockMailReceiver implements MailReceiver {
               .map(inbox -> {
                   if (inbox.isFull()) {
                       LOGGER.info("Cannot deliver mail to mailbox '{}': inbox is full. Returning to sender.", address);
-                      return NewMail.writeToLog(mail, MailDeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                            .message(MailDeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL));
+                      return Mail.writeToLog(mail, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                            .message(DeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL));
                   }
 
+
+
                   ItemStack insertedMail = mail.copyWithCount(1);
-                  NewMail.writeToLog(mail.copyWithCount(1), MailDeliveryRecord.arrivedTo(address).at(level.getGameTime()));
-                  NewMail.setId(insertedMail, Id.create(level));
+                  Mail.writeToLog(mail.copyWithCount(1), DeliveryRecord.arrivedTo(address).at(level.getGameTime()));
+                  if (!Mail.hasId(insertedMail)) {
+                      Mail.setId(insertedMail, Id.create(level));
+                  }
 
                   if (inbox.addMail(insertedMail)) {
                       if (inbox instanceof MailboxBlockEntity be) {
@@ -54,14 +58,14 @@ public class BlockMailReceiver implements MailReceiver {
                       return ItemStack.EMPTY;
                   } else {
                       LOGGER.info("Cannot deliver mail to mailbox '{}': mail cannot be inserted. Returning to sender.", address);
-                      return NewMail.writeToLog(insertedMail, MailDeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                            .message(MailDeliveryRecord.Message.UNABLE_TO_REACH));
+                      return Mail.writeToLog(insertedMail, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                            .message(DeliveryRecord.Message.UNABLE_TO_REACH));
                   }
               })
               .orElseGet(() -> {
                   LOGGER.info("Cannot deliver mail to mailbox '{}': address not found. Returning to sender.", address);
-                  return NewMail.writeToLog(mail, MailDeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-                        .message(MailDeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+                  return Mail.writeToLog(mail, DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+                        .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
               });
     }
 }

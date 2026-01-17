@@ -5,9 +5,10 @@ import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import org.slf4j.Logger;
 
@@ -97,7 +98,7 @@ public class DeliveryManager {
 
     public void dispatch(Delivery delivery) {
         if (!canDeliverTo(delivery.getRecipient())) {
-            delivery.getMail().writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
             delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
             return;
