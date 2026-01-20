@@ -69,8 +69,7 @@
 
   "gui.envelope.time.past": "%s ago",
 
-  "gui.envelope.mail.status.regular": "Regular",
-  "gui.envelope.mail.status.returned": "Returned",
+  "gui.envelope.mail.returned": "Returned",
 
   "gui.exposure.mailbox.address_box.title": "Address",
 

@@ -43,14 +43,14 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public void advancePhase(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.APPROACHING_SENDER);
             return;
         }
 
         if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.DEPARTING_RECIPIENT);
             return;

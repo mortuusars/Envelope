@@ -11,7 +11,6 @@ import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.mail.MailStatus;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
@@ -256,8 +255,8 @@ public class Envelope {
               b -> b.persistent(RequestedPayback.CODEC).networkSynchronized(RequestedPayback.STREAM_CODEC));
         public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
               b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
-        public static final DataComponentType<MailStatus> MAIL_STATUS = Register.dataComponentType("mail_status", b ->
-              b.persistent(MailStatus.CODEC).networkSynchronized(MailStatus.STREAM_CODEC));
+        public static final DataComponentType<Unit> MAIL_RETURNED = Register.dataComponentType("mail_returned", b ->
+              b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
         public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 

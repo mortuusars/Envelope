@@ -205,6 +205,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        hoveredMail = null;
+
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight, 512, 256);
 
         int addressBarX = titleLabelX - 18;
@@ -219,7 +221,6 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         List<ItemStack> mail = getMenu().getMail();
 
         if (!mail.isEmpty()) {
-            hoveredMail = null;
             scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
 
             for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
@@ -484,38 +485,31 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     // --
 
     protected WidgetSprites getDisplayedIcon(ItemStack mail) {
-        return switch (Mail.getStatus(mail)) {
-            case RETURNED -> ICON_RETURNED_SPRITES;
-            case REGULAR -> {
-                Address sender = Mail.getSender(mail);
-                if (sender == Address.UNKNOWN) yield ICON_ADDRESS_UNKNOWN_SPRITES;
-                if (sender == Address.MAIL_SERVICE) yield ICON_ADDRESS_MAIL_SERVICE_SPRITES;
-                if (sender.type() == Address.Type.BLOCK) yield ICON_ADDRESS_BLOCK_SPRITES;
-                if (sender.type() == Address.Type.PLAYER) yield ICON_ADDRESS_PLAYER_SPRITES;
-                if (sender.type() == Address.Type.ENTITY) yield ICON_ADDRESS_ENTITY_SPRITES;
-                yield ICON_ADDRESS_UNKNOWN_SPRITES;
-            }
+        if (Mail.isReturned(mail)) return ICON_RETURNED_SPRITES;
+        Address sender = Mail.getSenderOrUnknown(mail);
+        if (sender.equals(Address.UNKNOWN)) return ICON_ADDRESS_UNKNOWN_SPRITES;
+        if (sender.equals(Address.MAIL_SERVICE)) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
+        return switch (sender.type()) {
+            case BLOCK -> ICON_ADDRESS_BLOCK_SPRITES;
+            case PLAYER -> ICON_ADDRESS_PLAYER_SPRITES;
+            case ENTITY -> ICON_ADDRESS_ENTITY_SPRITES;
         };
     }
 
-    protected Component getDisplayedIconName(ItemStack hoveredMail) {
-        return switch (Mail.getStatus(hoveredMail)) {
-            case RETURNED -> Component.translatable("gui.envelope.mail.status.returned");
-            case REGULAR -> {
-                Address address = Mail.getSender(hoveredMail);
-                if (address.equals(Address.UNKNOWN)) yield Component.translatable("address.envelope.unknown");
-                if (address.equals(Address.MAIL_SERVICE)) yield Component.translatable("address.envelope.mail_service");
-                yield switch (address.type()) {
-                    case BLOCK -> Component.translatable("address.envelope.type.block");
-                    case PLAYER -> Component.translatable("address.envelope.type.player");
-                    case ENTITY -> Component.translatable("address.envelope.type.entity");
-                };
-            }
+    protected Component getDisplayedIconName(ItemStack mail) {
+        if (Mail.isReturned(mail)) return Component.translatable("gui.envelope.mail.returned");
+        Address sender = Mail.getSenderOrUnknown(mail);
+        if (sender.equals(Address.UNKNOWN)) return Component.translatable("address.envelope.unknown");
+        if (sender.equals(Address.MAIL_SERVICE)) return Component.translatable("address.envelope.mail_service");
+        return switch (sender.type()) {
+            case BLOCK -> Component.translatable("address.envelope.type.block");
+            case PLAYER -> Component.translatable("address.envelope.type.player");
+            case ENTITY -> Component.translatable("address.envelope.type.entity");
         };
     }
 
     protected Address getDisplayedSender(ItemStack mail) {
-        return Mail.getSender(mail);
+        return Mail.getSenderOrUnknown(mail);
     }
 
     // --

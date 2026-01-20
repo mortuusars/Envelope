@@ -71,6 +71,7 @@ public interface DeliveryHandler {
         }
 
         if (delivery.getPhase() == DeliveryPhase.STARTED) {
+            Mail.setSender(delivery.getMail(), delivery.getSender());
             Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()).at(level.getGameTime()));
         }
     }

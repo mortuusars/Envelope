@@ -28,6 +28,6 @@ public class MailServiceEntity extends MailEntity {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        return Mail.writeToLog(mail, DeliveryRecord.returnedFrom(getAddress()));
+        return Mail.writeToLog(mail, DeliveryRecord.returned(getAddress()));
     }
 }

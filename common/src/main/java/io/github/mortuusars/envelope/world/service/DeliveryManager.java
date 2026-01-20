@@ -5,7 +5,9 @@ import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.DeliveryDraft;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
+import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
@@ -17,15 +19,15 @@ import java.util.function.Function;
 public class DeliveryManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    private static final Error ERROR_NO_MAIL = new Error(
+          "Mail is empty.",
+          "error.envelope.delivery.no_mail");
     private static final Error ERROR_SAME_ADDRESSES = new Error(
           "Recipient address cannot be the same as sender address.",
           "error.envelope.delivery.same_addresses");
     private static final Error ERROR_RECIPIENT_UNKNOWN = new Error(
           "Cannot deliver to unknown address.",
           "error.envelope.delivery.unknown_address");
-    private static final Error ERROR_NO_MAIL = new Error(
-          "Mail is empty.",
-          "error.envelope.delivery.no_mail");
 
     private final MailService mailService;
 
@@ -39,40 +41,45 @@ public class DeliveryManager {
 
     // --
 
-    public Result<StartedDelivery> start(Pigeon pigeon, Delivery delivery) {
-        return tryStart(delivery, pigeon::startDelivery);
+    public Result<StartedDelivery> start(Pigeon pigeon, DeliveryDraft draft) {
+        return tryStart(draft, pigeon::startDelivery);
     }
 
-    public Result<StartedDelivery> start(Pigeon pigeon, Delivery.Builder deliveryBuilder) {
-        return start(pigeon, deliveryBuilder.create());
+    public Result<StartedDelivery> startService(DeliveryDraft draft) {
+        return tryStart(draft, delivery -> Pigeon.spawnServiceCourier(getMailService().getLevel(), delivery));
     }
 
-    public Result<StartedDelivery> startService(Delivery delivery) {
-        return tryStart(delivery, validDelivery -> Pigeon.spawnServiceCourier(getMailService().getLevel(), validDelivery));
-    }
+    protected Result<StartedDelivery> tryStart(DeliveryDraft draft, Function<Delivery, Courier> courier) {
+        /*
+        Maybe this validation is not that necessary? We should validate at dispatch point anyway.
+        if (delivery.getSender().matches(Address.UNKNOWN) && delivery.getRecipient().matches(Address.UNKNOWN)) {
+            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
+            return Result.error(ERROR_RECIPIENT_UNKNOWN);
+        }
+        if (delivery.getSender().matches(delivery.getRecipient())) {
+            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
+            return Result.error(ERROR_SAME_ADDRESSES);
+        }
+        */
 
-    public Result<StartedDelivery> startService(Delivery.Builder deliveryBuilder) {
-        return startService(deliveryBuilder.create());
-    }
-
-    protected Result<StartedDelivery> tryStart(Delivery delivery, Function<Delivery, Courier> courier) {
-//        if (delivery.getSender().matches(Address.UNKNOWN) && delivery.getRecipient().matches(Address.UNKNOWN)) {
-//            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
-//            return Result.error(ERROR_RECIPIENT_UNKNOWN);
-//        }
-//        if (delivery.getSender().matches(delivery.getRecipient())) {
-//            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
-//            return Result.error(ERROR_SAME_ADDRESSES);
-//        }
-        if (delivery.getPhase() == DeliveryPhase.STARTED && delivery.getMail().isEmpty()) {
-            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_NO_MAIL.getMessage(), delivery);
+        if (draft.getMail().isEmpty()) {
+            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_NO_MAIL.getMessage(), draft);
             return Result.error(ERROR_NO_MAIL);
         }
 
-        delivery.updateMetadata(data -> data.withTimestampIfMissing(getMailService().getGameTime()));
+        Delivery delivery = new Delivery(
+              draft.getOrCreateId(getMailService().getLevel()),
+              draft.getOwner(),
+              draft.getSender(),
+              draft.getRecipient(),
+              draft.getMail(),
+              DeliveryRoute.build(getMailService().getLevel(), draft.getSender(), draft.getRecipient()),
+              draft.getPhase(),
+              0,
+              false
+        );
 
-        LOGGER.debug("Starting delivery {}", delivery);
-
+        LOGGER.debug("Starting delivery: {}", delivery);
         return Result.success(new StartedDelivery(courier.apply(delivery), delivery));
     }
 
@@ -98,8 +105,9 @@ public class DeliveryManager {
 
     public void dispatch(Delivery delivery) {
         if (!canDeliverTo(delivery.getRecipient())) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(Address.MAIL_SERVICE)
                   .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+            Mail.setReturned(delivery.getMail());
             delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
             return;
         }

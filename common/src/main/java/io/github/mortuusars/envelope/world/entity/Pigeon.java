@@ -288,7 +288,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 //        }
 
         if (!delivery.getMail().isEmpty()) {
-            ItemStack mail = Mail.createDeliveryResult(delivery, level);
+            ItemStack mail = delivery.getPhase().isOnRecipientSide()
+                  ? Mail.asDelivered(delivery.getMail())
+                  : delivery.getMail();
             spawnAtLocation(mail);
             delivery.setMail(ItemStack.EMPTY);
         }

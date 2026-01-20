@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world.mail.receiver;
 
-import io.github.mortuusars.envelope.world.delivery.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
@@ -15,11 +15,8 @@ public class EntityMailReceiver implements MailReceiver {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        return ItemStack.EMPTY;
-        // TODO: implement
-//        return MailService.of(level).getMailEntities().byAddress(address)
-//              .map(entity -> entity.receiveMail(level, mail))
-//              .orElseGet(() -> mail.writeToLog(DeliveryRecord.returnedFrom(Address.MAIL_SERVICE)
-//                    .message(DeliveryRecord.Message.RECIPIENT_NOT_FOUND)));
+        return MailService.of(level).getMailEntities().byAddress(address)
+              .map(entity -> entity.receiveMail(level, mail))
+              .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 }

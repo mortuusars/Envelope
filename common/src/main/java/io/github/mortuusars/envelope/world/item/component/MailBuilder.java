@@ -32,17 +32,17 @@ public class MailBuilder<T extends MailBuilder<T>> implements DataComponentHolde
         return (T) this;
     }
 
-    public T setId(Id id) {
+    public T id(Id id) {
         Mail.setId(item, id);
         return self();
     }
 
-    public T setSender(Address sender) {
+    public T sender(Address sender) {
         Mail.setSender(item, sender);
         return self();
     }
 
-    public T setRecipient(Address recipient) {
+    public T recipient(Address recipient) {
         Mail.setRecipient(item, recipient);
         return self();
     }

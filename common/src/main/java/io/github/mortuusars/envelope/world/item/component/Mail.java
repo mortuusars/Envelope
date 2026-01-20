@@ -1,23 +1,55 @@
 package io.github.mortuusars.envelope.world.item.component;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
-import io.github.mortuusars.envelope.world.item.component.mail.MailStatus;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public final class Mail {
     private Mail() {
+    }
+
+    // -- Address
+
+    public static Optional<Address> getSender(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_SENDER));
+    }
+
+    public static @NotNull Address getSenderOrElse(ItemStack stack, Address orElse) {
+        return stack.getOrDefault(Envelope.DataComponents.MAIL_SENDER, orElse);
+    }
+
+    public static @NotNull Address getSenderOrUnknown(ItemStack stack) {
+        return getSenderOrElse(stack, Address.UNKNOWN);
+    }
+
+    public static void setSender(@NotNull ItemStack stack, @Nullable Address sender) {
+        stack.set(Envelope.DataComponents.MAIL_SENDER, sender);
+    }
+
+    public static Optional<Address> getRecipient(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_RECIPIENT));
+    }
+
+    public static @NotNull Address getRecipientOrElse(ItemStack stack, Address orElse) {
+        return stack.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, orElse);
+    }
+
+    public static @NotNull Address getRecipientOrUnknown(ItemStack stack) {
+        return getRecipientOrElse(stack, Address.UNKNOWN);
+    }
+
+    public static void setRecipient(@NotNull ItemStack stack, @Nullable Address recipient) {
+        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, recipient);
     }
 
     // -- Id
@@ -39,14 +71,19 @@ public final class Mail {
         return stack;
     }
 
-    // -- Status
+    // -- Returned
 
-    public static MailStatus getStatus(ItemStack stack) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_STATUS, MailStatus.REGULAR);
+    public static boolean isReturned(ItemStack stack) {
+        return stack.has(Envelope.DataComponents.MAIL_RETURNED);
     }
 
-    public static ItemStack setStatus(ItemStack stack, MailStatus status) {
-        stack.set(Envelope.DataComponents.MAIL_STATUS, status == MailStatus.REGULAR ? null : status);
+    public static ItemStack setReturned(ItemStack stack, boolean returned) {
+        stack.set(Envelope.DataComponents.MAIL_RETURNED, returned ? Unit.INSTANCE : null);
+        return stack;
+    }
+
+    public static ItemStack setReturned(ItemStack stack) {
+        stack.set(Envelope.DataComponents.MAIL_RETURNED, Unit.INSTANCE);
         return stack;
     }
 
@@ -82,43 +119,26 @@ public final class Mail {
 
     // --
 
-    public static @NotNull Address getSenderOrElse(ItemStack stack, Address orElse) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_SENDER, orElse);
+    public static ItemStack removePreviousDeliveryData(ItemStack mail) {
+        if (mail.isEmpty()) return ItemStack.EMPTY;
+
+        mail.remove(Envelope.DataComponents.MAIL_ID);
+        mail.remove(Envelope.DataComponents.MAIL_SENDER);
+        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
+        mail.remove(Envelope.DataComponents.MAIL_RETURNED);
+
+        return mail;
     }
 
-    public static @NotNull Address getSender(ItemStack stack) {
-        return getSenderOrElse(stack, Address.UNKNOWN);
-    }
+    public static ItemStack asDelivered(ItemStack mail) {
+        if (mail.isEmpty()) return ItemStack.EMPTY;
 
-    public static void setSender(@NotNull ItemStack stack, Address sender) {
-        stack.set(Envelope.DataComponents.MAIL_SENDER, sender);
-    }
-
-    public static @NotNull Address getRecipient(ItemStack stack) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, Address.UNKNOWN);
-    }
-
-    public static void setRecipient(@NotNull ItemStack stack, Address recipient) {
-        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, recipient);
-    }
-
-    // --
-
-    /**
-     *
-     */
-    public static ItemStack createDeliveryResult(@NotNull Delivery delivery, ServerLevel level) {
-        if (delivery.getMail().isEmpty()) return ItemStack.EMPTY;
-
-        ItemStack result = delivery.getMail().copyWithCount(1);
-
-        if (delivery.getPhase().isOnRecipientSide() || Mail.getStatus(result) == MailStatus.REGULAR) {
-            result.remove(Envelope.DataComponents.MAIL_RECIPIENT);
-            result.remove(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
-            result.set(Envelope.DataComponents.MAIL_SENDER, delivery.getSender());
+        if (!isReturned(mail)) {
+            mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+            mail.remove(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
         }
 
-        return result;
+        return mail;
     }
 
     // --

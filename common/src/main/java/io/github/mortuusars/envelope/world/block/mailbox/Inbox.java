@@ -48,16 +48,16 @@ public interface Inbox {
         return false;
     }
 
+    default boolean addMailNoUpdate(ItemStack mail) {
+        return addMailNoUpdate(Integer.MAX_VALUE, mail);
+    }
+
     default boolean addMail(int slot, ItemStack mail) {
         if (addMailNoUpdate(slot, mail)) {
             onMailAdded(mail);
             return true;
         }
         return false;
-    }
-
-    default boolean addMailNoUpdate(ItemStack mail) {
-        return addMailNoUpdate(Integer.MAX_VALUE, mail);
     }
 
     default boolean addMail(ItemStack mail) {

@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -48,23 +49,37 @@ public class AddressTagItem extends Item implements ApplicatorItem {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
-        if (action != ClickAction.SECONDARY) return false;
-        if (!slot.allowModification(player)) return false;
-        if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
-        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
-        if (Objects.equals(address, slot.getItem().get(Envelope.DataComponents.MAIL_RECIPIENT))) return true; // Do nothing
+        ItemStack target = slot.getItem();
 
-        if (address == null) {
-            slot.getItem().remove(Envelope.DataComponents.MAIL_RECIPIENT);
-        } else {
-            slot.getItem().set(Envelope.DataComponents.MAIL_RECIPIENT, address);
+        if (action != ClickAction.SECONDARY
+              || !slot.allowModification(player)
+              || !target.is(Envelope.Tags.Items.MAILABLE)) {
+            return false;
+        }
+
+        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
+        @Nullable Address recipient = Mail.getRecipient(target).orElse(null);
+        if (Objects.equals(address, recipient)) {
+            return true; // Do nothing
+        }
+
+        ItemStack result = target.copy();
+        Mail.setRecipient(result, address);
+        Mail.removePreviousDeliveryData(result);
+
+        if (!slot.mayPlace(result)) {
+            player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 1, 1);
+            return true;
+        }
+
+        slot.setByPlayer(result);
+
+        if (address != null) {
             stack.shrink(1);
         }
 
-        // Having old sender with new recipient address may confuse someone
-        slot.getItem().remove(Envelope.DataComponents.MAIL_SENDER);
-
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
+
         return true;
     }
 

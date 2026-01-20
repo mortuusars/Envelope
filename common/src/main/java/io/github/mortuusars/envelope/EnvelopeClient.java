@@ -2,19 +2,23 @@ package io.github.mortuusars.envelope;
 
 import io.github.mortuusars.envelope.client.gui.tooltip.*;
 import io.github.mortuusars.envelope.client.renderer.SealRenderer;
+import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.bugger.BuggerDebugScreen;
 import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
 import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -108,17 +112,32 @@ public class EnvelopeClient {
         }
 
         public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
-                                              Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag) {
-            Address senderAddress = stack.get(Envelope.DataComponents.MAIL_SENDER);
-            if (senderAddress != null) {
+                                              Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
+            Mail.getSender(stack).ifPresent(sender -> {
                 consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
                       .append(": ").withStyle(ChatFormatting.GRAY)
-                      .append(senderAddress.format().asNeutral().toComponent()));
+                      .append(sender.format().asNeutral().toComponent()));
+            });
+
+            DeliveryLog deliveryLog = Mail.getLog(stack);
+            if (!deliveryLog.isEmpty()) {
+                consumer.accept(Component.translatable("gui.envelope.delivery.log")
+                      .append(CommonComponents.SPACE)
+                      .append(Screen.hasShiftDown()
+                            ? CommonComponents.EMPTY
+                            : Component.literal("[Shift]").withStyle(ChatFormatting.DARK_GRAY)));
+                if (Screen.hasShiftDown()) {
+                    for (DeliveryRecord record : deliveryLog.records()) {
+                        consumer.accept(record.translate(Minecrft.level().getGameTime()));
+                    }
+                }
             }
 
-            Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {
-                consumer.accept(Component.literal("Id: " + id).withStyle(ChatFormatting.GRAY));
-            });
+            if (tooltipFlag.isAdvanced()) {
+                Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {
+                    consumer.accept(Component.literal("Mail Id: " + id).withStyle(ChatFormatting.GRAY));
+                });
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.world.*;
@@ -45,7 +46,7 @@ public class PackageItem extends BlockItem implements Sealable {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         stack = stack.transmuteCopy(Envelope.Items.PACKING_BOX.get());
-        stack.remove(Envelope.DataComponents.MAIL_SENDER);
+        Mail.setSender(stack, null);
 
         player.setItemInHand(hand, stack);
 

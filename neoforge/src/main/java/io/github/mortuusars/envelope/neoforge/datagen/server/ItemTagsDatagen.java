@@ -53,6 +53,7 @@ public class ItemTagsDatagen extends ItemTagsProvider {
               .add(Envelope.Items.SEALED_LETTER.get())
               .add(Envelope.Items.PACKAGE.get())
               .add(Envelope.Items.SEALED_PACKAGE.get())
+              .add(Envelope.Items.PAYBACK_PACKING_BOX.get())
               .add(Envelope.Items.PAYBACK_PACKAGE.get());
     }
 }

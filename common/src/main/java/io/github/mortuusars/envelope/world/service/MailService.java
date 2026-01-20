@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.service;
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;

@@ -369,13 +369,13 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
         applyAddress();
 
-        mailStack = mailStack.copyWithCount(1);
+        ItemStack mail = Mail.removePreviousDeliveryData(mailStack.copyWithCount(1));
 
         return MailService.of(level).getDeliveryManager()
-              .start(pigeon, Delivery.builder()
-                    .deliver(mailStack)
+              .start(pigeon, Delivery.draft()
+                    .deliver(mail)
                     .from(getAddress())
-                    .to(Mail.getRecipient(mailStack))
+                    .to(Mail.getRecipientOrUnknown(mail))
                     .owner(getOwner()))
               .getValue()
               .map(delivery -> {

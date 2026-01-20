@@ -56,7 +56,7 @@ public record DeliveryRecord(Status status, Address address, Optional<Long> time
         return new Builder(Status.ARRIVED, address);
     }
 
-    public static Builder returnedFrom(@NotNull Address address) {
+    public static Builder returned(@NotNull Address address) {
         Preconditions.checkNotNull(address);
         return new Builder(Status.RETURNED, address);
     }

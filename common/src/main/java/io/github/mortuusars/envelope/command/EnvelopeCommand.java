@@ -58,8 +58,18 @@ public class EnvelopeCommand {
         ServerLevel level = context.getSource().getLevel();
         ItemStack mail = item.createItemStack(1, false);
 
+        Address recipient = Mail.getRecipientOrUnknown(mail);
+
+        if (recipient.equals(Address.UNKNOWN)) {
+            context.getSource().sendFailure(Component.literal("Cannot send: recipient is not defined."));
+            return 0;
+        }
+
         MailService.of(level).getDeliveryManager()
-              .startService(Delivery.builder().deliver(mail).from(sender).to(Mail.getRecipient(mail)))
+              .startService(Delivery.draft()
+                    .deliver(mail)
+                    .from(sender)
+                    .to(recipient))
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")

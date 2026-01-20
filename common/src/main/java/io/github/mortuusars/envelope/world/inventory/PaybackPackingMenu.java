@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
+import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
@@ -84,8 +85,8 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
-        Address sender = stack.remove(Envelope.DataComponents.MAIL_SENDER);
-        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, sender);
+        Mail.setRecipient(stack, Mail.getSenderOrUnknown(stack));
+        Mail.setSender(stack, null);
         return stack;
     }
 }

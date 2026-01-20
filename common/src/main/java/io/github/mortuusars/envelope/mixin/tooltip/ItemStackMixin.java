@@ -27,6 +27,7 @@ public abstract class ItemStackMixin implements DataComponentHolder {
         return EnvelopeClient.TooltipComponents.modifyTooltipImage(((ItemStack) (Object) this), original);
     }
 
+    @SuppressWarnings("LocalMayUseName") // Using variable names can cause crashes on fabric.
     @Inject(method = "getTooltipLines",
           at = @At(value = "INVOKE",
           ordinal = 0,
