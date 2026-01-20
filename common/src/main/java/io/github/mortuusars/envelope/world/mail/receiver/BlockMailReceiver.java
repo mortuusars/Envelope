@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.block.mailbox.Inboxes;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.Mail;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
@@ -43,7 +43,7 @@ public class BlockMailReceiver implements MailReceiver {
                   }
 
                   ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
-                  Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address).at(level.getGameTime()));
+                  Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address, level.getGameTime()));
                   Mail.setId(deliveredMail, Id.create(level));
 
                   if (inbox.addMail(deliveredMail)) {

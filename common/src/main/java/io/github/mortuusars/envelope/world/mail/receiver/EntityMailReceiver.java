@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world.mail.receiver;
 
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;

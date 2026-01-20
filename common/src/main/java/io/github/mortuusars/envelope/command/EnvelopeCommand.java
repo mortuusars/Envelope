@@ -6,7 +6,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -24,6 +26,7 @@ import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.*;
 
@@ -166,6 +169,14 @@ public class EnvelopeCommand {
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
+
+        MailService.of(player.serverLevel()).getDeliveryManager()
+              .startService(Delivery.draft()
+                    .deliver(Mail.createPackage(new PackageContents(List.of(new ItemStack(Items.ACACIA_LOG))))
+                          .get())
+                    .from(new Address.Block("Blue"))
+                    .to(new Address.Block("Red"))
+                    .startAtPhase(DeliveryPhase.DISPATCHING));
 
 //        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
 //        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));

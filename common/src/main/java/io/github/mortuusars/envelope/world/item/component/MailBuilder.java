@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.world.item.component;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.core.component.DataComponentMap;

@@ -10,7 +10,7 @@ import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.*;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;

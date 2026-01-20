@@ -7,12 +7,14 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.item.component.Mail;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
 public interface DeliveryHandler {
+    CourierOrigin getOrigin();
+
     default void tickDelivery(ServerLevel level, Delivery delivery) {
         if (delivery.isEnded()) {
             return;
@@ -33,7 +35,8 @@ public interface DeliveryHandler {
                 delivery.end();
                 endDelivery(level, delivery);
                 if (Bugger.isEnabled()) {
-                    Envelope.LOGGER.info("Delivery '{} > {}' is finished.", delivery.getSender(), delivery.getRecipient());
+                    String type = getOrigin().isService() ? "Service delivery" : "Delivery";
+                    Envelope.LOGGER.info("{} '{} > {}' is finished.", type, delivery.getSender(), delivery.getRecipient());
                 }
             } else {
                 advancePhase(level, delivery);
@@ -59,7 +62,7 @@ public interface DeliveryHandler {
             case STARTED, FINISHED -> 1;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
             case TRAVELING_TO_MAIL_HUB, TRAVELING_TO_RECIPIENT -> delivery.getRoute().travelDuration().ticks() / 2;
-            case RETURNING_TO_SENDER -> delivery.getRoute().travelDuration().ticks();
+            case TRAVELING_TO_SENDER -> delivery.getRoute().travelDuration().ticks();
             case DISPATCHING -> 20;
             case HANDLING_DELIVERY, HANDLING_RETURN -> 5;
         };
@@ -72,7 +75,7 @@ public interface DeliveryHandler {
 
         if (delivery.getPhase() == DeliveryPhase.STARTED) {
             Mail.setSender(delivery.getMail(), delivery.getSender());
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()).at(level.getGameTime()));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender(), level.getGameTime()));
         }
     }
 

@@ -61,6 +61,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     private @NotNull List<ItemStack> mail = new ArrayList<>();
     private boolean loaded = false;
+    private boolean blockRemoved = false;
 
     protected MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -219,6 +220,39 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         }
     }
 
+    // -- Delivery
+
+    public boolean tryStartDelivery(Pigeon pigeon) {
+        ServerLevel level = ((ServerLevel) pigeon.level());
+
+        if (pigeon.isDelivering()) return false;
+        ItemStack mailStack = getItem(SLOT_MAIL);
+        if (!isSendable(mailStack)) return false;
+
+        applyAddress();
+
+        ItemStack mail = Mail.removePreviousDeliveryData(mailStack.copyWithCount(1));
+
+        return MailService.of(level).getDeliveryManager()
+              .start(pigeon, Delivery.draft()
+                    .deliver(mail)
+                    .from(getAddress())
+                    .to(Mail.getRecipientOrUnknown(mail))
+                    .owner(getOwner()))
+              .getValue()
+              .map(delivery -> {
+                  removeItem(SLOT_MAIL, 1);
+                  removeItem(SLOT_FOOD, 1);
+
+                  Vec3 pos = pigeon.position();
+                  level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
+                  level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
+
+                  return true;
+              })
+              .orElse(false);
+    }
+
     // -- Inbox
 
     @Override
@@ -277,12 +311,14 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public void onBlockRemoved(Level level, BlockPos pos, BlockState state, BlockState newState) {
         Containers.dropContentsOnDestroy(state, newState, level, pos);
         clearMail();
+        blockRemoved = true;
     }
 
     @Override
     public void clearRemoved() {
         super.clearRemoved();
         if (level instanceof ServerLevel serverLevel) {
+            blockRemoved = false; // idk if this does something, but just in case
             this.mail = Inboxes.get(serverLevel).retrieve(inboxId)
                   .map(UnloadedInbox::getAllMail)
                   .orElseGet(ArrayList::new);
@@ -295,7 +331,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     public void setRemoved() {
         super.setRemoved();
-        if (level instanceof ServerLevel serverLevel && address != null) {
+        if (level instanceof ServerLevel serverLevel && address != null && !blockRemoved) {
             Inboxes.get(serverLevel).store(inboxId, this);
             if (Bugger.isEnabled() && !getAllMail().isEmpty()) {
                 LOGGER.info("Stored inbox with size [{}] of mailbox {}@[{}]", mail.size(), address, getBlockPos().toShortString());
@@ -358,36 +394,5 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (level != null) {
             level.playSound(null, getBlockPos(), soundEvent, SoundSource.BLOCKS, volume, pitch);
         }
-    }
-
-    public boolean tryStartDelivery(Pigeon pigeon) {
-        ServerLevel level = ((ServerLevel) pigeon.level());
-
-        if (pigeon.isDelivering()) return false;
-        ItemStack mailStack = getItem(SLOT_MAIL);
-        if (!isSendable(mailStack)) return false;
-
-        applyAddress();
-
-        ItemStack mail = Mail.removePreviousDeliveryData(mailStack.copyWithCount(1));
-
-        return MailService.of(level).getDeliveryManager()
-              .start(pigeon, Delivery.draft()
-                    .deliver(mail)
-                    .from(getAddress())
-                    .to(Mail.getRecipientOrUnknown(mail))
-                    .owner(getOwner()))
-              .getValue()
-              .map(delivery -> {
-                  removeItem(SLOT_MAIL, 1);
-                  removeItem(SLOT_FOOD, 1);
-
-                  Vec3 pos = pigeon.position();
-                  level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
-                  level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
-
-                  return true;
-              })
-              .orElse(false);
     }
 }

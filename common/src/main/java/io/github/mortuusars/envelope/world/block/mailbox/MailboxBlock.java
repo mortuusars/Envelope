@@ -2,17 +2,23 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -138,6 +144,25 @@ public class MailboxBlock extends BaseEntityBlock {
             }
             return ItemInteractionResult.SUCCESS;
         }
+
+        if (stack.is(Envelope.Items.PIGEON_SPAWN_EGG.get())) {
+            if (level instanceof ServerLevel serverLevel) {
+                if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
+                      && blockEntity.isAvailableForPickup()
+                      && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
+                        pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
+                      && blockEntity.tryStartDelivery(pigeon)) {
+                    if (!player.isCreative()) {
+                        stack.shrink(1);
+                    }
+                } else {
+                    serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                }
+            }
+
+            return ItemInteractionResult.SUCCESS;
+        }
+
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 

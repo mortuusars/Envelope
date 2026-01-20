@@ -6,7 +6,6 @@ import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
 import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
@@ -85,7 +84,7 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected ItemStack createPackingResult() {
         ItemStack stack = getBoxStack().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
-        Mail.setRecipient(stack, Mail.getSenderOrUnknown(stack));
+        Mail.setRecipient(stack, Mail.getSenderOrUnknown(paybackSubject));
         Mail.setSender(stack, null);
         return stack;
     }

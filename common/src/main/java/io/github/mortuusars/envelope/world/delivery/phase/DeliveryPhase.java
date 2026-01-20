@@ -21,7 +21,7 @@ public enum DeliveryPhase implements StringRepresentable {
     APPROACHING_RECIPIENT("approaching_recipient"),
     HANDLING_DELIVERY("handling_delivery"),
     DEPARTING_RECIPIENT("departing_recipient"),
-    RETURNING_TO_SENDER("returning_to_sender"),
+    TRAVELING_TO_SENDER("traveling_to_sender"),
     APPROACHING_SENDER("approaching_sender"),
     HANDLING_RETURN("handling_return"),
     FINISHED("finished");
@@ -51,7 +51,7 @@ public enum DeliveryPhase implements StringRepresentable {
 
     public boolean isTraveling() {
         return this == TRAVELING_TO_MAIL_HUB || this == DISPATCHING
-              || this == TRAVELING_TO_RECIPIENT || this == RETURNING_TO_SENDER;
+              || this == TRAVELING_TO_RECIPIENT || this == TRAVELING_TO_SENDER;
     }
 
     public boolean isReturning() {
@@ -68,6 +68,10 @@ public enum DeliveryPhase implements StringRepresentable {
 
     public boolean isOnRecipientSide() {
         return (this.ordinal() >= TRAVELING_TO_RECIPIENT.ordinal() && this.ordinal() <= DEPARTING_RECIPIENT.ordinal());
+    }
+
+    public boolean isSpawnable() {
+        return !isTraveling() && this != DeliveryPhase.FINISHED;
     }
 
     public DeliveryPhase next() {

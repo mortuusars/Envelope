@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.util.bugger.test.cases;
 import com.mojang.serialization.DataResult;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.Test;
+import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
@@ -69,6 +70,11 @@ public class DeliveryHandlerTests extends BuggerTests {
             if (delivery.getPhase() == DeliveryPhase.FINISHED) {
                 endedCorrectly = true;
             }
+        }
+
+        @Override
+        public CourierOrigin getOrigin() {
+            return CourierOrigin.service();
         }
 
         @Override

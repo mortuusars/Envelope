@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.mail.entity.mail_service;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.world.item.component.Mail;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -28,6 +28,6 @@ public class MailServiceEntity extends MailEntity {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        return Mail.writeToLog(mail, DeliveryRecord.returned(getAddress()));
+        return Mail.writeToLog(mail, DeliveryRecord.returned(DeliveryRecord.Message.REJECTED));
     }
 }

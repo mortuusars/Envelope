@@ -2,9 +2,13 @@ package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
@@ -47,7 +51,7 @@ public class PigeonDeliverMailGoal extends Goal {
             pigeon().getDeliveryHandler().tickDelivery(level, delivery);
 
             delivery.getRoute().getSegment(delivery.getPhase()).endPos()
-                  .ifPresent(pos -> {
+                  .ifPresentOrElse(pos -> {
                       if (delivery.getPhase().isDescending()) {
                           BlockState state = level.getBlockState(pos);
                           if (state.getBlock() instanceof MailboxBlock) {
@@ -65,7 +69,16 @@ public class PigeonDeliverMailGoal extends Goal {
                       if (!pigeon.getNavigation().isInProgress() || !pos.equals(pigeon.getNavigation().getTargetPos())) {
                           pigeon.pathfindDirectlyTowards(pos);
                       }
-                  }); //TODO: orElse -> moveToRandomPos to simulate confusion that it doesn't know where to go
+                  }, () -> {
+                      //TODO: this is reached only when pigeon is already on DEPARTING_RECIPIENT phase,
+                      // due to "pigeon.hasReachedTarget(pos)" above
+                      // Should redo all this, so it wanders at APPROACHING_RECIPIENT and just returns straight back on departing.
+                      @Nullable Vec3 randomPos = AirAndWaterRandomPos.getPos(pigeon, 8, 4, -2,
+                            pigeon.getX(), pigeon.getZ(), (float) (Math.PI / 2));
+                      if (randomPos != null && level.getRandom().nextFloat() < 0.1f) {
+                          pigeon.pathfindDirectlyTowards(BlockPos.containing(randomPos));
+                      }
+                  });
         });
     }
 }

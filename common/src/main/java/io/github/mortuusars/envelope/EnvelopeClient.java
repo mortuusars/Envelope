@@ -8,8 +8,8 @@ import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.*;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
 import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
@@ -121,14 +121,14 @@ public class EnvelopeClient {
 
             DeliveryLog deliveryLog = Mail.getLog(stack);
             if (!deliveryLog.isEmpty()) {
-                consumer.accept(Component.translatable("gui.envelope.delivery.log")
+                consumer.accept(Component.translatable("gui.envelope.delivery_log")
                       .append(CommonComponents.SPACE)
                       .append(Screen.hasShiftDown()
                             ? CommonComponents.EMPTY
                             : Component.literal("[Shift]").withStyle(ChatFormatting.DARK_GRAY)));
                 if (Screen.hasShiftDown()) {
                     for (DeliveryRecord record : deliveryLog.records()) {
-                        consumer.accept(record.translate(Minecrft.level().getGameTime()));
+                        consumer.accept(record.toComponent(Minecrft.level().getGameTime()));
                     }
                 }
             }

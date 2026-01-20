@@ -111,7 +111,7 @@ public class DeliveryRoute {
         map.put(DeliveryPhase.APPROACHING_RECIPIENT, new Segment(recipientAscendPos, recipientPos));
         map.put(DeliveryPhase.HANDLING_DELIVERY, new Segment(recipientPos, recipientPos));
         map.put(DeliveryPhase.DEPARTING_RECIPIENT, new Segment(recipientPos, recipientAscendPos));
-        map.put(DeliveryPhase.RETURNING_TO_SENDER, new Segment(recipientAscendPos, senderAscendPos));
+        map.put(DeliveryPhase.TRAVELING_TO_SENDER, new Segment(recipientAscendPos, senderAscendPos));
         map.put(DeliveryPhase.APPROACHING_SENDER, new Segment(senderAscendPos, senderPos));
         map.put(DeliveryPhase.HANDLING_RETURN, new Segment(senderPos, senderPos));
         map.put(DeliveryPhase.FINISHED, new Segment(senderPos, senderPos));

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.item.component.mail;
+package io.github.mortuusars.envelope.world.item.component.mail.log;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;

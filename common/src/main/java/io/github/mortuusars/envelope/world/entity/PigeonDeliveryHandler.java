@@ -2,12 +2,12 @@ package io.github.mortuusars.envelope.world.entity;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.component.Mail;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
@@ -20,6 +20,11 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
 
     public Pigeon pigeon() {
         return pigeon;
+    }
+
+    @Override
+    public CourierOrigin getOrigin() {
+        return pigeon.getOrigin();
     }
 
     @Override
@@ -43,15 +48,13 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     @Override
     public void advancePhase(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(Address.MAIL_SERVICE)
-                  .message(DeliveryRecord.Message.UNABLE_TO_REACH));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.APPROACHING_SENDER);
             return;
         }
 
         if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(Address.MAIL_SERVICE)
-                  .message(DeliveryRecord.Message.UNABLE_TO_REACH));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.DEPARTING_RECIPIENT);
             return;
         }

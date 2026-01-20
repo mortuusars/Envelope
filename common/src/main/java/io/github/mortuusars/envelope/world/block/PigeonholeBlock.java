@@ -98,41 +98,8 @@ public class PigeonholeBlock extends BaseEntityBlock {
 
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-//        if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
-//              && blockEntity.mapAddressed((serverLevel, address, data) -> data.hasMail()).orElse(false)) {
-//            return 15;
-//        }
-
         return state.getValue(WASTE_LEVEL);
     }
-
-//    @Override
-//    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-//        if (!state.getBlock().equals(newState.getBlock())) {
-//            if (level instanceof ServerLevel serverLevel) {
-//                PigeonholeManager pigeonholeManager = MailService.of(serverLevel).getPigeonholeManager();
-//                @Nullable PigeonholeData data = pigeonholeManager.getDataAt(pos);
-//                if (data != null) {
-//                    NonNullList<ItemStack> itemsToDrop = data.extractAllMail().stream()
-//                          .map(mail -> mail.getItem().copy())
-//                          .collect(Collectors.toCollection(NonNullList::create));
-//
-//                    Containers.dropContents(level, pos, itemsToDrop);
-//
-//                    MailboxMenu.playersWithMenu(serverLevel, data.getAddress()).forEach(player ->
-//                          Packets.sendToClient(new PigeonholeMenuSetInboxS2CP(new Inbox(Collections.emptyList())), player));
-//
-//                    pigeonholeManager.remove(data.getAddress());
-//                }
-//            }
-//
-//            if (level.getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity) {
-//                blockEntity.onBlockRemoved();
-//            }
-//        }
-//
-//        super.onRemove(state, level, pos, newState, movedByPiston);
-//    }
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {

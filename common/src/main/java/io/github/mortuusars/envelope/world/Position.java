@@ -1,5 +1,7 @@
 package io.github.mortuusars.envelope.world;
 
+import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -129,5 +131,14 @@ public class Position {
         }
 
         return false;
+    }
+
+    public static Optional<BlockPos> estimateCourierPosition(Delivery delivery) {
+        DeliveryRoute.Segment segment = delivery.getRoute().getSegment(delivery.getPhase());
+        if (segment.startPos().isPresent() && segment.endPos().isPresent()) {
+            Vec3 pos = Position.lerp(segment.startPos().get(), segment.endPos().get(), delivery.getPhaseProgress());
+            return Optional.of(BlockPos.containing(pos));
+        }
+        return Optional.empty();
     }
 }

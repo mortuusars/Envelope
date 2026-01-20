@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.world.item.component;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.util.Unit;
@@ -153,7 +153,7 @@ public final class Mail {
     }
 
     public static MailBuilder<?> createPaybackPackingBox(PaybackSubject subject) {
-        return new MailBuilder<>(Envelope.Items.PACKAGE.get())
+        return new MailBuilder<>(Envelope.Items.PAYBACK_PACKING_BOX.get())
               .set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, subject);
     }
 }

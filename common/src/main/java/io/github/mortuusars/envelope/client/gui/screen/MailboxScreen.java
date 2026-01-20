@@ -4,8 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.Mail;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryLog;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
@@ -360,9 +360,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
         DeliveryLog deliveryLog = Mail.getLog(hoveredMail);
         if (!deliveryLog.isEmpty()) {
-            tooltip.add(Component.translatable("gui.envelope.delivery.log"));
+            tooltip.add(Component.translatable("gui.envelope.delivery_log"));
             for (DeliveryRecord record : deliveryLog.records()) {
-                tooltip.add(record.translate(Minecrft.level().getGameTime()));
+                tooltip.add(record.toComponent(Minecrft.level().getGameTime()));
             }
         }
 

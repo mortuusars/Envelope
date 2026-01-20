@@ -142,20 +142,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public static Courier spawnServiceCourier(ServerLevel level, Delivery delivery) {
         Pigeon pigeon = createService(level);
         pigeon.startDelivery(delivery);
-        Optional<BlockPos> spawnPos = delivery.getRoute().senderPos().map(p -> Position.aboveGround(level, p, 1));
-        return spawnPos.filter(pos -> Position.isInSimulationDistance(level, pos))
-              .map(pos -> {
-                  pigeon.moveTo(
-                        (double) pos.getX() + 0.5,
-                        (double) pos.getY() + 0.5,
-                        (double) pos.getZ() + 0.5,
-                        Mth.wrapDegrees(level.random.nextFloat() * 360.0F),
-                        0.0F);
-                  level.addFreshEntity(pigeon);
-                  pigeon.onAppeared(level);
-                  return (Courier) pigeon;
-              })
-              .orElseGet(() -> pigeon.transitionToBackground(level));
+        return pigeon.transitionToBackground(level);
     }
 
     @Override
@@ -269,7 +256,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         String carriedItem = !delivery.getMail().isEmpty()
               ? " a " + delivery.getMail().getHoverName().getString()
               : "";
-        String addresses = delivery.getSender().getName() + " to " + delivery.getRecipient().getName();
+        String addresses = delivery.getSender().getName().getString() + " to " + delivery.getRecipient().getName().getString();
 
         Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!",
               message, blockPosition().toShortString(), carriedItem, addresses);
