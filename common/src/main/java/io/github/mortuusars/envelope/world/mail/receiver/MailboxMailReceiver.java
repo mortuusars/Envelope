@@ -33,7 +33,7 @@ public class MailboxMailReceiver implements MailReceiver {
               .map(inbox -> {
                   if (inbox.isInboxFull()) {
                       LOGGER.info("Cannot deliver mail to mailbox '{}': inbox is full. Returning to sender.", address);
-                      return returned(level, mail, DeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL);
+                      return returned(mail, DeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL);
                   }
 
                   ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
@@ -45,12 +45,12 @@ public class MailboxMailReceiver implements MailReceiver {
                       return ItemStack.EMPTY;
                   } else {
                       LOGGER.info("Cannot deliver mail to mailbox '{}': mail cannot be inserted. Returning to sender.", address);
-                      return returned(level, mail, DeliveryRecord.Message.UNABLE_TO_REACH);
+                      return returned(mail, DeliveryRecord.Message.UNABLE_TO_REACH);
                   }
               })
               .orElseGet(() -> {
                   LOGGER.info("Cannot deliver mail to mailbox '{}': address not found. Returning to sender.", address);
-                  return returned(level, mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
+                  return returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
               });
     }
 

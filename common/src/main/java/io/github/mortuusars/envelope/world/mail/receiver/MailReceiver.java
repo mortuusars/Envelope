@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 public interface MailReceiver {
     ItemStack receiveMail(ServerLevel level, ItemStack mail);
 
-    default ItemStack returned(ServerLevel level, ItemStack mail, Component message) {
+    default ItemStack returned(ItemStack mail, Component message) {
         Mail.writeToLog(mail, DeliveryRecord.returned(message));
         Mail.setReturned(mail);
         return mail;
