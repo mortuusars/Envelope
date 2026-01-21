@@ -51,10 +51,10 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
               Optional.empty(), MessageType.NEUTRAL);
     }
 
-    public static DeliveryRecord returned(Component message) {
-        Preconditions.checkNotNull(message);
+    public static DeliveryRecord returned(Component reason) {
+        Preconditions.checkNotNull(reason);
         return new DeliveryRecord(Type.RETURNED, Optional.of(Address.MAIL_SERVICE), Optional.empty(),
-              Optional.of(message), MessageType.NEGATIVE);
+              Optional.of(reason), MessageType.NEGATIVE);
     }
 
     public static DeliveryRecord payback(@NotNull Component message, MessageType type) {

@@ -15,13 +15,15 @@ import java.util.function.IntFunction;
 public enum DeliveryPhase implements StringRepresentable {
     STARTED("started"),
     DEPARTING_SENDER("departing_sender"),
-    TRAVELING_TO_MAIL_HUB("traveling_to_mail_hub"),
-    DISPATCHING("dispatching"),
+    TRAVELING_TO_HUB("traveling_to_hub"),
+    DISPATCHING_DELIVERY("dispatching_delivery"),
     TRAVELING_TO_RECIPIENT("traveling_to_recipient"),
     APPROACHING_RECIPIENT("approaching_recipient"),
     HANDLING_DELIVERY("handling_delivery"),
     DEPARTING_RECIPIENT("departing_recipient"),
-    TRAVELING_TO_SENDER("traveling_to_sender"),
+    RETURNING_TO_HUB("returning_to_hub"),
+    DISPATCHING_RETURN("dispatching_return"),
+    RETURNING_TO_SENDER("returning_to_sender"),
     APPROACHING_SENDER("approaching_sender"),
     HANDLING_RETURN("handling_return"),
     FINISHED("finished");
@@ -41,17 +43,9 @@ public enum DeliveryPhase implements StringRepresentable {
         return name;
     }
 
-    public boolean isLast() {
-        return ordinal() == values().length - 1;
-    }
-
-    public boolean hasNext() {
-        return !isLast();
-    }
-
     public boolean isTraveling() {
-        return this == TRAVELING_TO_MAIL_HUB || this == DISPATCHING
-              || this == TRAVELING_TO_RECIPIENT || this == TRAVELING_TO_SENDER;
+        return this == TRAVELING_TO_HUB || this == DISPATCHING_DELIVERY || this == TRAVELING_TO_RECIPIENT
+            || this == RETURNING_TO_HUB || this == DISPATCHING_RETURN || this == RETURNING_TO_SENDER;
     }
 
     public boolean isReturning() {
@@ -72,6 +66,14 @@ public enum DeliveryPhase implements StringRepresentable {
 
     public boolean isSpawnable() {
         return !isTraveling() && this != DeliveryPhase.FINISHED;
+    }
+
+    public boolean isLast() {
+        return ordinal() == values().length - 1;
+    }
+
+    public boolean hasNext() {
+        return !isLast();
     }
 
     public DeliveryPhase next() {

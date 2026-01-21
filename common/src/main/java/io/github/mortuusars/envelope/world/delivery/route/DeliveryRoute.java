@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.delivery.route;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.Position;
@@ -56,9 +57,7 @@ public class DeliveryRoute {
         MailService mailService = MailService.of(level);
         Optional<BlockPos> senderPos = mailService.getPositionOf(sender);
         Optional<BlockPos> recipientPos = mailService.getPositionOf(recipient);
-        int ascendDistance = Position.getDistanceBetween(senderPos, recipientPos)
-              .map(distance -> Math.min(DEFAULT_ASCEND_DISTANCE, distance / 2))
-              .orElse(DEFAULT_ASCEND_DISTANCE);
+        int ascendDistance = DEFAULT_ASCEND_DISTANCE;
         // Address#hashCode is used as seed, to make random direction (if pos is unknown) of a specific address be always the same
         Optional<BlockPos> senderAscendPos = Position.ascendTowards(level, senderPos, recipientPos, ascendDistance, recipient.hashCode());
         Optional<BlockPos> recipientAscendPos = Position.ascendTowards(level, recipientPos, senderPos, ascendDistance, sender.hashCode());
@@ -105,16 +104,19 @@ public class DeliveryRoute {
         Map<DeliveryPhase, Segment> map = new HashMap<>();
         map.put(DeliveryPhase.STARTED, new Segment(senderPos, senderPos));
         map.put(DeliveryPhase.DEPARTING_SENDER, new Segment(senderPos, senderAscendPos));
-        map.put(DeliveryPhase.TRAVELING_TO_MAIL_HUB, new Segment(senderAscendPos, Optional.empty()));
-        map.put(DeliveryPhase.DISPATCHING, Segment.EMPTY);
+        map.put(DeliveryPhase.TRAVELING_TO_HUB, new Segment(senderAscendPos, Optional.empty()));
+        map.put(DeliveryPhase.DISPATCHING_DELIVERY, Segment.EMPTY);
         map.put(DeliveryPhase.TRAVELING_TO_RECIPIENT, new Segment(Optional.empty(), recipientAscendPos));
         map.put(DeliveryPhase.APPROACHING_RECIPIENT, new Segment(recipientAscendPos, recipientPos));
         map.put(DeliveryPhase.HANDLING_DELIVERY, new Segment(recipientPos, recipientPos));
         map.put(DeliveryPhase.DEPARTING_RECIPIENT, new Segment(recipientPos, recipientAscendPos));
-        map.put(DeliveryPhase.TRAVELING_TO_SENDER, new Segment(recipientAscendPos, senderAscendPos));
+        map.put(DeliveryPhase.RETURNING_TO_HUB, new Segment(recipientAscendPos, Optional.empty()));
+        map.put(DeliveryPhase.DISPATCHING_RETURN, Segment.EMPTY);
+        map.put(DeliveryPhase.RETURNING_TO_SENDER, new Segment(Optional.empty(), senderAscendPos));
         map.put(DeliveryPhase.APPROACHING_SENDER, new Segment(senderAscendPos, senderPos));
         map.put(DeliveryPhase.HANDLING_RETURN, new Segment(senderPos, senderPos));
         map.put(DeliveryPhase.FINISHED, new Segment(senderPos, senderPos));
+        Preconditions.checkState(map.size() == DeliveryPhase.values().length, "Built segments do not cover all delivery phases!");
         return map;
     }
 

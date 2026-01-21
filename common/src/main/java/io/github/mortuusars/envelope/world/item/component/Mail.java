@@ -154,6 +154,6 @@ public final class Mail {
 
     public static MailBuilder<?> createPaybackPackingBox(PaybackSubject subject) {
         return new MailBuilder<>(Envelope.Items.PAYBACK_PACKING_BOX.get())
-              .set(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT, subject);
+              .set(Envelope.DataComponents.PAYBACK_SUBJECT, subject);
     }
 }

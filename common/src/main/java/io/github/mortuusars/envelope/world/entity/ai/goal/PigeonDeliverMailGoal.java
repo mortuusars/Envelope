@@ -70,9 +70,6 @@ public class PigeonDeliverMailGoal extends Goal {
                           pigeon.pathfindDirectlyTowards(pos);
                       }
                   }, () -> {
-                      //TODO: this is reached only when pigeon is already on DEPARTING_RECIPIENT phase,
-                      // due to "pigeon.hasReachedTarget(pos)" above
-                      // Should redo all this, so it wanders at APPROACHING_RECIPIENT and just returns straight back on departing.
                       @Nullable Vec3 randomPos = AirAndWaterRandomPos.getPos(pigeon, 8, 4, -2,
                             pigeon.getX(), pigeon.getZ(), (float) (Math.PI / 2));
                       if (randomPos != null && level.getRandom().nextFloat() < 0.1f) {

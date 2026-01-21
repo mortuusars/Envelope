@@ -36,7 +36,7 @@ public class PaybackPackingMenu extends PackingMenu {
 
     @Override
     protected void init() {
-        this.paybackSubject = Optional.ofNullable(getBoxStack().get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT))
+        this.paybackSubject = Optional.ofNullable(getBoxStack().get(Envelope.DataComponents.PAYBACK_SUBJECT))
               .map(PaybackSubject::mail)
               .orElse(ItemStack.EMPTY);
         this.requestedPayback = Objects.requireNonNull(paybackSubject.get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK));

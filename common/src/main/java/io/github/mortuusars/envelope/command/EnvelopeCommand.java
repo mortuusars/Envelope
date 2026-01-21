@@ -51,7 +51,6 @@ public class EnvelopeCommand {
                           .then(Commands.argument("address", AddressArgument.block())
                                 .suggests(AddressSuggestions.block())
                                 .executes(c -> mailboxPosition(c, AddressArgument.getBlock(c, "address"))))))
-              /*.then(Commands.literal())*/
               .then(EnvelopeDebugCommand.commands())
               .then(Commands.literal("test")
                     .requires(stack -> {
@@ -185,7 +184,7 @@ public class EnvelopeCommand {
                           .get())
                     .from(new Address.Block("Blue"))
                     .to(new Address.Block("Red"))
-                    .startAtPhase(DeliveryPhase.DISPATCHING));
+                    .startAtPhase(DeliveryPhase.DISPATCHING_DELIVERY));
 
 //        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
 //        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));

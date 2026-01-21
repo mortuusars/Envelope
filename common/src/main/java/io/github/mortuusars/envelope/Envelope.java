@@ -290,7 +290,7 @@ public class Envelope {
 
         public static final DataComponentType<PaybackTagContents> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
               b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
-        public static final DataComponentType<PaybackSubject> PAYBACK_PACKAGE_SUBJECT = Register.dataComponentType("payback_package_subject",
+        public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
               b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC));
 
         // -- Misc

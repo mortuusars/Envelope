@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.MailId;
+import io.github.mortuusars.envelope.world.item.component.Id;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -18,14 +18,14 @@ import java.util.Map;
 
 public class PaybackDepartmentData extends SavedData {
     public static final Codec<PaybackDepartmentData> CODEC = RecordCodecBuilder.create(i -> i.group(
-          Codec.unboundedMap(MailId.STRING_CODEC, PaybackSubject.CODEC)
+          Codec.unboundedMap(Id.CODEC, PaybackSubject.CODEC)
                 .optionalFieldOf("payback_pending", Collections.emptyMap())
                 .forGetter(PaybackDepartmentData::getPaybackPendingSubjects)
     ).apply(i, PaybackDepartmentData::new));
 
-    private final Map<MailId, PaybackSubject> paybackPendingSubjects;
+    private final Map<Id, PaybackSubject> paybackPendingSubjects;
 
-    public PaybackDepartmentData(Map<MailId, PaybackSubject> paybackPendingSubjects) {
+    public PaybackDepartmentData(Map<Id, PaybackSubject> paybackPendingSubjects) {
         this.paybackPendingSubjects = new HashMap<>(paybackPendingSubjects); // Make sure it's mutable
     }
 
@@ -33,7 +33,7 @@ public class PaybackDepartmentData extends SavedData {
         this.paybackPendingSubjects = new HashMap<>();
     }
 
-    public Map<MailId, PaybackSubject> getPaybackPendingSubjects() {
+    public Map<Id, PaybackSubject> getPaybackPendingSubjects() {
         return paybackPendingSubjects;
     }
 

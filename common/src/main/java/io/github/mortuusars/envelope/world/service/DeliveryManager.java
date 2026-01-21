@@ -104,19 +104,4 @@ public class DeliveryManager {
 
         return getMailService().getKnownAddresses().isKnown(resolvedAddress);
     }
-
-    public void dispatch(Delivery delivery) {
-        if (!canDeliverTo(delivery.getRecipient())) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
-            Mail.setReturned(delivery.getMail());
-            delivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_TO_SENDER);
-            return;
-        }
-
-        if (getMailService().getPaybackDepartment().tryHandle(delivery)) {
-            return;
-        }
-
-        delivery.setPhaseAndResetProgress(delivery.getPhase().next()); // Continue normally
-    }
 }

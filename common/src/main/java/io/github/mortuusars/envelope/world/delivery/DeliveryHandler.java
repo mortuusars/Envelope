@@ -39,40 +39,42 @@ public interface DeliveryHandler {
                     Envelope.LOGGER.info("{} '{} > {}' is finished.", type, delivery.getSender(), delivery.getRecipient());
                 }
             } else {
-                advancePhase(level, delivery);
+                if (!handlePhaseTransition(level, delivery)) {
+                    delivery.setPhaseAndResetProgress(delivery.getPhase().next());
+                }
             }
         }
     }
 
     /**
-     * Handles next phase selection.<br>
+     * Allows manually handling selection of next phase. <br>
      * Jumping to phases non-linearly should be done here. (to return early, etc.)
+     * @return {@code true} to skip selection of next phase.<br>
+     * {@code false} to select next phase in order.
      */
-    default void advancePhase(ServerLevel level, Delivery delivery) {
-        if (delivery.getPhase() == DeliveryPhase.DISPATCHING) {
-            MailService.of(level).getDeliveryManager().dispatch(delivery);
-        } else {
-            DeliveryPhase nextPhase = delivery.getPhase().next();
-            delivery.setPhaseAndResetProgress(nextPhase);
+    default boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
+        if (delivery.getPhase() == DeliveryPhase.DISPATCHING_DELIVERY) {
+            return dispatchDelivery(level, delivery);
         }
+
+        if (delivery.getPhase() == DeliveryPhase.DISPATCHING_RETURN) {
+            return dispatchReturn(level, delivery);
+        }
+
+        return false;
     }
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
             case STARTED, FINISHED -> 1;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
-            case TRAVELING_TO_MAIL_HUB, TRAVELING_TO_RECIPIENT -> delivery.getRoute().travelDuration().ticks() / 2;
-            case TRAVELING_TO_SENDER -> delivery.getRoute().travelDuration().ticks();
-            case DISPATCHING -> 20;
+            case TRAVELING_TO_HUB, TRAVELING_TO_RECIPIENT, RETURNING_TO_HUB, RETURNING_TO_SENDER -> delivery.getRoute().travelDuration().ticks() / 2;
+            case DISPATCHING_DELIVERY, DISPATCHING_RETURN -> 20;
             case HANDLING_DELIVERY, HANDLING_RETURN -> 5;
         };
     }
 
     default void phaseStarted(ServerLevel level, Delivery delivery) {
-        if (!delivery.getPhase().isTraveling() || delivery.getRoute() == DeliveryRoute.EMPTY) {
-            delivery.updateRoute(level);
-        }
-
         if (delivery.getPhase() == DeliveryPhase.STARTED) {
             Mail.setSender(delivery.getMail(), delivery.getSender());
             Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender(), level.getGameTime()));
@@ -101,5 +103,34 @@ public interface DeliveryHandler {
     }
 
     default void endDelivery(ServerLevel level, Delivery delivery) {
+    }
+
+    // --
+
+    default boolean dispatchDelivery(ServerLevel level, Delivery delivery) {
+        MailService mailService = MailService.of(level);
+
+        if (!mailService.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+            Mail.setReturned(delivery.getMail());
+            delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            return true;
+        }
+
+        if (mailService.getPaybackDepartment().tryHandleDelivery(delivery)) {
+            return true;
+        }
+
+        delivery.updateRoute(level);
+        return false;
+    }
+
+    default boolean dispatchReturn(ServerLevel level, Delivery delivery) {
+        if (MailService.of(level).getPaybackDepartment().tryHandleReturn(delivery)) {
+            return true;
+        }
+
+        delivery.updateRoute(level);
+        return false;
     }
 }

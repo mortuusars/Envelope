@@ -78,14 +78,15 @@ public class DeliveryHandlerTests extends BuggerTests {
         }
 
         @Override
-        public void advancePhase(ServerLevel level, Delivery delivery) {
-            DeliveryPhase nextPhase = delivery.getPhase().next();
-            delivery.setPhaseAndResetProgress(nextPhase);
+        public boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
+            // Skip any logic and just transition linearly
+            delivery.setPhaseAndResetProgress(delivery.getPhase().next());
+            return true;
         }
 
         @Override
         public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
-            return DeliveryHandler.super.getPhaseDuration(level, delivery, phase) -1 ;
+            return DeliveryHandler.super.getPhaseDuration(level, delivery, phase) - 1;
         }
 
         @Override
