@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
         return Commands.literal("debug")
-              .then(Commands.literal("timeout_all_mail_awaiting_payback")
+              .then(Commands.literal("expire_all_awaiting_payback")
                     .executes(EnvelopeDebugCommand::timeoutAllPaybackMail))
               .then(Commands.literal("tests")
                     .executes(EnvelopeDebugCommand::runBuggerTests));

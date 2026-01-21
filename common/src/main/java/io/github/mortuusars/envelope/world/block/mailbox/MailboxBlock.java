@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
+import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.Mail;
@@ -113,6 +114,10 @@ public class MailboxBlock extends BaseEntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
+            // Using MailboxBlockEntity#onBlockRemoved does not cover every case,
+            // as block entity might not exist while the block is still placed.
+            // This happens with CarryOn relocation for example, where block entity is removed first.
+            // So we remove any registered mailbox at this position:
             MailService.of(serverLevel).mailboxes().remove(pos);
 
             if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
@@ -121,10 +126,6 @@ public class MailboxBlock extends BaseEntityBlock {
         }
 
         super.onRemove(state, level, pos, newState, movedByPiston);
-
-        if (!state.getBlock().equals(newState.getBlock()) && level instanceof ServerLevel serverLevel) {
-            MailService.of(serverLevel).mailboxes().remove(pos);
-        }
     }
 
     @Override
@@ -152,6 +153,7 @@ public class MailboxBlock extends BaseEntityBlock {
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
                         pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
+                    pigeon.setOrigin(CourierOrigin.service());
                     if (!player.isCreative()) {
                         stack.shrink(1);
                     }

@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -34,9 +35,9 @@ public class PaybackPackageItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_PACKAGE_SUBJECT);
         if (subject != null && !subject.mail().isEmpty()) {
-            tooltipComponents.add(Component.translatable("gui.envelope.time.remaining")
+            tooltipComponents.add(Component.literal("⌛ ")
                   .append(GameTime.formatLargest(subject.timeoutTick() - Minecrft.level().getGameTime(), false))
-                  .withStyle(ChatFormatting.RED));
+                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
         }
     }
 

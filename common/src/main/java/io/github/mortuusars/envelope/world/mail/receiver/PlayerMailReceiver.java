@@ -16,8 +16,8 @@ public class PlayerMailReceiver implements MailReceiver {
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
         return MailService.of(level).getPlayers().getDefaultAddressOf(address)
-              .map(BlockMailReceiver::new)
+              .map(MailboxMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
-              .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+              .orElseGet(() -> returned(level, mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 }

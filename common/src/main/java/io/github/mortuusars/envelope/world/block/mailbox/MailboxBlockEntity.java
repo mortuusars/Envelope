@@ -6,7 +6,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
-import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
@@ -211,6 +210,10 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     public void openMenu(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
+            if (getOwner() == null) {
+                setOwner(player.getUUID());
+            }
+
             PlatformHelper.openMenu(serverPlayer, this, buffer -> {
                 buffer.writeBlockPos(getBlockPos());
                 Address.Block.STREAM_CODEC.encode(buffer, getAddress());
@@ -266,8 +269,12 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     }
 
     @Override
+    public void onMailInserted(ItemStack mail) {
+        playSound(SoundEvents.NOTE_BLOCK_CHIME.value(), 1, 1);
+    }
+
+    @Override
     public void onMailAdded(ItemStack mail) {
-        Inbox.super.onMailAdded(mail);
         if (level instanceof ServerLevel serverLevel) {
             MailboxMenu.playersWithMenu(serverLevel, getAddress())
                   .forEach(player -> Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player));
@@ -276,7 +283,6 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     @Override
     public void onMailRemoved(int slot, ItemStack mail) {
-        Inbox.super.onMailRemoved(slot, mail);
         if (level instanceof ServerLevel serverLevel) {
             Optional.ofNullable(Mail.getId(mail)).ifPresent(id -> {
                 MailboxMenu.executeForPlayersWithMenu(serverLevel, getAddress(),
@@ -290,6 +296,26 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (level != null) {
             level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
         }
+    }
+
+    // As inbox can be quite large in size, we cannot store it as regular block entity data.
+    // So we use dedicated inbox storage for that, and load/unload each time block entity is being loaded/unloaded.
+
+    protected void loadInbox() {
+        if (level instanceof ServerLevel serverLevel) {
+            mail = InboxStorage.get(serverLevel).remove(inboxId)
+                  .map(Inbox::getAllMail)
+                  .orElseGet(ArrayList::new);
+        } else {
+            mail = new ArrayList<>();
+        }
+    }
+
+    protected void unloadInbox() {
+        if (level instanceof ServerLevel serverLevel && address != null) {
+            InboxStorage.get(serverLevel).put(inboxId, this);
+        }
+        mail.clear();
     }
 
     // -- Events
@@ -317,33 +343,25 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     public void clearRemoved() {
         super.clearRemoved();
-        if (level instanceof ServerLevel serverLevel) {
-            blockRemoved = false; // idk if this does something, but just in case
-            this.mail = Inboxes.get(serverLevel).retrieve(inboxId)
-                  .map(UnloadedInbox::getAllMail)
-                  .orElseGet(ArrayList::new);
-            if (Bugger.isEnabled() && !getAllMail().isEmpty()) {
-                LOGGER.info("Loaded inbox with size [{}] of mailbox {}@[{}]", getAllMail().size(), address, getBlockPos().toShortString());
-            }
-        }
+        loadInbox();
+        blockRemoved = false;
     }
 
     @Override
     public void setRemoved() {
         super.setRemoved();
-        if (level instanceof ServerLevel serverLevel && address != null && !blockRemoved) {
-            Inboxes.get(serverLevel).store(inboxId, this);
-            if (Bugger.isEnabled() && !getAllMail().isEmpty()) {
-                LOGGER.info("Stored inbox with size [{}] of mailbox {}@[{}]", mail.size(), address, getBlockPos().toShortString());
-            }
-            this.mail = new ArrayList<>();
+        if (!blockRemoved) {
+            unloadInbox();
         }
-        mail.clear();
     }
 
     @Override
     public void setChanged() {
         super.setChanged();
+        updateBlockStateIfNeeded();
+    }
+
+    private void updateBlockStateIfNeeded() {
         if (!isRemoved() && level instanceof ServerLevel serverLevel) {
             BlockState state = getBlockState();
             boolean isOpen = state.getValue(MailboxBlock.OPEN);

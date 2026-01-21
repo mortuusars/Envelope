@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.service;
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -12,7 +11,7 @@ import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailServiceEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
 import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
-import io.github.mortuusars.envelope.world.mail.receiver.BlockMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.MailboxMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import net.minecraft.core.BlockPos;
@@ -179,7 +178,7 @@ public class MailService {
 
     public ItemStack deliverMail(Address address, ItemStack mail) {
         if (mail.isEmpty()) return mail;
-        return address.map(BlockMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
+        return address.map(MailboxMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
     }
 
     // --

@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.component.Mail;
@@ -50,8 +51,16 @@ public class EnvelopeCommand {
                           .then(Commands.argument("address", AddressArgument.block())
                                 .suggests(AddressSuggestions.block())
                                 .executes(c -> mailboxPosition(c, AddressArgument.getBlock(c, "address"))))))
+              /*.then(Commands.literal())*/
               .then(EnvelopeDebugCommand.commands())
               .then(Commands.literal("test")
+                    .requires(stack -> {
+                        if (!Bugger.isEnabled()) {
+                            stack.sendFailure(Component.literal("Requires debug mode."));
+                            return false;
+                        }
+                        return true;
+                    })
                     .executes(EnvelopeCommand::test)));
     }
 
