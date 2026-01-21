@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -114,24 +113,18 @@ public class EnvelopeClient {
         public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
                                               Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
             Mail.getSender(stack).ifPresent(sender -> {
-                consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
-                      .append(": ").withStyle(ChatFormatting.GRAY)
-                      .append(sender.format().asNeutral().toComponent()));
-            });
-
-            DeliveryLog deliveryLog = Mail.getLog(stack);
-            if (!deliveryLog.isEmpty()) {
-                consumer.accept(Component.translatable("gui.envelope.delivery_log")
-                      .append(CommonComponents.SPACE)
-                      .append(Screen.hasShiftDown()
-                            ? CommonComponents.EMPTY
-                            : Component.literal("[Shift]").withStyle(ChatFormatting.DARK_GRAY)));
-                if (Screen.hasShiftDown()) {
+                DeliveryLog deliveryLog = Mail.getLog(stack);
+                if (Screen.hasShiftDown() && !deliveryLog.isEmpty()) {
+                    consumer.accept(Component.translatable("gui.envelope.delivery_log").withStyle(ChatFormatting.DARK_GRAY));
                     for (DeliveryRecord record : deliveryLog.records()) {
                         consumer.accept(record.toComponent(Minecrft.level().getGameTime()));
                     }
+                } else {
+                    consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
+                          .append(": ").withStyle(ChatFormatting.GRAY)
+                          .append(sender.format().asNeutral().toComponent()));
                 }
-            }
+            });
 
             if (tooltipFlag.isAdvanced()) {
                 Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {
