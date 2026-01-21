@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item.crafting;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.LetterAndQuillItem;
 import io.github.mortuusars.envelope.world.item.LetterItem;
-import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;

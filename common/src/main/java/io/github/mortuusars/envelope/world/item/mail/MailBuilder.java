@@ -1,6 +1,7 @@
-package io.github.mortuusars.envelope.world.item.component;
+package io.github.mortuusars.envelope.world.item.mail;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;

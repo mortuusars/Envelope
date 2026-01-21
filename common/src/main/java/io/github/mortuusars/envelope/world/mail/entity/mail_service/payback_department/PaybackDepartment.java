@@ -10,7 +10,7 @@ import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
 import io.github.mortuusars.envelope.world.item.PaybackPackingBoxItem;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;

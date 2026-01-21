@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailR
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuSetMailS2CP;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;

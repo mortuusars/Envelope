@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;

@@ -5,13 +5,13 @@
   "minVersion": "0.8",
   "client": [
     "EditBoxMixin",
+    "applicator_carrying_tooltip.AbstractContainerScreenMixin",
     "bugger.EntityRendererMixin",
     "bugger.KeyboardHandlerMixin",
     "bugger.MouseHandlerMixin",
     "bugger.ScreenOverlayMixin",
     "bugger.ScreenRenderLinesInvoker",
-    "tooltip.ClientTooltipComponentMixin",
-    "applicator_carrying_tooltip.AbstractContainerScreenMixin"
+    "tooltip.ClientTooltipComponentMixin"
   ],
   "mixins": [
     "dispenser_waste_scooping.DispenserBlockMixin",
@@ -19,8 +19,10 @@
     "fox_tatter.FoxMixin",
     "injected.ServerLevelMixin",
     "jei.JeiKeyConflictContextMixin",
-    "tooltip.ItemStackMixin",
-    "spawners.MinecraftServerMixin"
+    "shears_clearing.ItemStackMixin",
+    "shears_clearing.ShearsItemMixin",
+    "spawners.MinecraftServerMixin",
+    "tooltip.ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

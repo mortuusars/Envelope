@@ -1,11 +1,18 @@
-package io.github.mortuusars.envelope.world.item.component;
+package io.github.mortuusars.envelope.world.item.mail;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -155,5 +162,25 @@ public final class Mail {
     public static MailBuilder<?> createPaybackPackingBox(PaybackSubject subject) {
         return new MailBuilder<>(Envelope.Items.PAYBACK_PACKING_BOX.get())
               .set(Envelope.DataComponents.PAYBACK_SUBJECT, subject);
+    }
+
+    // --
+
+    public static boolean handleShearsUse(ItemStack stack, Slot slot, ClickAction action, Player player) {
+        if (action != ClickAction.SECONDARY) return false;
+        if (!slot.allowModification(player)) return false;
+        if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
+
+        ItemStack result = removePreviousDeliveryData(slot.getItem().copy());
+
+        if (!ItemStack.isSameItemSameComponents(slot.getItem(), result)) {
+            slot.setByPlayer(result);
+            stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+            player.playSound(SoundEvents.SHEEP_SHEAR, 0.75f, 1f);
+        } else {
+            player.playSound(SoundEvents.COMPARATOR_CLICK, 0.75f, 1f);
+        }
+
+        return true;
     }
 }

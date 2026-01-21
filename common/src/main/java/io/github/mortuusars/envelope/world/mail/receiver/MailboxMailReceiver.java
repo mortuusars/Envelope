@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.block.mailbox.InboxStorage;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.Mail;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
