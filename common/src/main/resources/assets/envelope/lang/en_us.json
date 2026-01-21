@@ -3,6 +3,7 @@
   "block.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
   "block.envelope.birch_pigeonhole": "Birch Pigeonhole",
 
+  "block.envelope.mailbox": "Mailbox",
   "block.envelope.paper_box": "Paper Box",
   "block.envelope.package": "Package",
   "block.envelope.sealed_package": "Sealed Package",
@@ -21,6 +22,7 @@
   "item.envelope.letter": "Letter",
   "item.envelope.sealed_letter": "Sealed Letter",
 
+  "item.envelope.mailbox": "Mailbox",
   "item.envelope.paper_box": "Paper Box",
   "item.envelope.packing_box": "Packing Box",
   "item.envelope.package": "Package",

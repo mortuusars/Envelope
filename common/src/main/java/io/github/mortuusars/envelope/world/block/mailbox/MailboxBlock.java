@@ -1,16 +1,25 @@
 package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.mojang.serialization.MapCodec;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.network.Packets;
+import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
+import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -19,6 +28,7 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -36,6 +46,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class MailboxBlock extends BaseEntityBlock {
     public static final MapCodec<MailboxBlock> CODEC = simpleCodec(MailboxBlock::new);
@@ -134,6 +146,14 @@ public class MailboxBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
+        if (stack.getItem() instanceof AddressTagItem) {
+            if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
+                AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeMailService().getKnownAddresses();
+                Packets.sendToClient(new OpenMailboxAddressTagScreenS2CP(hand, knownAddresses, pos, Optional.of(blockEntity.getAddress())), serverPlayer);
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+
         if (player.isCreative()
               && stack.is(Envelope.Tags.Items.MAILABLE)
               && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block recipientAddress
@@ -188,8 +208,85 @@ public class MailboxBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS_NO_ITEM_USED;
     }
 
-    public void applyAddressTag(Player player, BlockState state, BlockPos pos, int slot, String addressId) {
+    // --
 
+    public void changeAddress(Player player, BlockPos pos, InteractionHand hand, String addressId) {
+        if (!(player.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (!(stack.getItem() instanceof AddressTagItem)) {
+            Envelope.LOGGER.error("Failed change address: item in hand is not AddressTagItem, but {}", stack);
+            return;
+        }
+
+        if (!(level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity)) {
+            Envelope.LOGGER.error("Failed change address: block entity at pos is not a MailboxBlockEntity.");
+            return;
+        }
+
+        AddressValidation.forMailbox(MailService.of(level).getKnownAddresses(), player)
+              .test(addressId)
+              .ifPresentOrElse(
+                    id -> {
+                        applyAddress(player, blockEntity, new Address.Block(id), stack);
+                        player.swing(hand);
+                    },
+                    error -> {
+                        player.displayClientMessage(error.getTranslation(), true);
+                        player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 0.75f, 1f);
+                    });
+    }
+
+    public static void placeBlockWithAddress(Player player, InteractionHand hand, BlockPlaceContext context, String addressId) {
+        if (!(player.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        BlockPos pos = context.getClickedPos();
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 0.75f, 1f);
+            Envelope.LOGGER.error("Failed to place mailbox: item in hand is not a BlockItem, but {}", stack);
+            return;
+        }
+
+        AddressValidation.forMailbox(MailService.of(level).getKnownAddresses(), player)
+              .test(addressId)
+              .ifPresentOrElse(
+                    id -> {
+                        blockItem.place(context);
+
+                        if (!(level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity)) {
+                            player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 0.75f, 1f);
+                            Envelope.LOGGER.error("Failed to place mailbox: be at pos [{}] is not MailboxBlockEntity", pos.toShortString());
+                            return;
+                        }
+
+                        blockEntity.getBlockState().getBlock().setPlacedBy(level, pos, blockEntity.getBlockState(), player, stack);
+                        applyAddress(player, blockEntity, new Address.Block(id), stack);
+                        player.swing(hand);
+                    },
+                    error -> {
+                        player.displayClientMessage(error.getTranslation(), true);
+                        player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 0.75f, 1f);
+                    });
+    }
+
+    private static void applyAddress(Player player, MailboxBlockEntity blockEntity, Address.Block address, ItemStack stack) {
+        blockEntity.setAddress(address);
+
+        if (Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get() > 0) {
+            player.level().playSound(player, blockEntity.getBlockPos(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS);
+        }
+
+        if (!player.isCreative()) {
+            stack.shrink(1);
+            player.giveExperienceLevels(-Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get());
+        }
     }
 
     // --

@@ -11,20 +11,21 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public record MailboxAddressTagApplyC2SP(int slot, String addressId, BlockPos pos) implements Packet {
+public record MailboxAddressTagApplyC2SP(InteractionHand hand, String addressId, BlockPos pos) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("mailbox_address_tag_apply");
     public static final Type<MailboxAddressTagApplyC2SP> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MailboxAddressTagApplyC2SP> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, MailboxAddressTagApplyC2SP::slot,
-            ByteBufCodecs.STRING_UTF8, MailboxAddressTagApplyC2SP::addressId,
-            BlockPos.STREAM_CODEC, MailboxAddressTagApplyC2SP::pos,
-            MailboxAddressTagApplyC2SP::new
+          ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), MailboxAddressTagApplyC2SP::hand,
+          ByteBufCodecs.STRING_UTF8, MailboxAddressTagApplyC2SP::addressId,
+          BlockPos.STREAM_CODEC, MailboxAddressTagApplyC2SP::pos,
+          MailboxAddressTagApplyC2SP::new
     );
 
     @Override
@@ -34,16 +35,10 @@ public record MailboxAddressTagApplyC2SP(int slot, String addressId, BlockPos po
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
-        if (slot < 0 || slot > player.getInventory().items.size()) {
-            Envelope.LOGGER.error("Cannot handle {} packet: slot {} is not in valid range (0 - {}).",
-                    ID, slot, player.getInventory().items.size());
-            return false;
-        }
-
-        ItemStack tag = player.getInventory().getItem(slot);
+        ItemStack tag = player.getItemInHand(hand);
 
         if (!(tag.getItem() instanceof AddressTagItem)) {
-            Envelope.LOGGER.error("Cannot handle {} packet: item in slot {} is not an AddressTagItem.", ID, slot);
+            Envelope.LOGGER.error("Cannot handle {} packet: item in hand is not an AddressTagItem, but {}.", ID, tag);
             return false;
         }
 
@@ -53,7 +48,7 @@ public record MailboxAddressTagApplyC2SP(int slot, String addressId, BlockPos po
             return false;
         }
 
-        block.applyAddressTag(player, state, pos, slot, addressId);
+        block.changeAddress(player, pos, hand, addressId);
         return true;
     }
 }
