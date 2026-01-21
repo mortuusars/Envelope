@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity.ai.goal;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -27,7 +28,8 @@ public class PigeonLocateMailboxGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return !pigeon.isDelivering()
+        return MailService.operatesIn(pigeon.level())
+              && !pigeon.isDelivering()
               && pigeon.canStartDelivery()
               && pigeon.getMailboxHandler().getLocateCooldown() <= 0
               && pigeon.getMailboxHandler().getTargetPos() == null

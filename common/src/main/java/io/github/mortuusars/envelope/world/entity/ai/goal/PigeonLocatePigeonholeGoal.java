@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity.ai.goal;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -22,7 +23,8 @@ public class PigeonLocatePigeonholeGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return pigeon.getPigeonholeHandler().getLocateCooldown() == 0
+        return MailService.operatesIn(pigeon.level())
+              && pigeon.getPigeonholeHandler().getLocateCooldown() == 0
               && pigeon.getPigeonholeHandler().getTargetPos() == null
               && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon);
     }

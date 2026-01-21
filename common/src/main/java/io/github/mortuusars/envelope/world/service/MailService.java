@@ -195,4 +195,8 @@ public class MailService {
     public long getGameTime() {
         return getLevel().getGameTime();
     }
+
+    public static boolean operatesIn(Level level) {
+        return level.dimension() == Level.OVERWORLD;
+    }
 }

@@ -73,7 +73,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     protected @NotNull Component getDefaultName() {
         return address != null
-              ? getAddress().getName()
+              ? address.getName()
               : Component.translatable("container.envelope.mailbox");
     }
 
@@ -88,7 +88,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         @Nullable Address.Block currentAddress = this.address;
         this.address = address;
 
-        if (getLevel() instanceof ServerLevel serverLevel) {
+        if (getLevel() instanceof ServerLevel serverLevel && MailService.operatesIn(serverLevel)) {
             address = Objects.requireNonNullElseGet(address, () -> generateRandomAddress(serverLevel));
             address = MailService.of(serverLevel).mailboxes().correctOrRegisterIfNeeded(address, getBlockPos());
 
@@ -226,6 +226,10 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     // -- Delivery
 
     public boolean tryStartDelivery(Pigeon pigeon) {
+        if (!MailService.operatesIn(pigeon.level())) {
+            return false;
+        }
+
         ServerLevel level = ((ServerLevel) pigeon.level());
 
         if (pigeon.isDelivering()) return false;

@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ public class PigeonStartDeliveryFromMailboxGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (pigeon.isDelivering() || !pigeon.canStartDelivery()) {
+        if (!MailService.operatesIn(pigeon.level()) || pigeon.isDelivering() || !pigeon.canStartDelivery()) {
             return false;
         }
 

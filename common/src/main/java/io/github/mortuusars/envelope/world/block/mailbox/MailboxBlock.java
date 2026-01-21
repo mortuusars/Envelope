@@ -9,8 +9,10 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -130,6 +132,12 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!MailService.operatesIn(level)) {
+            player.displayClientMessage(Component.literal("Mail Service does not operate in this dimension.")
+                  .withStyle(ChatFormatting.RED), true);
+            return ItemInteractionResult.SUCCESS;
+        }
+
         if (player.isCreative()
               && stack.is(Envelope.Tags.Items.MAILABLE)
               && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block recipientAddress
@@ -171,9 +179,16 @@ public class MailboxBlock extends BaseEntityBlock {
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
                                                         Player player, BlockHitResult hitResult) {
+        if (!MailService.operatesIn(level)) {
+            player.displayClientMessage(Component.literal("Mail Service does not operate in this dimension.")
+                  .withStyle(ChatFormatting.RED), true);
+            return InteractionResult.SUCCESS_NO_ITEM_USED;
+        }
+
         if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
             blockEntity.openMenu(player);
         }
+
         return InteractionResult.SUCCESS_NO_ITEM_USED;
     }
 
