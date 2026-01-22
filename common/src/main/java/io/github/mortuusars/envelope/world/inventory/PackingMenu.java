@@ -231,7 +231,7 @@ public class PackingMenu extends AbstractContainerMenu {
             if (getPackage().shouldBeDestroyedWhenEmpty(getBoxStack())) {
                 player.getItemInHand(hand).shrink(1);
                 serverPlayer.serverLevel().playSound(null, serverPlayer,
-                      Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 1, 1);
+                      SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
             }
         }
 

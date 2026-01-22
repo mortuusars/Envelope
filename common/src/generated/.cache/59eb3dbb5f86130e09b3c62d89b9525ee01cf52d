@@ -1,4 +1,5 @@
-// 1.21.1	2025-11-27T21:19:01.3147245	Loot Tables
+// 1.21.1	2026-01-22T05:40:45.395327	Loot Tables
+0315802b9c612bf8161c9d062c4e9d6d80929030 data/envelope/loot_table/blocks/mailbox.json
 455ed6fbdc5e3316ef81d343d0d3dd6b94bc8daf data/envelope/loot_table/blocks/oak_pigeonhole.json
 44f7d5b44f220c1b344512b51a7a2cb306348c9a data/envelope/loot_table/blocks/paper_box.json
 c458b44ed8443754ad34747f3ae5cd797feb194b data/envelope/loot_table/entities/pigeon.json

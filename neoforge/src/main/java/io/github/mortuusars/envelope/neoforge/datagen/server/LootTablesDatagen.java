@@ -22,7 +22,7 @@ public class LootTablesDatagen extends LootTableProvider {
     public static LootTablesDatagen create(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         return new LootTablesDatagen(
                 output,
-                Collections.emptySet(), // Envelope.LootTables.all()
+                Collections.emptySet(),
                 List.of(
                         new LootTableProvider.SubProviderEntry(BlockLootTableProvider::new, LootContextParamSets.BLOCK),
                         new LootTableProvider.SubProviderEntry(EntityLootTableProvider::new, LootContextParamSets.ENTITY)

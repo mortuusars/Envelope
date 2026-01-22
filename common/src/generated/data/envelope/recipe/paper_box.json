@@ -1,19 +1,15 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "equipment",
-  "ingredients": [
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:paper"
-    },
-    {
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
       "item": "minecraft:paper"
     }
+  },
+  "pattern": [
+    "PP ",
+    "PP ",
+    "   "
   ],
   "result": {
     "count": 1,

@@ -99,6 +99,12 @@ public class Envelope {
 
         public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak", MapColor.WOOD);
 
+        public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
+              () -> new MailboxBlock(BlockBehaviour.Properties.of()
+                    .strength(4f)
+                    .sound(SoundType.WOOD)
+                    .mapColor(MapColor.WOOD)));
+
         public static final Supplier<PaperBoxBlock> PAPER_BOX = Register.block("paper_box",
               () -> new PaperBoxBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
@@ -125,12 +131,6 @@ public class Envelope {
                     .sound(SoundTypes.PAPER)
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
-
-        public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
-              () -> new MailboxBlock(BlockBehaviour.Properties.of()
-                    .strength(2f)
-                    .sound(SoundType.WOOD)
-                    .mapColor(MapColor.WOOD)));
 
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";

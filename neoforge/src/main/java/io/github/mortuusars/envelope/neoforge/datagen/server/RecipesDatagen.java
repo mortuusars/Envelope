@@ -21,6 +21,16 @@ public class RecipesDatagen extends RecipeProvider {
     protected void buildRecipes(@NotNull RecipeOutput output) {
         pigeonhole(output, Envelope.Items.OAK_PIGEONHOLE.get(), Items.OAK_PLANKS);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.MAILBOX.get(), 1)
+              .define('P', ItemTags.PLANKS)
+              .define('S', ItemTags.WOODEN_SLABS)
+              .define('T', Envelope.Items.ADDRESS_TAG.get())
+              .pattern("SSS")
+              .pattern("PTP")
+              .pattern("PPP")
+              .unlockedBy("has_planks", has(ItemTags.PLANKS))
+              .save(output);
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.LETTER_AND_QUILL.get())
               .requires(Items.PAPER)
               .requires(Items.FEATHER)
@@ -28,11 +38,11 @@ public class RecipesDatagen extends RecipeProvider {
               .unlockedBy("has_paper", has(Items.PAPER))
               .save(output);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PAPER_BOX.get())
-              .requires(Items.PAPER)
-              .requires(Items.PAPER)
-              .requires(Items.PAPER)
-              .requires(Items.PAPER)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.PAPER_BOX.get(), 1)
+              .define('P', Items.PAPER)
+              .pattern("PP ")
+              .pattern("PP ")
+              .pattern("   ")
               .unlockedBy("has_paper", has(Items.PAPER))
               .save(output);
 
@@ -54,6 +64,12 @@ public class RecipesDatagen extends RecipeProvider {
               .requires(Tags.Items.DYES_RED)
               .unlockedBy("has_paper", has(Items.PAPER))
               .save(output);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PAYBACK_TAG.get())
+              .requires(Envelope.Items.ADDRESS_TAG.get())
+              .requires(Tags.Items.DYES_RED)
+              .unlockedBy("has_paper", has(Items.PAPER))
+              .save(output, "payback_tag_from_address_tag");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Envelope.Items.SEAL_STAMP.get(), 1)
               .define('S', ItemTags.WOODEN_SLABS)

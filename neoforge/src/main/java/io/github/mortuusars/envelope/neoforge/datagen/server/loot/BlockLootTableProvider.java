@@ -35,6 +35,7 @@ public class BlockLootTableProvider extends BlockLootSubProvider {
     protected @NotNull Iterable<Block> getKnownBlocks() {
         List<Block> blocks = new ArrayList<>(
               Envelope.Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toList());
+        blocks.add(Envelope.Blocks.MAILBOX.get());
         blocks.add(Envelope.Blocks.PAPER_BOX.get());
         return blocks;
     }
@@ -42,10 +43,13 @@ public class BlockLootTableProvider extends BlockLootSubProvider {
     @Override
     public void generate() {
         Envelope.Blocks.PIGEONHOLES.forEach((id, block) -> add(block.get(), this::createPigeonholeDrop));
+        dropSelf(Envelope.Blocks.MAILBOX.get());
         add(Envelope.Blocks.PAPER_BOX.get(), this::createPaperBoxDrops);
     }
 
-    public LootTable.Builder createPaperBoxDrops(Block paperBoxBlock) {
+    // --
+
+    protected LootTable.Builder createPaperBoxDrops(Block paperBoxBlock) {
         return LootTable.lootTable().withPool(LootPool.lootPool()
               .setRolls(ConstantValue.exactly(1.0F))
               .add(applyExplosionDecay(paperBoxBlock, LootItem.lootTableItem(paperBoxBlock)
@@ -59,7 +63,7 @@ public class BlockLootTableProvider extends BlockLootSubProvider {
         );
     }
 
-    public LootTable.Builder createPigeonholeDrop(Block block) {
+    protected LootTable.Builder createPigeonholeDrop(Block block) {
         return LootTable.lootTable().withPool(LootPool.lootPool()
               .setRolls(ConstantValue.exactly(1.0F))
               .add(LootItem.lootTableItem(block)

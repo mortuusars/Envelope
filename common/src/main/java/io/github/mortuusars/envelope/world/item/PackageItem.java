@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -49,8 +50,13 @@ public class PackageItem extends BlockItem implements Sealable {
         Mail.setSender(stack, null);
 
         player.setItemInHand(hand, stack);
+        level.playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 1, 1);
 
-        ((PackingBoxItem)stack.getItem()).openPackingGui(player, hand, stack);
+        if (stack.getItem() instanceof PackingBoxItem packingBox) {
+            packingBox.openPackingGui(player, hand, stack);
+        } else {
+            Envelope.LOGGER.error("Cannot open packing box gui. Stack {} is not a PackingBoxItem.", stack.getHoverName().getString());
+        }
 
         return InteractionResultHolder.success(stack);
     }
