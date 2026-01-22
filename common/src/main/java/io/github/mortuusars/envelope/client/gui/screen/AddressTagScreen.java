@@ -83,6 +83,8 @@ public class AddressTagScreen extends Screen {
         addRenderableWidget(confirmButton);
 
         setInitialFocus(addressBox);
+
+        addressTextChanged(addressBox.getValue());
     }
 
     // --

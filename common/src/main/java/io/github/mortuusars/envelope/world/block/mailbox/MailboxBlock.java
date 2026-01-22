@@ -228,7 +228,11 @@ public class MailboxBlock extends BaseEntityBlock {
               .ifPresentOrElse(
                     id -> {
                         applyAddress(player, blockEntity, new Address.Block(id), stack);
-                        player.swing(hand);
+                        player.swing(hand, true);
+
+                        if (!player.isCreative()) {
+                            stack.shrink(1);
+                        }
                     },
                     error -> {
                         player.displayClientMessage(error.getTranslation(), true);
@@ -264,7 +268,7 @@ public class MailboxBlock extends BaseEntityBlock {
 
                         blockEntity.getBlockState().getBlock().setPlacedBy(level, pos, blockEntity.getBlockState(), player, stack);
                         applyAddress(player, blockEntity, new Address.Block(id), stack);
-                        player.swing(hand);
+                        player.swing(hand, true);
                     },
                     error -> {
                         player.displayClientMessage(error.getTranslation(), true);
@@ -280,7 +284,6 @@ public class MailboxBlock extends BaseEntityBlock {
         }
 
         if (!player.isCreative()) {
-            stack.shrink(1);
             player.giveExperienceLevels(-Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get());
         }
     }

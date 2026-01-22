@@ -75,7 +75,7 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
 
         MutableComponent confirmTooltip = Component.translatable("gui.envelope.confirm");
 
-        if (!canConfirm()) {
+        if (!confirmButton.active) {
             getAddressValidator().getErrors()
                   .forEach(issue -> confirmTooltip.append("\n")
                         .append(Component.literal("• ").withStyle(ChatFormatting.RED))
@@ -132,7 +132,7 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
 
     @Override
     protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        int color = isCurrentIdSameAsExistingAddress() || getAddressValidator().getErrors().isEmpty() ? 0xFFFFFFFF : 0xAAFFFFFF;
+        int color = canConfirm() ? 0xFFFFFFFF : 0xAAFFFFFF;
         guiGraphics.drawString(font, EnvelopeSymbols.ADDRESS_BLOCK, leftPos + 17, topPos + 21, color, true);
     }
 

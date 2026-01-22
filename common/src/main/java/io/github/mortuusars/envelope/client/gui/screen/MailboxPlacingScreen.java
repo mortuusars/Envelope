@@ -56,4 +56,9 @@ public class MailboxPlacingScreen extends AbstractMailboxAddressScreen {
     protected boolean stillValid() {
         return player.getItemInHand(hand).getItem() instanceof MailboxBlockItem;
     }
+
+    @Override
+    protected boolean isCurrentIdSameAsExistingAddress() {
+        return false;
+    }
 }
