@@ -1,14 +1,24 @@
 # Changelog
 
-## 0.4.0.2
+## 0.4.0.2 - Reworks, reworks, reworks
+- Pigeonhole has been split into two blocks:
+  - Added Mailbox block. This is now a main interaction point with the mail system.
+    - Upon placing a Mailbox, player will be asked to provide an address for it. (Address Tag can still be used to change existing address)
+    - When mailbox has mail to send and food for pigeons, its front hatch will open - allowing nearby pigeons to pick it up for delivery.  
+  - Pigeonhole no longer acts like a mailbox. Now it's just a place for pigeons to chill.
+- Reduced xp requirement for setting/changing mailbox address from 5 to 3 levels.
+- Mail items:
+  - Tooltips now have separate lines for sender/recipient addresses. 
+  - Delivered mail no longer keeps sending data (recipient and payback).
+  - Delivery Log can now be seen in the mail item tooltip by pressing [Shift], if mail has a sender component.
+  - Using Shears on the mail item in inventory (clicking the item with them) removes delivery data.
 - Added recipe for Payback Tag
+- Payback timeout config option is now in minutes instead of seconds. Config will update automatically as it's name changed as well.
 - Changed Address Tag recipe: it's now shapeless, requires only one sign and gives one tag.
-- Payback timeout config option is now in minutes instead of seconds. Config will update automatically as it's name changed as well. 
-- Delivered mail no longer keeps sending data (recipient and payback).
-- Traveling mail no longer shows sender address from the start. It will be added when delivered (or dropped near recipient).
-- Changed some internal systems. Renamed several item components.
-  - Some existing stuff will likely disappear from the world again.
-- Improvements to delivery system to make it more robust.
+- Heavy changes to internal systems. Renamed several item components.
+  - Some existing stuff will disappear from the world again.
+- Many changes and improvements to delivery system to make it more robust.
+- Many smaller changes and tweaks.
 
 ## 0.4.0.1
 [Some existing envelope world data might disappear when updating to this version]
