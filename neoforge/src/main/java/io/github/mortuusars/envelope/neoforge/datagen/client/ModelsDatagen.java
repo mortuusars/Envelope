@@ -9,6 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -28,7 +29,13 @@ public class ModelsDatagen extends BlockStateProvider {
             itemModels().simpleBlockItem(block.get());
         });
 
-        itemModels().simpleBlockItem(Envelope.Blocks.MAILBOX.get());
+        itemModels().simpleBlockItem(Envelope.Blocks.MAILBOX.get())
+              .transforms()
+              .transform(ItemDisplayContext.GUI)
+              .rotation(30, -135, 0)
+              .scale(0.75f)
+              .translation(0, 0.75f, 0)
+              .end();
 
         horizontalBlock(Envelope.Blocks.PACKAGE.get(), models().getExistingFile(modLoc("block/package")));
         horizontalBlock(Envelope.Blocks.SEALED_PACKAGE.get(), models().getExistingFile(modLoc("block/sealed_package")));

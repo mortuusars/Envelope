@@ -16,12 +16,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 public record OpenMailboxAddressTagScreenS2CP(InteractionHand hand,
                                               AllAddresses knownAddresses,
                                               BlockPos pos,
-                                              Optional<Address.Block> currentAddress) implements Packet {
+                                              Address.Block currentAddress) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("open_mailbox_address_tag_screen");
     public static final Type<OpenMailboxAddressTagScreenS2CP> TYPE = new Type<>(ID);
 
@@ -29,7 +27,7 @@ public record OpenMailboxAddressTagScreenS2CP(InteractionHand hand,
             ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), OpenMailboxAddressTagScreenS2CP::hand,
             AllAddresses.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::knownAddresses,
             BlockPos.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::pos,
-            ByteBufCodecs.optional(Address.Block.STREAM_CODEC), OpenMailboxAddressTagScreenS2CP::currentAddress,
+            Address.Block.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::currentAddress,
             OpenMailboxAddressTagScreenS2CP::new
     );
 

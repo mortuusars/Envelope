@@ -1,4 +1,4 @@
-// 1.21.1	2026-01-12T19:07:33.7975856	Block States: envelope
+// 1.21.1	2026-01-22T04:50:10.5186487	Block States: envelope
 ca94026bfb0f110bcf354d04afde4c12ded3ff23 assets/envelope/blockstates/oak_pigeonhole.json
 b23843de3b5faa9851524890cf48a8e74e2c9872 assets/envelope/blockstates/package.json
 2edeec08f84e99e329a540acc27758c11b070a94 assets/envelope/blockstates/paper_box.json
@@ -14,7 +14,7 @@ dd5b3bcca8aed6183e930e11506d027f24facbfc assets/envelope/models/block/oak_pigeon
 b9113bcf8fcfca91251fe43178275d73b5b8d42b assets/envelope/models/item/letter_tattered_unfolded_content.json
 6a5b2efd8a205dc9a36e38511dc97298dc555a33 assets/envelope/models/item/letter_unfolded.json
 2da24d29660b7574690fda6fd55ff1bb3b161362 assets/envelope/models/item/letter_unfolded_content.json
-a80822403d4e1eaba808aaf78f42c970be11d942 assets/envelope/models/item/mailbox.json
+d72af9fd2639b53e67dd9e194eca691bfa1ef815 assets/envelope/models/item/mailbox.json
 ad2a0e20629d12e639432cedebb873df7f485b58 assets/envelope/models/item/oak_pigeonhole.json
 131ae31e873cf751e0f298a8cadb0345faae2790 assets/envelope/models/item/package.json
 7578f3b3106d32ab77033541178b155106aa1da7 assets/envelope/models/item/packing_box.json

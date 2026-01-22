@@ -48,7 +48,9 @@
   "gui.envelope.package.tooltip.has_letter.shift": "\uEE10\uEEFFHas Letter §8- [§7Right Click§8] to remove",
 
   "gui.envelope.address_tag.title": "Address",
-  "gui.envelope.mailbox_address_tag.title": "Mailbox Address",
+
+  "gui.envelope.mailbox_choose_address.title": "Mailbox Address",
+  "gui.envelope.mailbox_change_address.title": "Mailbox Address",
 
   "gui.envelope.mailbox.inbox": "Inbox",
   "gui.envelope.mailbox.send": "Send",

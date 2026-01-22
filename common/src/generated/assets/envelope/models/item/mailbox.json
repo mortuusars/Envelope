@@ -1,3 +1,22 @@
 {
-  "parent": "envelope:block/mailbox"
+  "parent": "envelope:block/mailbox",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        -135,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "translation": [
+        0,
+        0.75,
+        0
+      ]
+    }
+  }
 }

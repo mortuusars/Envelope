@@ -3,54 +3,41 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.validation.CachedValidator;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.MailboxAddressTagApplyC2SP;
-import io.github.mortuusars.envelope.util.EnvelopeSymbols;
-import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class MailboxAddressTagScreen extends AddressTagScreen {
+public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     protected final LocalPlayer player;
-    protected final BlockPos pos;
-    protected final BlockState state;
-    protected final BlockEntity blockEntity;
     protected CachedValidator<String> addressValidator;
 
-    public MailboxAddressTagScreen(InteractionHand hand, AllAddresses knownAddresses,
-                                   BlockPos pos, Optional<Address.Block> existingAddress,
-                                   Component title) {
+    public AbstractMailboxAddressScreen(InteractionHand hand, AllAddresses knownAddresses,
+                                        Optional<Address.Block> existingAddress, Component title) {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
-        this.pos = pos;
-        this.state = player.level().getBlockState(pos);
-        this.blockEntity = player.level().getBlockEntity(pos);
         this.existingAddress = existingAddress.map(Address.class::cast);
         this.addressValidator = AddressValidation.forMailbox(knownAddresses, player).cached();
     }
+
+    @Override
+    protected abstract ItemStack getTargetPreview();
+    protected abstract void onConfirm();
+    protected abstract boolean stillValid();
 
     // -- Address
 
@@ -69,12 +56,17 @@ public class MailboxAddressTagScreen extends AddressTagScreen {
         return AllAddresses.EMPTY; // Don't suggest anything
     }
 
-    // --
+    // -- Validation
 
-    @Override
-    protected ItemStack getTarget() {
-        return new ItemStack(state.getBlock().asItem());
+    public CachedValidator<String> getAddressValidator() {
+        return addressValidator;
     }
+
+    protected boolean canConfirm() {
+        return isCurrentIdSameAsExistingAddress() || getAddressValidator().getErrors().isEmpty();
+    }
+
+    // --
 
     protected void updateConfirmButton() {
         if (confirmButton == null) return; // Not initialized yet
@@ -118,11 +110,7 @@ public class MailboxAddressTagScreen extends AddressTagScreen {
         }
 
         if (!isCurrentIdSameAsExistingAddress()) {
-            Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
-            if (Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get() > 0) {
-                player.level().playSound(player, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS);
-            }
-            Packets.sendToServer(new MailboxAddressTagApplyC2SP(hand, getCurrentAddressId().trim(), pos));
+            onConfirm();
         }
         close();
         return true;
@@ -181,22 +169,5 @@ public class MailboxAddressTagScreen extends AddressTagScreen {
         guiGraphics.drawString(font, text, leftPos + x - 1, topPos + y, outlineColor, false);
 
         guiGraphics.drawString(font, text, leftPos + x, topPos + y, centerColor, false);
-    }
-
-    // --
-
-    protected boolean stillValid() {
-        return player.getItemInHand(hand).getItem() instanceof AddressTagItem
-              && Container.stillValidBlockEntity(blockEntity, player);
-    }
-
-    // -- Validation
-
-    public CachedValidator<String> getAddressValidator() {
-        return addressValidator;
-    }
-
-    protected boolean canConfirm() {
-        return isCurrentIdSameAsExistingAddress() || getAddressValidator().getErrors().isEmpty();
     }
 }

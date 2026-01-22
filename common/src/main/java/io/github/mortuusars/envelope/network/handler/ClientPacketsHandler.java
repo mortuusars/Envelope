@@ -27,22 +27,26 @@ public class ClientPacketsHandler {
 
     public static void openAddressTagScreen(OpenAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
-            Minecrft.get().setScreen(new AddressTagScreen(packet.hand(), packet.knownAddresses(), Component.translatable("gui.envelope.address_tag.title")));
+            AddressTagScreen screen = new AddressTagScreen(packet.hand(), packet.knownAddresses(),
+                  Component.translatable("gui.envelope.address_tag.title"));
+            Minecrft.get().setScreen(screen);
         }
     }
 
     public static void openMailboxPlacingScreen(OpenMailboxPlacingScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof MailboxBlockItem) {
-            Minecrft.get().setScreen(new MailboxPlacingScreen(packet.hand(), packet.knownAddresses(),
-                  packet.hitResult(), Component.translatable("gui.envelope.mailbox_address_tag.title")));
+            MailboxPlacingScreen screen = new MailboxPlacingScreen(packet.hand(), packet.knownAddresses(),
+                  packet.hitResult(), Component.translatable("gui.envelope.mailbox_choose_address.title"));
+            Minecrft.get().setScreen(screen);
         }
     }
 
     public static void openMailboxAddressTagScreen(OpenMailboxAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
-            Minecrft.get().setScreen(new MailboxAddressTagScreen(packet.hand(),
-                    packet.knownAddresses(), packet.pos(), packet.currentAddress(),
-                  Component.translatable("gui.envelope.mailbox_address_tag.title")));
+            MailboxChangeAddressScreen screen = new MailboxChangeAddressScreen(packet.hand(),
+                  packet.knownAddresses(), packet.pos(), packet.currentAddress(),
+                  Component.translatable("gui.envelope.mailbox_change_address.title"));
+            Minecrft.get().setScreen(screen);
         }
     }
 }

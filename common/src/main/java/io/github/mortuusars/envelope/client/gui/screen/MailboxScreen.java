@@ -235,7 +235,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                 }
                 renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
             }
-        } else if (this.hashCode() % 16 == 0) {
+        } else if (this.hashCode() % 20 == 0) {
             // Sad face
             guiGraphics.blit(TEXTURE, leftPos + 59, topPos + 92, 348, 0, 17, 9, 512, 256);
         }

@@ -87,7 +87,7 @@ public class AddressTagScreen extends Screen {
 
     // --
 
-    protected ItemStack getTarget() {
+    protected ItemStack getTargetPreview() {
         return tag;
     }
 
@@ -219,7 +219,7 @@ public class AddressTagScreen extends Screen {
     }
 
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack target = getTarget();
+        ItemStack target = getTargetPreview();
         if (target.isEmpty()) {
             return;
         }
