@@ -82,8 +82,8 @@ public abstract class Config {
             {
                 builder.push("mailbox");
                 MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST = builder
-                      .comment("Levels of experience needed to set or change an address.")
-                      .defineInRange("address_experience_levels_cost", 5, 0, 128);
+                      .comment("Levels of experience needed to set or change the address.")
+                      .defineInRange("address_experience_levels_cost", 3, 0, 128);
                 builder.pop();
             }
 
