@@ -110,7 +110,7 @@ public abstract class Config {
                       .defineInRange("default_distance", 1500, 1, Integer.MAX_VALUE);
                 DELIVERY_COURIER_TRAVEL_SPEED = builder
                       .comment("Courier speed (in blocks per second) while in traveling (background) phases.")
-                      .defineInRange("courier_travel_speed", 25.0, 0.01, 9999.0);
+                      .defineInRange("courier_travel_speed", 20.0, 0.01, 9999.0);
                 DELIVERY_TRAVEL_DURATION_DISTANCE_CAP = builder
                       .comment("Distance (in blocks) after which travel duration stops increasing and stays at maximum value.")
                       .defineInRange("travel_duration_distance_cap", 5000, 1, Integer.MAX_VALUE);

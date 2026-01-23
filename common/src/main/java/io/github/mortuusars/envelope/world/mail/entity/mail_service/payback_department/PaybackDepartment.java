@@ -113,7 +113,7 @@ public class PaybackDepartment {
                     .deliver(mail)
                     .from(Address.MAIL_SERVICE)
                     .to(subject.returnAddress())
-                    .startAtPhase(DeliveryPhase.TRAVELING_TO_RECIPIENT))
+                    .startAtPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_RECIPIENT))
               .ifError(error -> {
                   LOGGER.info("Cannot return subject of [{}] with id [{}] back to sender.",
                         subject.mail().getHoverName().getString(), subject.id());
@@ -194,7 +194,7 @@ public class PaybackDepartment {
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));
         }
 
-        subjectDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+        subjectDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
     }
 
     protected boolean sendPaybackPackingBoxToBuyer(Delivery subjectDelivery, PaybackSubject paybackSubject) {
@@ -224,7 +224,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -233,7 +233,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -241,7 +241,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -251,7 +251,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -259,7 +259,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -275,7 +275,7 @@ public class PaybackDepartment {
               .writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE, mailService.getGameTime()))
               .get();
         paybackDelivery.setMail(subject);
-        paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+        paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
     }
 
     protected boolean sendPaymentPackageToSeller(Delivery paybackDelivery, PackageContents packageContents, ItemStack paybackPackage) {

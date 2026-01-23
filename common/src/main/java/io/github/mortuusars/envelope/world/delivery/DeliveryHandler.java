@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.delivery;
 
 import com.google.common.base.Preconditions;
+import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
@@ -67,7 +68,8 @@ public interface DeliveryHandler {
         return switch (phase) {
             case STARTED, FINISHED -> 1;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
-            case TRAVELING_TO_HUB, TRAVELING_TO_RECIPIENT, RETURNING_TO_HUB, RETURNING_TO_SENDER -> delivery.getRoute().travelDuration().ticks() / 2;
+            case TRAVELING_FROM_SENDER_TO_HUB, TRAVELING_FROM_HUB_TO_SENDER -> delivery.getRoute().getSenderToHubDuration().ticks();
+            case TRAVELING_FROM_HUB_TO_RECIPIENT, TRAVELING_FROM_RECIPIENT_TO_HUB -> delivery.getRoute().getRecipientToHubDuration().ticks();
             case DISPATCHING_DELIVERY, DISPATCHING_RETURN -> 20;
             case HANDLING_DELIVERY, HANDLING_RETURN -> 5;
         };
@@ -112,7 +114,7 @@ public interface DeliveryHandler {
         if (!mailService.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
             Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
             Mail.setReturned(delivery.getMail());
-            delivery.setPhaseAndResetProgress(DeliveryPhase.RETURNING_TO_SENDER);
+            delivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return true;
         }
 
@@ -126,6 +128,14 @@ public interface DeliveryHandler {
 
     default boolean dispatchReturn(ServerLevel level, Delivery delivery) {
         if (MailService.of(level).getPaybackDepartment().tryHandleReturn(delivery)) {
+            return true;
+        }
+
+        if (getOrigin().isService() && delivery.getMail().isEmpty()) {
+            // Skipping rest of the delivery, as it does not matter anymore, just taking up cpu cycles.
+            // This can technically cause side effects, if some logic depends on courier completing specific phase, even if empty.
+            LogUtils.getLogger().debug("Finishing service delivery [{}] early, as it does not carry returning mail.", delivery.getId());
+            delivery.setPhaseAndResetProgress(DeliveryPhase.FINISHED);
             return true;
         }
 

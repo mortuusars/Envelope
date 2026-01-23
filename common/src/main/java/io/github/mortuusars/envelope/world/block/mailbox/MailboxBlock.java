@@ -124,7 +124,7 @@ public class MailboxBlock extends BaseEntityBlock {
             // as block entity might not exist while the block is still placed.
             // This happens with CarryOn relocation for example, where block entity is removed first.
             // So we remove any registered mailbox at this position:
-            MailService.of(serverLevel).mailboxes().remove(pos);
+            MailService.of(serverLevel).getMailboxes().remove(pos);
 
             if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
                 blockEntity.onBlockRemoved(level, pos, state, newState);

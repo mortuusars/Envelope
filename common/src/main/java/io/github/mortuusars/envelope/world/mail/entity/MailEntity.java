@@ -1,22 +1,23 @@
 package io.github.mortuusars.envelope.world.mail.entity;
 
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.receiver.MailReceiver;
 
 public abstract class MailEntity implements MailReceiver {
     private final Address.Entity address;
-    private final int distance;
+    private final AddressLocation location;
 
-    public MailEntity(Address.Entity address, int distance) {
+    public MailEntity(Address.Entity address, AddressLocation location) {
         this.address = address;
-        this.distance = distance;
+        this.location = location;
     }
 
     public Address.Entity getAddress() {
         return address;
     }
 
-    public int getDistance() {
-        return distance;
+    public AddressLocation getLocation() {
+        return location;
     }
 }

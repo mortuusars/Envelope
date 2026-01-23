@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
@@ -66,7 +67,7 @@ public class MailService {
         return level;
     }
 
-    public Mailboxes mailboxes() {
+    public Mailboxes getMailboxes() {
         return mailboxes;
     }
 
@@ -102,7 +103,7 @@ public class MailService {
 
     public AllAddresses getKnownAddresses() {
         return new AllAddresses(
-              mailboxes().getAllAddresses(),
+              getMailboxes().getAllAddresses(),
               getPlayers().getDefaultAddresses().keySet(),
               getMailEntities().getAllAddresses()
         );
@@ -113,7 +114,7 @@ public class MailService {
             return getKnownAddresses();
         }
         return switch (type) {
-            case BLOCK -> AllAddresses.blocks(mailboxes().getAllAddresses());
+            case BLOCK -> AllAddresses.blocks(getMailboxes().getAllAddresses());
             case PLAYER -> AllAddresses.players(getPlayers().getDefaultAddresses().keySet());
             case ENTITY -> AllAddresses.entities(getMailEntities().getAllAddresses());
         };
@@ -135,44 +136,57 @@ public class MailService {
 
     public Optional<BlockPos> getPositionOf(Address address) {
         return address.map(
-              block -> mailboxes().getPositionOf(block),
+              block -> getMailboxes().getPositionOf(block),
               player -> getPlayers().getDefaultAddressOf(player).flatMap(this::getPositionOf),
               entity -> Optional.empty());
     }
 
-    public Optional<Integer> getDistanceBetween(Address first, Address second) {
-        //TODO: this is quite verbose for simply getting distance involving entity address
-        if (first instanceof Address.Entity firstEntity && second instanceof Address.Entity secondEntity) {
-            Optional<Integer> firstDistance = getMailEntities().byAddress(firstEntity).map(MailEntity::getDistance);
-            Optional<Integer> secondDistance = getMailEntities().byAddress(secondEntity).map(MailEntity::getDistance);
-
-            if (firstDistance.isPresent() && secondDistance.isPresent()) {
-                return Optional.of(Math.max(firstDistance.get(), secondDistance.get()));
-            }
-            return firstDistance.or(() -> secondDistance);
-        }
-
-        if (first instanceof Address.Entity entityAddress) {
-            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
-        }
-
-        if (second instanceof Address.Entity entityAddress) {
-            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
-        }
-
-        Optional<BlockPos> firstPos = getPositionOf(first);
-        Optional<BlockPos> secondPos = getPositionOf(second);
-
-        if (firstPos.isEmpty() || secondPos.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of((int) Math.sqrt(firstPos.get().distSqr(secondPos.get())));
+    public AddressLocation getLocationOf(Address address) {
+        return address.map(
+              block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact),
+              player -> getPlayers().getDefaultAddressOf(player).map(this::getLocationOf),
+              entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation))
+              .orElse(AddressLocation.UNKNOWN);
     }
 
-    public int getDistanceBetweenOrDefault(Address first, Address second) {
-        return getDistanceBetween(first, second).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
-    }
+//    public Optional<Integer> getDistanceBetween(Address first, Address second) {
+//        AddressLocation firstLocation = getLocationOf(first);
+//        AddressLocation secondLocation = getLocationOf(second);
+//
+//
+//
+//        //TODO: this is quite verbose for simply getting distance involving entity address
+//        if (first instanceof Address.Entity firstEntity && second instanceof Address.Entity secondEntity) {
+//            Optional<Integer> firstDistance = getMailEntities().byAddress(firstEntity).map(MailEntity::getDistance);
+//            Optional<Integer> secondDistance = getMailEntities().byAddress(secondEntity).map(MailEntity::getDistance);
+//
+//            if (firstDistance.isPresent() && secondDistance.isPresent()) {
+//                return Optional.of(Math.max(firstDistance.get(), secondDistance.get()));
+//            }
+//            return firstDistance.or(() -> secondDistance);
+//        }
+//
+//        if (first instanceof Address.Entity entityAddress) {
+//            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
+//        }
+//
+//        if (second instanceof Address.Entity entityAddress) {
+//            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
+//        }
+//
+//        Optional<BlockPos> firstPos = getPositionOf(first);
+//        Optional<BlockPos> secondPos = getPositionOf(second);
+//
+//        if (firstPos.isEmpty() || secondPos.isEmpty()) {
+//            return Optional.empty();
+//        }
+//
+//        return Optional.of((int) Math.sqrt(firstPos.get().distSqr(secondPos.get())));
+//    }
+
+//    public int getDistanceBetweenOrDefault(Address first, Address second) {
+//        return getDistanceBetween(first, second).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
+//    }
 
     // --
 

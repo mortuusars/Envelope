@@ -1,7 +1,5 @@
 package io.github.mortuusars.envelope.world;
 
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -23,6 +21,16 @@ public class Position {
         return new Vec3(x, y, z);
     }
 
+    public static BlockPos snapToGrid(BlockPos pos, int size) {
+        int x = Math.round(pos.getX() / (float) size) * size;
+        int z = Math.round(pos.getZ() / (float) size) * size;
+        return new BlockPos(x, pos.getY(), z);
+    }
+
+    public static BlockPos nearestHub(BlockPos pos) {
+        return snapToGrid(pos, 1024).atY(500);
+    }
+
     public static BlockPos towardsDirection(BlockPos origin, BlockPos target, double distance) {
         Vec3 originVec = Vec3.atCenterOf(origin);
         Vec3 targetVec = Vec3.atCenterOf(target);
@@ -39,6 +47,11 @@ public class Position {
         random.nextLong(); // For some reason this fixes similar values returned for similar seeds. I'm not going to pretend I know why.
         double angle = random.nextDouble() * 2 * Math.PI;
         return origin.offset((int) (Math.cos(angle) * distance), 0, (int) (Math.sin(angle) * distance));
+    }
+
+    public static BlockPos ascendTowards(BlockPos origin, BlockPos target, int distance) {
+        return Position.towardsHorizontalDirection(origin, target, distance)
+              .above(distance);
     }
 
     public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance, int seed) {
@@ -116,9 +129,13 @@ public class Position {
         return pos.getY() == y ? pos : pos.atY(y);
     }
 
+    public static int getDistanceBetween(BlockPos a, BlockPos b) {
+        return (int) Math.sqrt(a.distSqr(b));
+    }
+
     public static Optional<Integer> getDistanceBetween(Optional<BlockPos> a, Optional<BlockPos> b) {
         if (a.isEmpty() || b.isEmpty()) return Optional.empty();
-        return Optional.of((int) Math.sqrt(a.get().distSqr(b.get())));
+        return Optional.of(getDistanceBetween(a.get(), b.get()));
     }
 
     public static boolean isFireNearby(Level level, BlockPos pos) {
@@ -131,14 +148,5 @@ public class Position {
         }
 
         return false;
-    }
-
-    public static Optional<BlockPos> estimateCourierPosition(Delivery delivery) {
-        DeliveryRoute.Segment segment = delivery.getRoute().getSegment(delivery.getPhase());
-        if (segment.startPos().isPresent() && segment.endPos().isPresent()) {
-            Vec3 pos = Position.lerp(segment.startPos().get(), segment.endPos().get(), delivery.getPhaseProgress());
-            return Optional.of(BlockPos.containing(pos));
-        }
-        return Optional.empty();
     }
 }

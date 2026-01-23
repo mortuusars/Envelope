@@ -35,7 +35,7 @@ public class MailServiceBuggerData extends NbtData {
         List<? extends Pigeon> pigeons = mailService.getLevel().getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
         List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getCouriers();
 
-        tag.putInt("mailboxes", mailService.mailboxes().getAllAddresses().size());
+        tag.putInt("mailboxes", mailService.getMailboxes().getAllAddresses().size());
         tag.putInt("payback_pending_mail", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
 
         tag.putInt("delivering_pigeons", pigeons.size());
@@ -59,11 +59,11 @@ public class MailServiceBuggerData extends NbtData {
               " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
               ChatFormatting.GREEN + delivery.getRecipient().format().withIcon().toString() + ChatFormatting.RESET +
 
-              ChatFormatting.GRAY + " | ✉ " +
-              (!delivery.getMail().isEmpty() ? delivery.getMail().getHoverName().getString() : "Empty") +
-              mailService.getDistanceBetween(delivery.getSender(), delivery.getRecipient()).map(d -> " | ↔" + d).orElse("") +
-              " | ⌚" + delivery.getRoute().travelDuration().seconds() + "s" +
-              (courier.getOrigin().isService() ? " | Service" : "") +
+              ChatFormatting.GRAY +
+              " | " + (courier.getOrigin().isService() ? "Service" : "Regular") +
+              " | ✉ " + (!delivery.getMail().isEmpty() ? delivery.getMail().getHoverName().getString() : "Empty") +
+              " | ↔ " + delivery.getRoute().getDistance().map(i -> Integer.toString(i)).orElse("?") +
+              " | ⌚" + delivery.getRoute().getFullTravelDuration().seconds() + "s" +
               ChatFormatting.RESET +
 
               " // " + delivery.getPhase().toPrettyString() +

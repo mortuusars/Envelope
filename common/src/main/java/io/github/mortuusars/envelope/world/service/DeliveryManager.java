@@ -76,8 +76,6 @@ public class DeliveryManager {
               false
         );
 
-        delivery.updateRoute(getMailService().getLevel());
-
         LOGGER.debug("Starting delivery: {}", delivery);
         return Result.success(new StartedDelivery(courier.apply(delivery), delivery));
     }

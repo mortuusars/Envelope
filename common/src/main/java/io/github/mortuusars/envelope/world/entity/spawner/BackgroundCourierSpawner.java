@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.world.delivery.background.BackgroundDeliver
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.Util;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.CustomSpawner;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,11 @@ public class BackgroundCourierSpawner implements CustomSpawner {
     protected void trySpawn(ServerLevel level, BackgroundCourier backgroundCourier) {
         Delivery delivery = backgroundCourier.getDelivery();
 
-        Position.estimateCourierPosition(delivery)
+        int duration = backgroundCourier.getPhaseDuration(level, delivery, delivery.getPhase());
+        int progress = delivery.getPhaseProgress();
+        float completeness = Mth.clamp(progress / (float)duration, 0f, 1f);
+
+        delivery.getRoute().getSegment(delivery.getPhase()).getCurrentLocation(completeness)
               .filter(level::isLoaded)
               .map(pos -> Position.aboveGround(level, pos, 2))
               .filter(pos -> Position.isInSimulationDistance(level, pos))

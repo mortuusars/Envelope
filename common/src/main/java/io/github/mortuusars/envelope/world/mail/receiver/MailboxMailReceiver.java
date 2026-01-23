@@ -55,7 +55,7 @@ public class MailboxMailReceiver implements MailReceiver {
     }
 
     public static Optional<Inbox> getInboxByAddress(ServerLevel level, Address.Block address) {
-        return MailService.of(level).mailboxes().getBlockEntityOf(address)
+        return MailService.of(level).getMailboxes().getBlockEntityOf(address)
               .map(blockEntity -> ((Inbox) blockEntity))
               .or(() -> InboxStorage.get(level).getForDelivery(address));
     }

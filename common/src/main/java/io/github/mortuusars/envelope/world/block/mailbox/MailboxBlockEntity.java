@@ -90,7 +90,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
         if (getLevel() instanceof ServerLevel serverLevel && MailService.operatesIn(serverLevel)) {
             address = Objects.requireNonNullElseGet(address, () -> generateRandomAddress(serverLevel));
-            address = MailService.of(serverLevel).mailboxes().correctOrRegisterIfNeeded(address, getBlockPos());
+            address = MailService.of(serverLevel).getMailboxes().correctOrRegisterIfNeeded(address, getBlockPos());
 
             if (!address.equals(currentAddress)) {
                 this.address = address;

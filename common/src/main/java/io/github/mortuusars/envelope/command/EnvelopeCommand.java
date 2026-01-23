@@ -101,13 +101,13 @@ public class EnvelopeCommand {
 
     private static int listAllMailboxes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
-        Set<Address.Block> addresses = MailService.of(level).mailboxes().getAllAddresses();
+        Set<Address.Block> addresses = MailService.of(level).getMailboxes().getAllAddresses();
 
         if (!addresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("All mailboxes:"), true);
             for (Address.Block address : addresses) {
                 context.getSource().sendSuccess(() -> copyableAddressAndPos(address,
-                      MailService.of(level).mailboxes().getPositionOf(address)), true);
+                      MailService.of(level).getMailboxes().getPositionOf(address)), true);
             }
         } else {
             context.getSource().sendSuccess(() ->
@@ -125,7 +125,7 @@ public class EnvelopeCommand {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
 
             defaultAddresses.forEach((playerAddress, address) -> {
-                Optional<BlockPos> position = MailService.of(level).mailboxes().getPositionOf(address);
+                Optional<BlockPos> position = MailService.of(level).getMailboxes().getPositionOf(address);
                 context.getSource().sendSuccess(() -> Component.literal(playerAddress.toString())
                       .append(" - ")
                       .append(copyableAddressAndPos(address, position)), true);
@@ -140,12 +140,12 @@ public class EnvelopeCommand {
 
     private static int mailboxPosition(CommandContext<CommandSourceStack> context, Address.Block address) {
         ServerLevel level = context.getSource().getLevel();
-        if (!MailService.of(level).mailboxes().exists(address)) {
+        if (!MailService.of(level).getMailboxes().exists(address)) {
             context.getSource().sendFailure(address.getName().append(" does not exist."));
             return 1;
         }
 
-        MailService.of(level).mailboxes().getPositionOf(address)
+        MailService.of(level).getMailboxes().getPositionOf(address)
               .ifPresentOrElse(
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
                     () -> context.getSource().sendFailure(address.getName()

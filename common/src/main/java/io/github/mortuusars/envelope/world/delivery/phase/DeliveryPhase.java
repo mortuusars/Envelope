@@ -15,15 +15,15 @@ import java.util.function.IntFunction;
 public enum DeliveryPhase implements StringRepresentable {
     STARTED("started"),
     DEPARTING_SENDER("departing_sender"),
-    TRAVELING_TO_HUB("traveling_to_hub"),
+    TRAVELING_FROM_SENDER_TO_HUB("traveling_from_sender_to_hub"),
     DISPATCHING_DELIVERY("dispatching_delivery"),
-    TRAVELING_TO_RECIPIENT("traveling_to_recipient"),
+    TRAVELING_FROM_HUB_TO_RECIPIENT("traveling_from_hub_to_recipient"),
     APPROACHING_RECIPIENT("approaching_recipient"),
     HANDLING_DELIVERY("handling_delivery"),
     DEPARTING_RECIPIENT("departing_recipient"),
-    RETURNING_TO_HUB("returning_to_hub"),
+    TRAVELING_FROM_RECIPIENT_TO_HUB("traveling_from_recipient_to_hub"),
     DISPATCHING_RETURN("dispatching_return"),
-    RETURNING_TO_SENDER("returning_to_sender"),
+    TRAVELING_FROM_HUB_TO_SENDER("traveling_from_hub_to_sender"),
     APPROACHING_SENDER("approaching_sender"),
     HANDLING_RETURN("handling_return"),
     FINISHED("finished");
@@ -44,8 +44,8 @@ public enum DeliveryPhase implements StringRepresentable {
     }
 
     public boolean isTraveling() {
-        return this == TRAVELING_TO_HUB || this == DISPATCHING_DELIVERY || this == TRAVELING_TO_RECIPIENT
-            || this == RETURNING_TO_HUB || this == DISPATCHING_RETURN || this == RETURNING_TO_SENDER;
+        return this == TRAVELING_FROM_SENDER_TO_HUB || this == DISPATCHING_DELIVERY || this == TRAVELING_FROM_HUB_TO_RECIPIENT
+            || this == TRAVELING_FROM_RECIPIENT_TO_HUB || this == DISPATCHING_RETURN || this == TRAVELING_FROM_HUB_TO_SENDER;
     }
 
     public boolean isReturning() {
@@ -61,7 +61,7 @@ public enum DeliveryPhase implements StringRepresentable {
     }
 
     public boolean isOnRecipientSide() {
-        return (this.ordinal() >= TRAVELING_TO_RECIPIENT.ordinal() && this.ordinal() <= DEPARTING_RECIPIENT.ordinal());
+        return (this.ordinal() >= TRAVELING_FROM_HUB_TO_RECIPIENT.ordinal() && this.ordinal() <= DEPARTING_RECIPIENT.ordinal());
     }
 
     public boolean isSpawnable() {
