@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -247,32 +248,31 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     }
 
     @Override
+    protected boolean shouldDropLoot() {
+        return super.shouldDropLoot() && !getOrigin().isService();
+    }
+
+    @Override
     protected void dropAllDeathLoot(ServerLevel level, DamageSource damageSource) {
         super.dropAllDeathLoot(level, damageSource);
 
-        if (delivery == null) return;
+        getCurrentDelivery().ifPresent(delivery -> {
+            diedWhileDelivering(level, damageSource, delivery);
+        });
+    }
 
+    protected void diedWhileDelivering(ServerLevel level, DamageSource damageSource, Delivery delivery) {
         String message = damageSource.getLocalizedDeathMessage(this).getString();
         String carriedItem = !delivery.getMail().isEmpty()
               ? " a " + delivery.getMail().getHoverName().getString()
               : "";
         String addresses = delivery.getSender().getName().getString() + " to " + delivery.getRecipient().getName().getString();
 
-        Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!",
-              message, blockPosition().toShortString(), carriedItem, addresses);
+        Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!", message, blockPosition().toShortString(), carriedItem, addresses);
 
-        //TODO: send pigeon death notice to sender
-//        if (delivery.getSender() instanceof Address.Pigeonhole
-//              && level.getEnvelopeContext().addresses().getAll(Address.Type.PIGEONHOLE).isKnown(delivery.getSender())) {
-//            ItemStack letter = new ItemStack(Envelope.Items.LETTER.get());
-//            letter.set(Envelope.DataComponents.LETTER_SUBJECT, "Courier Death Notice");
-//            letter.set(Envelope.DataComponents.LETTER_MESSAGE, message + " at " + "[" + blockPosition().toShortString() + "]");
-//
-//            letter.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
-//            letter.set(Envelope.DataComponents.MAIL_RECIPIENT, delivery.getSender());
-//
-//            level.getEnvelopeContext().startDelivery(letter);
-//        }
+        if (!getOrigin().isService()) {
+            MailService.of(level).sendCourierDeathNotice(this, delivery, damageSource);
+        }
 
         if (!delivery.getMail().isEmpty()) {
             ItemStack mail = delivery.getPhase().isOnRecipientSide()

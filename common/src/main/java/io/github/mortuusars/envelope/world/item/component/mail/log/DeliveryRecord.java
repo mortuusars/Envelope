@@ -75,7 +75,6 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
                     .withIcon()
                     .withIconColor(addressColor)
                     .withColor(addressColor)
-                    .withMaxLength(25)
                     .toComponent())
               .orElse(Component.empty());
 

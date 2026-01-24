@@ -2,11 +2,13 @@ package io.github.mortuusars.envelope.world.item.mail;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -152,6 +154,11 @@ public final class Mail {
 
     public static MailBuilder<?> of(ItemStack stack) {
         return new MailBuilder<>(stack);
+    }
+
+    public static MailBuilder<?> createLetter(Component text) {
+        return new MailBuilder<>(Envelope.Items.LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text));
     }
 
     public static MailBuilder<?> createPackage(PackageContents contents) {

@@ -1,9 +1,11 @@
 package io.github.mortuusars.envelope.world.service;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.util.result.Result;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -15,8 +17,13 @@ import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.MailboxMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
@@ -134,59 +141,13 @@ public class MailService {
         return address;
     }
 
-    public Optional<BlockPos> getPositionOf(Address address) {
-        return address.map(
-              block -> getMailboxes().getPositionOf(block),
-              player -> getPlayers().getDefaultAddressOf(player).flatMap(this::getPositionOf),
-              entity -> Optional.empty());
-    }
-
     public AddressLocation getLocationOf(Address address) {
         return address.map(
-              block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact),
-              player -> getPlayers().getDefaultAddressOf(player).map(this::getLocationOf),
-              entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation))
+                    block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact),
+                    player -> getPlayers().getDefaultAddressOf(player).map(this::getLocationOf),
+                    entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation))
               .orElse(AddressLocation.UNKNOWN);
     }
-
-//    public Optional<Integer> getDistanceBetween(Address first, Address second) {
-//        AddressLocation firstLocation = getLocationOf(first);
-//        AddressLocation secondLocation = getLocationOf(second);
-//
-//
-//
-//        //TODO: this is quite verbose for simply getting distance involving entity address
-//        if (first instanceof Address.Entity firstEntity && second instanceof Address.Entity secondEntity) {
-//            Optional<Integer> firstDistance = getMailEntities().byAddress(firstEntity).map(MailEntity::getDistance);
-//            Optional<Integer> secondDistance = getMailEntities().byAddress(secondEntity).map(MailEntity::getDistance);
-//
-//            if (firstDistance.isPresent() && secondDistance.isPresent()) {
-//                return Optional.of(Math.max(firstDistance.get(), secondDistance.get()));
-//            }
-//            return firstDistance.or(() -> secondDistance);
-//        }
-//
-//        if (first instanceof Address.Entity entityAddress) {
-//            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
-//        }
-//
-//        if (second instanceof Address.Entity entityAddress) {
-//            return getMailEntities().byAddress(entityAddress).map(MailEntity::getDistance);
-//        }
-//
-//        Optional<BlockPos> firstPos = getPositionOf(first);
-//        Optional<BlockPos> secondPos = getPositionOf(second);
-//
-//        if (firstPos.isEmpty() || secondPos.isEmpty()) {
-//            return Optional.empty();
-//        }
-//
-//        return Optional.of((int) Math.sqrt(firstPos.get().distSqr(secondPos.get())));
-//    }
-
-//    public int getDistanceBetweenOrDefault(Address first, Address second) {
-//        return getDistanceBetween(first, second).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
-//    }
 
     // --
 
@@ -212,5 +173,40 @@ public class MailService {
 
     public static boolean operatesIn(Level level) {
         return level.dimension() == Level.OVERWORLD;
+    }
+
+    public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
+        if (!(delivery.getSender() instanceof Address.Block address)) {
+            return null;
+        }
+
+        ItemStack letter = createCourierDeathNoticeLetter(entity, delivery, damageSource);
+
+        return getDeliveryManager().startService(Delivery.draft()
+              .deliver(letter)
+              .from(Address.MAIL_SERVICE)
+              .to(address));
+    }
+
+    public ItemStack createCourierDeathNoticeLetter(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
+        Component text = Component.empty()
+              .append(Component.translatable("letter.envelope.courier_death_notice.title").withStyle(ChatFormatting.ITALIC))
+              .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + entity.getRandom().nextInt(5),
+                          damageSource.getLocalizedDeathMessage(entity)))
+              .append(Component.translatable("letter.envelope.courier_death_notice.delivery." + delivery.getPhase().getSerializedName(),
+                    delivery.getRecipient().format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
+              .append(!delivery.getMail().isEmpty()
+                    ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + entity.getRandom().nextInt(6),
+                    delivery.getMail().getHoverName().copy()
+                          .withStyle(Style.EMPTY.withUnderlined(true)
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(delivery.getMail())))))
+                    : CommonComponents.EMPTY)
+              .append(Component.translatable("letter.envelope.courier_death_notice.condolence_" + entity.getRandom().nextInt(5),
+                    entity.getName()))
+              .append(Component.translatable("letter.envelope.courier_death_notice.signature"));
+
+        return Mail.createLetter(text)
+              .set(DataComponents.CUSTOM_NAME, Component.translatable("letter.envelope.courier_death_notice.name"))
+              .get();
     }
 }

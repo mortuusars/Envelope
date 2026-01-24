@@ -165,5 +165,44 @@
 
   "error.envelope.delivery.same_addresses": "Recipient address cannot be the same as sender address.",
   "error.envelope.delivery.unknown_address": "Cannot deliver to unknown address.",
-  "error.envelope.delivery.no_mail": "No mail to deliver."
+  "error.envelope.delivery.no_mail": "No mail to deliver.",
+
+  "letter.envelope.courier_death_notice.name": "Courier Death Notice",
+  "letter.envelope.courier_death_notice.title": "     Courier Death Notice\n\n",
+
+  "letter.envelope.courier_death_notice.inform_0": "  We regret to inform you, that %s",
+  "letter.envelope.courier_death_notice.inform_1": "  We regret to bring you the news, that %s",
+  "letter.envelope.courier_death_notice.inform_2": "  We are sorry to inform you that, %s",
+  "letter.envelope.courier_death_notice.inform_3": "  We are sorry to bring you the news that, %s",
+  "letter.envelope.courier_death_notice.inform_4": "  This notice is issued to inform you that %s",
+
+  "letter.envelope.courier_death_notice.delivery.started": " while preparing to depart to %s.",
+  "letter.envelope.courier_death_notice.delivery.departing_sender": " while departing to %s.",
+  "letter.envelope.courier_death_notice.delivery.traveling_from_sender_to_hub": " while traveling to dispatch hub en route to %s.",
+  "letter.envelope.courier_death_notice.delivery.dispatching_delivery": " while dispatching to %s.",
+  "letter.envelope.courier_death_notice.delivery.traveling_from_hub_to_recipient": " while traveling to %s.",
+  "letter.envelope.courier_death_notice.delivery.approaching_recipient": " while approaching %s.",
+  "letter.envelope.courier_death_notice.delivery.handling_delivery": " while handling delivery at %s.",
+  "letter.envelope.courier_death_notice.delivery.departing_recipient": " while departing %s.",
+  "letter.envelope.courier_death_notice.delivery.traveling_from_recipient_to_hub": " while traveling to dispatch hub from %s.",
+  "letter.envelope.courier_death_notice.delivery.dispatching_return": " while dispatching after return from %s.",
+  "letter.envelope.courier_death_notice.delivery.traveling_from_hub_to_sender": " while traveling to sender from %s.",
+  "letter.envelope.courier_death_notice.delivery.approaching_sender": " while approaching sender from %s.",
+  "letter.envelope.courier_death_notice.delivery.handling_return": " while handling return from %s.",
+  "letter.envelope.courier_death_notice.delivery.finished": " while ending delivery from %s.",
+
+  "letter.envelope.courier_death_notice.mail_lost_0": "\n  Carried %s was lost along with the courier.",
+  "letter.envelope.courier_death_notice.mail_lost_1": "\n  Location of %s courier was carrying is unknown.",
+  "letter.envelope.courier_death_notice.mail_lost_2": "\n  Recovery efforts were unsuccessful; location of carried %s is unknown.",
+  "letter.envelope.courier_death_notice.mail_lost_3": "\n  %s carried by the courier could not be recovered.",
+  "letter.envelope.courier_death_notice.mail_lost_4": "\n  We must report that the location of carried %s remains unknown.",
+  "letter.envelope.courier_death_notice.mail_lost_5": "\n  Despite due effort, carried %s could not be located.",
+
+  "letter.envelope.courier_death_notice.condolence_0": "\n\nPlease accept our sincere condolences.",
+  "letter.envelope.courier_death_notice.condolence_1": "\n\nPlease accept our condolences for the loss of %s. Their spirit will be remembered.",
+  "letter.envelope.courier_death_notice.condolence_2": "\n\nPlease accept our condolences for the loss of %s. Their memory will live on.",
+  "letter.envelope.courier_death_notice.condolence_3": "\n\nMay the memories of %s help you find comfort.",
+  "letter.envelope.courier_death_notice.condolence_4": "\n\n%s will always be in our hearts.",
+
+  "letter.envelope.courier_death_notice.signature": "\n\nMail Service"
 }

@@ -106,8 +106,14 @@ public class AddressFormatter {
     // --
 
     public MutableComponent toComponent() {
-        String string = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
-        MutableComponent addressComponent = Component.literal(string).withStyle(createStyle(textStyle));
+        MutableComponent addressComponent;
+        if (maxLength < Integer.MAX_VALUE) {
+            String string = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
+            addressComponent = Component.literal(string);
+        } else {
+            addressComponent = address.getName();
+        }
+        addressComponent = addressComponent.withStyle(createStyle(textStyle));
 
         if (icon) {
             return Component.empty()

@@ -12,13 +12,16 @@ import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,11 +100,16 @@ public class LetterViewScreen extends Screen {
             RenderSystem.disableBlend();
         }
 
-        if (lines.size() > maxTextLines
-              && mouseX >= x && mouseX < x + maxTextWidth
-              && mouseY >= y && mouseY < y + maxTextHeight) {
-            List<FormattedCharSequence> leftovers = lines.stream().skip(maxTextLines).toList();
-            guiGraphics.renderTooltip(font, leftovers, mouseX, mouseY);
+        @Nullable Style style = getComponentStyleAt(mouseX, mouseY);
+        if (style != null && style.getHoverEvent() != null) {
+            guiGraphics.renderComponentHoverEffect(font, style, mouseX, mouseY);
+        } else {
+            if (lines.size() > maxTextLines
+                  && mouseX >= x && mouseX < x + maxTextWidth
+                  && mouseY >= y && mouseY < y + maxTextHeight) {
+                List<FormattedCharSequence> leftovers = lines.stream().skip(maxTextLines).toList();
+                guiGraphics.renderTooltip(font, leftovers, mouseX, mouseY);
+            }
         }
     }
 
@@ -110,6 +118,31 @@ public class LetterViewScreen extends Screen {
         this.renderTransparentBackground(guiGraphics);
         ResourceLocation texture = isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
         guiGraphics.blit(texture, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+    }
+
+    @Nullable
+    public Style getComponentStyleAt(double mouseX, double mouseY) {
+        if (lines.isEmpty()
+              || mouseX < leftPos + 17 || mouseX >= leftPos + 17 + maxTextWidth
+              || mouseY < topPos + 21 || mouseY >= topPos + 21 + maxTextHeight) {
+            return null;
+        }
+
+        int x = (int)mouseX - (leftPos + 17);
+        int y = (int)mouseY - (topPos + 21);
+
+        int linesCount = Math.min(lines.size(), maxTextLines);
+        if (y < font.lineHeight * linesCount + linesCount) {
+            int clickedLine = y / font.lineHeight;
+            if (clickedLine >= 0 && clickedLine < lines.size()) {
+                FormattedCharSequence text = lines.get(clickedLine);
+                return font.getSplitter().componentStyleAtWidth(text, x);
+            }
+
+            return null;
+        }
+
+        return null;
     }
 
     @Override
@@ -128,5 +161,34 @@ public class LetterViewScreen extends Screen {
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    public boolean mouseClicked(double x, double y, int button) {
+        if (button == 0) {
+            @Nullable Style style = getComponentStyleAt(x, y);
+            if (handleComponentClicked(style)) {
+                return true;
+            }
+        }
+
+        return super.mouseClicked(x, y, button);
+    }
+
+    public boolean handleComponentClicked(@Nullable Style style) {
+        if (style == null) {
+            return false;
+        }
+
+        @Nullable ClickEvent clickEvent = style.getClickEvent();
+        if (clickEvent == null) {
+            return false;
+        }
+
+        boolean handled = handleComponentClicked(style);
+        if (handled && clickEvent.getAction() == ClickEvent.Action.RUN_COMMAND) {
+            onClose();
+        }
+
+        return handled;
     }
 }

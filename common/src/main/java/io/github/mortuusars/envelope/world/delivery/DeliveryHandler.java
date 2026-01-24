@@ -66,12 +66,12 @@ public interface DeliveryHandler {
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
-            case STARTED, FINISHED -> 1;
+            case STARTED, FINISHED -> 8;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
             case TRAVELING_FROM_SENDER_TO_HUB, TRAVELING_FROM_HUB_TO_SENDER -> delivery.getRoute().getSenderToHubDuration().ticks();
             case TRAVELING_FROM_HUB_TO_RECIPIENT, TRAVELING_FROM_RECIPIENT_TO_HUB -> delivery.getRoute().getRecipientToHubDuration().ticks();
             case DISPATCHING_DELIVERY, DISPATCHING_RETURN -> 20;
-            case HANDLING_DELIVERY, HANDLING_RETURN -> 5;
+            case HANDLING_DELIVERY, HANDLING_RETURN -> 10;
         };
     }
 
