@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -54,12 +55,16 @@ public class PackageItem extends BlockItem implements PackingBox, Sealable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, components, tooltipFlag);
+
+        if (shouldBeDestroyedWhenEmpty(stack)) {
+            components.add(Component.literal("⚠").withColor(0xFFE48174));
+        }
 
         @Nullable SeededContainerLoot loot = stack.get(DataComponents.CONTAINER_LOOT);
         if (tooltipFlag.isAdvanced() && loot != null) {
-            tooltipComponents.add(Component.literal("Loot Table: ").withStyle(ChatFormatting.DARK_GRAY)
+            components.add(Component.literal("Loot Table: ").withStyle(ChatFormatting.DARK_GRAY)
                   .append(Component.literal(loot.lootTable().location().toString()).withStyle(ChatFormatting.DARK_GRAY)));
         }
     }

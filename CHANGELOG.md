@@ -2,7 +2,8 @@
 
 ## UNRELEASED
 - Added `minecraft:container_loot` support for packages.
-- Last opening of a Package (when it will be destroyed) now required holding the use button, to not unpack accidentally. 
+- Package that will be destroyed after opening now displays a warning sign in the item tooltip.
+- Opening a Package that will be destroyed after opening now requires holding the use button, to not unpack accidentally.
 
 ## 0.4.0.3
 - Added Courier Death Notice. 
