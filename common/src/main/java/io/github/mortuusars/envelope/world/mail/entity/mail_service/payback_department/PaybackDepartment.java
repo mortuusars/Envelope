@@ -246,7 +246,7 @@ public class PaybackDepartment {
         }
 
         RequestedPayback requestedPayback = paybackSubject.mail().getOrDefault(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK, RequestedPayback.DEFAULT);
-        PackageContents packageContents = PackageContents.of(paybackPackage);
+        PackageContents packageContents = PackageContents.from(paybackPackage);
         if (!requestedPayback.matches(packageContents)) {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),

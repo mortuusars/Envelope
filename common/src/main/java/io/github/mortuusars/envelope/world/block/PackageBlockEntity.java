@@ -52,7 +52,7 @@ public class PackageBlockEntity extends BlockEntity {
     public void dropContents(Level level, BlockPos pos) {
         ItemStack packageStack = getPackage();
         if (unpackWhenBroken() && packageStack.getItem() instanceof PackageItem packageItem) {
-            packageItem.unpack(packageStack).forEach(stored ->
+            packageItem.unpack(packageStack, level, pos, null).forEach(stored ->
                   Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
         } else {
             Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), packageStack);

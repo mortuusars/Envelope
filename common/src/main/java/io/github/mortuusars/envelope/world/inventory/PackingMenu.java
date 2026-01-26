@@ -43,7 +43,7 @@ public class PackingMenu extends AbstractContainerMenu {
         this.packageSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : playerInventory.selected;
         this.packageStack = playerInventory.getItem(packageSlot);
         this.packingBox = (PackingBox) packageStack.getItem();
-        this.initialPackageContents = PackageContents.of(packageStack);
+        this.initialPackageContents = PackageContents.from(packageStack);
         this.canPack = packingBox.canPack(packageStack);
         this.packageContainer = createPackageContainer();
         init();
@@ -66,7 +66,7 @@ public class PackingMenu extends AbstractContainerMenu {
 
     protected @NotNull SimpleContainer createPackageContainer() {
         final SimpleContainer packageContainer;
-        List<ItemStack> items = new ArrayList<>(PackageContents.of(packageStack).copyItems());
+        List<ItemStack> items = new ArrayList<>(PackageContents.from(packageStack).copyItems());
         while (items.size() < PackageContents.SLOTS) {
             items.add(ItemStack.EMPTY);
         }
@@ -144,7 +144,7 @@ public class PackingMenu extends AbstractContainerMenu {
     }
 
     protected @NotNull PackageContents getPackageContentsFromItem() {
-        return PackageContents.of(getBoxStack());
+        return PackageContents.from(getBoxStack());
     }
 
     public boolean canPack() {
@@ -160,7 +160,7 @@ public class PackingMenu extends AbstractContainerMenu {
             return false;
         }
 
-        PackageContents contents = PackageContents.of(packageContainer);
+        PackageContents contents = PackageContents.createFrom(packageContainer);
         return !contents.isEmpty();
     }
 
@@ -204,7 +204,7 @@ public class PackingMenu extends AbstractContainerMenu {
 
     protected void pack(@NotNull Player player) {
         ItemStack stack = createPackingResult();
-        stack.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.of(packageContainer));
+        stack.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.createFrom(packageContainer));
         stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED,
               stack.getOrDefault(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 0) + 1);
 
@@ -223,7 +223,7 @@ public class PackingMenu extends AbstractContainerMenu {
     @Override
     public void removed(@NotNull Player player) {
         if (!packed && player instanceof ServerPlayer serverPlayer) {
-            for (ItemStack stack : PackageContents.of(packageContainer).copyItems()) {
+            for (ItemStack stack : PackageContents.createFrom(packageContainer).copyItems()) {
                 player.drop(stack, true);
             }
             getBoxStack().remove(Envelope.DataComponents.PACKAGE_CONTENTS);

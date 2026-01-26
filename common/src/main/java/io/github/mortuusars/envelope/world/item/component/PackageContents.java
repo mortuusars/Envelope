@@ -35,7 +35,7 @@ public final class PackageContents implements TooltipComponent {
         }
     }
 
-    public static PackageContents of(Container container) {
+    public static PackageContents createFrom(Container container) {
         List<ItemStack> items = new ArrayList<>();
         for (int i = 0; i < Math.min(container.getContainerSize(), SLOTS); i++) {
             items.add(container.getItem(i));
@@ -43,7 +43,7 @@ public final class PackageContents implements TooltipComponent {
         return new PackageContents(items);
     }
 
-    public static PackageContents of(ItemStack stack) {
+    public static PackageContents from(ItemStack stack) {
         return stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, EMPTY);
     }
 
