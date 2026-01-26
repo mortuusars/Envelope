@@ -31,6 +31,11 @@ public class PaybackPackageItem extends Item {
     }
 
     @Override
+    public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.PACKAGE_CONTENTS));
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
         if (subject != null && !subject.mail().isEmpty()) {
@@ -38,11 +43,6 @@ public class PaybackPackageItem extends Item {
                   .append(GameTime.formatLargest(subject.timeoutTick() - Minecrft.level().getGameTime(), false))
                   .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
         }
-    }
-
-    @Override
-    public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.ofNullable(stack.get(Envelope.DataComponents.PACKAGE_CONTENTS));
     }
 
     // --

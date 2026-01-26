@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
@@ -12,13 +13,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -34,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class PackageItem extends BlockItem implements Sealable {
+public class PackageItem extends BlockItem implements PackingBox, Sealable {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
     }
@@ -63,6 +67,23 @@ public class PackageItem extends BlockItem implements Sealable {
     // --
 
     @Override
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+        return Config.Server.PACKAGE_LAST_OPEN_ANIMATION.get() && shouldBeDestroyedWhenEmpty(stack) ? 15 : 0;
+    }
+
+    @Override
+    public @NotNull UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.EAT;
+    }
+
+    @Override
+    public @NotNull SoundEvent getEatingSound() {
+        return Envelope.SoundEvents.PAPER_TEAR.get();
+    }
+
+    // --
+
+    @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
         if (!context.isSecondaryUseActive()) {
             return InteractionResult.PASS;
@@ -73,12 +94,31 @@ public class PackageItem extends BlockItem implements Sealable {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+
+        if (Config.Server.PACKAGE_LAST_OPEN_ANIMATION.get() && shouldBeDestroyedWhenEmpty(stack)) {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.success(stack);
+        } else {
+            return InteractionResultHolder.success(open(level, player, hand, stack));
+        }
+    }
+
+    @Override
+    public @NotNull ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+        if (entity instanceof Player player) {
+            return open(level, player, player.getUsedItemHand(), stack);
+        }
+        return super.finishUsingItem(stack, level, entity);
+    }
+
+    // --
+
+    protected ItemStack open(Level level, Player player, InteractionHand hand, ItemStack stack) {
         stack = stack.transmuteCopy(Envelope.Items.PACKING_BOX.get());
         Mail.removePreviousDeliveryData(stack);
 
         unpackLootTableIfPresent(stack, level, player.blockPosition(), player);
 
-        player.setItemInHand(hand, stack);
         level.playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 1, 1);
 
         if (stack.getItem() instanceof PackingBoxItem packingBox) {
@@ -86,8 +126,7 @@ public class PackageItem extends BlockItem implements Sealable {
         } else {
             Envelope.LOGGER.error("Cannot open packing box gui. Stack {} is not a PackingBoxItem.", stack.getHoverName().getString());
         }
-
-        return InteractionResultHolder.success(stack);
+        return stack;
     }
 
     protected void unpackLootTableIfPresent(ItemStack stack, Level level, BlockPos pos, @Nullable Player player) {

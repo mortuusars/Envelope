@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 - Added `minecraft:container_loot` support for packages.
+- Last opening of a Package (when it will be destroyed) now required holding the use button, to not unpack accidentally. 
 
 ## 0.4.0.3
 - Added Courier Death Notice. 

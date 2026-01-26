@@ -29,6 +29,7 @@ public abstract class Config {
 
         // Package
         public static final ModConfigSpec.IntValue PACKAGE_PACK_LIMIT;
+        public static final ModConfigSpec.BooleanValue PACKAGE_LAST_OPEN_ANIMATION;
 
         // Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
@@ -89,7 +90,8 @@ public abstract class Config {
 
             {
                 builder.push("letter");
-                LETTER_PAUSE = builder.comment("Letter screen pauses singleplayer game.",
+                LETTER_PAUSE = builder
+                      .comment("Letter screen pauses singleplayer game.",
                             " Default: false")
                       .define("pause", false);
                 builder.pop();
@@ -97,9 +99,14 @@ public abstract class Config {
 
             {
                 builder.push("package");
-                PACKAGE_PACK_LIMIT = builder.comment("Number of packs that a single package can handle.",
+                PACKAGE_PACK_LIMIT = builder
+                      .comment("Number of packs that a single package can handle.",
                             "(When reached, the item will be destroyed after all items are removed from it).")
                       .defineInRange("pack_limit", 3, 1, Integer.MAX_VALUE);
+                PACKAGE_LAST_OPEN_ANIMATION = builder
+                      .comment("Player would need to hold use button to open the Package that will be destroyed after opening.",
+                            "Default: true")
+                      .define("last_open_animation", true);
                 builder.pop();
             }
 
