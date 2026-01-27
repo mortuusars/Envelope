@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Service pigeons now wear a mailman hat.
+- Small updates and changes to pigeon textures, model and animations.
 - Added `minecraft:container_loot` support for packages.
 - Package that will be destroyed after opening now displays a warning sign in the item tooltip.
 - Opening a Package that will be destroyed after opening now requires holding the use button, to not unpack accidentally.

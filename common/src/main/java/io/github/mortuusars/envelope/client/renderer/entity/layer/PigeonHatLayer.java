@@ -11,23 +11,23 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.ResourceLocation;
 
-public class PigeonBackpackLayer extends RenderLayer<Pigeon, PigeonModel> {
-    public static final ModelLayerLocation PIGEON_BACKPACK = new ModelLayerLocation(Envelope.resource("pigeon_backpack"), "main");
+public class PigeonHatLayer extends RenderLayer<Pigeon, PigeonModel> {
+    public static final ModelLayerLocation PIGEON_HAT = new ModelLayerLocation(Envelope.resource("pigeon_hat"), "main");
 
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/pigeon_backpack.png");
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/pigeon_hat.png");
 
     protected final PigeonModel model;
 
-    public PigeonBackpackLayer(RenderLayerParent<Pigeon, PigeonModel> renderer, EntityModelSet modelSet) {
+    public PigeonHatLayer(RenderLayerParent<Pigeon, PigeonModel> renderer, EntityModelSet modelSet) {
         super(renderer);
-        model = new PigeonModel(modelSet.bakeLayer(PIGEON_BACKPACK));
+        model = new PigeonModel(modelSet.bakeLayer(PIGEON_HAT));
     }
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, Pigeon pigeon, float limbSwing,
                        float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (!pigeon.isBaby() && pigeon.hasMail()) {
-            coloredCutoutModelCopyLayerRender(getParentModel(), model, TEXTURE, poseStack, buffer, packedLight, pigeon,
+        if (!pigeon.isBaby() && pigeon.hasMailmanHat()) {
+            coloredCutoutModelCopyLayerRender(getParentModel(), model,TEXTURE, poseStack, buffer, packedLight, pigeon,
                   limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTick, -1);
         }
     }

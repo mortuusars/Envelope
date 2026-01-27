@@ -95,6 +95,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     private static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_TIRED = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
 
     public float flap;
@@ -151,6 +152,25 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         setVariant(Variant.getRandom(random));
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+    }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+              .add(Attributes.MAX_HEALTH, 8.0)
+              .add(Attributes.FLYING_SPEED, 2F)
+              .add(Attributes.MOVEMENT_SPEED, 0.3F)
+              .add(Attributes.ATTACK_DAMAGE, 3.0);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_VARIANT_ID, 0);
+        builder.define(DATA_SITTING, false);
+        builder.define(DATA_DELIVERING, false);
+        builder.define(DATA_SERVICE, false);
+        builder.define(DATA_HAS_MAIL, false);
+        builder.define(DATA_TIRED, false);
     }
 
     // -- Variant
@@ -295,10 +315,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     public boolean isDelivering() {
-        //TODO: rework
-        if (level() instanceof ServerLevel) {
-            return delivery != null;
-        }
         return entityData.get(DATA_DELIVERING);
     }
 
@@ -314,6 +330,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         entityData.set(DATA_HAS_MAIL, hasMail);
     }
 
+    public boolean isService() {
+        return entityData.get(DATA_SERVICE);
+    }
+
+    public void setService(boolean service) {
+        entityData.set(DATA_SERVICE, service);
+    }
+
     public boolean isTired() {
         if (!level().isClientSide) {
             return tiredTicks > 0;
@@ -326,28 +350,8 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         entityData.set(DATA_TIRED, tiredTicks > 0);
     }
 
-    public boolean hasFancyHat() {
-        //TODO: supporters
-        // return getOwnerUUID()
-        return false;
-    }
-
-    public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes()
-              .add(Attributes.MAX_HEALTH, 8.0)
-              .add(Attributes.FLYING_SPEED, 2F)
-              .add(Attributes.MOVEMENT_SPEED, 0.3F)
-              .add(Attributes.ATTACK_DAMAGE, 3.0);
-    }
-
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_VARIANT_ID, 0);
-        builder.define(DATA_SITTING, false);
-        builder.define(DATA_DELIVERING, false);
-        builder.define(DATA_HAS_MAIL, false);
-        builder.define(DATA_TIRED, false);
+    public boolean hasMailmanHat() {
+        return isService();
     }
 
     @Nullable
@@ -592,6 +596,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public void setOrigin(@Nullable CourierOrigin origin) {
         this.origin = origin;
+        setService(origin != null && origin.isService());
     }
 
     @Override
@@ -639,9 +644,9 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         }
 
         if (tag.contains("Origin")) {
-            origin = CourierOrigin.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("Origin"))
+            setOrigin(CourierOrigin.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("Origin"))
                   .resultOrPartial(e -> LOGGER.error("Cannot parse CourierOrigin from tag '{}': {}", tag.getCompound("Origin"), e))
-                  .orElse(null);
+                  .orElse(null));
         }
 
         setDelivering(delivery != null);

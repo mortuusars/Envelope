@@ -6,12 +6,10 @@ import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackPackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
-import io.github.mortuusars.envelope.client.model.PigeonBackpackModel;
-import io.github.mortuusars.envelope.client.model.PigeonFancyHatModel;
-import io.github.mortuusars.envelope.client.model.PigeonLegBandModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
-import io.github.mortuusars.envelope.client.model.geom.EnvelopeModelLayers;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
+import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
+import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.world.item.Sealable;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -44,10 +42,9 @@ public class NeoForgeClientEvents {
 
         @SubscribeEvent
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON, PigeonModel::createLayerDefinition);
-            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_LEG_BAND, PigeonLegBandModel::createLayerDefinition);
-            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_BACKPACK, PigeonBackpackModel::createLayerDefinition);
-            event.registerLayerDefinition(EnvelopeModelLayers.PIGEON_FANCY_HAT, PigeonFancyHatModel::createLayerDefinition);
+            event.registerLayerDefinition(PigeonRenderer.PIGEON_LAYER, PigeonModel::createLayerDefinition);
+            event.registerLayerDefinition(PigeonBackpackLayer.PIGEON_BACKPACK, PigeonModel::createLayerDefinition);
+            event.registerLayerDefinition(PigeonHatLayer.PIGEON_HAT, PigeonModel::createLayerDefinition);
         }
 
         @SubscribeEvent
