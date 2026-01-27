@@ -11,7 +11,7 @@
 - Added Courier Death Notice. 
 - Reworked how delivery route and delivery duration is calculated. 
   - It's somewhat involved, maybe I'll explain it the future in a wiki or something. 
-- Reduced `courier_travel_speed` config value from 25 to 20.]()
+- Reduced `courier_travel_speed` config value from 25 to 20.
 
 ## 0.4.0.2 - Reworks, reworks, reworks
 - Pigeonhole has been split into two blocks:

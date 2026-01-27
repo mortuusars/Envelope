@@ -92,7 +92,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     );
 
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
@@ -166,7 +165,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_VARIANT_ID, 0);
-        builder.define(DATA_SITTING, false);
         builder.define(DATA_DELIVERING, false);
         builder.define(DATA_SERVICE, false);
         builder.define(DATA_HAS_MAIL, false);
@@ -306,11 +304,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     // -- Properties
 
     public boolean isSitting() {
-        return entityData.get(DATA_SITTING);
+        return getPose() == Pose.SITTING;
     }
 
     public void setSitting(boolean sitting) {
-        entityData.set(DATA_SITTING, sitting);
+        setPose(sitting ? Pose.SITTING : Pose.STANDING);
     }
 
     @Override
@@ -612,7 +610,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, tag).getOrThrow());
         tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, tag).getOrThrow());
         tag.putInt("Variant", getVariant().id);
-        tag.putBoolean("Sitting", isSitting());
+        if (isSitting()) tag.putBoolean("Sitting", true);
         if (tiredTicks > 0) tag.putInt("TiredTicks", tiredTicks);
 
         if (delivery != null) {
