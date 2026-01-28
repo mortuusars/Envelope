@@ -15,6 +15,9 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE;
         public static final ModConfigSpec.IntValue PIGEON_TIRED_AFTER_DELIVERY_TICKS;
+        public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_CAT;
+        public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
+        public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
 
         // Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
@@ -62,6 +65,17 @@ public abstract class Config {
                 PIGEON_TIRED_AFTER_DELIVERY_TICKS = builder
                       .comment("Time (in ticks) for which Pigeon will be tired after finishing a delivery.")
                       .defineInRange("ticks_tired_after_delivery", 6000, 0, Integer.MAX_VALUE);
+
+                PIGEON_HUNTED_BY_CAT = builder
+                      .comment("Cat will hunt and kill pigeons.", "Default: true")
+                      .define("hunted_by_cat", true);
+                PIGEON_HUNTED_BY_OCELOT = builder
+                      .comment("Ocelot will hunt and kill pigeons.", "Default: true")
+                      .define("hunted_by_ocelot", true);
+                PIGEON_HUNTED_BY_FOX = builder
+                      .comment("Fox will hunt and kill pigeons.", "Default: true")
+                      .define("hunted_by_fox", true);
+
                 builder.pop();
             }
 

@@ -1,7 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+- Pigeons are now hunted by predators (cat, ocelot, fox).
 - Service pigeons now wear a mailman hat.
+- Small changes to pigeon movement and AI.
 - Small updates and changes to pigeon textures, model and animations.
 - Added `minecraft:container_loot` support for packages.
 - Package that will be destroyed after opening now displays a warning sign in the item tooltip.

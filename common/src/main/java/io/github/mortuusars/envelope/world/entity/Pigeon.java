@@ -39,8 +39,7 @@ import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.util.AirRandomPos;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -56,6 +55,7 @@ import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 
 public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, TransitionableCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -91,6 +91,13 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
           "Delivery"
     );
 
+    public static final Predicate<LivingEntity> AVOID_SELECTOR = entity -> {
+        if (entity instanceof Cat) return Config.Server.PIGEON_HUNTED_BY_CAT.get();
+        if (entity instanceof Ocelot) return Config.Server.PIGEON_HUNTED_BY_OCELOT.get();
+        if (entity instanceof Fox) return Config.Server.PIGEON_HUNTED_BY_FOX.get();
+        return false;
+    };
+
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
@@ -108,7 +115,6 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     protected PigeonholeHandler pigeonholeHandler;
     protected MailboxHandler mailboxHandler;
     protected PigeonDeliveryHandler deliveryHandler;
-    protected PigeonDeliverMailGoal deliverMailGoal;
 
     protected @Nullable Delivery delivery;
     protected @Nullable CourierOrigin origin;
@@ -121,6 +127,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         mailboxHandler = new MailboxHandler();
         deliveryHandler = new PigeonDeliveryHandler(this);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
+        setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
     }
 
     // -- Spawn
@@ -156,9 +163,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
               .add(Attributes.MAX_HEALTH, 8.0)
-              .add(Attributes.FLYING_SPEED, 2F)
-              .add(Attributes.MOVEMENT_SPEED, 0.3F)
+              .add(Attributes.FLYING_SPEED, 1F)
+              .add(Attributes.MOVEMENT_SPEED, 0.2F)
               .add(Attributes.ATTACK_DAMAGE, 3.0);
+    }
+
+    @Override
+    protected float getFlyingSpeed() {
+        return isPanicking() ? 0.35f : 0.0275f;
     }
 
     @Override
@@ -185,20 +197,22 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     protected void registerGoals() {
-        deliverMailGoal = new PigeonDeliverMailGoal(this);
-        goalSelector.addGoal(0, deliverMailGoal);
-        goalSelector.addGoal(1, new PigeonEnterPigeonholeGoal(this));
-        goalSelector.addGoal(1, new PigeonStartDeliveryFromMailboxGoal(this));
-        goalSelector.addGoal(2, new BreedGoal(this, 1.0));
-        goalSelector.addGoal(3, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
-        goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        goalSelector.addGoal(5, new FollowParentGoal(this, 1.25));
-        goalSelector.addGoal(5, new PigeonLocatePigeonholeGoal(this));
-        goalSelector.addGoal(5, new PigeonGoToPigeonholeGoal(this));
-        goalSelector.addGoal(5, new PigeonLocateMailboxGoal(this));
-        goalSelector.addGoal(5, new PigeonGoToMailboxGoal(this));
-        goalSelector.addGoal(6, new PigeonWanderGoal(this));
-        goalSelector.addGoal(7, new FloatGoal(this));
+        goalSelector.addGoal(0, new PigeonDeliverMailGoal(this));
+        goalSelector.addGoal(1, new FloatGoal(this));
+        goalSelector.addGoal(1, new PigeonAvoidEntityGoal<>(this, Animal.class,
+              8, 1.5, 3.5, AVOID_SELECTOR));
+        goalSelector.addGoal(2, new PigeonPanicGoal(this, 3.5));
+        goalSelector.addGoal(2, new PigeonEnterPigeonholeGoal(this));
+        goalSelector.addGoal(3, new PigeonStartDeliveryFromMailboxGoal(this));
+        goalSelector.addGoal(4, new BreedGoal(this, 1.0));
+        goalSelector.addGoal(5, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
+        goalSelector.addGoal(6, new FollowParentGoal(this, 1.25));
+        goalSelector.addGoal(7, new PigeonLocatePigeonholeGoal(this));
+        goalSelector.addGoal(7, new PigeonGoToPigeonholeGoal(this));
+        goalSelector.addGoal(7, new PigeonLocateMailboxGoal(this));
+        goalSelector.addGoal(8, new PigeonGoToMailboxGoal(this));
+        goalSelector.addGoal(9, new PigeonWanderGoal(this));
+        goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 8.0F));
     }
 
     @Override
@@ -230,7 +244,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public void checkDespawn() {
         // This method seems to be called every tick, even if entity is not in ticking range
         // It's a good place to check if courier should be transitioned to background
-        if (level() instanceof ServerLevel level && isDelivering() && !Position.isInSimulationDistance(level, this)) {
+        if (level() instanceof ServerLevel level && !isNoAi() && isDelivering() && !Position.isInSimulationDistance(level, this)) {
             transitionToBackground(level);
             return;
         }
@@ -267,7 +281,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     protected boolean shouldDropLoot() {
-        return super.shouldDropLoot() && !getOrigin().isService();
+        return super.shouldDropLoot() && (origin == null || !origin.isService());
     }
 
     @Override
@@ -577,7 +591,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     public void onDeliveryChanged() {
         if (!level().isClientSide()) {
-            setDelivering(isDelivering());
+            setDelivering(getCurrentDelivery().isPresent());
             setHasMail(delivery != null && !delivery.getMail().isEmpty());
 
             Bugger.PIGEON_DELIVERY.send(getId(), Optional.ofNullable(delivery));

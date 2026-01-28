@@ -22,7 +22,7 @@ public class PigeonWanderGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return pigeon.getNavigation().isDone() && pigeon.getRandom().nextInt(10) == 0;
+        return pigeon.getNavigation().isDone() && pigeon.getRandom().nextInt(25) == 0;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PigeonWanderGoal extends Goal {
         }
 
         int radius = 8;
-        Vec3 vec33 = HoverRandomPos.getPos(pigeon, radius, 12, pos.x, pos.z, (float) (Math.PI / 2), 3, 1);
-        return vec33 != null ? vec33 : AirAndWaterRandomPos.getPos(pigeon, radius, 4, -2, pos.x, pos.z, (float) (Math.PI / 2));
+        Vec3 hoverPos = HoverRandomPos.getPos(pigeon, radius, 12, pos.x, pos.z, (float) (Math.PI / 2), 3, 1);
+        return hoverPos != null ? hoverPos : AirAndWaterRandomPos.getPos(pigeon, radius, 4, -2, pos.x, pos.z, (float) (Math.PI / 2));
     }
 }
