@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
@@ -14,6 +13,7 @@ import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -23,13 +23,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ByIdMap;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.StringRepresentable;
-import net.minecraft.util.random.Weight;
-import net.minecraft.util.random.WeightedEntry;
-import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -45,6 +40,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -54,10 +50,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.*;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
-public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, FlyingAnimal, TransitionableCourier {
+public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, FlyingAnimal, TransitionableCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -135,14 +130,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     public static boolean checkSpawnRules(EntityType<Pigeon> pigeon, LevelAccessor level,
                                           MobSpawnType spawnType, BlockPos pos, RandomSource random) {
         return Config.Server.PIGEON_SPAWNS_NATURALLY.get()
-              && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON)
+              && level.getBlockState(pos.below()).is(Envelope.Tags.Blocks.PIGEONS_SPAWNABLE_ON)
               && isBrightEnoughToSpawn(level, pos);
     }
 
     public static Pigeon createService(ServerLevel level) {
         Pigeon pigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
               "Failed to create an entity. This should not happen.");
-        pigeon.setVariant(Variant.getRandom(level.getRandom()));
+        pigeon.setVariant(PigeonVariant.getRandomService(level.getRandom()));
         pigeon.setOrigin(CourierOrigin.service());
         return pigeon;
     }
@@ -156,7 +151,14 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Override
     public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
-        setVariant(Variant.getRandom(random));
+        Holder<Biome> biome = level.getBiome(blockPosition());
+
+        if (biome.is(Envelope.Tags.Biomes.HAS_PASSENGER_PIGEONS)) {
+            setVariant(PigeonVariant.getRandomPassengerPriority(getRandom()));
+        } else {
+            setVariant(PigeonVariant.getRandomRegular(getRandom()));
+        }
+
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
@@ -185,12 +187,12 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     // -- Variant
 
-    public @NotNull Pigeon.Variant getVariant() {
-        return Variant.byId(this.entityData.get(DATA_VARIANT_ID));
+    public @NotNull PigeonVariant getVariant() {
+        return PigeonVariant.byId(this.entityData.get(DATA_VARIANT_ID));
     }
 
-    public void setVariant(Variant variant) {
-        entityData.set(DATA_VARIANT_ID, variant.id);
+    public void setVariant(PigeonVariant variant) {
+        entityData.set(DATA_VARIANT_ID, variant.getId());
     }
 
     // -- AI
@@ -382,7 +384,11 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        return Envelope.EntityTypes.PIGEON.get().create(level);
+        @Nullable Pigeon offspring = Envelope.EntityTypes.PIGEON.get().create(level);
+        if (offspring != null && otherParent instanceof Pigeon otherPigeon) {
+            offspring.setVariant(getRandom().nextBoolean() ? this.getVariant() : otherPigeon.getVariant());
+        }
+        return offspring;
     }
 
     @Override
@@ -636,7 +642,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.addAdditionalSaveData(tag);
         tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, tag).getOrThrow());
         tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, tag).getOrThrow());
-        tag.putInt("Variant", getVariant().id);
+        tag.putInt("Variant", getVariant().getId());
         if (isSitting()) tag.putBoolean("Sitting", true);
         if (tiredTicks > 0) tag.putInt("TiredTicks", tiredTicks);
 
@@ -657,7 +663,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         super.readAdditionalSaveData(tag);
         setPigeonholeHandler(PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler")).getOrThrow());
         setMailboxHandler(MailboxHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("MailboxHandler")).getOrThrow());
-        setVariant(Variant.byId(tag.getInt("Variant")));
+        setVariant(PigeonVariant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
         setTiredTicks(tag.getInt("TiredTicks"));
 
@@ -676,49 +682,5 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
         setDelivering(delivery != null);
         setHasMail(delivery != null && !delivery.getMail().isEmpty());
-    }
-
-    // --
-
-    public enum Variant implements StringRepresentable, WeightedEntry {
-        GRAY(0, "gray", 12),
-        BROWN(1, "brown", 6),
-        WHITE(2, "white", 1);
-
-        public static final Codec<Variant> CODEC = StringRepresentable.fromEnum(Variant::values);
-        private static final IntFunction<Variant> BY_ID = ByIdMap.continuous(Variant::getId, values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
-        public static final WeightedRandomList<Variant> WEIGHTED_LIST = WeightedRandomList.create(Variant.values());
-
-        private final int id;
-        private final String name;
-        private final Weight weight;
-
-        Variant(int id, String name, int weight) {
-            this.id = id;
-            this.name = name;
-            this.weight = Weight.of(weight);
-        }
-
-        public int getId() {
-            return this.id;
-        }
-
-        @Override
-        public @NotNull Weight getWeight() {
-            return weight;
-        }
-
-        @Override
-        public @NotNull String getSerializedName() {
-            return this.name;
-        }
-
-        public static Variant byId(int id) {
-            return BY_ID.apply(id);
-        }
-
-        public static Variant getRandom(RandomSource random) {
-            return WEIGHTED_LIST.getRandom(random).orElseThrow();
-        }
     }
 }

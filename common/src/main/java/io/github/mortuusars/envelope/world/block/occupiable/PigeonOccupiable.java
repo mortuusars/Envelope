@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 public interface PigeonOccupiable extends Occupiable {
     @Override
     default boolean canBeOccupiedBy(Entity entity) {
-        return entity instanceof Pigeon;
+        return entity.getType().is(Envelope.Tags.EntityTypes.PIGEONHOLE_INHABITORS);
     }
 
     @Override

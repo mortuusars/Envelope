@@ -1,11 +1,17 @@
 # Changelog
 
 ## UNRELEASED
+Pigeon:
+- Added Passenger Pigeon variant.
+  - Spawns only in old growth biomes, or taiga village.
+- Offspring variant is now dependent on parents, with a 50/50 chance, instead of random from all variants.
 - Pigeons are now hunted by predators (cat, ocelot, fox).
 - Pigeons are now sitting occasionally when tired.
 - Service pigeons now wear a mailman hat.
 - Small changes to pigeon movement and AI.
 - Small updates and changes to pigeon textures, model and animations.
+
+Package:
 - Added `minecraft:container_loot` support for packages.
 - Package that will be destroyed after opening now displays a warning sign in the item tooltip.
 - Opening a Package that will be destroyed after opening now requires holding the use button, to not unpack accidentally.

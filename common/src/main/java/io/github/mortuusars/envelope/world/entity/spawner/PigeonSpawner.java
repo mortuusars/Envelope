@@ -68,10 +68,11 @@ public class PigeonSpawner implements CustomSpawner {
 
     protected int spawnInVillage(ServerLevel serverLevel, BlockPos pos) {
         int area = 48;
-        if (serverLevel.getPoiManager().getCountInRange(holder -> holder.is(PoiTypes.HOME), pos, area, PoiManager.Occupancy.IS_OCCUPIED) > 4L) {
+        if (serverLevel.getPoiManager().getCountInRange(holder ->
+              holder.is(PoiTypes.HOME), pos, area, PoiManager.Occupancy.IS_OCCUPIED) > 4L) {
             List<Pigeon> pigeonsInArea = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area, 8.0, area));
             if (pigeonsInArea.size() < 5) {
-                return spawn(serverLevel, pos);
+                 return spawn(serverLevel, pos);
             }
         }
 
@@ -90,8 +91,8 @@ public class PigeonSpawner implements CustomSpawner {
             return 0;
         }
 
-        pigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.NATURAL, null);
         pigeon.moveTo(pos, 0.0F, 0.0F);
+        pigeon.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.NATURAL, null);
         level.addFreshEntityWithPassengers(pigeon);
         level.playSound(null, pigeon, Envelope.SoundEvents.PIGEON_AMBIENT.get(), SoundSource.NEUTRAL, 2, 1);
         return 1;

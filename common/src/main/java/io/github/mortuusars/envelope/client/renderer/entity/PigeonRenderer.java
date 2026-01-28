@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -18,6 +19,7 @@ public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
     public static final ResourceLocation GRAY = Envelope.resource("textures/entity/pigeon/pigeon_gray.png");
     public static final ResourceLocation BROWN = Envelope.resource("textures/entity/pigeon/pigeon_brown.png");
     public static final ResourceLocation WHITE = Envelope.resource("textures/entity/pigeon/pigeon_white.png");
+    public static final ResourceLocation PASSENGER = Envelope.resource("textures/entity/pigeon/pigeon_passenger.png");
 
     public PigeonRenderer(EntityRendererProvider.Context context) {
         super(context, new PigeonModel(context.bakeLayer(PIGEON_LAYER)), 0.35f);
@@ -39,11 +41,12 @@ public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
 
     // --
 
-    public static @NotNull ResourceLocation getVariantTexture(Pigeon.Variant variant) {
+    public static @NotNull ResourceLocation getVariantTexture(PigeonVariant variant) {
         return switch (variant) {
             case GRAY -> GRAY;
             case BROWN -> BROWN;
             case WHITE -> WHITE;
+            case PASSENGER -> PASSENGER;
         };
     }
 }

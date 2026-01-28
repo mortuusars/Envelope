@@ -84,7 +84,7 @@ public class EnvelopeFabric implements ModInitializer {
         });
 
         BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_PIGEON_SPAWNS),
-                MobCategory.CREATURE, Envelope.EntityTypes.PIGEON.get(), 2, 4, 6);
+                MobCategory.CREATURE, Envelope.EntityTypes.PIGEON.get(), 2, 3, 6);
 
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING, Pigeon::checkSpawnRules);

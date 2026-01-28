@@ -4,7 +4,7 @@
   "spawners": {
     "type": "envelope:pigeon",
     "weight": 2,
-    "minCount": 4,
+    "minCount": 3,
     "maxCount": 6
   }
 }

@@ -21,8 +21,11 @@ public class BlockTagsDatagen extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
-        tag(Envelope.Tags.Blocks.PIGEON_SPAWNABLE_ON)
+        tag(Envelope.Tags.Blocks.PIGEONS_SPAWNABLE_ON)
                 .add(Blocks.GRASS_BLOCK)
+                .add(Blocks.DIRT)
+                .add(Blocks.PODZOL)
+                .add(Blocks.COARSE_DIRT)
                 .add(Blocks.AIR)
                 .addTag(BlockTags.LEAVES)
                 .addTag(BlockTags.LOGS)

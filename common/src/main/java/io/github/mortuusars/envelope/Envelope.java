@@ -395,8 +395,8 @@ public class Envelope {
 
     public static class Tags {
         public static class Blocks {
-            public static final TagKey<Block> PIGEON_SPAWNABLE_ON =
-                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeon_spawnable_on"));
+            public static final TagKey<Block> PIGEONS_SPAWNABLE_ON =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeons_spawnable_on"));
             public static final TagKey<Block> PIGEONHOLES =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes"));
         }
@@ -432,6 +432,8 @@ public class Envelope {
             public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
                   TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_pigeon_spawns"));
 
+            public static final TagKey<Biome> HAS_PASSENGER_PIGEONS =
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("has_passenger_pigeons"));;
         }
 
         public static class Structures {
