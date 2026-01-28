@@ -171,11 +171,6 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     }
 
     @Override
-    protected float getFlyingSpeed() {
-        return isPanicking() ? 0.035f : 0.0275f;
-    }
-
-    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_VARIANT_ID, 0);
@@ -417,8 +412,13 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     }
 
     @Override
+    protected float getFlyingSpeed() {
+        return isPanicking() ? 0.035f : 0.0275f;
+    }
+
+    @Override
     public @NotNull Vec3 getLeashOffset() {
-        return new Vec3(0.0, 0.5F * getEyeHeight(), getBbWidth() * 0.4F);
+        return new Vec3(0.0, getEyeHeight() * 0.65F, getBbWidth() * 0.4F);
     }
 
     public boolean hasReachedTarget(BlockPos pos) {
