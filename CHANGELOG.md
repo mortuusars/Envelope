@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 - Pigeons are now hunted by predators (cat, ocelot, fox).
+- Pigeons are now sitting occasionally when tired.
 - Service pigeons now wear a mailman hat.
 - Small changes to pigeon movement and AI.
 - Small updates and changes to pigeon textures, model and animations.
