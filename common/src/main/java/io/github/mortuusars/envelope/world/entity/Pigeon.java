@@ -170,7 +170,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
 
     @Override
     protected float getFlyingSpeed() {
-        return isPanicking() ? 0.35f : 0.0275f;
+        return isPanicking() ? 0.035f : 0.0275f;
     }
 
     @Override
@@ -210,6 +210,7 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         goalSelector.addGoal(7, new PigeonLocatePigeonholeGoal(this));
         goalSelector.addGoal(7, new PigeonGoToPigeonholeGoal(this));
         goalSelector.addGoal(7, new PigeonLocateMailboxGoal(this));
+        goalSelector.addGoal(7, new PigeonSitGoal(this));
         goalSelector.addGoal(8, new PigeonGoToMailboxGoal(this));
         goalSelector.addGoal(9, new PigeonWanderGoal(this));
         goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 8.0F));
@@ -234,6 +235,10 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
             if (level() instanceof ServerLevel serverLevel && level().getRandom().nextFloat() < 0.1) {
                 serverLevel.sendParticles(ParticleTypes.SMOKE, position().x, position().y, position().z, 1, 0.2, 0.2, 0.2, 0);
             }
+        }
+
+        if (isSitting() && getNavigation().isInProgress()) {
+            setSitting(false);
         }
 
         getPigeonholeHandler().tick(this, level());
@@ -357,7 +362,15 @@ public class Pigeon extends Animal implements VariantHolder<Pigeon.Variant>, Fly
         return entityData.get(DATA_TIRED);
     }
 
+    public int getTiredTicks() {
+        return tiredTicks;
+    }
+
     public void setTiredTicks(int ticks) {
+        if (ticks <= 0 && tiredTicks > 0 && level() instanceof ServerLevel level) {
+            level.sendParticles(ParticleTypes.HAPPY_VILLAGER, position().x, position().y, position().z, 7, 0.25, 0.25, 0.25, 0);
+        }
+
         tiredTicks = ticks;
         entityData.set(DATA_TIRED, tiredTicks > 0);
     }

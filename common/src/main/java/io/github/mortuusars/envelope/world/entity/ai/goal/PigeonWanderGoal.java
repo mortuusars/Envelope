@@ -22,7 +22,7 @@ public class PigeonWanderGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return pigeon.getNavigation().isDone() && pigeon.getRandom().nextInt(25) == 0;
+        return !pigeon.isSitting() && pigeon.getNavigation().isDone() && pigeon.getRandom().nextInt(25) == 0;
     }
 
     @Override
