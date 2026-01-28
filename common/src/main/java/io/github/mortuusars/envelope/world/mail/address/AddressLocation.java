@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public interface AddressLocation {
-    int ASCEND_DISTANCE = 12;
+    int ASCEND_DISTANCE = 16;
 
     Optional<BlockPos> getPosition();
     int getDistanceTo(BlockPos pos);
