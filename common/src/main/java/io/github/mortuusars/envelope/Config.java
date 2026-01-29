@@ -18,6 +18,7 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_CAT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
+        public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHEN_DELIVERING;
 
         // Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
@@ -75,6 +76,10 @@ public abstract class Config {
                 PIGEON_HUNTED_BY_FOX = builder
                       .comment("Fox will hunt and kill pigeons.", "Default: true")
                       .define("hunted_by_fox", true);
+
+                PIGEON_DAMAGE_EVASION_CHANCE_WHEN_DELIVERING = builder
+                      .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
+                      .defineInRange("damage_evasion_chance_when_delivering", 0.0, 0.0, 1.0);
 
                 builder.pop();
             }

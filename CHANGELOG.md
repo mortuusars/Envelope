@@ -10,6 +10,7 @@ Pigeon:
 - Service pigeons now wear a mailman hat.
 - Small changes to pigeon movement and AI.
 - Small updates and changes to pigeon textures, model and animations.
+- Added `pigeon.damage_evasion_chance_when_delivering` config option.
 
 Package:
 - Added `minecraft:container_loot` support for packages.
