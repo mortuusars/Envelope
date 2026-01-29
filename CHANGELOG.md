@@ -1,11 +1,11 @@
 # Changelog
 
-## UNRELEASED
+## 0.4.0.4
 Pigeon:
 - Added Passenger Pigeon variant.
   - Spawns only in old growth biomes, or taiga village.
 - Offspring variant is now dependent on parents, with a 50/50 chance, instead of random from all variants.
-- Pigeons are now hunted by predators (cat, ocelot, fox).
+- Pigeons are now hunted by cats, ocelots and foxes.
 - Pigeons are now sitting occasionally when tired.
 - Service pigeons now wear a mailman hat.
 - Small changes to pigeon movement and AI.
