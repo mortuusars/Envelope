@@ -30,7 +30,7 @@
     "${mod_id}-common.mixins.json"
   ],
   "depends": {
-    "minecraft": ">=1.21.0",
+    "minecraft": ["1.21.0", "1.21.1"],
     "fabric": "*",
     "fabric-api": "*",
     "forgeconfigapiport": ">=21.0.0"

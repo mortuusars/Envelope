@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 - 2026-01-30
+[The mod is not fully finished. Use in forever world is not recommended.]
+- Release
+
 ## 0.4.0.5
 - Config translation
 - Added mod icon

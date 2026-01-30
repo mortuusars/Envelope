@@ -242,7 +242,7 @@ publishMods {
         modLoaders.add("fabric")
         displayName = "${mod_name} - Fabric ${minecraft_version} - ${mod_version}"
         requires("fabric-api")
-        requires("forge-config-api-port-fabric")
+        requires("forge-config-api-port")
     }
 
     modrinth("modrinthNeoForge") {
