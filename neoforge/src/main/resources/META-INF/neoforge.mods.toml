@@ -3,7 +3,7 @@ license="${mod_license}"
 loaderVersion="${neoforge_loader_version_range}"
 issueTrackerURL="${mod_issues}"
 displayURL="${mod_page}"
-logoFile="${mod_id}_logo.png"
+logoFile="icon.png"
 
 [[mixins]]
 config="${mod_id}-common.mixins.json"

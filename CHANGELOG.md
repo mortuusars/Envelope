@@ -2,6 +2,7 @@
 
 ## 0.4.0.5
 - Config translation
+- Added mod icon
 
 ## 0.4.0.4
 Pigeon:
