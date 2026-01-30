@@ -401,7 +401,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         if (level().isClientSide()) return false;
         if (isDeadOrDying()) return false;
 
-        if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHEN_DELIVERING.get()
+        if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING.get()
             && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
 
             if (level() instanceof ServerLevel level) {

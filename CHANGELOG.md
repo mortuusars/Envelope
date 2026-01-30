@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.0.5
+- Config translation
+
 ## 0.4.0.4
 Pigeon:
 - Added Passenger Pigeon variant.
