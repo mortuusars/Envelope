@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.1 - 2026-01-31
+- Removed `Requires debug mode` message in chat on world load.
+
 ## 0.5.0 - 2026-01-30
 [The mod is not fully finished. Use in forever world is not recommended.]
 - Release

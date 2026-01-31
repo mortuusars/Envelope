@@ -2,24 +2,37 @@ package io.github.mortuusars.envelope.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryHandlerTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
+import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+import java.util.List;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
         return Commands.literal("debug")
               .then(Commands.literal("expire_all_awaiting_payback")
                     .executes(EnvelopeDebugCommand::timeoutAllPaybackMail))
-              .then(Commands.literal("tests")
-                    .executes(EnvelopeDebugCommand::runBuggerTests));
+              .then(Commands.literal("run_tests")
+                    .executes(EnvelopeDebugCommand::runBuggerTests))
+              .then(Commands.literal("test")
+                    .executes(EnvelopeDebugCommand::test));
     }
 
     private static int timeoutAllPaybackMail(CommandContext<CommandSourceStack> context) {
@@ -59,6 +72,39 @@ public class EnvelopeDebugCommand {
                       .withStyle(ChatFormatting.RED), true);
             });
         }
+
+        return 0;
+    }
+
+    // --
+
+    private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+
+        ServerPlayer player = context.getSource().getPlayerOrException();
+
+        MailService.of(player.serverLevel()).getDeliveryManager()
+              .startService(Delivery.draft()
+                    .deliver(Mail.createPackage(new PackageContents(List.of(new ItemStack(Items.ACACIA_LOG))))
+                          .get())
+                    .from(new Address.Block("Blue"))
+                    .to(new Address.Block("Red"))
+                    .startAtPhase(DeliveryPhase.DISPATCHING_DELIVERY));
+
+//        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
+//        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));
+//        pkg.set(Envelope.DataComponents.SENDER, new Address.Block("Original-Sender"));
+//        pkg.set(Envelope.DataComponents.RECIPIENT, new Address.Block("Base"));
+//        pkg.set(Envelope.DataComponents.PAYBACK, Payback.createOrDefault(List.of(
+//              new RequestedItem(Items.EMERALD, 3), new RequestedItem(ItemTags.LOGS, 13))));
+//
+//        Mail mail = new Mail(pkg);
+//
+//        ItemStack paybackPackage = new ItemStack(Envelope.Items.PAYBACK_PACKING_BOX.get());
+//        paybackPackage.set(Envelope.DataComponents.PAYBACK_SUBJECT, new StoredItemStack(mail.getItemCopy()));
+//        paybackPackage.set(Envelope.DataComponents.SENDER, Address.MAIL_SERVICE);
+//        paybackPackage.set(Envelope.DataComponents.RECIPIENT, mail.getRecipient());
+//
+//        Containers.dropItemStack(context.getSource().getLevel(), player.getX(), player.getY(), player.getZ(), paybackPackage);
 
         return 0;
     }
