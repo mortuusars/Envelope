@@ -65,14 +65,12 @@ public class PackingMenu extends AbstractContainerMenu {
     // --
 
     protected @NotNull SimpleContainer createPackageContainer() {
-        final SimpleContainer packageContainer;
         List<ItemStack> items = new ArrayList<>(PackageContents.from(packageStack).copyItems());
         while (items.size() < PackageContents.SLOTS) {
             items.add(ItemStack.EMPTY);
         }
 
-        packageContainer = new SimpleContainer(items.toArray(ItemStack[]::new));
-        return packageContainer;
+        return new SimpleContainer(items.toArray(ItemStack[]::new));
     }
 
     protected void addPackageSlots() {
@@ -226,7 +224,8 @@ public class PackingMenu extends AbstractContainerMenu {
             for (ItemStack stack : PackageContents.createFrom(packageContainer).copyItems()) {
                 player.drop(stack, true);
             }
-            getBoxStack().remove(Envelope.DataComponents.PACKAGE_CONTENTS);
+
+            player.getItemInHand(hand).remove(Envelope.DataComponents.PACKAGE_CONTENTS);
 
             if (getPackage().shouldBeDestroyedWhenEmpty(getBoxStack())) {
                 player.getItemInHand(hand).shrink(1);

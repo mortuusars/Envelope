@@ -77,7 +77,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     }
 
     public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, Address.Block address, List<ItemStack> mail) {
-        this(Envelope.MenuTypes.PIGEONHOLE.get(), id, playerInventory, pos, address, mail);
+        this(Envelope.MenuTypes.MAILBOX.get(), id, playerInventory, pos, address, mail);
     }
 
     public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {

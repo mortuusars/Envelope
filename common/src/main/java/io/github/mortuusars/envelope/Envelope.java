@@ -7,8 +7,7 @@ import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
-import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
-import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
+import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -21,15 +20,12 @@ import io.github.mortuusars.envelope.world.block.*;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.inventory.PackingMenu;
-import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -206,8 +202,8 @@ public class Envelope {
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
               () -> new SealedLetterItem(new Item.Properties()));
 
-        public static final Supplier<BlockItem> PAPER_BOX = Register.item("paper_box",
-              () -> new BlockItem(Blocks.PAPER_BOX.get(), new Item.Properties()));
+        public static final Supplier<PaperBoxItem> PAPER_BOX = Register.item("paper_box",
+              () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), new Item.Properties()));
         public static final Supplier<PackingBoxItem> PACKING_BOX = Register.item("packing_box",
               () -> new PackingBoxItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
@@ -317,8 +313,11 @@ public class Envelope {
     }
 
     public static class MenuTypes {
-        public static final Supplier<MenuType<MailboxMenu>> PIGEONHOLE =
-              Register.menuType("pigeonhole", MailboxMenu::fromNetwork);
+        public static final Supplier<MenuType<MailboxMenu>> MAILBOX =
+              Register.menuType("mailbox", MailboxMenu::fromNetwork);
+
+        public static final Supplier<MenuType<NewPackingMenu>> PACKING =
+              Register.menuType("packing", NewPackingMenu::fromNetwork);
 
         public static final Supplier<MenuType<PackingMenu>> PACKAGE =
               Register.menuType("package", PackingMenu::fromNetwork);
