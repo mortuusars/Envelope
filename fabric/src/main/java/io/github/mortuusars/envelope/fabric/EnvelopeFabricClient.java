@@ -35,6 +35,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PACKING.get(), NewPackingScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.NEW_PACKAGE.get(), NewPackageScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackingScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackingScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);

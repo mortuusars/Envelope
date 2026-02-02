@@ -203,7 +203,7 @@ public class Envelope {
               () -> new SealedLetterItem(new Item.Properties()));
 
         public static final Supplier<PaperBoxItem> PAPER_BOX = Register.item("paper_box",
-              () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), new Item.Properties()));
+              () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
         public static final Supplier<PackingBoxItem> PACKING_BOX = Register.item("packing_box",
               () -> new PackingBoxItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
@@ -318,6 +318,9 @@ public class Envelope {
 
         public static final Supplier<MenuType<NewPackingMenu>> PACKING =
               Register.menuType("packing", NewPackingMenu::fromNetwork);
+
+        public static final Supplier<MenuType<NewPackageMenu>> NEW_PACKAGE =
+              Register.menuType("new_package", NewPackageMenu::fromNetwork);
 
         public static final Supplier<MenuType<PackingMenu>> PACKAGE =
               Register.menuType("package", PackingMenu::fromNetwork);
