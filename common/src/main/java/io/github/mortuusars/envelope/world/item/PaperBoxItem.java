@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 public class PaperBoxItem extends BlockItem {
@@ -25,8 +26,9 @@ public class PaperBoxItem extends BlockItem {
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if (context.getPlayer() != null && !context.getPlayer().isSecondaryUseActive()
-              && !(context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof PaperBoxBlock)) {
+              && (!(state.getBlock() instanceof PaperBoxBlock) || state.getValue(PaperBoxBlock.BOXES) >= 4)) {
             openPackingMenu(context.getPlayer(), context.getHand(), context.getItemInHand());
             return InteractionResult.SUCCESS_NO_ITEM_USED;
         }
