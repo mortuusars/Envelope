@@ -38,7 +38,6 @@ public class RequestedItemTests extends BuggerTests {
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-        stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5);
         add("RequestedItem_simpleMatching_withRandomComponents", Test.isTrue(() -> requestedItem.matches(stack)));
     }
 
@@ -52,7 +51,6 @@ public class RequestedItemTests extends BuggerTests {
 
         ItemStack stack = new ItemStack(Items.OAK_LOG, 12);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-        stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5);
         add("RequestedItem_simpleMatching_withRandomComponents", Test.isTrue(() -> requestedItem.matches(stack)));
     }
 
@@ -60,13 +58,11 @@ public class RequestedItemTests extends BuggerTests {
         RequestedItem requestedItem = new RequestedItem(Items.FEATHER, 3, DataComponentPredicate.builder()
               .expect(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE)
               .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
-              .expect(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5)
               .build());
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
         stack.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-        stack.set(Envelope.DataComponents.PACKAGE_TIMES_PACKED, 5);
         add("RequestedItem_componentMatching", Test.isTrue(() -> requestedItem.matches(stack)));
 
         ItemStack stack2 = stack.copy();

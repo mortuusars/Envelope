@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
-import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import net.minecraft.client.gui.GuiGraphics;
@@ -53,7 +52,7 @@ public class PaybackPackageScreen extends AbstractContainerScreen<PaybackPackage
     protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
         super.renderSlot(guiGraphics, slot);
 
-        if (slot instanceof DisabledSlot || (!slot.allowModification(Minecrft.player()) && !slot.hasItem())) {
+        if (!slot.hasItem() && !slot.allowModification(Minecrft.player())) {
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0, 0, 300);
             RenderSystem.enableBlend();

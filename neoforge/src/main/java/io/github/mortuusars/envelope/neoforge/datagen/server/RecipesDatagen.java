@@ -38,7 +38,7 @@ public class RecipesDatagen extends RecipeProvider {
               .unlockedBy("has_paper", has(Items.PAPER))
               .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.PAPER_BOX.get(), 4)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.PAPER_BOX.get(), 3)
               .define('P', Items.PAPER)
               .define('H', Items.HONEYCOMB)
               .pattern(" P ")

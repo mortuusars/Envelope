@@ -82,10 +82,12 @@ public class PackageItem extends BlockItem implements Sealable {
         if (player instanceof ServerPlayer serverPlayer) {
             unpackLootTableIfPresent(stack, level, player.blockPosition(), player);
 
-            SimpleMenuProvider menuProvider = new SimpleMenuProvider((id, inventory, pl) ->
-                  new PackageMenu(id, inventory, hand), stack.getHoverName());
-            PlatformHelper.openMenu(serverPlayer, menuProvider,buffer ->
-                  buffer.writeEnum(hand));
+            // Force update the stack on client before opening, so the client has correct initial state.
+            player.inventoryMenu.broadcastChanges();
+
+            SimpleMenuProvider menuProvider = new SimpleMenuProvider(
+                  (id, inventory, pl) -> new PackageMenu(id, inventory, hand), stack.getHoverName());
+            PlatformHelper.openMenu(serverPlayer, menuProvider,buffer -> buffer.writeEnum(hand));
         }
 
         player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
@@ -133,8 +135,8 @@ public class PackageItem extends BlockItem implements Sealable {
 
     @Override
     public ItemStack seal(Level level, ItemStack stack, Seal seal) {
-        ItemStack sealedLetter = stack.transmuteCopy(Envelope.Items.SEALED_PACKAGE.get());
-        sealedLetter.set(Envelope.DataComponents.SEAL, seal);
-        return sealedLetter;
+        ItemStack sealedPackage = stack.transmuteCopy(Envelope.Items.SEALED_PACKAGE.get());
+        sealedPackage.set(Envelope.DataComponents.SEAL, seal);
+        return sealedPackage;
     }
 }

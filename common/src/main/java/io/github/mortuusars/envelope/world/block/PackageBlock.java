@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -88,8 +87,14 @@ public class PackageBlock extends Block implements EntityBlock {
 
     @Override
     public @NotNull BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity && player.isSecondaryUseActive()) {
-            blockEntity.setUnpackWhenBroken(false);
+        if (!level.isClientSide
+              && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity
+              && !player.isSecondaryUseActive()) {
+            if (!player.isCreative()) {
+                blockEntity.setUnpackWhenBroken(false);
+            } else {
+                blockEntity.setPackage(ItemStack.EMPTY);
+            }
         }
         return super.playerWillDestroy(level, pos, state, player);
     }

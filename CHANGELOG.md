@@ -1,5 +1,17 @@
 # Changelog
 
+## UNRELEASED
+Reworked Packages:
+- `Paper Box` and `Payback Box` are now used to create respective packages
+- Recipe of `Paper Box` has been changed: `4 paper + 1 honeycomb -> 3 boxes`  
+- `Package` can no longer be repacked several times. If any item inside an opened `Package` changes - it will break and drop remaining items
+- When a `Package` is broken - it has a chance to drop a `Packing Box` or `Payback Box` depending on a package type 
+- Behavior of `Package` blocks breaking is now inverted:
+  - Just breaking will drop the intact `Package `
+  - Sneaking will destroy the `Package` and drop its contents
+- Removed `Packing Box` and `Payback Packing Box`
+- Smaller improvements and fixes
+
 ## 0.5.1 - 2026-01-31
 - Removed `Requires debug mode` message in chat on world load.
 

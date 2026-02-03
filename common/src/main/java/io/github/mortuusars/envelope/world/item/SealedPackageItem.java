@@ -32,6 +32,11 @@ public class SealedPackageItem extends PackageItem implements Unsealable {
     }
 
     @Override
+    public @NotNull UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.EAT;
+    }
+
+    @Override
     public @NotNull SoundEvent getEatingSound() {
         return getUnsealingSound();
     }

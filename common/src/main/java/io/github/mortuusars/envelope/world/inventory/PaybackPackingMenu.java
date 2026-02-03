@@ -47,7 +47,7 @@ public class PaybackPackingMenu extends PackingMenu {
 
     @Override
     public boolean canPack() {
-        return getPaybackRequest().matches(getContainer());
+        return super.canPack() && getPaybackRequest().matches(getContainer());
     }
 
     // --

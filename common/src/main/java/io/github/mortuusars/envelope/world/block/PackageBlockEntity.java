@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.block;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.BlockPos;
@@ -51,9 +52,14 @@ public class PackageBlockEntity extends BlockEntity {
 
     public void dropContents(Level level, BlockPos pos) {
         ItemStack packageStack = getPackage();
-        if (unpackWhenBroken() && packageStack.getItem() instanceof PackageItem packageItem) {
-            packageItem.unpack(packageStack, level, pos, null).forEach(stored ->
-                  Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
+        if (unpackWhenBroken()) {
+            if (packageStack.getItem() instanceof PackageItem packageItem) {
+                packageItem.unpack(packageStack, level, pos, null).forEach(stored ->
+                      Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
+            }
+            if (level.getRandom().nextDouble() < Config.Server.PACKAGE_PAPER_BOX_RETURN_CHANCE.get()) {
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Envelope.Items.PAPER_BOX.get()));
+            }
         } else {
             Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), packageStack);
         }

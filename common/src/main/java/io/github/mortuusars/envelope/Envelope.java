@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
@@ -248,7 +247,7 @@ public class Envelope {
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_REQUEST = Register.dataComponentType("mail_payback_request",
-              b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC));
+              b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
               b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
         public static final DataComponentType<Unit> MAIL_RETURNED = Register.dataComponentType("mail_returned", b ->
@@ -263,7 +262,7 @@ public class Envelope {
                     b.persistent(LetterAndQuillContent.CODEC).networkSynchronized(LetterAndQuillContent.STREAM_CODEC));
         public static final DataComponentType<LetterContent> LETTER_CONTENT =
               Register.dataComponentType("letter_content", b ->
-                    b.persistent(LetterContent.CODEC).networkSynchronized(LetterContent.STREAM_CODEC));
+                    b.persistent(LetterContent.CODEC).networkSynchronized(LetterContent.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<Unit> LETTER_TATTERED =
               Register.dataComponentType("letter_tattered", b ->
                     b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
@@ -272,22 +271,20 @@ public class Envelope {
 
         public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = Register.dataComponentType("package_contents",
               b -> b.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));
-        public static final DataComponentType<Integer> PACKAGE_TIMES_PACKED = Register.dataComponentType("package_times_packed",
-              b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
         // -- Seal
 
         public static final DataComponentType<Seal> SEAL = Register.dataComponentType("seal",
-              b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC));
+              b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<Holder<SealImpression>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
-              b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC));
+              b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC).cacheEncoding());
 
         // -- Payback
 
         public static final DataComponentType<PaybackTagContents> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
               b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
         public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
-              b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC));
+              b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC).cacheEncoding());
 
         // -- Misc
 

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
-import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -46,7 +45,7 @@ public class PackageScreen extends AbstractContainerScreen<PackageMenu> {
     protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
         super.renderSlot(guiGraphics, slot);
 
-        if (slot instanceof DisabledSlot || (!slot.allowModification(Minecrft.player()) && !slot.hasItem())) {
+        if (!slot.hasItem() && !slot.allowModification(Minecrft.player())) {
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0, 0, 300);
             RenderSystem.enableBlend();

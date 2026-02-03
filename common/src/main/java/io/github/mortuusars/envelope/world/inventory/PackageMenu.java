@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.PickupOnlySlot;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -15,7 +14,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +24,8 @@ import java.util.List;
 public class PackageMenu extends AbstractInHandContainerMenu {
     private final PackageContents initialContents;
 
-    protected PackageMenu(@Nullable MenuType<?> menuType, int containerId, Inventory inventory, InteractionHand hand) {
+    protected PackageMenu(@Nullable MenuType<?> menuType, int containerId, Inventory inventory,
+                          InteractionHand hand) {
         super(menuType, containerId, inventory, hand);
         this.initialContents = PackageContents.from(getItemInHand());
     }
@@ -38,8 +37,6 @@ public class PackageMenu extends AbstractInHandContainerMenu {
     public static PackageMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         return new PackageMenu(id, inventory, buffer.readEnum(InteractionHand.class));
     }
-
-    // --
 
     public PackageContents getInitialContents() {
         return initialContents;
@@ -72,11 +69,7 @@ public class PackageMenu extends AbstractInHandContainerMenu {
                 int x = packageSlotsX + column * 18;
                 int y = packageSlotsY + row * 18;
 
-                Slot slot = getContainer().getItem(index).isEmpty()
-                      ? new DisabledSlot(getContainer(), index, x, y)
-                      : new PickupOnlySlot(getContainer(), index, x, y);
-
-                addSlot(slot);
+                addSlot(new PickupOnlySlot(getContainer(), index, x, y));
             }
         }
     }

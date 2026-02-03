@@ -34,6 +34,10 @@ public class PackingMenu extends AbstractInHandContainerMenu {
         return new PackingMenu(id, inventory, buffer.readEnum(InteractionHand.class));
     }
 
+    public boolean isPacked() {
+        return packed;
+    }
+
     @Override
     protected Container createContainer() {
         return new SimpleContainer(PackageContents.SLOTS);
@@ -76,8 +80,8 @@ public class PackingMenu extends AbstractInHandContainerMenu {
         return false;
     }
 
-    protected boolean canPack() {
-        return true;
+    public boolean canPack() {
+        return !getContainer().isEmpty();
     }
 
     protected boolean pack() {
@@ -91,6 +95,7 @@ public class PackingMenu extends AbstractInHandContainerMenu {
 
         player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
               1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
+        player.swing(getHand());
         return true;
     }
 
@@ -102,7 +107,7 @@ public class PackingMenu extends AbstractInHandContainerMenu {
 
     @Override
     public void removed(@NotNull Player player) {
-        if (!packed) {
+        if (!isPacked()) {
             Containers.dropContents(player.level(), player.blockPosition(), getContainer());
             getContainer().clearContent();
         }

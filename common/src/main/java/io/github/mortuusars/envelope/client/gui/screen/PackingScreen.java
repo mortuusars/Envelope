@@ -42,7 +42,6 @@ public class PackingScreen extends AbstractContainerScreen<PackingMenu> {
     }
 
     protected void pack(Button button) {
-        button.active = false;
         getMenu().clickMenuButton(getMenu().getPlayer(), PackingMenu.PACK_BUTTON_ID);
         Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PackingMenu.PACK_BUTTON_ID);
         onClose();
@@ -50,6 +49,8 @@ public class PackingScreen extends AbstractContainerScreen<PackingMenu> {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        packButton.active = !getMenu().isPacked();
+        packButton.visible = getMenu().canPack();
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
