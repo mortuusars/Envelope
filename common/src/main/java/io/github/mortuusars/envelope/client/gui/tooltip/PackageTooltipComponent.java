@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class PackageTooltipComponent implements ClientTooltipComponent {
-    public static final ResourceLocation BACKGROUND_SPRITE = Envelope.resource("container/package/background");
+    public static final ResourceLocation BACKGROUND_SPRITE = Envelope.resource("tooltip/package/background");
     protected static final int BG_WIDTH = 58;
     protected static final int BG_HEIGHT = 40;
 

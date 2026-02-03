@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
@@ -144,7 +144,7 @@ public final class Mail {
 
         if (!isReturned(mail)) {
             mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
-            mail.remove(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK);
+            mail.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
         }
 
         return mail;
@@ -166,8 +166,8 @@ public final class Mail {
               .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
     }
 
-    public static MailBuilder<?> createPaybackPackingBox(PaybackSubject subject) {
-        return new MailBuilder<>(Envelope.Items.PAYBACK_PACKING_BOX.get())
+    public static MailBuilder<?> createPaybackBox(PaybackSubject subject) {
+        return new MailBuilder<>(Envelope.Items.PAYBACK_BOX.get())
               .set(Envelope.DataComponents.PAYBACK_SUBJECT, subject);
     }
 

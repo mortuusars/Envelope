@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.world.item.Sealable;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -29,11 +28,12 @@ public class NeoForgeClientEvents {
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
             event.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
 
-            event.register(Envelope.MenuTypes.PACKING.get(), NewPackingScreen::new);
-            event.register(Envelope.MenuTypes.NEW_PACKAGE.get(), NewPackageScreen::new);
+            event.register(Envelope.MenuTypes.PACKING.get(), PackingScreen::new);
+            event.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
 
-            event.register(Envelope.MenuTypes.PACKAGE.get(), PackingScreen::new);
-            event.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackingScreen::new);
+            event.register(Envelope.MenuTypes.PAYBACK_PACKING.get(), PaybackPackingScreen::new);
+            event.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackageScreen::new);
+
             event.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);
         }
 
@@ -59,10 +59,5 @@ public class NeoForgeClientEvents {
         public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
             event.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
         }
-    }
-
-    // @EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
-    public static class GameBus {
-
     }
 }

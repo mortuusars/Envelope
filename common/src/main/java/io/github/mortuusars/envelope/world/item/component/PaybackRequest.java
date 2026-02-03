@@ -14,26 +14,26 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.Optional;
 
-public record RequestedPayback(List<RequestedItem> items) implements TooltipComponent {
+public record PaybackRequest(List<RequestedItem> items) implements TooltipComponent {
     public static final int SLOTS = 6;
-    public static final RequestedPayback DEFAULT = new RequestedPayback(List.of(RequestedItem.DEFAULT));
+    public static final PaybackRequest DEFAULT = new PaybackRequest(List.of(RequestedItem.DEFAULT));
 
-    public static final Codec<RequestedPayback> CODEC =
-          Codec.list(RequestedItem.CODEC, 1, 6).xmap(RequestedPayback::new, RequestedPayback::items);
+    public static final Codec<PaybackRequest> CODEC =
+          Codec.list(RequestedItem.CODEC, 1, 6).xmap(PaybackRequest::new, PaybackRequest::items);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, RequestedPayback> STREAM_CODEC =
-          RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(RequestedPayback::new, RequestedPayback::items);
+    public static final StreamCodec<RegistryFriendlyByteBuf, PaybackRequest> STREAM_CODEC =
+          RequestedItem.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(PaybackRequest::new, PaybackRequest::items);
 
-    public RequestedPayback {
+    public PaybackRequest {
         Preconditions.checkArgument(!items.isEmpty(), "Payback must have at least one requested item.");
     }
 
-    public static Optional<RequestedPayback> create(List<RequestedItem> items) {
-        return !items.isEmpty() ? Optional.of(new RequestedPayback(items)) : Optional.empty();
+    public static Optional<PaybackRequest> create(List<RequestedItem> items) {
+        return !items.isEmpty() ? Optional.of(new PaybackRequest(items)) : Optional.empty();
     }
 
-    public static RequestedPayback createOrDefault(List<RequestedItem> items) {
-        return !items.isEmpty() ? new RequestedPayback(items) : DEFAULT;
+    public static PaybackRequest createOrDefault(List<RequestedItem> items) {
+        return !items.isEmpty() ? new PaybackRequest(items) : DEFAULT;
     }
 
     // --
@@ -75,6 +75,6 @@ public record RequestedPayback(List<RequestedItem> items) implements TooltipComp
     // --
 
     public static boolean isValidPaybackItem(ItemStack stack) {
-        return Envelope.Items.PACKING_BOX.get().canInsert(stack) && !stack.is(Envelope.Tags.Items.CANNOT_BE_USED_AS_PAYBACK);
+        return stack.getItem().canFitInsideContainerItems() && !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED) && !stack.is(Envelope.Tags.Items.CANNOT_BE_USED_AS_PAYBACK);
     }
 }

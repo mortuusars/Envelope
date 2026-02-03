@@ -34,10 +34,10 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         ColorProviderRegistry.BLOCK.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PACKING.get(), NewPackingScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.NEW_PACKAGE.get(), NewPackageScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackingScreen::new);
-        MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackingScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PACKING.get(), PackingScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKING.get(), PaybackPackingScreen::new);
+        MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackageScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);
 
         FabricS2CPacketHandler.register();

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "envelope:item/packing_box"
+    "layer0": "envelope:item/payback_box"
   }
 }

@@ -32,8 +32,8 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
 
         // Package
-        public static final ModConfigSpec.IntValue PACKAGE_PACK_LIMIT;
-        public static final ModConfigSpec.BooleanValue PACKAGE_LAST_OPEN_ANIMATION;
+        public static final ModConfigSpec.DoubleValue PACKAGE_PAPER_BOX_RETURN_CHANCE;
+        public static final ModConfigSpec.DoubleValue PAYBACK_PACKAGE_BOX_RETURN_CHANCE;
 
         // Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
@@ -118,14 +118,12 @@ public abstract class Config {
 
             {
                 builder.push("package");
-                PACKAGE_PACK_LIMIT = builder
-                      .comment("Number of packs that a single package can handle.",
-                            "(When reached, the item will be destroyed after all items are removed from it).")
-                      .defineInRange("pack_limit", 3, 1, Integer.MAX_VALUE);
-                PACKAGE_LAST_OPEN_ANIMATION = builder
-                      .comment("Player would need to hold use button to open the Package that will be destroyed after opening.",
-                            "Default: true")
-                      .define("last_open_animation", true);
+                PACKAGE_PAPER_BOX_RETURN_CHANCE = builder
+                      .comment("Chance of a Package \"recycling\" back into Paper Box after opening.")
+                      .defineInRange("paper_box_return_chance", 0.5, 0.0, 1.0);
+                PAYBACK_PACKAGE_BOX_RETURN_CHANCE = builder
+                      .comment("Chance of Payback Package \"recycling\" back into Payback Box after opening, allowing another try to pack the payment.")
+                      .defineInRange("payback_box_return_chance", 0.75, 0.0, 1.0);
                 builder.pop();
             }
 

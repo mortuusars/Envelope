@@ -49,6 +49,10 @@ public final class PackageContents implements TooltipComponent {
 
     // --
 
+    public boolean isEmpty() {
+        return this.equals(EMPTY) || getItemsForReading().isEmpty() || getItemsForReading().stream().allMatch(ItemStack::isEmpty);
+    }
+
     public int size() {
         return items.size();
     }
@@ -97,7 +101,9 @@ public final class PackageContents implements TooltipComponent {
         return "PackageContents" + this.items;
     }
 
-    public boolean isEmpty() {
-        return this.equals(EMPTY) || getItemsForReading().isEmpty() || getItemsForReading().stream().allMatch(ItemStack::isEmpty);
+    // --
+
+    public static boolean canHold(ItemStack stack) {
+        return stack.getItem().canFitInsideContainerItems() && !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED);
     }
 }

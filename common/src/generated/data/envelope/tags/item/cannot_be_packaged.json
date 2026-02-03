@@ -1,6 +1,8 @@
 {
   "values": [
     "#envelope:packages",
+    "envelope:paper_box",
+    "envelope:payback_box",
     "minecraft:bundle"
   ]
 }

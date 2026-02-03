@@ -38,18 +38,13 @@ public class RecipesDatagen extends RecipeProvider {
               .unlockedBy("has_paper", has(Items.PAPER))
               .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.PAPER_BOX.get(), 1)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.PAPER_BOX.get(), 4)
               .define('P', Items.PAPER)
-              .pattern("PP ")
-              .pattern("PP ")
-              .pattern("   ")
+              .define('H', Items.HONEYCOMB)
+              .pattern(" P ")
+              .pattern("PHP")
+              .pattern(" P ")
               .unlockedBy("has_paper", has(Items.PAPER))
-              .save(output);
-
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PACKING_BOX.get())
-              .requires(Envelope.Items.PAPER_BOX.get())
-              .requires(Items.HONEYCOMB)
-              .unlockedBy("has_paper_box", has(Envelope.Items.PAPER_BOX.get()))
               .save(output);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.ADDRESS_TAG.get())

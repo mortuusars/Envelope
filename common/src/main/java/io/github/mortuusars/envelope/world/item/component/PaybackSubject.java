@@ -1,8 +1,8 @@
-package io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department;
+package io.github.mortuusars.envelope.world.item.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -24,4 +24,8 @@ public record PaybackSubject(Id id, ItemStack mail, Address returnAddress, long 
           ByteBufCodecs.VAR_LONG, PaybackSubject::timeoutTick,
           PaybackSubject::new
     );
+
+    public PaybackRequest getRequest() {
+        return mail.getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.DEFAULT);
+    }
 }

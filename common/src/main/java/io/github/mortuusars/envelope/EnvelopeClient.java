@@ -87,7 +87,7 @@ public class EnvelopeClient {
             return switch (component) {
                 case MailAddressTagTooltip mailAddress -> new MailAddressTagTooltipComponent(mailAddress.address());
                 case PackageContents packageContents -> new PackageTooltipComponent(packageContents);
-                case RequestedPayback requestedPayback -> new PaybackTooltipComponent(requestedPayback);
+                case PaybackRequest paybackRequest -> new PaybackTooltipComponent(paybackRequest);
                 case PaybackTagContents paybackTagContents -> new PaybackTagContentsTooltipComponent(paybackTagContents);
                 case Seal seal -> new SealTooltipComponent(seal);
                 case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die ->
@@ -104,7 +104,7 @@ public class EnvelopeClient {
                 return CompositeTooltip.of(
                       original,
                       Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_RECIPIENT)).map(MailAddressTagTooltip::new),
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK))
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST))
                 );
             }
 

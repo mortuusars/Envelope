@@ -1,13 +1,18 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
+import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
@@ -50,11 +55,15 @@ public class PaybackPackageItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        stack = stack.transmuteCopy(Envelope.Items.PAYBACK_PACKING_BOX.get());
-        player.setItemInHand(hand, stack);
 
-        ((PaybackPackingBoxItem)stack.getItem()).openPackingGui(player, hand, stack);
+        if (player instanceof ServerPlayer serverPlayer) {
+            SimpleMenuProvider menuProvider = new SimpleMenuProvider((id, inventory, pl) ->
+                  new PaybackPackageMenu(id, inventory, hand), stack.getHoverName());
+            PlatformHelper.openMenu(serverPlayer, menuProvider, buffer ->
+                  buffer.writeEnum(hand));
+        }
 
+        player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
         return InteractionResultHolder.success(stack);
     }
 }

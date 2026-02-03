@@ -20,7 +20,7 @@ import io.github.mortuusars.envelope.world.block.*;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -204,8 +204,6 @@ public class Envelope {
 
         public static final Supplier<PaperBoxItem> PAPER_BOX = Register.item("paper_box",
               () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
-        public static final Supplier<PackingBoxItem> PACKING_BOX = Register.item("packing_box",
-              () -> new PackingBoxItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<PackageItem> PACKAGE = Register.item("package",
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
         public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
@@ -213,8 +211,8 @@ public class Envelope {
 
         public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
               () -> new PaybackTagItem(new Item.Properties()));
-        public static final Supplier<PaybackPackingBoxItem> PAYBACK_PACKING_BOX = Register.item("payback_packing_box",
-              () -> new PaybackPackingBoxItem(new Item.Properties().stacksTo(1)));
+        public static final Supplier<PaybackBoxItem> PAYBACK_BOX = Register.item("payback_box",
+              () -> new PaybackBoxItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<PaybackPackageItem> PAYBACK_PACKAGE = Register.item("payback_package",
               () -> new PaybackPackageItem(new Item.Properties().stacksTo(1)));
 
@@ -249,8 +247,8 @@ public class Envelope {
               b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<RequestedPayback> MAIL_REQUESTED_PAYBACK = Register.dataComponentType("mail_requested_payback",
-              b -> b.persistent(RequestedPayback.CODEC).networkSynchronized(RequestedPayback.STREAM_CODEC));
+        public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_REQUEST = Register.dataComponentType("mail_payback_request",
+              b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC));
         public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
               b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
         public static final DataComponentType<Unit> MAIL_RETURNED = Register.dataComponentType("mail_returned", b ->
@@ -316,16 +314,15 @@ public class Envelope {
         public static final Supplier<MenuType<MailboxMenu>> MAILBOX =
               Register.menuType("mailbox", MailboxMenu::fromNetwork);
 
-        public static final Supplier<MenuType<NewPackingMenu>> PACKING =
-              Register.menuType("packing", NewPackingMenu::fromNetwork);
+        public static final Supplier<MenuType<PackingMenu>> PACKING =
+              Register.menuType("packing", PackingMenu::fromNetwork);
+        public static final Supplier<MenuType<PackageMenu>> PACKAGE =
+              Register.menuType("package", PackageMenu::fromNetwork);
 
-        public static final Supplier<MenuType<NewPackageMenu>> NEW_PACKAGE =
-              Register.menuType("new_package", NewPackageMenu::fromNetwork);
-
-        public static final Supplier<MenuType<PackingMenu>> PACKAGE =
-              Register.menuType("package", PackingMenu::fromNetwork);
-        public static final Supplier<MenuType<PaybackPackingMenu>> PAYBACK_PACKAGE =
-              Register.menuType("payback_package", PaybackPackingMenu::fromNetwork);
+        public static final Supplier<MenuType<PaybackPackingMenu>> PAYBACK_PACKING =
+              Register.menuType("payback_packing", PaybackPackingMenu::fromNetwork);
+        public static final Supplier<MenuType<PaybackPackageMenu>> PAYBACK_PACKAGE =
+              Register.menuType("payback_package", PaybackPackageMenu::fromNetwork);
 
         public static final Supplier<MenuType<PaybackTagMenu>> PAYBACK_TAG =
               Register.menuType("payback_tag", PaybackTagMenu::fromNetwork);

@@ -58,8 +58,8 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
     public void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
         if (reason == ReleaseReason.EMERGENCY) return;
 
-        double wasteChance = getWasteIncreaseChanceOnRelease(entity);
-        if (getBlockState().getBlock() instanceof PigeonholeBlock block && level.random.nextDouble() < wasteChance) {
+        if (getBlockState().getBlock() instanceof PigeonholeBlock block
+              && level.random.nextDouble() < getWasteIncreaseChanceOnRelease(entity)) {
             block.addWaste(level, getBlockPos(), getBlockState());
             setChanged();
         }

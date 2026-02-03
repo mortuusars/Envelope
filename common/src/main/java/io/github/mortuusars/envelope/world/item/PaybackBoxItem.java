@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackSubject;
+import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -23,8 +23,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PaybackPackingBoxItem extends Item implements PackingBox {
-    public PaybackPackingBoxItem(Properties properties) {
+public class PaybackBoxItem extends Item {
+    public PaybackBoxItem(Properties properties) {
         super(properties);
     }
 
@@ -56,7 +56,7 @@ public class PaybackPackingBoxItem extends Item implements PackingBox {
 
     public boolean openPackingGui(Player player, InteractionHand hand, ItemStack stack) {
         @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
-        if (subject == null || subject.mail().isEmpty() || !subject.mail().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK)) {
+        if (subject == null || subject.mail().isEmpty() || !subject.mail().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST)) {
             return false;
         }
 

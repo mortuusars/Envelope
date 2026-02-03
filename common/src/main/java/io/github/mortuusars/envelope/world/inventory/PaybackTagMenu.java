@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.FilteredSlot;
 import io.github.mortuusars.envelope.world.item.PaybackTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
+import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
@@ -92,7 +92,7 @@ public class PaybackTagMenu extends AbstractContainerMenu {
                 int index = column + row * 3;
                 int x = slotsX + column * 18;
                 int y = slotsY + row * 18;
-                addSlot(new FilteredSlot(paybackContainer, index, x, y, RequestedPayback::isValidPaybackItem));
+                addSlot(new FilteredSlot(paybackContainer, index, x, y, PaybackRequest::isValidPaybackItem));
             }
         }
     }

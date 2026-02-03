@@ -4,7 +4,7 @@
     "envelope:sealed_letter",
     "envelope:package",
     "envelope:sealed_package",
-    "envelope:payback_packing_box",
+    "envelope:payback_box",
     "envelope:payback_package"
   ]
 }

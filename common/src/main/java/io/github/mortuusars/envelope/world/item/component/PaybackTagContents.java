@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 public record PaybackTagContents(List<ItemStack> items) implements TooltipComponent {
-    public static final int SLOTS = RequestedPayback.SLOTS;
+    public static final int SLOTS = PaybackRequest.SLOTS;
 
     public static final Codec<PaybackTagContents> CODEC = ItemStack.OPTIONAL_CODEC.listOf(0, SLOTS)
           .xmap(PaybackTagContents::new, PaybackTagContents::getItemsForReading);

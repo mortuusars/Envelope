@@ -8,11 +8,12 @@ import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
-import io.github.mortuusars.envelope.world.item.PaybackPackingBoxItem;
+import io.github.mortuusars.envelope.world.item.PaybackBoxItem;
 import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.component.RequestedPayback;
+import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.service.MailService;
@@ -124,7 +125,7 @@ public class PaybackDepartment {
     // --
 
     public boolean tryHandleDelivery(Delivery delivery) {
-        if (delivery.getMail().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK)) {
+        if (delivery.getMail().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST)) {
             handlePaybackSubject(delivery);
             return true;
         }
@@ -138,7 +139,7 @@ public class PaybackDepartment {
     }
 
     public boolean tryHandleReturn(Delivery delivery) {
-        if (delivery.getMail().getItem() instanceof PaybackPackingBoxItem) {
+        if (delivery.getMail().getItem() instanceof PaybackBoxItem) {
             @Nullable PaybackSubject subject = delivery.getMail().get(Envelope.DataComponents.PAYBACK_SUBJECT);
             if (subject == null) {
                 LOGGER.info("Returning Payback Packing Box does not have a subject linked. Packing Box will be voided.");
@@ -174,7 +175,7 @@ public class PaybackDepartment {
     // -- Payback Subject
 
     protected void handlePaybackSubject(Delivery subjectDelivery) {
-        Preconditions.checkArgument(subjectDelivery.getMail().has(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK));
+        Preconditions.checkArgument(subjectDelivery.getMail().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST));
 
         ItemStack subject = subjectDelivery.getMail();
 
@@ -198,7 +199,7 @@ public class PaybackDepartment {
     }
 
     protected boolean sendPaybackPackingBoxToBuyer(Delivery subjectDelivery, PaybackSubject paybackSubject) {
-        ItemStack packingBox = Mail.createPaybackPackingBox(paybackSubject)
+        ItemStack packingBox = Mail.createPaybackBox(paybackSubject)
               .sender(subjectDelivery.getSender())
               .recipient(subjectDelivery.getRecipient())
               .writeToLog(DeliveryRecord.sentFrom(Address.MAIL_SERVICE, subjectDelivery.getId().getTick()))
@@ -245,9 +246,9 @@ public class PaybackDepartment {
             return;
         }
 
-        RequestedPayback requestedPayback = paybackSubject.mail().getOrDefault(Envelope.DataComponents.MAIL_REQUESTED_PAYBACK, RequestedPayback.DEFAULT);
+        PaybackRequest paybackRequest = paybackSubject.mail().getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.DEFAULT);
         PackageContents packageContents = PackageContents.from(paybackPackage);
-        if (!requestedPayback.matches(packageContents)) {
+        if (!paybackRequest.matches(packageContents)) {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(Address.MAIL_SERVICE, getMailService().getGameTime()));

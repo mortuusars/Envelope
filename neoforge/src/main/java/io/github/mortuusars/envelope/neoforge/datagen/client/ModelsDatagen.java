@@ -78,7 +78,6 @@ public class ModelsDatagen extends BlockStateProvider {
               .texture("layer1", Envelope.resource("item/package_seal_overlay"));
 
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
-        itemModels().basicItem(Envelope.Items.PACKING_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());
 
 //        itemModels().basicItem(Envelope.Items.PACKAGE.get())
@@ -88,7 +87,7 @@ public class ModelsDatagen extends BlockStateProvider {
 //              .end();
 
         itemModels().basicItem(Envelope.Items.PAYBACK_TAG.get());
-        itemModels().basicItem(Envelope.Items.PAYBACK_PACKING_BOX.get());
+        itemModels().basicItem(Envelope.Items.PAYBACK_BOX.get());
         itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get());
 
         itemModels().spawnEggItem(Envelope.Items.PIGEON_SPAWN_EGG.get());

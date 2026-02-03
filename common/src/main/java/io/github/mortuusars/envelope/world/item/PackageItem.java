@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
-import io.github.mortuusars.envelope.world.inventory.NewPackageMenu;
+import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.ChatFormatting;
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class PackageItem extends BlockItem implements PackingBox, Sealable {
+public class PackageItem extends BlockItem implements Sealable {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
     }
@@ -54,14 +54,14 @@ public class PackageItem extends BlockItem implements PackingBox, Sealable {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, components, tooltipFlag);
 
-        if (shouldBeDestroyedWhenEmpty(stack)) {
-            components.add(Component.literal("⚠").withColor(0xFFE48174));
-        }
-
         @Nullable SeededContainerLoot loot = stack.get(DataComponents.CONTAINER_LOOT);
-        if (tooltipFlag.isAdvanced() && loot != null) {
-            components.add(Component.literal("Loot Table: ").withStyle(ChatFormatting.DARK_GRAY)
-                  .append(Component.literal(loot.lootTable().location().toString()).withStyle(ChatFormatting.DARK_GRAY)));
+        if (loot != null) {
+            components.add(Component.translatable("container.envelope.package.contents_unknown").withStyle(ChatFormatting.GRAY));
+
+            if (tooltipFlag.isAdvanced()) {
+                components.add(Component.literal("Loot Table: ").withStyle(ChatFormatting.DARK_GRAY)
+                      .append(Component.literal(loot.lootTable().location().toString()).withStyle(ChatFormatting.DARK_GRAY)));
+            }
         }
     }
 
@@ -83,7 +83,7 @@ public class PackageItem extends BlockItem implements PackingBox, Sealable {
             unpackLootTableIfPresent(stack, level, player.blockPosition(), player);
 
             SimpleMenuProvider menuProvider = new SimpleMenuProvider((id, inventory, pl) ->
-                  new NewPackageMenu(id, inventory, hand), stack.getHoverName());
+                  new PackageMenu(id, inventory, hand), stack.getHoverName());
             PlatformHelper.openMenu(serverPlayer, menuProvider,buffer ->
                   buffer.writeEnum(hand));
         }
