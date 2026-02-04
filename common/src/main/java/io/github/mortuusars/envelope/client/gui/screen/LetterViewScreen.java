@@ -184,7 +184,7 @@ public class LetterViewScreen extends Screen {
             return false;
         }
 
-        boolean handled = handleComponentClicked(style);
+        boolean handled = super.handleComponentClicked(style);
         if (handled && clickEvent.getAction() == ClickEvent.Action.RUN_COMMAND) {
             onClose();
         }

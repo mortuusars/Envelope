@@ -12,6 +12,9 @@ Reworked Packages:
 - Removed `Packing Box` and `Payback Packing Box`
 - Smaller improvements and fixes
 
+Misc
+- Fixed crash in Letter view screen  
+
 ## 0.5.1 - 2026-01-31
 - Removed `Requires debug mode` message in chat on world load.
 
