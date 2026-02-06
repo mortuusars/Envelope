@@ -8,20 +8,19 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.CustomSpawner;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class FinishedBackgroundCourierSpawner implements CustomSpawner {
+public class FinishedBackgroundCourierSpawner implements Spawner {
     protected static final int SPAWN_ATTEMPT_DELAY = 10;
     protected int nextAttemptDelay;
 
     @Override
-    public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
+    public void tick(ServerLevel level) {
         nextAttemptDelay--;
         if (nextAttemptDelay > 0) {
-            return 0;
+            return;
         }
 
         nextAttemptDelay = SPAWN_ATTEMPT_DELAY;
@@ -30,19 +29,19 @@ public class FinishedBackgroundCourierSpawner implements CustomSpawner {
         List<FinishedBackgroundCourier> couriers = backgroundDelivery.getFinishedCouriers();
 
         if (couriers.isEmpty()) {
-            return 0;
+            return;
         }
 
         FinishedBackgroundCourier courier = Util.getRandom(couriers, level.getRandom());
 
         @Nullable BlockPos spawnPos = Position.findNearbyHeightmapSpawnPosition(level, courier.spawnPos(), 2);
         if (spawnPos == null) {
-            return 0;
+            return;
         }
 
         @Nullable Entity entity = courier.entityData().createEntity(level);
         if (entity == null) {
-            return 0;
+            return;
         }
 
         entity.moveTo(spawnPos, entity.getYRot(), entity.getXRot());
@@ -53,6 +52,5 @@ public class FinishedBackgroundCourierSpawner implements CustomSpawner {
         }
 
         backgroundDelivery.removeFinishedCourier(courier);
-        return 0;
     }
 }

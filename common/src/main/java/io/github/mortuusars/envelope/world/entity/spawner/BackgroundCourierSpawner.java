@@ -10,14 +10,13 @@ import net.minecraft.Util;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.level.CustomSpawner;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BackgroundCourierSpawner implements CustomSpawner {
+public class BackgroundCourierSpawner implements Spawner {
     @Override
-    public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
+    public void tick(ServerLevel level) {
         BackgroundDelivery backgroundDelivery = MailService.of(level).getBackgroundDelivery();
 
         List<BackgroundCourier> spawnableCouriers = backgroundDelivery.getCouriers()
@@ -26,13 +25,11 @@ public class BackgroundCourierSpawner implements CustomSpawner {
               .toList();
 
         if (spawnableCouriers.isEmpty()) {
-            return 0;
+            return;
         }
 
         BackgroundCourier courier = Util.getRandom(spawnableCouriers, level.getRandom());
         trySpawn(level, courier);
-
-        return 0;
     }
 
     private boolean canSpawn(BackgroundCourier courier) {
@@ -50,7 +47,7 @@ public class BackgroundCourierSpawner implements CustomSpawner {
 
         int duration = backgroundCourier.getPhaseDuration(level, delivery, delivery.getPhase());
         int progress = delivery.getPhaseProgress();
-        float completeness = Mth.clamp(progress / (float)duration, 0f, 1f);
+        float completeness = Mth.clamp(progress / (float) duration, 0f, 1f);
 
         delivery.getRoute().getSegment(delivery.getPhase()).getCurrentLocation(completeness)
               .filter(level::isLoaded)

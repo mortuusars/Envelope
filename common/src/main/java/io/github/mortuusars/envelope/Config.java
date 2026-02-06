@@ -40,6 +40,7 @@ public abstract class Config {
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.IntValue DELIVERY_PAYBACK_TIMEOUT_MINUTES;
+        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -141,6 +142,10 @@ public abstract class Config {
                 DELIVERY_PAYBACK_TIMEOUT_MINUTES = builder
                       .comment("How long (in minutes) Mail Service will wait for payment before returning the mail back to sender.")
                       .defineInRange("payback_timeout_minutes", 60, 1, Integer.MAX_VALUE);
+                DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE = builder
+                      .comment("Delivering pigeons will not spawn when 'doMobSpawning' rule is set to 'false'.",
+                            "Default: false (spawn anyway)")
+                      .define("spawning_respects_domobspawning_rule", false);
                 builder.pop();
             }
 

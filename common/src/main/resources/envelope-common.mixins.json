@@ -25,6 +25,7 @@
     "shears_clearing.ItemStackMixin",
     "shears_clearing.ShearsItemMixin",
     "spawners.MinecraftServerMixin",
+    "spawners.ServerLevelMixin",
     "tooltip.ItemStackMixin"
   ],
   "injectors": {

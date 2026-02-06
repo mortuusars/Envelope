@@ -1,18 +1,19 @@
 # Changelog
 
-## UNRELEASED
-Reworked Packages:
-- `Paper Box` and `Payback Box` are now used to create respective packages
-- Recipe of `Paper Box` has been changed: `4 paper + 1 honeycomb -> 3 boxes`  
-- `Package` can no longer be repacked several times. If any item inside an opened `Package` changes - it will break and drop remaining items
-- When a `Package` is broken - it has a chance to drop a `Packing Box` or `Payback Box` depending on a package type 
-- Behavior of `Package` blocks breaking is now inverted:
+## 0.5.2 - 2026-02-06
+#### Reworked Packages:
+- `Paper Box` is now used to create a package; `Packing Box` has been removed
+- Recipe of `Paper Box` has been changed to `4 paper + 1 honeycomb -> 3 boxes`  
+- `Package` can no longer be repacked several times. If any item inside the opened `Package` changes - it will break and drop remaining items
+- When the `Package` is broken - it has a chance to drop a `Paper Box`
+- `Payback Packages` also follow this new system  
+- Behavior of `Package` block breaking is now inverted:
   - Just breaking will drop the intact `Package `
   - Sneaking will destroy the `Package` and drop its contents
-- Removed `Packing Box` and `Payback Packing Box`
 - Smaller improvements and fixes
 
-Misc
+#### Misc
+- _doMobSpawning_ game rule no longer prevents delivering pigeons from spawning. _Configurable._ 
 - Fixed crash in Letter view screen  
 - Fixed error with `C2ME`
 
