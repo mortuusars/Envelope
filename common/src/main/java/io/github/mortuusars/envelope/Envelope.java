@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.*;
+import io.github.mortuusars.envelope.world.inventory.recipe.MailRecipe;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -41,6 +42,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -75,6 +77,7 @@ public class Envelope {
         CriteriaTriggers.init();
         ItemSubPredicates.init();
         MenuTypes.init();
+        RecipeTypes.init();
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
@@ -328,9 +331,24 @@ public class Envelope {
         }
     }
 
+    public static class RecipeTypes {
+        public static final Supplier<RecipeType<MailRecipe>> MAIL = Register.recipeType("mail",
+              () -> new RecipeType<>() {
+                  @Override
+                  public String toString() {
+                      return ID + ":mail";
+                  }
+              });
+
+        static void init() { }
+    }
+
     public static class RecipeSerializers {
         public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
+
+        public static final Supplier<RecipeSerializer<?>> MAIL =
+              Register.recipeSerializer("mail", MailRecipe.Serializer::new);
 
         static void init() {
         }

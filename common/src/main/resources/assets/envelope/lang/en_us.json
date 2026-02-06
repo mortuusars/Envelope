@@ -96,6 +96,8 @@
   "gui.envelope.delivery_log.message.returned_recipient_not_found": "Recipient Not Found",
   "gui.envelope.delivery_log.message.returned_recipient_inbox_is_full": "Recipient Inbox Is Full",
   "gui.envelope.delivery_log.message.returned_unable_to_reach": "Unable To Reach",
+  "gui.envelope.delivery_log.message.returned_no_sender": "Sender Cannot Be Determined",
+  "gui.envelope.delivery_log.message.returned_unable_to_process": "Unable To Process",
   "gui.envelope.delivery_log.message.returned_rejected": "Rejected",
   "gui.envelope.delivery_log.message.payback_fulfilled": "Fulfilled",
   "gui.envelope.delivery_log.message.returned_payback_subject_not_found": "Payback Subject Not Found",

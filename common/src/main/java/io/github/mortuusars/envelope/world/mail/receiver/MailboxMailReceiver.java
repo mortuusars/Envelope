@@ -24,7 +24,7 @@ public class MailboxMailReceiver implements MailReceiver {
     }
 
     @Override
-    public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
+    public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
         if (mail.isEmpty()) {
             return ItemStack.EMPTY;
         }

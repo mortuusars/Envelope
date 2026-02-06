@@ -93,11 +93,11 @@ public interface DeliveryHandler {
 
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                ItemStack result = MailService.of(level).deliverMail(delivery.getRecipient(), delivery.getMail());
+                ItemStack result = MailService.of(level).deliverMail(delivery.getRecipient(), delivery.getSender(), delivery.getMail());
                 delivery.setMail(result);
             }
             case HANDLING_RETURN -> {
-                ItemStack result = MailService.of(level).deliverMail(delivery.getSender(), delivery.getMail());
+                ItemStack result = MailService.of(level).deliverMail(delivery.getSender(), delivery.getRecipient(), delivery.getMail());
                 delivery.setMail(result);
             }
         }

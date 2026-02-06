@@ -156,7 +156,7 @@ public class MailboxBlock extends BaseEntityBlock {
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(recipientAddress)) {
             if (level instanceof ServerLevel serverLevel) {
-                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, stack.split(1));
+                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, new Address.Player(player), stack.split(1));
                 if (player.getItemInHand(hand).isEmpty()) {
                     player.setItemInHand(hand, result.copy());
                 } else if (!player.addItem(result)) {

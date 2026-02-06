@@ -14,6 +14,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -159,6 +160,7 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
         Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_not_found");
         Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_inbox_is_full");
         Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.returned_unable_to_reach");
+        Component NO_RETURN_ADDRESS = Component.translatable("gui.envelope.delivery_log.message.returned_no_sender");
         Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.returned_rejected");
 
         Component PAYBACK_FULFILLED = Component.translatable("gui.envelope.delivery_log.message.payback_fulfilled");

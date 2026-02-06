@@ -13,21 +13,14 @@ import org.slf4j.Logger;
 public class MailServiceEntity extends MailEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final MailService mailService;
-
-    public MailServiceEntity(MailService mailService) {
-        super(Address.MAIL_SERVICE, AddressLocation.VIRTUAL);
-        this.mailService = mailService;
-    }
-
-    public MailService getMailService() {
-        return mailService;
+    public MailServiceEntity(MailService service) {
+        super(service, Address.MAIL_SERVICE, AddressLocation.VIRTUAL);
     }
 
     // --
 
     @Override
-    public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
+    public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
         return returned(mail, DeliveryRecord.Message.REJECTED);
     }
 }

@@ -160,9 +160,9 @@ public class MailService {
 
     // --
 
-    public ItemStack deliverMail(Address address, ItemStack mail) {
-        if (mail.isEmpty()) return mail;
-        return address.map(MailboxMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, mail);
+    public ItemStack deliverMail(Address recipient, Address sender, ItemStack mail) {
+        if (mail.isEmpty()) return ItemStack.EMPTY;
+        return recipient.map(MailboxMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, sender, mail);
     }
 
     // --

@@ -1,0 +1,18 @@
+{
+  "type": "envelope:mail",
+  "address": {
+    "id": "Mail Service"
+  },
+  "ingredients": [
+    {
+      "item": "envelope:address_tag"
+    },
+    {
+      "item": "minecraft:red_dye"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:payback_tag"
+  }
+}
