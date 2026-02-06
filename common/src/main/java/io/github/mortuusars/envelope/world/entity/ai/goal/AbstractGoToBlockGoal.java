@@ -11,6 +11,7 @@ import net.minecraft.world.level.pathfinder.Path;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class AbstractGoToBlockGoal extends Goal {
     public static final int MAX_TRAVELLING_TICKS = 600;
@@ -21,7 +22,6 @@ public abstract class AbstractGoToBlockGoal extends Goal {
 
     public AbstractGoToBlockGoal(Pigeon pigeon) {
         this.pigeon = pigeon;
-        this.travellingTicks = pigeon.level().random.nextInt(10);
         setFlags(EnumSet.of(Flag.MOVE));
     }
 

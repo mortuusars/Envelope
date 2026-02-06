@@ -14,6 +14,7 @@ Reworked Packages:
 
 Misc
 - Fixed crash in Letter view screen  
+- Fixed error with `C2ME`
 
 ## 0.5.1 - 2026-01-31
 - Removed `Requires debug mode` message in chat on world load.
