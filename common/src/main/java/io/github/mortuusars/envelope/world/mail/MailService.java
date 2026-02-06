@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.service;
+package io.github.mortuusars.envelope.world.mail;
 
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
@@ -17,10 +17,11 @@ import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.MailboxMailReceiver;
 import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
+import io.github.mortuusars.envelope.world.KnownPlayers;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,11 +42,11 @@ public class MailService {
     protected final PaybackDepartment paybackDepartment;
     protected final DeliveryManager deliveryManager;
 
-    protected @Nullable Players players;
+    protected @Nullable KnownPlayers knownPlayers;
     protected @Nullable BackgroundDelivery backgroundDelivery;
 
     private MailService(ServerLevel level) {
-        Preconditions.checkArgument(level.dimension() == Level.OVERWORLD, "MailService can exist only on overworld level.");
+        Preconditions.checkArgument(operatesIn(level), "MailService cannot exist in the '" + level.dimension().location() + "' dimension.");
         this.level = level;
         this.mailboxes = new Mailboxes(level);
         this.mailEntities = new MailEntities();
@@ -66,6 +67,14 @@ public class MailService {
 
     public static MailService of(ServerLevel level) {
         return level.getEnvelopeMailService();
+    }
+
+    public static boolean operatesIn(ResourceKey<Level> dimension) {
+        return dimension == Level.OVERWORLD;
+    }
+
+    public static boolean operatesIn(Level level) {
+        return operatesIn(level.dimension());
     }
 
     // --
@@ -90,10 +99,10 @@ public class MailService {
         return paybackDepartment;
     }
 
-    public @NotNull Players getPlayers() {
-        return players == null
-              ? players = Players.get(level, "envelope_players")
-              : players;
+    public @NotNull KnownPlayers getKnownPlayers() {
+        return knownPlayers == null
+              ? knownPlayers = KnownPlayers.get(level, "envelope_players")
+              : knownPlayers;
     }
 
     public @NotNull BackgroundDelivery getBackgroundDelivery() {
@@ -111,7 +120,7 @@ public class MailService {
     public AllAddresses getKnownAddresses() {
         return new AllAddresses(
               getMailboxes().getAllAddresses(),
-              getPlayers().getDefaultAddresses().keySet(),
+              getKnownPlayers().getDefaultAddresses().keySet(),
               getMailEntities().getAllAddresses()
         );
     }
@@ -122,13 +131,13 @@ public class MailService {
         }
         return switch (type) {
             case BLOCK -> AllAddresses.blocks(getMailboxes().getAllAddresses());
-            case PLAYER -> AllAddresses.players(getPlayers().getDefaultAddresses().keySet());
+            case PLAYER -> AllAddresses.players(getKnownPlayers().getDefaultAddresses().keySet());
             case ENTITY -> AllAddresses.entities(getMailEntities().getAllAddresses());
         };
     }
 
     public Optional<Address.Block> getPlayerDefaultAddress(Address.Player playerAddress) {
-        return Optional.ofNullable(getPlayers().getDefaultAddresses().get(playerAddress));
+        return Optional.ofNullable(getKnownPlayers().getDefaultAddresses().get(playerAddress));
     }
 
     /**
@@ -144,7 +153,7 @@ public class MailService {
     public AddressLocation getLocationOf(Address address) {
         return address.map(
                     block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact),
-                    player -> getPlayers().getDefaultAddressOf(player).map(this::getLocationOf),
+                    player -> getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf),
                     entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation))
               .orElse(AddressLocation.UNKNOWN);
     }
@@ -169,10 +178,6 @@ public class MailService {
 
     public long getGameTime() {
         return getLevel().getGameTime();
-    }
-
-    public static boolean operatesIn(Level level) {
-        return level.dimension() == Level.OVERWORLD;
     }
 
     public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity entity, Delivery delivery, DamageSource damageSource) {

@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
@@ -81,7 +81,7 @@ public class Mailboxes {
     public void remove(Address.Block address) {
         @Nullable RegisteredMailbox removed = getMailboxes().remove(address);
         if (removed != null) {
-            MailService.of(level).getPlayers().removeDefaultAddress(address);
+            MailService.of(level).getKnownPlayers().removeDefaultAddress(address);
             setDirty();
             if (Envelope.debug()) LOGGER.info("Removed mailbox '{}'@[{}]",
                   removed.getAddress().id(), removed.getPos().toShortString());
@@ -95,7 +95,7 @@ public class Mailboxes {
     public @NotNull RegisteredMailbox rename(RegisteredMailbox data, Address.Block suggestedAddress) {
         Address.Block newAddress = uniquifyIfKnown(suggestedAddress);
 
-        MailService.of(level).getPlayers().renameDefaultAddress(data.getAddress(), newAddress);
+        MailService.of(level).getKnownPlayers().renameDefaultAddress(data.getAddress(), newAddress);
 
         RegisteredMailbox newData = new RegisteredMailbox(newAddress, data.getPos());
 

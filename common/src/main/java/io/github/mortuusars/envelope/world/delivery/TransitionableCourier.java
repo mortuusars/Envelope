@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.delivery;
 
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;

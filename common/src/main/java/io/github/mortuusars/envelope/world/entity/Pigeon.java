@@ -11,7 +11,7 @@ import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;

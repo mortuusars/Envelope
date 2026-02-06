@@ -110,7 +110,7 @@ public class MailboxMenu extends AbstractContainerMenu {
 
     public boolean hasDefaultAddress() {
         if (player instanceof ServerPlayer serverPlayer) {
-            return serverPlayer.serverLevel().getEnvelopeMailService().getPlayers()
+            return serverPlayer.serverLevel().getEnvelopeMailService().getKnownPlayers()
                   .getDefaultAddressOf(player)
                   .isPresent();
         }
@@ -125,7 +125,7 @@ public class MailboxMenu extends AbstractContainerMenu {
 
     public boolean isDefaultAddress() {
         if (player instanceof ServerPlayer serverPlayer) {
-            return serverPlayer.serverLevel().getEnvelopeMailService().getPlayers()
+            return serverPlayer.serverLevel().getEnvelopeMailService().getKnownPlayers()
                   .getDefaultAddressOf(player)
                   .map(address::equals)
                   .orElse(false);
@@ -261,7 +261,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id == ADDRESS_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.serverLevel().getEnvelopeMailService().getPlayers().setDefaultAddress(player, address);
+            serverPlayer.serverLevel().getEnvelopeMailService().getKnownPlayers().setDefaultAddress(player, address);
             updateHasDefault();
             updateIsDefault();
             return true;

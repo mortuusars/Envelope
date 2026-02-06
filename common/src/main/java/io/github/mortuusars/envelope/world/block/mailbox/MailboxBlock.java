@@ -11,7 +11,7 @@ import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

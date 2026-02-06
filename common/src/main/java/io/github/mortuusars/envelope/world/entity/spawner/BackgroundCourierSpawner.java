@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.TransitionableCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.Util;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;

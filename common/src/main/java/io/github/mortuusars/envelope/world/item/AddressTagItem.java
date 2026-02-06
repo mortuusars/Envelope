@@ -8,7 +8,7 @@ import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;

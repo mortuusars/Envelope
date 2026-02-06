@@ -11,6 +11,6 @@ public class ServerEvents {
     }
 
     public static void playerLogin(ServerPlayer player) {
-        player.serverLevel().getEnvelopeMailService().getPlayers().add(player);
+        player.serverLevel().getEnvelopeMailService().getKnownPlayers().add(player);
     }
 }

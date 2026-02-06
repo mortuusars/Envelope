@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.entity.spawner;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.delivery.background.FinishedBackgroundCourier;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

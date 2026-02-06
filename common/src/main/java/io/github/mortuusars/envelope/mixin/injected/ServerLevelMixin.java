@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.mixin.injected;
 
-import io.github.mortuusars.envelope.world.service.MailService;
-import io.github.mortuusars.envelope.world.service.MailServiceHolder;
+import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.MailServiceHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;

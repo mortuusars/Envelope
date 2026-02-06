@@ -9,7 +9,7 @@ import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -105,7 +105,7 @@ public class EnvelopeCommand {
     private static int listDefaultMailboxes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
 
-        Map<Address.Player, Address.Block> defaultAddresses = MailService.of(level).getPlayers().getDefaultAddresses();
+        Map<Address.Player, Address.Block> defaultAddresses = MailService.of(level).getKnownPlayers().getDefaultAddresses();
 
         if (!defaultAddresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);

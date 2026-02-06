@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.delivery.Courier;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

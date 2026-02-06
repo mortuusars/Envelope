@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.mail.receiver;
 
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
@@ -15,7 +15,7 @@ public class PlayerMailReceiver implements MailReceiver {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, ItemStack mail) {
-        return MailService.of(level).getPlayers().getDefaultAddressOf(address)
+        return MailService.of(level).getKnownPlayers().getDefaultAddressOf(address)
               .map(MailboxMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, mail))
               .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));

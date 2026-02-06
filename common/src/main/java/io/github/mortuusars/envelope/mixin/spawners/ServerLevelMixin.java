@@ -4,7 +4,7 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.entity.spawner.BackgroundCourierSpawner;
 import io.github.mortuusars.envelope.world.entity.spawner.FinishedBackgroundCourierSpawner;
 import io.github.mortuusars.envelope.world.entity.spawner.Spawner;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;

@@ -8,7 +8,7 @@ import io.github.mortuusars.envelope.world.delivery.TravelDuration;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;

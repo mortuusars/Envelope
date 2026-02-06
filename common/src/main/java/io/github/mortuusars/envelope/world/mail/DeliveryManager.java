@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.service;
+package io.github.mortuusars.envelope.world.mail;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.util.result.Error;

@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.jetbrains.annotations.Nullable;

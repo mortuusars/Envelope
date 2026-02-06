@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.service;
+package io.github.mortuusars.envelope.world.mail;
 
 /**
  * Injected in ServerLevel.<br>

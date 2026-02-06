@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.entity.ai.goal;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;

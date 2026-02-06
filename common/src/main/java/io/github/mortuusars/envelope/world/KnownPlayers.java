@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.service;
+package io.github.mortuusars.envelope.world;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
@@ -20,21 +20,19 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class Players extends SavedData {
-    public static final Codec<Players> CODEC = Codec.unboundedMap(Codec.STRING, PlayerData.CODEC)
-          .xmap(Players::new, Players::getData);
+public class KnownPlayers extends SavedData {
+    public static final Codec<KnownPlayers> CODEC = Codec.unboundedMap(Codec.STRING, PlayerData.CODEC)
+          .xmap(KnownPlayers::new, KnownPlayers::getData);
 
     protected final Map<String, PlayerData> data;
-//    protected @Nullable Map<UUID, PlayerData> dataById;
-//    protected @Nullable Map<Address.Player, PlayerData> dataByAddress;
     protected @Nullable Set<Address.Player> addresses;
     protected @Nullable Map<Address.Player, Address.Block> defaultAddresses;
 
-    public Players(Map<String, PlayerData> data) {
+    public KnownPlayers(Map<String, PlayerData> data) {
         this.data = new HashMap<>(data); // Make sure it's modifiable
     }
 
-    public Players() {
+    public KnownPlayers() {
         this(Collections.emptyMap());
     }
 
@@ -111,23 +109,6 @@ public class Players extends SavedData {
         setDirty();
     }
 
-//    public Optional<UUID> getUuid(String name) {
-//        return Optional.ofNullable(map.get(name));
-//    }
-//
-//    public Optional<UUID> getUuid(Address.Player address) {
-//        return Optional.ofNullable(map.get(address.id()));
-//    }
-//
-//    public Optional<String> getName(UUID uuid) {
-//        for (var entry : map.entrySet()) {
-//            if (Objects.equals(entry.getValue(), uuid)) {
-//                return Optional.ofNullable(entry.getKey());
-//            }
-//        }
-//        return Optional.empty();
-//    }
-
     // --
 
     public @NotNull Set<Address.Player> getAllAddresses() {
@@ -161,7 +142,7 @@ public class Players extends SavedData {
 
     // -- Save / Load
 
-    public static Players get(ServerLevel level, String name) {
+    public static KnownPlayers get(ServerLevel level, String name) {
         return level.getDataStorage().computeIfAbsent(factory(), name);
     }
 
@@ -175,14 +156,14 @@ public class Players extends SavedData {
                 .orElse(tag);
     }
 
-    private static Players load(CompoundTag tag, HolderLookup.Provider registries) {
+    private static KnownPlayers load(CompoundTag tag, HolderLookup.Provider registries) {
         return CODEC.decode(NbtOps.INSTANCE, tag)
                 .ifError(e -> Envelope.LOGGER.error("Cannot load KnownPlayers: {}", e.message()))
-                .result().map(Pair::getFirst).orElseGet(Players::new);
+                .result().map(Pair::getFirst).orElseGet(KnownPlayers::new);
     }
 
-    private static Factory<Players> factory() {
-        return new Factory<>(Players::new, Players::load, null);
+    private static Factory<KnownPlayers> factory() {
+        return new Factory<>(KnownPlayers::new, KnownPlayers::load, null);
     }
 
     // --

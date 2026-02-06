@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecor
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;

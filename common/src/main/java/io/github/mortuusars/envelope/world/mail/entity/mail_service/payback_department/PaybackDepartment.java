@@ -16,7 +16,7 @@ import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.service.MailService;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
