@@ -2,11 +2,11 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.MailboxAddressTagApplyC2SP;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -25,8 +25,8 @@ public class MailboxChangeAddressScreen extends AbstractMailboxAddressScreen {
     protected final BlockState state;
     protected final BlockEntity blockEntity;
 
-    public MailboxChangeAddressScreen(InteractionHand hand, AllAddresses knownAddresses,
-                                      BlockPos pos, Address.Block existingAddress,
+    public MailboxChangeAddressScreen(InteractionHand hand, AllAddresses.Realized knownAddresses,
+                                      BlockPos pos, BlockAddress existingAddress,
                                       Component title) {
         super(hand, knownAddresses, Optional.ofNullable(existingAddress), title);
         this.pos = pos;

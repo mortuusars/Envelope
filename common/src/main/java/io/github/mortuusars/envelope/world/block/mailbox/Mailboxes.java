@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressUniquifier;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class Mailboxes {
         return data;
     }
 
-    protected Map<Address.Block, RegisteredMailbox> getMailboxes() {
+    protected Map<BlockAddress, RegisteredMailbox> getMailboxes() {
         return data().getMailboxes();
     }
 
@@ -39,7 +40,7 @@ public class Mailboxes {
         data().setDirty();
     }
 
-    public Set<Address.Block> getAllAddresses() {
+    public Set<BlockAddress> getAllAddresses() {
         return getMailboxes().keySet();
     }
 
@@ -47,7 +48,7 @@ public class Mailboxes {
      * Ensures that address is properly registered at current block position.<br>
      * If suggestedAddress is already in use elsewhere - it will be uniquified.
      */
-    public @NotNull Address.Block correctOrRegisterIfNeeded(Address.Block suggestedAddress, BlockPos pos) {
+    public @NotNull BlockAddress correctOrRegisterIfNeeded(BlockAddress suggestedAddress, BlockPos pos) {
         @Nullable RegisteredMailbox registeredAtPos = getAtPosition(pos);
         if (registeredAtPos != null) {
             // inUseAsPlayerOrEntity check is to handle the case when new player joins,
@@ -60,12 +61,12 @@ public class Mailboxes {
             return rename(registeredAtPos, suggestedAddress).getAddress();
         }
 
-        Address.Block address = uniquifyIfKnown(suggestedAddress);
+        BlockAddress address = uniquifyIfKnown(suggestedAddress);
 
         getMailboxes().entrySet().removeIf(entry -> {
             if (entry.getValue().getPos().equals(pos)) {
                 LOGGER.info("Removing mailbox '{}'@[{}] because new mailbox '{}' is being registered at the same blockpos.",
-                      entry.getValue().getAddress().id(), entry.getValue().getPos().toShortString(), address.id());
+                      entry.getValue().getAddress().getId(), entry.getValue().getPos().toShortString(), address.getId());
                 return true;
             }
             return false;
@@ -73,18 +74,18 @@ public class Mailboxes {
 
         RegisteredMailbox data = new RegisteredMailbox(address, pos);
         getMailboxes().put(address, data);
-        if (Envelope.debug()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.id(), pos.toShortString());
+        if (Envelope.debug()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.getId(), pos.toShortString());
         setDirty();
         return address;
     }
 
-    public void remove(Address.Block address) {
+    public void remove(BlockAddress address) {
         @Nullable RegisteredMailbox removed = getMailboxes().remove(address);
         if (removed != null) {
             MailService.of(level).getKnownPlayers().removeDefaultAddress(address);
             setDirty();
             if (Envelope.debug()) LOGGER.info("Removed mailbox '{}'@[{}]",
-                  removed.getAddress().id(), removed.getPos().toShortString());
+                  removed.getAddress().getId(), removed.getPos().toShortString());
         }
     }
 
@@ -92,8 +93,8 @@ public class Mailboxes {
         Optional.ofNullable(getAtPosition(pos)).ifPresent(data -> remove(data.getAddress()));
     }
 
-    public @NotNull RegisteredMailbox rename(RegisteredMailbox data, Address.Block suggestedAddress) {
-        Address.Block newAddress = uniquifyIfKnown(suggestedAddress);
+    public @NotNull RegisteredMailbox rename(RegisteredMailbox data, BlockAddress suggestedAddress) {
+        BlockAddress newAddress = uniquifyIfKnown(suggestedAddress);
 
         MailService.of(level).getKnownPlayers().renameDefaultAddress(data.getAddress(), newAddress);
 
@@ -103,7 +104,7 @@ public class Mailboxes {
         getMailboxes().put(newAddress, newData);
 
         if (Envelope.debug()) {
-            LOGGER.info("Renamed mailbox '{}'@[{}] to '{}'", data.getAddress().id(), data.getPos().toShortString(), newAddress.id());
+            LOGGER.info("Renamed mailbox '{}'@[{}] to '{}'", data.getAddress().getId(), data.getPos().toShortString(), newAddress.getId());
         }
 
         setDirty();
@@ -111,17 +112,17 @@ public class Mailboxes {
         return newData;
     }
 
-    public void rename(Address.Block oldAddress, Address.Block suggestedAddress) {
+    public void rename(BlockAddress oldAddress, BlockAddress suggestedAddress) {
         getByAddress(oldAddress).ifPresent(data -> rename(data, suggestedAddress));
     }
 
-    public boolean exists(Address.Block block) {
+    public boolean exists(BlockAddress block) {
         return getMailboxes().containsKey(block);
     }
 
     // --
 
-    public Optional<RegisteredMailbox> getByAddress(Address.Block address) {
+    public Optional<RegisteredMailbox> getByAddress(BlockAddress address) {
         return Optional.ofNullable(getMailboxes().get(address));
     }
 
@@ -134,11 +135,11 @@ public class Mailboxes {
         return null;
     }
 
-    public Optional<BlockPos> getPositionOf(Address.Block address) {
+    public Optional<BlockPos> getPositionOf(BlockAddress address) {
         return getByAddress(address).map(RegisteredMailbox::getPos);
     }
 
-    public Optional<MailboxBlockEntity> getBlockEntityOf(Address.Block address) {
+    public Optional<MailboxBlockEntity> getBlockEntityOf(BlockAddress address) {
         return getPositionOf(address)
               .flatMap(pos -> level.isLoaded(pos) && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                     ? Optional.of(blockEntity)
@@ -147,19 +148,19 @@ public class Mailboxes {
 
     // --
 
-    private boolean inUseAsPlayerOrEntity(Address.Block address) {
-        AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
+    private boolean inUseAsPlayerOrEntity(BlockAddress address) {
+        AllAddresses.Realized knownAddresses = MailService.of(level).getKnownAddresses();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
               || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
     }
 
-    private Address.Block uniquifyIfKnown(Address.Block address) {
-        AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
+    private BlockAddress uniquifyIfKnown(BlockAddress address) {
+        AllAddresses.Realized knownAddresses = MailService.of(level).getKnownAddresses();
         if (!knownAddresses.isKnown(address)) {
             return address;
         }
         AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses);
-        String uniqueId = uniquifier.uniquify(address.id());
-        return new Address.Block(uniqueId);
+        String uniqueId = uniquifier.uniquify(address.getId());
+        return new BlockAddress(uniqueId);
     }
 }

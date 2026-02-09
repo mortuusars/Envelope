@@ -10,9 +10,9 @@ import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -55,7 +55,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     private NonNullList<ItemStack> items = NonNullList.withSize(REGULAR_SLOTS, ItemStack.EMPTY);
     private @NotNull UUID inboxId = UUID.randomUUID();
-    private @Nullable Address.Block address;
+    private @Nullable BlockAddress address;
     private @Nullable UUID owner;
 
     private @NotNull List<ItemStack> mail = new ArrayList<>();
@@ -73,19 +73,19 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     protected @NotNull Component getDefaultName() {
         return address != null
-              ? address.getName()
+              ? address.getDisplayComponent()
               : Component.translatable("container.envelope.mailbox");
     }
 
     // -- Address
 
-    public @NotNull Address.Block getAddress() {
+    public @NotNull BlockAddress getAddress() {
         return Preconditions.checkNotNull(address,
               "Address of mailbox at [" + getBlockPos().toShortString() + "] was not set.");
     }
 
-    public void setAddress(@Nullable Address.Block address) {
-        @Nullable Address.Block currentAddress = this.address;
+    public void setAddress(@Nullable BlockAddress address) {
+        @Nullable BlockAddress currentAddress = this.address;
         this.address = address;
 
         if (getLevel() instanceof ServerLevel serverLevel && MailService.operatesIn(serverLevel)) {
@@ -105,7 +105,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         setAddress(this.address);
     }
 
-    protected @NotNull Address.Block generateRandomAddress(ServerLevel level) {
+    protected @NotNull BlockAddress generateRandomAddress(ServerLevel level) {
         return new SimpleBlockAddressGenerator(MailService.of(level).getKnownAddresses(), 50).generate(level.getRandom());
     }
 
@@ -216,7 +216,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
             PlatformHelper.openMenu(serverPlayer, this, buffer -> {
                 buffer.writeBlockPos(getBlockPos());
-                Address.Block.STREAM_CODEC.encode(buffer, getAddress());
+                BlockAddress.STREAM_CODEC.encode(buffer, getAddress());
                 ItemStack.LIST_STREAM_CODEC.encode(buffer, getAllMail());
             });
             playSound(SoundEvents.BARREL_OPEN, 0.6f, 1.1f);
@@ -397,7 +397,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.loadAllItems(tag, items, registries);
-        setAddress(tag.contains("address", Tag.TAG_STRING) ? new Address.Block(tag.getString("address")) : null);
+        setAddress(tag.contains("address", Tag.TAG_STRING) ? new BlockAddress(tag.getString("address")) : null);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         inboxId = tag.hasUUID("inbox_id") ? tag.getUUID("inbox_id") : UUID.randomUUID();
     }
@@ -405,7 +405,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.saveAllItems(tag, items, registries);
-        if (address != null) tag.putString("address", address.id());
+        if (address != null) tag.putString("address", address.getId());
         if (owner != null) tag.putUUID("owner", owner);
         tag.putUUID("inbox_id", inboxId);
     }

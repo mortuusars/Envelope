@@ -13,6 +13,7 @@ import io.github.mortuusars.envelope.network.packet.S2CPackets;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -110,6 +111,7 @@ public class NeoForgeCommonEvents {
 
         @SubscribeEvent
         public static void addDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+            event.dataPackRegistry(Envelope.Registries.ENTITY_ADDRESS, EntityAddressDefinition.DIRECT_CODEC, EntityAddressDefinition.DIRECT_CODEC);
             event.dataPackRegistry(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
             event.dataPackRegistry(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
         }

@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -39,7 +40,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
         if (address != null) {
-            tooltipComponents.add(address.format()
+            tooltipComponents.add(address.realize(Minecrft.registryAccess()).format()
                   .withIcon()
                   .withIconColor(AddressFormatter.NEUTRAL_COLOR)
                   .withColor(AddressFormatter.NEUTRAL_COLOR)

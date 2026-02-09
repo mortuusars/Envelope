@@ -9,13 +9,12 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.type.*;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailServiceEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
-import io.github.mortuusars.envelope.world.mail.receiver.EntityMailReceiver;
-import io.github.mortuusars.envelope.world.mail.receiver.MailboxMailReceiver;
-import io.github.mortuusars.envelope.world.mail.receiver.PlayerMailReceiver;
+import io.github.mortuusars.envelope.world.mail.receiver.*;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import io.github.mortuusars.envelope.world.KnownPlayers;
 import net.minecraft.ChatFormatting;
@@ -117,14 +116,14 @@ public class MailService {
 
     // -- Address
 
-    public AllAddresses getKnownAddresses() {
-        return new AllAddresses(
+    public AllAddresses.Realized getKnownAddresses() {
+        return new AllAddresses.Realized(
               getMailboxes().getAllAddresses(),
               getKnownPlayers().getDefaultAddresses().keySet(),
-              getMailEntities().getAllAddresses()
+              getMailEntities().getAllAddresses(),
+              getLevel().registryAccess()
         );
     }
-
     public AllAddresses getKnownAddressesOfType(@Nullable Address.Type type) {
         if (type == null) {
             return getKnownAddresses();
@@ -133,36 +132,40 @@ public class MailService {
             case BLOCK -> AllAddresses.blocks(getMailboxes().getAllAddresses());
             case PLAYER -> AllAddresses.players(getKnownPlayers().getDefaultAddresses().keySet());
             case ENTITY -> AllAddresses.entities(getMailEntities().getAllAddresses());
+            case CUSTOM, UNKNOWN -> AllAddresses.EMPTY;
         };
     }
 
-    public Optional<Address.Block> getPlayerDefaultAddress(Address.Player playerAddress) {
+    public Optional<BlockAddress> getPlayerDefaultAddress(PlayerAddress playerAddress) {
         return Optional.ofNullable(getKnownPlayers().getDefaultAddresses().get(playerAddress));
     }
 
-    /**
-     * @return "final" address. Mainly for getting default block address of a player.
-     */
-    public Address resolve(Address address) {
-        if (address instanceof Address.Player playerAddress) {
-            return getPlayerDefaultAddress(playerAddress).map(Address.class::cast).orElse(address);
-        }
-        return address;
-    }
-
     public AddressLocation getLocationOf(Address address) {
-        return address.map(
-                    block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact),
-                    player -> getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf),
-                    entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation))
-              .orElse(AddressLocation.UNKNOWN);
+        return switch (address) {
+            case BlockAddress block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact).orElse(AddressLocation.UNKNOWN);
+            case PlayerAddress player -> getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf).orElse(AddressLocation.UNKNOWN);
+            case EntityAddress entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation).orElse(AddressLocation.UNKNOWN);
+            default -> AddressLocation.UNKNOWN;
+        };
     }
 
     // --
 
     public ItemStack deliverMail(Address recipient, Address sender, ItemStack mail) {
-        if (mail.isEmpty()) return ItemStack.EMPTY;
-        return recipient.map(MailboxMailReceiver::new, PlayerMailReceiver::new, EntityMailReceiver::new).receiveMail(level, sender, mail);
+        if (mail.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        MailReceiver receiver = switch (recipient) {
+            case BlockAddress block -> new MailboxMailReceiver(block);
+            case PlayerAddress player -> new PlayerMailReceiver(player);
+            case EntityAddress entity -> new EntityMailReceiver(entity);
+            case CustomAddress custom -> new CustomMailReceiver(custom);
+            case UnknownAddress ignored -> new UnknownMailReceiver();
+            default -> throw new IllegalStateException("Unexpected type of recipient address: " + sender.getType());
+        };
+
+        return receiver.receiveMail(level, sender, mail);
     }
 
     // --
@@ -181,7 +184,7 @@ public class MailService {
     }
 
     public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
-        if (!(delivery.getSender() instanceof Address.Block address)) {
+        if (!(delivery.getSender() instanceof BlockAddress address)) {
             return null;
         }
 
@@ -199,7 +202,7 @@ public class MailService {
               .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + entity.getRandom().nextInt(5),
                           damageSource.getLocalizedDeathMessage(entity)))
               .append(Component.translatable("letter.envelope.courier_death_notice.delivery." + delivery.getPhase().getSerializedName(),
-                    delivery.getRecipient().format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
+                    delivery.getRecipient().realize(this).format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
               .append(!delivery.getMail().isEmpty()
                     ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + entity.getRandom().nextInt(6),
                     delivery.getMail().getHoverName().copy()

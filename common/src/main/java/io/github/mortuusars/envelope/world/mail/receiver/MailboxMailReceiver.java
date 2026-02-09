@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
@@ -17,9 +18,9 @@ import java.util.Optional;
 public class MailboxMailReceiver implements MailReceiver {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Address.Block address;
+    private final BlockAddress address;
 
-    public MailboxMailReceiver(Address.Block address) {
+    public MailboxMailReceiver(BlockAddress address) {
         this.address = address;
     }
 
@@ -54,7 +55,7 @@ public class MailboxMailReceiver implements MailReceiver {
               });
     }
 
-    public static Optional<Inbox> getInboxByAddress(ServerLevel level, Address.Block address) {
+    public static Optional<Inbox> getInboxByAddress(ServerLevel level, BlockAddress address) {
         return MailService.of(level).getMailboxes().getBlockEntityOf(address)
               .map(blockEntity -> ((Inbox) blockEntity))
               .or(() -> InboxStorage.get(level).getForDelivery(address));

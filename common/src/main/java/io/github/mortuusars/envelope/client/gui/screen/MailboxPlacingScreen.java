@@ -22,7 +22,7 @@ public class MailboxPlacingScreen extends AbstractMailboxAddressScreen {
     protected final LocalPlayer player;
     protected final BlockHitResult hitResult;
 
-    public MailboxPlacingScreen(InteractionHand hand, AllAddresses knownAddresses, BlockHitResult hitResult, Component title) {
+    public MailboxPlacingScreen(InteractionHand hand, AllAddresses.Realized knownAddresses, BlockHitResult hitResult, Component title) {
         super(hand, knownAddresses, Optional.empty(), title);
         this.player = Minecrft.player();
         this.hitResult = hitResult;

@@ -8,10 +8,12 @@ import io.github.mortuusars.envelope.util.validation.CachedValidator;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -26,11 +28,11 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     protected final LocalPlayer player;
     protected CachedValidator<String> addressValidator;
 
-    public AbstractMailboxAddressScreen(InteractionHand hand, AllAddresses knownAddresses,
-                                        Optional<Address.Block> existingAddress, Component title) {
+    public AbstractMailboxAddressScreen(InteractionHand hand, AllAddresses.Realized knownAddresses,
+                                        Optional<BlockAddress> existingAddress, Component title) {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
-        this.existingAddress = existingAddress.map(Address.class::cast);
+        this.existingAddress = existingAddress.map(Address.Realized.class::cast);
         this.addressValidator = AddressValidation.forMailbox(knownAddresses, player).cached();
     }
 
@@ -44,16 +46,15 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     @Override
     protected String getInitialAddressValue() {
         return existingAddress
-              .map(Address::id)
+              .map(Address.Realized::getDisplayString)
               .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
-                    .map(Address::getName)
-                    .map(Component::getString)
+                    .map(address -> address.realize(Minecrft.registryAccess()).getDisplayString())
                     .orElse(""));
     }
 
     @Override
-    protected AllAddresses getAddressesForSuggestions() {
-        return AllAddresses.EMPTY; // Don't suggest anything
+    protected AllAddresses.Realized getAddressesForSuggestions() {
+        return AllAddresses.EMPTY.realized(RegistryAccess.EMPTY); // Don't suggest anything
     }
 
     // -- Validation

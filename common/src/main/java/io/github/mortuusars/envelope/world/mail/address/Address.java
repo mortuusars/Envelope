@@ -1,120 +1,92 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.util.result.Error;
+import com.mojang.serialization.*;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.*;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public interface Address {
     int MAX_LENGTH = 40;
 
-    Codec<String> ID_CODEC = Codec.STRING.xmap(String::trim, String::trim).validate(Address::validate);
-    Codec<Address> CODEC = Type.CODEC.dispatch(Address::type, Type::getCodec);
-    StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::type, Type::getStreamCodec);
+    Codec<String> ID_CODEC = Codec.STRING.xmap(String::trim, String::trim).validate(AddressValidation::validateId);
 
-    Address.Entity MAIL_SERVICE = new Entity("Mail Service", Component.translatable("address.envelope.mail_service"));
-    Address UNKNOWN = new Entity("Unknown", Component.translatable("address.envelope.unknown"));
+    Codec<Address> CODEC = Type.CODEC.dispatch(Address::getType, Type::getCodec);
+    StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::getType, Type::getStreamCodec);
 
-    Type type();
+    EntityAddress MAIL_SERVICE = new EntityAddress(Envelope.resource("mail_service"));
+    UnknownAddress UNKNOWN = UnknownAddress.INSTANCE;
 
-    String id();
+    Type getType();
 
-    /**
-     * @return "Display" name of an address. For Block and Player addresses that's just id.<br>
-     * Entity address returns its translation, if present.
-     */
-    String toString();
+    String getId();
 
-    /**
-     * @return "Display" name of an address. For Block and Player addresses that's just id.<br>
-     * Entity address returns its translation, if present.
-     */
-    default MutableComponent getName() {
-        return Component.literal(id());
+    default boolean isMailService() {
+        return this instanceof EntityAddress entityAddress && entityAddress.getKey().equals(MAIL_SERVICE.getKey());
+    }
+
+    default boolean isUnknown() {
+        return this instanceof UnknownAddress;
     }
 
     // --
 
-    /**
-     * Compares "display" name of a current address to the given string (ignoring the case).<br>
-     * Nothing special for Block and Player addresses, but Entity address will be compared by its translation, if present.
-     *
-     * @return {@code true} if names look the same (ignoring the case).
-     */
-    default boolean matches(String name) {
-        return toString().equalsIgnoreCase(name);
+    default Address.Realized realize(RegistryAccess access) {
+        if (this instanceof Address.Realized realized) return realized;
+        if (this instanceof Address.Realizable realizable) return realizable.realize(access);
+        throw new IllegalStateException("Address " + this + " cannot be realized.");
     }
 
-    /**
-     * Shortcut for {@link Address#matches(String)}
-     */
-    default boolean matches(Address address) {
-        return matches(address.toString());
+    default Address.Realized realize(Level level) {
+        return realize(level.registryAccess());
+    }
+
+    default Address.Realized realize(MailService service) {
+        return realize(service.getLevel());
     }
 
     // --
 
-    default AddressFormatter format() {
-        return AddressFormatter.of(this);
-    }
-
-    default <R> R map(Function<Block, R> ifBlock, Function<Player, R> ifPlayer, Function<Entity, R> ifEntity) {
-        return switch (this) {
-            case Block block -> ifBlock.apply(block);
-            case Player player -> ifPlayer.apply(player);
-            case Entity entity -> ifEntity.apply(entity);
-            default -> throw new IllegalStateException("Unknown type of address. " + this.getClass());
-        };
-    }
-
-    // --
-
-    static @NotNull DataResult<String> validate(String id) {
-        return AddressValidation.id()
-              .test(id)
-              .map(DataResult::success, Error::asDataResult);
+    default Address.Realized resolve(MailService service) {
+        if (this instanceof PlayerAddress player) {
+            return service.getPlayerDefaultAddress(player).map(a -> a.realize(service)).orElse(Address.UNKNOWN);
+        }
+        return realize(service);
     }
 
     // --
 
     enum Type implements StringRepresentable {
-        BLOCK(0, "block", Block.CODEC, Block.STREAM_CODEC),
-        PLAYER(1, "player", Player.CODEC, Player.STREAM_CODEC),
-        ENTITY(2, "entity", Entity.CODEC, Entity.STREAM_CODEC);
+        BLOCK("block", BlockAddress.CODEC, BlockAddress.STREAM_CODEC),
+        PLAYER("player", PlayerAddress.CODEC, PlayerAddress.STREAM_CODEC),
+        ENTITY("entity", EntityAddress.CODEC, EntityAddress.STREAM_CODEC),
+        CUSTOM("custom", CustomAddress.CODEC, CustomAddress.STREAM_CODEC),
+        UNKNOWN("unknown", MapCodec.unit(UnknownAddress.INSTANCE), StreamCodec.unit(UnknownAddress.INSTANCE));
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
-        public static final IntFunction<Type> BY_ID = ByIdMap.continuous(Type::getId, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+        public static final IntFunction<Type> BY_ID = ByIdMap.continuous(Type::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
         public static final StreamCodec<RegistryFriendlyByteBuf, Type> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Type::ordinal).cast();
 
-        private final int id;
         private final String name;
         private final MapCodec<? extends Address> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, ? extends Address> streamCodec;
 
-        Type(int id, String name, MapCodec<? extends Address> codec, StreamCodec<RegistryFriendlyByteBuf, ? extends Address> streamCodec) {
-            this.id = id;
+        Type(String name, MapCodec<? extends Address> codec, StreamCodec<RegistryFriendlyByteBuf, ? extends Address> streamCodec) {
             this.name = name;
             this.codec = codec;
             this.streamCodec = streamCodec;
-        }
-
-        public int getId() {
-            return id;
         }
 
         @Override
@@ -135,138 +107,23 @@ public interface Address {
         }
     }
 
-    record Block(String id) implements Address {
-        public static final MapCodec<Block> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              ID_CODEC.fieldOf("id").forGetter(Block::id)
-        ).apply(instance, Block::new));
+    // --
 
-        public static final Codec<Block> STRING_CODEC = Codec.STRING.xmap(Block::new, Block::id);
+    interface Realized extends Address {
+        String getDisplayString();
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, Block> STREAM_CODEC =
-              ByteBufCodecs.STRING_UTF8.map(Block::new, Block::id).cast();
+        MutableComponent getDisplayComponent();
 
-        public Block {
-            validate(id).getOrThrow();
+        default boolean matches(String name) {
+            return getDisplayString().equalsIgnoreCase(name);
         }
 
-        @Override
-        public Type type() {
-            return Type.BLOCK;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Block that = (Block) o;
-            return this.id.equalsIgnoreCase(that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return ("b" + id.toLowerCase(Locale.ROOT)).hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return id;
+        default AddressFormatter format() {
+            return AddressFormatter.of(this);
         }
     }
 
-    record Player(String id) implements Address {
-        public static final MapCodec<Player> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              ID_CODEC.fieldOf("id").forGetter(Player::id)
-        ).apply(instance, Player::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, Player> STREAM_CODEC =
-              ByteBufCodecs.STRING_UTF8.map(Player::new, Player::id).cast();
-
-        public Player {
-            validate(id).getOrThrow();
-        }
-
-        public Player(net.minecraft.world.entity.player.Player player) {
-            this(player.getScoreboardName());
-        }
-
-        @Override
-        public Type type() {
-            return Type.PLAYER;
-        }
-
-        @Override
-        public String toString() {
-            return id;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Player that = (Player) o;
-            return this.id.equalsIgnoreCase(that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return ("p" + id.toLowerCase(Locale.ROOT)).hashCode();
-        }
-    }
-
-    /**
-     * Due to how address matching is implemented (by display name), and how choosing address in GUIs, etc, works -<br>
-     * using translations in Entity addresses works as it should.<br>
-     */
-    record Entity(String id, Optional<Component> displayName) implements Address {
-        public static final MapCodec<Entity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-              ID_CODEC.fieldOf("id").forGetter(Entity::id),
-              ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(Entity::displayName)
-        ).apply(instance, Entity::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, Entity> STREAM_CODEC = StreamCodec.composite(
-              ByteBufCodecs.STRING_UTF8, Entity::id,
-              ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), Entity::displayName,
-              Entity::new
-        );
-
-        public Entity {
-            validate(id).getOrThrow();
-        }
-
-        public Entity(String id, @NotNull Component displayName) {
-            this(id, Optional.of(displayName));
-        }
-
-        public Entity(String id) {
-            this(id, Optional.empty());
-        }
-
-        @Override
-        public Type type() {
-            return Type.ENTITY;
-        }
-
-        @Override
-        public MutableComponent getName() {
-            return displayName.map(Component::plainCopy).orElseGet(Address.super::getName);
-        }
-
-        @Override
-        public String toString() {
-            return getName().getString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Entity that = (Entity) o;
-            return this.id.equalsIgnoreCase(that.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return ("e" + id.toLowerCase(Locale.ROOT)).hashCode();
-        }
+    interface Realizable extends Address {
+        Address.Realized realize(RegistryAccess access);
     }
 }

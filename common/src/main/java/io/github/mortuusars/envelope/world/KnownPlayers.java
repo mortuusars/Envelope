@@ -5,7 +5,8 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -25,8 +26,8 @@ public class KnownPlayers extends SavedData {
           .xmap(KnownPlayers::new, KnownPlayers::getData);
 
     protected final Map<String, PlayerData> data;
-    protected @Nullable Set<Address.Player> addresses;
-    protected @Nullable Map<Address.Player, Address.Block> defaultAddresses;
+    protected @Nullable Set<PlayerAddress> addresses;
+    protected @Nullable Map<PlayerAddress, BlockAddress> defaultAddresses;
 
     public KnownPlayers(Map<String, PlayerData> data) {
         this.data = new HashMap<>(data); // Make sure it's modifiable
@@ -66,19 +67,19 @@ public class KnownPlayers extends SavedData {
 
     // --
 
-    public Optional<Address.Block> getDefaultAddressOf(Player player) {
+    public Optional<BlockAddress> getDefaultAddressOf(Player player) {
         return getDataOf(player.getScoreboardName()).flatMap(PlayerData::getDefaultAddress);
     }
 
-    public Optional<Address.Block> getDefaultAddressOf(Address.Player playerAddress) {
+    public Optional<BlockAddress> getDefaultAddressOf(PlayerAddress playerAddress) {
         return getDataOf(playerAddress.toString()).flatMap(PlayerData::getDefaultAddress);
     }
 
-    public void setDefaultAddress(Player player, Address.Block address) {
+    public void setDefaultAddress(Player player, BlockAddress address) {
         update(player, data -> data.setDefaultAddress(address));
     }
 
-    public void renameDefaultAddress(Address.Block oldAddress, Address.Block newAddress) {
+    public void renameDefaultAddress(BlockAddress oldAddress, BlockAddress newAddress) {
         getData().values().forEach(data -> {
             if (data.getDefaultAddress().map(a -> a.equals(oldAddress)).orElse(false)) {
                 data.setDefaultAddress(newAddress);
@@ -87,7 +88,7 @@ public class KnownPlayers extends SavedData {
         setDirty();
     }
 
-    public void removeDefaultAddress(Address.Block address) {
+    public void removeDefaultAddress(BlockAddress address) {
         getData().values().forEach(data -> {
             if (data.getDefaultAddress().map(a -> a.equals(address)).orElse(false)) {
                 data.setDefaultAddress(null);
@@ -111,16 +112,16 @@ public class KnownPlayers extends SavedData {
 
     // --
 
-    public @NotNull Set<Address.Player> getAllAddresses() {
+    public @NotNull Set<PlayerAddress> getAllAddresses() {
         if (addresses == null) {
             addresses = data.keySet().stream()
-                  .map(Address.Player::new)
+                  .map(PlayerAddress::new)
                   .collect(Collectors.toSet());
         }
         return addresses;
     }
 
-    public Map<Address.Player, Address.Block> getDefaultAddresses() {
+    public Map<PlayerAddress, BlockAddress> getDefaultAddresses() {
         if (defaultAddresses == null) {
             defaultAddresses = new HashMap<>();
             getData().forEach((name, data) ->
@@ -171,16 +172,16 @@ public class KnownPlayers extends SavedData {
     public static class PlayerData {
         public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(i -> i.group(
               ExtraCodecs.GAME_PROFILE_WITHOUT_PROPERTIES.codec().fieldOf("profile").forGetter(PlayerData::getProfile),
-              Address.Block.STRING_CODEC.optionalFieldOf("default_address").forGetter(PlayerData::getDefaultAddress)
+              BlockAddress.STRING_CODEC.optionalFieldOf("default_address").forGetter(PlayerData::getDefaultAddress)
         ).apply(i, PlayerData::new));
 
         protected final GameProfile profile;
-        protected final Address.Player address;
-        protected Optional<Address.Block> defaultAddress;
+        protected final PlayerAddress address;
+        protected Optional<BlockAddress> defaultAddress;
 
-        public PlayerData(GameProfile profile, Optional<Address.Block> defaultAddress) {
+        public PlayerData(GameProfile profile, Optional<BlockAddress> defaultAddress) {
             this.profile = profile;
-            this.address = new Address.Player(profile.getName());
+            this.address = new PlayerAddress(profile.getName());
             this.defaultAddress = defaultAddress;
         }
 
@@ -192,15 +193,15 @@ public class KnownPlayers extends SavedData {
             return profile;
         }
 
-        public Address.Player getAddress() {
+        public PlayerAddress getAddress() {
             return address;
         }
 
-        public Optional<Address.Block> getDefaultAddress() {
+        public Optional<BlockAddress> getDefaultAddress() {
             return defaultAddress;
         }
 
-        public void setDefaultAddress(@Nullable Address.Block address) {
+        public void setDefaultAddress(@Nullable BlockAddress address) {
             this.defaultAddress = Optional.ofNullable(address);
         }
     }

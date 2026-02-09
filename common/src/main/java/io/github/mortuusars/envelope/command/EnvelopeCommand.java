@@ -10,6 +10,8 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -70,7 +72,7 @@ public class EnvelopeCommand {
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")
-                              .append(delivery.delivery().getRecipient().format().asRecipient().toComponent());
+                              .append(delivery.delivery().getRecipient().realize(level).format().asRecipient().toComponent());
                         context.getSource().sendSuccess(() -> message, true);
                     },
                     error -> context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()))
@@ -87,11 +89,11 @@ public class EnvelopeCommand {
 
     private static int listAllMailboxes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
-        Set<Address.Block> addresses = MailService.of(level).getMailboxes().getAllAddresses();
+        Set<BlockAddress> addresses = MailService.of(level).getMailboxes().getAllAddresses();
 
         if (!addresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("All mailboxes:"), true);
-            for (Address.Block address : addresses) {
+            for (BlockAddress address : addresses) {
                 context.getSource().sendSuccess(() -> copyableAddressAndPos(address,
                       MailService.of(level).getMailboxes().getPositionOf(address)), true);
             }
@@ -105,7 +107,7 @@ public class EnvelopeCommand {
     private static int listDefaultMailboxes(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
 
-        Map<Address.Player, Address.Block> defaultAddresses = MailService.of(level).getKnownPlayers().getDefaultAddresses();
+        Map<PlayerAddress, BlockAddress> defaultAddresses = MailService.of(level).getKnownPlayers().getDefaultAddresses();
 
         if (!defaultAddresses.isEmpty()) {
             context.getSource().sendSuccess(() -> Component.literal("Default addresses:"), true);
@@ -124,27 +126,27 @@ public class EnvelopeCommand {
         return 0;
     }
 
-    private static int mailboxPosition(CommandContext<CommandSourceStack> context, Address.Block address) {
+    private static int mailboxPosition(CommandContext<CommandSourceStack> context, BlockAddress address) {
         ServerLevel level = context.getSource().getLevel();
         if (!MailService.of(level).getMailboxes().exists(address)) {
-            context.getSource().sendFailure(address.getName().append(" does not exist."));
+            context.getSource().sendFailure(address.getDisplayComponent().append(" does not exist."));
             return 1;
         }
 
         MailService.of(level).getMailboxes().getPositionOf(address)
               .ifPresentOrElse(
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
-                    () -> context.getSource().sendFailure(address.getName()
+                    () -> context.getSource().sendFailure(address.getDisplayComponent()
                           .append(" does not have a position associated with it.")));
         return 0;
     }
 
     private static MutableComponent copyableAddressAndPos(Address address, Optional<BlockPos> pos) {
-        String addressId = address.getName().getString();
+        String addressId = address.getId();
         String posStr = pos.map(BlockPos::toShortString).orElse("");
         String posToCopy = posStr.replace(",", "");
 
-        return address.getName()
+        return Component.literal(addressId)
               .withStyle(Style.EMPTY
                     .withColor(AddressFormatter.NEUTRAL_COLOR)
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Address")

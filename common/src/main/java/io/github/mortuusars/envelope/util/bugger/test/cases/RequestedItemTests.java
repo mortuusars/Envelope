@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.Test;
 import io.github.mortuusars.envelope.world.inventory.RequestedItem;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.ItemTags;
@@ -86,7 +87,7 @@ public class RequestedItemTests extends BuggerTests {
                   "envelope:letter_tattered": {},
                   "envelope:mail_sender": {
                       "type": "entity",
-                      "id": "Mail Service"
+                      "key": "envelope:mail_service"
                   },
                   "envelope:mail_recipient": {
                       "type": "block",
@@ -100,7 +101,7 @@ public class RequestedItemTests extends BuggerTests {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_SENDER, Address.MAIL_SERVICE);
-                  stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new Address.Block("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new BlockAddress("Mortuusars Laboratory"));
                   return decodeFromJson(json).matches(stack);
               }));
     }

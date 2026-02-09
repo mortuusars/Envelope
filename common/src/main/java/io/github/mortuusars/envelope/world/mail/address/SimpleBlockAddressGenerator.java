@@ -1,21 +1,22 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.Util;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleBlockAddressGenerator {
-    private final AllAddresses knownAddresses;
+    private final AllAddresses.Realized knownAddresses;
     private final int tries;
 
-    public SimpleBlockAddressGenerator(AllAddresses knownAddresses, int tries) {
+    public SimpleBlockAddressGenerator(AllAddresses.Realized knownAddresses, int tries) {
         Preconditions.checkArgument(tries > 0, "Should have at least 1 try.");
         this.knownAddresses = knownAddresses;
         this.tries = tries;
     }
 
-    public @NotNull Address.Block generate(RandomSource random) {
+    public @NotNull BlockAddress generate(RandomSource random) {
         String[] adjectives = getAdjectives();
         String[] nouns = getNouns();
 
@@ -24,7 +25,7 @@ public class SimpleBlockAddressGenerator {
 
         do {
             if (count > tries) {
-                return new Address.Block(id);
+                return new BlockAddress(id);
             }
             count++;
 
@@ -45,7 +46,7 @@ public class SimpleBlockAddressGenerator {
                   : firstAdjective + " " + secondAdjective + " " + noun;
         } while (knownAddresses.isKnown(id));
 
-        return new Address.Block(id);
+        return new BlockAddress(id);
     }
 
     private String[] getAdjectives() {

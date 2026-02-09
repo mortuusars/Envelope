@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecor
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
@@ -25,9 +26,9 @@ import java.util.stream.Collectors;
 public class EntityMailReceiver implements MailReceiver {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Address.Entity address;
+    private final EntityAddress address;
 
-    public EntityMailReceiver(Address.Entity address) {
+    public EntityMailReceiver(EntityAddress address) {
         this.address = address;
     }
 
@@ -48,14 +49,14 @@ public class EntityMailReceiver implements MailReceiver {
               .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 
-    public List<RecipeHolder<MailRecipe>> getRecipesByAddress(RecipeManager manager, Address.Entity address) {
-        return manager.getAllRecipesFor(Envelope.RecipeTypes.MAIL.get()).stream()
-              .filter(holder -> holder.value().getAddress().matches(address))
+    public List<RecipeHolder<MailRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
+        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAIL.get()).stream()
+              .filter(recipeHolder -> recipeHolder.value().getAddress().equals(address))
               .collect(Collectors.toList());
     }
 
     protected ItemStack tryHandleCrafting(ServerLevel level, Address sender, ItemStack mail) {
-        if (sender.equals(Address.UNKNOWN)) {
+        if (sender.isUnknown()) {
             return returned(mail, DeliveryRecord.Message.NO_RETURN_ADDRESS);
         }
 
@@ -68,7 +69,7 @@ public class EntityMailReceiver implements MailReceiver {
             return returned(mail, DeliveryRecord.Message.REJECTED);
         }
 
-        List<RecipeHolder<MailRecipe>> recipes = getRecipesByAddress(level.getRecipeManager(), address);
+        List<RecipeHolder<MailRecipe>> recipes = getRecipesByAddress(level, address);
         if (recipes.isEmpty()) {
             return ItemStack.EMPTY;
         }

@@ -1,28 +1,26 @@
 package io.github.mortuusars.envelope.command;
 
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.JsonOps;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryHandlerTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-
-import java.util.List;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -82,13 +80,61 @@ public class EnvelopeDebugCommand {
 
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-        MailService.of(player.serverLevel()).getDeliveryManager()
-              .startService(Delivery.draft()
-                    .deliver(Mail.createPackage(new PackageContents(List.of(new ItemStack(Items.ACACIA_LOG))))
-                          .get())
-                    .from(new Address.Block("Blue"))
-                    .to(new Address.Block("Red"))
-                    .startAtPhase(DeliveryPhase.DISPATCHING_DELIVERY));
+//        EntityAddress value = MAIL_SERVICE.value(player.registryAccess());
+
+        String keyJson = """
+              {
+                  "id":"envelope:letter",
+                  "count":1,
+                  "components":{
+                    "envelope:mail_sender": {
+                        "type": "new_entity",
+                        "key": "envelope:mail_service"
+                    }
+                  }
+              }
+              """;
+        JsonObject keyObj = GsonHelper.parse(keyJson);
+        ItemStack keyStack = ItemStack.CODEC.parse(player.registryAccess().createSerializationContext(JsonOps.INSTANCE), keyObj)
+              .result()
+              .orElse(ItemStack.EMPTY);
+
+        String valueJson = """
+              {
+                  "id":"envelope:letter",
+                  "count":1,
+                  "components":{
+                    "envelope:mail_sender": {
+                        "type": "new_entity",
+                        "id": "mail_service",
+                        "display_name": {
+                            "translate": "block.envelope.mailbox"
+                        }
+                    }
+                  }
+              }
+              """;
+
+        JsonObject valueObj = GsonHelper.parse(valueJson);
+        ItemStack valueStack = ItemStack.CODEC.parse(player.registryAccess().createSerializationContext(JsonOps.INSTANCE), valueObj)
+              .result()
+              .orElse(ItemStack.EMPTY);
+
+
+//        Registry<Address.Entity> registry = context.getSource().getLevel().registryAccess().registryOrThrow(Envelope.Registries.ENTITY_ADDRESS);
+
+
+
+
+        boolean a = true;
+
+//        MailService.of(player.serverLevel()).getDeliveryManager()
+//              .startService(Delivery.draft()
+//                    .deliver(Mail.createPackage(new PackageContents(List.of(new ItemStack(Items.ACACIA_LOG))))
+//                          .get())
+//                    .from(new Address.Block("Blue"))
+//                    .to(new Address.Block("Red"))
+//                    .startAtPhase(DeliveryPhase.DISPATCHING_DELIVERY));
 
 //        ItemStack pkg = new ItemStack(Envelope.Items.PACKAGE.get());
 //        pkg.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(List.of(new ItemStack(Items.FEATHER, 5))));

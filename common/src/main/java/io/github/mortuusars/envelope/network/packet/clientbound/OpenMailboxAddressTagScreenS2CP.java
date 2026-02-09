@@ -1,10 +1,10 @@
 package io.github.mortuusars.envelope.network.packet.clientbound;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.handler.ClientPacketsHandler;
 import io.github.mortuusars.envelope.network.packet.Packet;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public record OpenMailboxAddressTagScreenS2CP(InteractionHand hand,
                                               AllAddresses knownAddresses,
                                               BlockPos pos,
-                                              Address.Block currentAddress) implements Packet {
+                                              BlockAddress currentAddress) implements Packet {
     public static final ResourceLocation ID = Envelope.resource("open_mailbox_address_tag_screen");
     public static final Type<OpenMailboxAddressTagScreenS2CP> TYPE = new Type<>(ID);
 
@@ -27,7 +27,7 @@ public record OpenMailboxAddressTagScreenS2CP(InteractionHand hand,
             ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), OpenMailboxAddressTagScreenS2CP::hand,
             AllAddresses.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::knownAddresses,
             BlockPos.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::pos,
-            Address.Block.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::currentAddress,
+            BlockAddress.STREAM_CODEC, OpenMailboxAddressTagScreenS2CP::currentAddress,
             OpenMailboxAddressTagScreenS2CP::new
     );
 

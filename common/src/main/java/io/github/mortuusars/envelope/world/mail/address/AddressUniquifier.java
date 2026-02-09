@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 public class AddressUniquifier {
     private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+)$");
 
-    protected final AllAddresses knownAddresses;
+    protected final AllAddresses.Realized knownAddresses;
 
-    public AddressUniquifier(AllAddresses knownAddresses) {
+    public AddressUniquifier(AllAddresses.Realized knownAddresses) {
         this.knownAddresses = knownAddresses;
     }
 

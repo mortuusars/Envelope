@@ -45,6 +45,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_block"));
     public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
     public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_entity"));
+    public static final WidgetSprites ICON_ADDRESS_CUSTOM_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_custom"));
     public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mail_service"));
     public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unknown"));
     public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_returned"));
@@ -282,7 +283,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
 
-        String sender = getDisplayedSender(mail).getName().getString();
+        String sender = getDisplayedSender(mail).getDisplayString();
         if (font.width(sender) > 76) {
             sender = font.plainSubstrByWidth(sender, 72) + "...";
         }
@@ -349,9 +350,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         List<Component> tooltip = new ArrayList<>();
 
         // Show full sender address if it doesn't fit on the widget
-        Address sender = getDisplayedSender(hoveredMail);
+        Address.Realized sender = getDisplayedSender(hoveredMail);
         if (font.width(sender.toString()) > 76) {
-            tooltip.add(AddressFormatter.of(sender)
+            tooltip.add(sender.format()
                   .withIcon()
                   .withIconColor(AddressFormatter.NEUTRAL_COLOR)
                   .withColor(ChatFormatting.WHITE)
@@ -362,7 +363,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         if (!deliveryLog.isEmpty()) {
             tooltip.add(Component.translatable("gui.envelope.delivery_log"));
             for (DeliveryRecord record : deliveryLog.records()) {
-                tooltip.add(record.toComponent(Minecrft.level().getGameTime()));
+                tooltip.add(record.toComponent(Minecrft.level()));
             }
         }
 
@@ -487,29 +488,31 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected WidgetSprites getDisplayedIcon(ItemStack mail) {
         if (Mail.isReturned(mail)) return ICON_RETURNED_SPRITES;
         Address sender = Mail.getSenderOrUnknown(mail);
-        if (sender.equals(Address.UNKNOWN)) return ICON_ADDRESS_UNKNOWN_SPRITES;
-        if (sender.equals(Address.MAIL_SERVICE)) return ICON_ADDRESS_MAIL_SERVICE_SPRITES;
-        return switch (sender.type()) {
+        return switch (sender.getType()) {
             case BLOCK -> ICON_ADDRESS_BLOCK_SPRITES;
             case PLAYER -> ICON_ADDRESS_PLAYER_SPRITES;
-            case ENTITY -> ICON_ADDRESS_ENTITY_SPRITES;
+            case ENTITY -> sender.isMailService() ? ICON_ADDRESS_MAIL_SERVICE_SPRITES : ICON_ADDRESS_ENTITY_SPRITES;
+            case CUSTOM -> ICON_ADDRESS_ENTITY_SPRITES;
+            case UNKNOWN -> ICON_ADDRESS_UNKNOWN_SPRITES;
         };
     }
 
     protected Component getDisplayedIconName(ItemStack mail) {
         if (Mail.isReturned(mail)) return Component.translatable("gui.envelope.mail.returned");
         Address sender = Mail.getSenderOrUnknown(mail);
-        if (sender.equals(Address.UNKNOWN)) return Component.translatable("address.envelope.unknown");
-        if (sender.equals(Address.MAIL_SERVICE)) return Component.translatable("address.envelope.mail_service");
-        return switch (sender.type()) {
+        return switch (sender.getType()) {
             case BLOCK -> Component.translatable("address.envelope.type.block");
             case PLAYER -> Component.translatable("address.envelope.type.player");
-            case ENTITY -> Component.translatable("address.envelope.type.entity");
+            case ENTITY -> sender.isMailService()
+                  ? Component.translatable("address.envelope.mail_service")
+                  : Component.translatable("address.envelope.type.entity");
+            case CUSTOM -> Component.translatable("address.envelope.type.custom");
+            case UNKNOWN -> Component.translatable("address.envelope.type.unknown");
         };
     }
 
-    protected Address getDisplayedSender(ItemStack mail) {
-        return Mail.getSenderOrUnknown(mail);
+    protected Address.Realized getDisplayedSender(ItemStack mail) {
+        return Mail.getSenderOrUnknown(mail).realize(Minecrft.registryAccess());
     }
 
     // --

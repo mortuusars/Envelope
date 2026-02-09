@@ -3,10 +3,15 @@ package io.github.mortuusars.envelope.command.argument;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.world.mail.address.*;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -36,14 +41,14 @@ public class AddressArgument implements ArgumentType<Address> {
         return new AddressArgument(Address.Type.ENTITY);
     }
 
-    public static Address.Block getBlock(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
+    public static BlockAddress getBlock(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
         Address address = context.getArgument(name, Address.class);
-        if (address instanceof Address.Block block) {
+        if (address instanceof BlockAddress block) {
             return block;
         }
         Component message = Component.literal("Address has wrong type: Expected: "
               + Address.Type.BLOCK.getSerializedName() + ", Got: "
-              + address.type().getSerializedName());
+              + address.getType().getSerializedName());
         throw new SimpleCommandExceptionType(message).create();
     }
 
@@ -59,10 +64,9 @@ public class AddressArgument implements ArgumentType<Address> {
         }
 
         return switch (type) {
-            case BLOCK -> new Address.Block(id);
-            case PLAYER -> new Address.Player(id);
-            case ENTITY -> new Address.Entity(id);
-            case null -> new Address.Block(id);
+            case BLOCK -> new BlockAddress(id);
+            case PLAYER -> new PlayerAddress(id);
+            default -> throw new SimpleCommandExceptionType(Component.literal("Cannot parse address type " + type)).create();
         };
     }
 }

@@ -9,11 +9,13 @@ package io.github.mortuusars.envelope.util;
  */
 public class EnvelopeSymbols {
     public static final String SMALL_SPACE = "\uEEFF";
-    public static final String ADDRESS_BLOCK = "\uEE00";
-    public static final String ADDRESS_PLAYER = "\uEE01";
-    public static final String ADDRESS_ENTITY = "\uEE02";
-    public static final String ADDRESS_UNKNOWN = "\uEE03";
-    public static final String ADDRESS_MAIL_SERVICE = "\uEE04";
+    public static final String ADDRESS_GENERIC = "\uEE00";
+    public static final String ADDRESS_BLOCK = "\uEE01";
+    public static final String ADDRESS_PLAYER = "\uEE02";
+    public static final String ADDRESS_ENTITY = "\uEE03";
+    public static final String ADDRESS_CUSTOM = "\uEE04";
+    public static final String ADDRESS_MAIL_SERVICE = "\uEE05";
+    public static final String ADDRESS_UNKNOWN = "\uEE06";
     public static final String LETTER = "\uEE10";
     public static final String SMALL_FILLED_ARROW_LEFT = "\uEE20";
     public static final String SMALL_FILLED_ARROW_RIGHT = "\uEE21";

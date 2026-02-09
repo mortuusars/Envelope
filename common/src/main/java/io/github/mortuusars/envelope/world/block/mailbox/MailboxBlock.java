@@ -8,10 +8,11 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddre
 import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -152,11 +153,11 @@ public class MailboxBlock extends BaseEntityBlock {
 
         if (player.isCreative()
               && stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof Address.Block recipientAddress
+              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof BlockAddress recipientAddress
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(recipientAddress)) {
             if (level instanceof ServerLevel serverLevel) {
-                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, new Address.Player(player), stack.split(1));
+                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, new PlayerAddress(player), stack.split(1));
                 if (player.getItemInHand(hand).isEmpty()) {
                     player.setItemInHand(hand, result.copy());
                 } else if (!player.addItem(result)) {
@@ -227,7 +228,7 @@ public class MailboxBlock extends BaseEntityBlock {
               .test(addressId)
               .ifPresentOrElse(
                     id -> {
-                        applyAddress(player, blockEntity, new Address.Block(id), stack);
+                        applyAddress(player, blockEntity, new BlockAddress(id), stack);
                         player.swing(hand, true);
 
                         if (!player.isCreative()) {
@@ -267,7 +268,7 @@ public class MailboxBlock extends BaseEntityBlock {
                         }
 
                         blockEntity.getBlockState().getBlock().setPlacedBy(level, pos, blockEntity.getBlockState(), player, stack);
-                        applyAddress(player, blockEntity, new Address.Block(id), stack);
+                        applyAddress(player, blockEntity, new BlockAddress(id), stack);
                         player.swing(hand, true);
                     },
                     error -> {
@@ -276,7 +277,7 @@ public class MailboxBlock extends BaseEntityBlock {
                     });
     }
 
-    private static void applyAddress(Player player, MailboxBlockEntity blockEntity, Address.Block address, ItemStack stack) {
+    private static void applyAddress(Player player, MailboxBlockEntity blockEntity, BlockAddress address, ItemStack stack) {
         blockEntity.setAddress(address);
 
         if (Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get() > 0) {

@@ -14,7 +14,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -65,14 +65,14 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
 
     // --
 
-    public MutableComponent toComponent(long gameTime) {
+    public MutableComponent toComponent(Level level) {
         int addressColor = switch (type()) {
             case SENT -> AddressFormatter.SENDER_COLOR;
             case ARRIVED -> AddressFormatter.RECIPIENT_COLOR;
             case RETURNED, PAYBACK, CUSTOM -> AddressFormatter.NEUTRAL_COLOR;
         };
 
-        Component addressComponent = this.address.map(a -> a.format()
+        Component addressComponent = this.address.map(a -> a.realize(level).format()
                     .withIcon()
                     .withIconColor(addressColor)
                     .withColor(addressColor)
@@ -82,7 +82,7 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
         MutableComponent messageComponent = Component.empty().append(message.orElse(CommonComponents.EMPTY))
               .withStyle(messageType().getStyle());
 
-        Component elapsedTimeComponent = timestamp.map(time -> GameTime.formatLargest(gameTime - time, false)
+        Component elapsedTimeComponent = timestamp.map(time -> GameTime.formatLargest(level.getGameTime() - time, false)
               .withStyle(ChatFormatting.DARK_GRAY)).orElse(Component.empty());
 
         return Component.translatable("gui.envelope.delivery_log.record." + this.type().getSerializedName(),
@@ -158,6 +158,7 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
 
     public interface Message {
         Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_not_found");
+        Component RECIPIENT_CANNOT_BE_DETERMINED = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_cannot_be_determined");
         Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_inbox_is_full");
         Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.returned_unable_to_reach");
         Component NO_RETURN_ADDRESS = Component.translatable("gui.envelope.delivery_log.message.returned_no_sender");

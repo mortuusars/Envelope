@@ -27,7 +27,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
     protected final Font font = Minecrft.get().font;
 
     protected final EditBox editBox;
-    protected final AllAddresses addresses;
+    protected final AllAddresses.Realized addresses;
 
     protected final List<Suggestion> suggestions = new ArrayList<>();
     protected int maxDisplayedLines;
@@ -35,7 +35,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
     protected int scroll = 0;
     protected boolean show;
 
-    public AddressBoxSuggestions(EditBox addressBox, AllAddresses addresses, int maxDisplayedLines) {
+    public AddressBoxSuggestions(EditBox addressBox, AllAddresses.Realized addresses, int maxDisplayedLines) {
         super(addressBox.getX(), addressBox.getY() + addressBox.getHeight() + 3, addressBox.getWidth(), 1, Component.empty());
         this.editBox = addressBox;
         this.addresses = addresses;

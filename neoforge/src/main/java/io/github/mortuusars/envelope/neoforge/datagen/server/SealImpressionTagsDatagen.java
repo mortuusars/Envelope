@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SealImpressionDatagen extends TagsProvider<SealImpression> {
-    public SealImpressionDatagen(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, String modId, @Nullable ExistingFileHelper existingFileHelper) {
+public class SealImpressionTagsDatagen extends TagsProvider<SealImpression> {
+    public SealImpressionTagsDatagen(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, String modId, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, Envelope.Registries.SEAL_IMPRESSION, completableFuture, modId, existingFileHelper);
     }
 

@@ -301,7 +301,9 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         String carriedItem = !delivery.getMail().isEmpty()
               ? " a " + delivery.getMail().getHoverName().getString()
               : "";
-        String addresses = delivery.getSender().getName().getString() + " to " + delivery.getRecipient().getName().getString();
+        String addresses = delivery.getSender().realize(level).getDisplayString()
+              + " to "
+              + delivery.getRecipient().realize(level).getDisplayString();
 
         Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!", message, blockPosition().toShortString(), carriedItem, addresses);
 

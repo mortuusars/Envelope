@@ -1,11 +1,13 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
+import com.mojang.serialization.DataResult;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.validation.Rule;
 import io.github.mortuusars.envelope.util.validation.Validator;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
 
 public interface AddressValidation {
     Error CANNOT_BE_EMPTY = new Error("Id cannot be empty", "error.envelope.address.id_cannot_be_empty");
@@ -24,7 +26,7 @@ public interface AddressValidation {
         return ID;
     }
 
-    static Validator<String> forMailbox(AllAddresses addresses, Player player) {
+    static Validator<String> forMailbox(AllAddresses.Realized addresses, Player player) {
         return id()
               .and(isNotTaken(addresses))
               .and(hasEnoughXp(player, Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get()));
@@ -32,11 +34,17 @@ public interface AddressValidation {
 
     // --
 
-    static Rule<String> isNotTaken(AllAddresses addresses) {
+    static Rule<String> isNotTaken(AllAddresses.Realized addresses) {
         return Rule.when(addresses::isKnown, TAKEN);
     }
 
     static Rule<String> hasEnoughXp(Player player, int xpLevelsRequired) {
         return Rule.when(id -> !player.isCreative() && player.experienceLevel < xpLevelsRequired, NOT_ENOUGH_XP);
+    }
+
+    static @NotNull DataResult<String> validateId(String id) {
+        return id()
+              .test(id)
+              .map(DataResult::success, Error::asDataResult);
     }
 }

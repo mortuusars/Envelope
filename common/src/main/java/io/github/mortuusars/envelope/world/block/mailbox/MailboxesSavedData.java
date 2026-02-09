@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -17,13 +17,13 @@ import java.util.Map;
 
 public class MailboxesSavedData extends SavedData {
     public static final Codec<MailboxesSavedData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          Codec.unboundedMap(Address.Block.STRING_CODEC, RegisteredMailbox.CODEC)
+          Codec.unboundedMap(BlockAddress.STRING_CODEC, RegisteredMailbox.CODEC)
                 .optionalFieldOf("mailboxes", Collections.emptyMap()).forGetter(MailboxesSavedData::getMailboxes)
     ).apply(instance, MailboxesSavedData::new));
 
-    private final HashMap<Address.Block, RegisteredMailbox> mailboxes;
+    private final HashMap<BlockAddress, RegisteredMailbox> mailboxes;
 
-    protected MailboxesSavedData(Map<Address.Block, RegisteredMailbox> mailboxes) {
+    protected MailboxesSavedData(Map<BlockAddress, RegisteredMailbox> mailboxes) {
         this.mailboxes = new HashMap<>(mailboxes); // Make sure it's mutable
     }
 
@@ -31,7 +31,7 @@ public class MailboxesSavedData extends SavedData {
         this(new HashMap<>());
     }
 
-    public HashMap<Address.Block, RegisteredMailbox> getMailboxes() {
+    public HashMap<BlockAddress, RegisteredMailbox> getMailboxes() {
         return mailboxes;
     }
 

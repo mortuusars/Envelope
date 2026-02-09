@@ -94,6 +94,7 @@
   "gui.envelope.delivery_log.record.custom": " %2$s",
 
   "gui.envelope.delivery_log.message.returned_recipient_not_found": "Recipient Not Found",
+  "gui.envelope.delivery_log.message.returned_recipient_cannot_be_determined": "Recipient Cannot Be Determined",
   "gui.envelope.delivery_log.message.returned_recipient_inbox_is_full": "Recipient Inbox Is Full",
   "gui.envelope.delivery_log.message.returned_unable_to_reach": "Unable To Reach",
   "gui.envelope.delivery_log.message.returned_no_sender": "Sender Cannot Be Determined",
@@ -151,6 +152,8 @@
   "address.envelope.type.block": "Block",
   "address.envelope.type.player": "Player",
   "address.envelope.type.entity": "Entity",
+  "address.envelope.type.custom": "Address",
+  "address.envelope.type.unknown": "Unknown",
 
   "subtitle.envelope.paper.crackle": "Paper crackles",
   "subtitle.envelope.paper.tear": "Paper tears",

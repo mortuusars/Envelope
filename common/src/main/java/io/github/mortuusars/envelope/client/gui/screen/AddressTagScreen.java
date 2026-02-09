@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -34,8 +35,8 @@ public class AddressTagScreen extends Screen {
 
     protected final InteractionHand hand;
     protected final ItemStack tag;
-    protected final AllAddresses knownAddresses;
-    protected Optional<Address> existingAddress;
+    protected final AllAddresses.Realized knownAddresses;
+    protected Optional<Address.Realized> existingAddress;
 
     protected int imageWidth, imageHeight;
     protected int leftPos, topPos;
@@ -48,12 +49,13 @@ public class AddressTagScreen extends Screen {
     protected Optional<Address> matchedKnownAddress = Optional.empty();
     protected @Nullable String currentSuggestion;
 
-    public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses, Component title) {
+    public AddressTagScreen(InteractionHand hand, AllAddresses.Realized knownAddresses, Component title) {
         super(title);
         this.hand = hand;
         this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.knownAddresses = knownAddresses;
-        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS));
+        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS))
+              .map(a -> a.realize(Minecrft.registryAccess()));
     }
 
     @Override
@@ -100,11 +102,9 @@ public class AddressTagScreen extends Screen {
     }
 
     protected String getInitialAddressValue() {
-        @Nullable Address address = tag.get(Envelope.DataComponents.ADDRESS);
-        if (address != null) {
-            return address.toString();
-        }
-        return "";
+        return existingAddress
+              .map(Address.Realized::getDisplayString)
+              .orElse("");
     }
 
     protected Optional<Address> getMatchedKnownAddress() {
@@ -117,10 +117,10 @@ public class AddressTagScreen extends Screen {
             return Optional.empty();
         }
 
-        return getMatchedKnownAddress().or(() -> Optional.of(new Address.Block(addressId)));
+        return getMatchedKnownAddress().or(() -> Optional.of(new BlockAddress(addressId)));
     }
 
-    protected AllAddresses getAddressesForSuggestions() {
+    protected AllAddresses.Realized getAddressesForSuggestions() {
         return knownAddresses;
     }
 
@@ -129,8 +129,9 @@ public class AddressTagScreen extends Screen {
     }
 
     protected boolean isCurrentIdSameAsExistingAddress() {
-        String currentAddressId = getCurrentAddressId().trim();
-        return existingAddress.map(address -> address.matches(currentAddressId)).orElse(false);
+        return existingAddress
+              .map(address -> address.matches(getCurrentAddressId().trim()))
+              .orElse(false);
     }
 
     protected void updateItem() {
@@ -216,7 +217,7 @@ public class AddressTagScreen extends Screen {
         guiGraphics.drawString(font, AddressFormatter.getIcon(address), leftPos + 17, topPos + 21, color, true);
 
         if (address != Address.UNKNOWN && isHovering(15, 20, 9, 9, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, address.type().translate(), mouseX, mouseY);
+            guiGraphics.renderTooltip(font, address.getType().translate(), mouseX, mouseY);
         }
     }
 

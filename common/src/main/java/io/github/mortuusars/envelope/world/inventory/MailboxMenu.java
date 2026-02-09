@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -38,14 +39,14 @@ public class MailboxMenu extends AbstractContainerMenu {
     protected final Inventory playerInventory;
     protected final Player player;
     protected final BlockPos pos;
-    protected final Address.Block address;
+    protected final BlockAddress address;
     protected final MailboxBlockEntity blockEntity;
 
     protected List<ItemStack> mail;
     protected boolean hasNewMail;
 
     protected MailboxMenu(@Nullable MenuType<?> menuType, int id, Inventory playerInventory,
-                          BlockPos pos, Address.Block address, List<ItemStack> mail) {
+                          BlockPos pos, BlockAddress address, List<ItemStack> mail) {
         super(menuType, id);
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -76,13 +77,13 @@ public class MailboxMenu extends AbstractContainerMenu {
         updateIsDefault();
     }
 
-    public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, Address.Block address, List<ItemStack> mail) {
+    public MailboxMenu(int id, Inventory playerInventory, BlockPos pos, BlockAddress address, List<ItemStack> mail) {
         this(Envelope.MenuTypes.MAILBOX.get(), id, playerInventory, pos, address, mail);
     }
 
     public static MailboxMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         BlockPos mailboxPos = buffer.readBlockPos();
-        Address.Block address = Address.Block.STREAM_CODEC.decode(buffer);
+        BlockAddress address = BlockAddress.STREAM_CODEC.decode(buffer);
         List<ItemStack> mail = ItemStack.LIST_STREAM_CODEC.decode(buffer);
         return new MailboxMenu(id, inventory, mailboxPos, address, mail);
     }
@@ -277,13 +278,13 @@ public class MailboxMenu extends AbstractContainerMenu {
         return false;
     }
 
-    public static List<ServerPlayer> playersWithMenu(ServerLevel level, @Nullable Address.Block address) {
+    public static List<ServerPlayer> playersWithMenu(ServerLevel level, @Nullable BlockAddress address) {
         return level.players().stream()
               .filter(pl -> pl.containerMenu instanceof MailboxMenu menu && menu.getAddress().equals(address))
               .toList();
     }
 
-    public static void executeForPlayersWithMenu(ServerLevel level, @Nullable Address.Block address, BiConsumer<ServerPlayer, MailboxMenu> action) {
+    public static void executeForPlayersWithMenu(ServerLevel level, @Nullable BlockAddress address, BiConsumer<ServerPlayer, MailboxMenu> action) {
         playersWithMenu(level, address).forEach(pl -> action.accept(pl, ((MailboxMenu) pl.containerMenu)));
     }
 

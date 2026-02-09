@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -64,7 +64,7 @@ public class InboxStorage extends SavedData {
               });
     }
 
-    public @NotNull Optional<Inbox> getForDelivery(Address.Block address) {
+    public @NotNull Optional<Inbox> getForDelivery(BlockAddress address) {
         for (UnloadedInbox inbox : getInboxes().values()) {
             if (inbox.getAddress().equals(address)) {
                 inbox.onChanged(this::setDirty);

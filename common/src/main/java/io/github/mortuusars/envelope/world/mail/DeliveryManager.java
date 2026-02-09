@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.world.delivery.DeliveryDraft;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.*;
 import org.slf4j.Logger;
 
 import java.util.function.Function;
@@ -47,18 +48,6 @@ public class DeliveryManager {
     }
 
     protected Result<StartedDelivery> tryStart(DeliveryDraft draft, Function<Delivery, Courier> courier) {
-        /*
-        Maybe this validation is not that necessary? We should validate at dispatch point anyway.
-        if (delivery.getSender().matches(Address.UNKNOWN) && delivery.getRecipient().matches(Address.UNKNOWN)) {
-            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_RECIPIENT_UNKNOWN.getMessage(), delivery);
-            return Result.error(ERROR_RECIPIENT_UNKNOWN);
-        }
-        if (delivery.getSender().matches(delivery.getRecipient())) {
-            LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_SAME_ADDRESSES.getMessage(), delivery);
-            return Result.error(ERROR_SAME_ADDRESSES);
-        }
-        */
-
         if (draft.getMail().isEmpty()) {
             LOGGER.error("Cannot start delivery: {}. Delivery: {}", ERROR_NO_MAIL.getMessage(), draft);
             return Result.error(ERROR_NO_MAIL);
@@ -86,17 +75,10 @@ public class DeliveryManager {
     // --
 
     public boolean canDeliverTo(Address address) {
-        if (address.matches(Address.UNKNOWN)) {
-            return false;
-        }
-
-        Address resolvedAddress = getMailService().resolve(address);
-
-        if (resolvedAddress instanceof Address.Player) {
-            // Player doesn't have default address
-            return false;
-        }
-
-        return getMailService().getKnownAddresses().isKnown(resolvedAddress);
+        return switch (address.resolve(getMailService())) {
+            case BlockAddress block -> getMailService().getKnownAddresses().isKnown(block);
+            case EntityAddress entity -> true;
+            default -> false;
+        };
     }
 }

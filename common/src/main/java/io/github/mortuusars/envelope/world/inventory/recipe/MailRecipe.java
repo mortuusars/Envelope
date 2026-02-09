@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -20,17 +20,17 @@ import java.util.List;
 import java.util.function.Function;
 
 public class MailRecipe implements Recipe<CraftingInput> {
-    private final Address.Entity address;
+    private final EntityAddress address;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
 
-    public MailRecipe(Address.Entity address, NonNullList<Ingredient> ingredients, ItemStack result) {
+    public MailRecipe(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result) {
         this.address = address;
         this.ingredients = ingredients;
         this.result = result;
     }
 
-    public Address.Entity getAddress() {
+    public EntityAddress getAddress() {
         return address;
     }
 
@@ -83,7 +83,7 @@ public class MailRecipe implements Recipe<CraftingInput> {
 
     public record Serializer() implements RecipeSerializer<MailRecipe> {
         public static final MapCodec<MailRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-              Address.Entity.CODEC.fieldOf("address").forGetter(MailRecipe::getAddress),
+              EntityAddress.CODEC.codec().fieldOf("address").forGetter(MailRecipe::getAddress),
               Ingredient.CODEC_NONEMPTY.listOf()
                     .fieldOf("ingredients")
                     .flatXmap(Serializer::validateIngredients, DataResult::success)
@@ -105,7 +105,7 @@ public class MailRecipe implements Recipe<CraftingInput> {
                     }, Function.identity());
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MailRecipe> STREAM_CODEC = StreamCodec.composite(
-              Address.Entity.STREAM_CODEC, MailRecipe::getAddress,
+              EntityAddress.STREAM_CODEC, MailRecipe::getAddress,
               INGREDIENTS_STREAM_CODEC, MailRecipe::getIngredients,
               ItemStack.STREAM_CODEC, MailRecipe::getResult,
               MailRecipe::new

@@ -118,12 +118,12 @@ public class EnvelopeClient {
                 if (Screen.hasShiftDown() && !deliveryLog.isEmpty()) {
                     consumer.accept(Component.translatable("gui.envelope.delivery_log").withStyle(ChatFormatting.DARK_GRAY));
                     for (DeliveryRecord record : deliveryLog.records()) {
-                        consumer.accept(record.toComponent(Minecrft.level().getGameTime()));
+                        consumer.accept(record.toComponent(Minecrft.level()));
                     }
                 } else {
                     consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
                           .append(": ").withStyle(ChatFormatting.GRAY)
-                          .append(sender.format().asNeutral().toComponent()));
+                          .append(sender.realize(Minecrft.registryAccess()).format().asNeutral().toComponent()));
                 }
             });
 

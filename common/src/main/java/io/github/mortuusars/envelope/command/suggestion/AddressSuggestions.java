@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.command.suggestion;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -38,10 +37,10 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         MailService mailService = context.getSource().getLevel().getEnvelopeMailService();
         Stream<String> addresses = mailService.getKnownAddressesOfType(type).stream()
-              .map(address -> address.id().indexOf(" ") > 0 ? "\"" + address.id() + "\"" : address.id());
+              .map(address -> address.getId().indexOf(" ") > 0 ? "\"" + address.getId() + "\"" : address.getId());
         return SharedSuggestionProvider.suggest(addresses, builder);
     }
 }
