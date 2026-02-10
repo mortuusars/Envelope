@@ -1,6 +1,5 @@
-// 1.21.1	2026-02-07T00:01:19.6892685	Registries
+// 1.21.1	2026-02-10T15:21:24.0064928	Registries
 c23857e20ccd22e52ddc1f0b9189d36d65c1ed6c data/envelope/envelope/entity_address/mail_service.json
-070c6bc5bd2c9762cd912f68c828c9ca61b3c4b2 data/envelope/envelope/entity_address/unknown.json
 443721356b14e3657f5883d9abb19a3e0a91def4 data/envelope/envelope/seal_impression/0.json
 b8724411b2635a174fe8c960736cc457356f8e70 data/envelope/envelope/seal_impression/1.json
 c762fe01bd21156ed766687f240bd6d02d77aa4b data/envelope/envelope/seal_impression/2.json

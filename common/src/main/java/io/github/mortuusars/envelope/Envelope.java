@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.*;
-import io.github.mortuusars.envelope.world.inventory.recipe.MailRecipe;
+import io.github.mortuusars.envelope.world.inventory.recipe.DeliveryRecipe;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -22,7 +22,6 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -334,11 +333,11 @@ public class Envelope {
     }
 
     public static class RecipeTypes {
-        public static final Supplier<RecipeType<MailRecipe>> MAIL = Register.recipeType("mail",
+        public static final Supplier<RecipeType<DeliveryRecipe>> DELIVERY = Register.recipeType("delivery",
               () -> new RecipeType<>() {
                   @Override
                   public String toString() {
-                      return ID + ":mail";
+                      return ID + ":delivery";
                   }
               });
 
@@ -349,8 +348,8 @@ public class Envelope {
         public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> MAIL =
-              Register.recipeSerializer("mail", MailRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<?>> DELIVERY =
+              Register.recipeSerializer("delivery", DeliveryRecipe.Serializer::new);
 
         static void init() {
         }

@@ -22,7 +22,7 @@
       "io.github.mortuusars.envelope.fabric.EnvelopeFabricClient"
     ],
     "jei_mod_plugin": [
-      "io.github.mortuusars.envelope.compat.jei.EnvelopeJeiPlugin"
+      "io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin"
     ]
   },
   "mixins": [

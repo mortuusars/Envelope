@@ -18,7 +18,7 @@ public class AddressFormatter {
 
     protected final Address.Realized address;
     protected boolean icon = false;
-    protected String iconSeparator = EnvelopeSymbols.SMALL_SPACE;
+    protected String iconSeparator = " ";
     protected Either<ChatFormatting, Style> iconStyle = Either.right(Style.EMPTY);
     protected Either<ChatFormatting, Style> textStyle = Either.right(Style.EMPTY);
     protected int maxLength = Integer.MAX_VALUE;
@@ -125,7 +125,7 @@ public class AddressFormatter {
 
     @Override
     public String toString() {
-        String addressString = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
+        String addressString = StringUtil.truncateStringIfNecessary(address.getDisplayString(), maxLength, true);
 
         String addressText = textStyle.left()
               .map(formatting -> formatting + addressString + ChatFormatting.RESET)

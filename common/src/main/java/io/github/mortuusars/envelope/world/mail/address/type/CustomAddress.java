@@ -48,7 +48,7 @@ public final class CustomAddress implements Address.Realized {
 
     @Override
     public Type getType() {
-        return Type.ENTITY;
+        return Type.CUSTOM;
     }
 
     @Override

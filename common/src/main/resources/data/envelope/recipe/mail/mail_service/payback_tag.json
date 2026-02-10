@@ -1,0 +1,16 @@
+{
+  "type": "envelope:delivery",
+  "address": "envelope:mail_service",
+  "ingredients": [
+    {
+      "item": "envelope:address_tag"
+    },
+    {
+      "tag": "c:dyes/red"
+    }
+  ],
+  "result": {
+    "id": "envelope:payback_tag",
+    "count": 1
+  }
+}

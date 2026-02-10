@@ -108,8 +108,7 @@ public class PackingMenu extends AbstractInHandContainerMenu {
     @Override
     public void removed(@NotNull Player player) {
         if (!isPacked()) {
-            Containers.dropContents(player.level(), player.blockPosition(), getContainer());
-            getContainer().clearContent();
+            clearContainer(player, getContainer());
         }
 
         super.removed(player);

@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.compat.jei.JeiCompatibleScreen;
+import io.github.mortuusars.envelope.integration.jei.JeiCompatibleScreen;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.LetterEditC2SP;
 import io.github.mortuusars.envelope.util.ItemAndStack;

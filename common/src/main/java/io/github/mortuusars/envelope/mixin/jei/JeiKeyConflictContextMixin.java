@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.mixin.jei;
 
-import io.github.mortuusars.envelope.compat.jei.JeiCompatibleScreen;
+import io.github.mortuusars.envelope.integration.jei.JeiCompatibleScreen;
 import mezz.jei.common.input.IInternalKeyMappings;
 import mezz.jei.gui.input.IUserInputHandler;
 import mezz.jei.gui.input.UserInput;

@@ -1,5 +1,18 @@
 # Changelog
 
+## UNRELEASED
+- Added mail delivery crafting:
+  - Send a Package with ingredients to a mail entity - receive crafted result back
+  - Similar to shapeless recipes
+  - JEI shows available recipes 
+
+#### Address
+- Entity addresses are now data-driven
+  - Address component now references a definition by its key: `{ type:"entity", key:"envelope:mail_service" }`
+- Added "custom" address type: `{ type:"custom", id:"Example", display_name:{translate:"optional.display.name"} }`
+  - Can be used as a virtual address for display purposes (commands, scripts, etc.). Cannot receive mail.
+- Unknown address is now a separate type: `{ type:"unknown" }`
+
 ## 0.5.2 - 2026-02-06
 #### Reworked Packages:
 - `Paper Box` is now used to create a package; `Packing Box` has been removed

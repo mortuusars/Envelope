@@ -237,5 +237,7 @@
   "envelope.configuration.payback_box_return_chance": "Payback Box Return Chance",
   "envelope.configuration.spawning_respects_domobspawning_rule": "Spawning Respects 'doMobSpawning' Rule",
 
-  "container.envelope.package.contents_unknown": "Contents Unknown"
+  "container.envelope.package.contents_unknown": "Contents Unknown",
+
+  "envelope.jei.category.delivery": "Delivery"
 }

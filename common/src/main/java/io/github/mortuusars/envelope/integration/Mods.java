@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.compat;
+package io.github.mortuusars.envelope.integration;
 
 import io.github.mortuusars.envelope.PlatformHelper;
 

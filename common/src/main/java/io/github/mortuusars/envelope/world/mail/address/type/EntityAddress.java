@@ -23,6 +23,9 @@ public class EntityAddress implements Address.Realizable {
           ResourceKey.codec(Envelope.Registries.ENTITY_ADDRESS).fieldOf("key").forGetter(EntityAddress::getKey)
     ).apply(i, EntityAddress::new));
 
+    public static final Codec<EntityAddress> DIRECT_CODEC = ResourceKey.codec(Envelope.Registries.ENTITY_ADDRESS)
+          .xmap(EntityAddress::new, EntityAddress::getKey);
+
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityAddress> STREAM_CODEC = StreamCodec.composite(
           ResourceKey.streamCodec(Envelope.Registries.ENTITY_ADDRESS), EntityAddress::getKey,
           EntityAddress::new
