@@ -6,14 +6,13 @@ import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.validation.CachedValidator;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
+import io.github.mortuusars.envelope.world.mail.address.BlockAddressValidation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -33,7 +32,7 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
         this.existingAddress = existingAddress.map(Address.class::cast);
-        this.addressValidator = AddressValidation.forMailbox(knownAddresses, player).cached();
+        this.addressValidator = BlockAddressValidation.forMailbox(knownAddresses, player).cached();
     }
 
     @Override
@@ -46,9 +45,9 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     @Override
     protected String getInitialAddressValue() {
         return existingAddress
-              .map(Address::getDisplayString)
+              .map(Address::getString)
               .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
-                    .map(Address::getDisplayString)
+                    .map(Address::getString)
                     .orElse(""));
     }
 

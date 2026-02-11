@@ -5,11 +5,12 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.validation.Rule;
 import io.github.mortuusars.envelope.util.validation.Validator;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
-public interface AddressValidation {
+public interface BlockAddressValidation {
     Error CANNOT_BE_EMPTY = new Error("Id cannot be empty", "error.envelope.address.id_cannot_be_empty");
     Error TOO_LONG = new Error("Id is too long", "error.envelope.address.id_too_long");
     Error CONTAINS_INVALID_CHARS = new Error("Id is too long", "error.envelope.address.id_contains_invalid_chars");
@@ -18,7 +19,7 @@ public interface AddressValidation {
 
     Validator<String> ID = Validator.of(
           Rule.when(StringUtil::isBlank, CANNOT_BE_EMPTY),
-          Rule.when(id -> id.length() > Address.MAX_LENGTH, TOO_LONG),
+          Rule.when(id -> id.length() > BlockAddress.MAX_LENGTH, TOO_LONG),
           Rule.when(id -> !StringUtil.filterText(id).equals(id), CONTAINS_INVALID_CHARS)
     );
 
@@ -46,5 +47,12 @@ public interface AddressValidation {
         return id()
               .test(id)
               .map(DataResult::success, Error::asDataResult);
+    }
+
+    static String throwIfInvalid(String id) throws IllegalArgumentException {
+        id().test(id).getError().ifPresent(error -> {
+            throw new IllegalArgumentException(error.getMessage());
+        });
+        return id;
     }
 }

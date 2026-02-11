@@ -109,7 +109,7 @@ public class AddressFormatter {
             String string = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
             addressComponent = Component.literal(string);
         } else {
-            addressComponent = address.getDisplayComponent();
+            addressComponent = address.getComponent();
         }
         addressComponent = addressComponent.withStyle(createStyle(textStyle));
 
@@ -125,7 +125,7 @@ public class AddressFormatter {
 
     @Override
     public String toString() {
-        String addressString = StringUtil.truncateStringIfNecessary(address.getDisplayString(), maxLength, true);
+        String addressString = StringUtil.truncateStringIfNecessary(address.getString(), maxLength, true);
 
         String addressText = textStyle.left()
               .map(formatting -> formatting + addressString + ChatFormatting.RESET)

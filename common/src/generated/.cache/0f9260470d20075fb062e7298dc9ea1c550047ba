@@ -1,5 +1,0 @@
-// 1.21.1	2026-01-28T19:59:47.8428479	Tags for minecraft:block mod id envelope
-f4f266bec70a783884af07be3b507ba2a0063746 data/envelope/tags/block/pigeonholes.json
-30767d12d8d4a3ad7cd8ec793ddbccc68c0836b0 data/envelope/tags/block/pigeons_spawnable_on.json
-927a6b03df6c1658839b7edc47d34ad8614da7c6 data/minecraft/tags/block/does_not_block_hoppers.json
-8ccf6f5cdc9b3c4c7e634ac54401d2e5bd07cf65 data/minecraft/tags/block/mineable/axe.json

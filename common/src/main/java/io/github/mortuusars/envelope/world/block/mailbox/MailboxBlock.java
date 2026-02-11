@@ -8,7 +8,7 @@ import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddre
 import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
-import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
+import io.github.mortuusars.envelope.world.mail.address.BlockAddressValidation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
@@ -224,7 +224,7 @@ public class MailboxBlock extends BaseEntityBlock {
             return;
         }
 
-        AddressValidation.forMailbox(MailService.of(level).getKnownAddresses(), player)
+        BlockAddressValidation.forMailbox(MailService.of(level).getKnownAddresses(), player)
               .test(addressId)
               .ifPresentOrElse(
                     id -> {
@@ -255,7 +255,7 @@ public class MailboxBlock extends BaseEntityBlock {
             return;
         }
 
-        AddressValidation.forMailbox(MailService.of(level).getKnownAddresses(), player)
+        BlockAddressValidation.forMailbox(MailService.of(level).getKnownAddresses(), player)
               .test(addressId)
               .ifPresentOrElse(
                     id -> {

@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressValidation;
+import io.github.mortuusars.envelope.world.mail.address.BlockAddressValidation;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -16,20 +16,25 @@ import java.util.Locale;
 import java.util.Objects;
 
 public final class BlockAddress implements Address {
-    public static final MapCodec<BlockAddress> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-          ID_CODEC.fieldOf("id").forGetter(BlockAddress::getId)
-    ).apply(instance, BlockAddress::new));
+    public static final Codec<String> ID_CODEC = Codec.STRING
+          .xmap(String::trim, String::trim)
+          .validate(BlockAddressValidation::validateId);
 
-    public static final Codec<BlockAddress> STRING_CODEC = Address.ID_CODEC.xmap(BlockAddress::new, BlockAddress::getId);
+    public static final Codec<BlockAddress> STRING_CODEC = ID_CODEC.xmap(BlockAddress::new, BlockAddress::getString);
+
+    public static final MapCodec<BlockAddress> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+          ID_CODEC.fieldOf("id").forGetter(BlockAddress::getString)
+    ).apply(i, BlockAddress::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockAddress> STREAM_CODEC =
-          ByteBufCodecs.STRING_UTF8.map(BlockAddress::new, BlockAddress::getId).cast();
+          ByteBufCodecs.STRING_UTF8.map(BlockAddress::new, BlockAddress::getString).cast();
+
+    public static final int MAX_LENGTH = 40;
 
     private final String id;
 
     public BlockAddress(String id) {
-        AddressValidation.validateId(id).getOrThrow();
-        this.id = id;
+        this.id = BlockAddressValidation.throwIfInvalid(id);
     }
 
     @Override
@@ -37,16 +42,11 @@ public final class BlockAddress implements Address {
         return Type.BLOCK;
     }
 
-    @Override
-    public String getId() {
+    public String getString() {
         return id;
     }
 
-    public String getDisplayString() {
-        return id;
-    }
-
-    public MutableComponent getDisplayComponent() {
+    public MutableComponent getComponent() {
         return Component.literal(id);
     }
 
@@ -56,7 +56,7 @@ public final class BlockAddress implements Address {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         BlockAddress that = (BlockAddress) o;
-        return Objects.equals(id, that.id);
+        return matches(that.getString());
     }
 
     @Override

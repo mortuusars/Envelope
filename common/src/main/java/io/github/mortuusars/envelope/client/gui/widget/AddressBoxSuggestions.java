@@ -52,7 +52,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
 
         if (!addresses.isKnown(text)) {
             suggestions.addAll(SharedSuggestionProvider.suggest(
-                        addresses.stream().map(Address::getDisplayString),
+                        addresses.stream().map(Address::getString),
                         new SuggestionsBuilder(text, 0)
                   )
                   .join()

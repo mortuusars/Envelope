@@ -11,10 +11,9 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFileCodec;
 
-public record EntityAddressDefinition(String id, Component displayName) {
+public record EntityAddressDefinition(Component displayName) {
     public static final Codec<EntityAddressDefinition> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
-          Codec.STRING.fieldOf("id").forGetter(EntityAddressDefinition::id),
-          ComponentSerialization.CODEC.fieldOf("display_name").forGetter(EntityAddressDefinition::displayName)
+          ComponentSerialization.CODEC.fieldOf("name").forGetter(EntityAddressDefinition::displayName)
     ).apply(i, EntityAddressDefinition::new));
 
     public static final Codec<Holder<EntityAddressDefinition>> CODEC =
@@ -22,7 +21,6 @@ public record EntityAddressDefinition(String id, Component displayName) {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityAddressDefinition> STREAM_CODEC =
           StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, EntityAddressDefinition::id,
                 ComponentSerialization.STREAM_CODEC, EntityAddressDefinition::displayName,
                 EntityAddressDefinition::new
           );

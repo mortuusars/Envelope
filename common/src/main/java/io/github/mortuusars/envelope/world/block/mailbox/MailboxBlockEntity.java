@@ -73,7 +73,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     protected @NotNull Component getDefaultName() {
         return address != null
-              ? address.getDisplayComponent()
+              ? address.getComponent()
               : Component.translatable("container.envelope.mailbox");
     }
 
@@ -405,7 +405,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.saveAllItems(tag, items, registries);
-        if (address != null) tag.putString("address", address.getId());
+        if (address != null) tag.putString("address", address.getString());
         if (owner != null) tag.putUUID("owner", owner);
         tag.putUUID("inbox_id", inboxId);
     }

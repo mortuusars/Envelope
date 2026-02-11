@@ -114,7 +114,7 @@ public class EnvelopeCommand {
 
             defaultAddresses.forEach((playerAddress, address) -> {
                 Optional<BlockPos> position = MailService.of(level).getMailboxes().getPositionOf(address);
-                context.getSource().sendSuccess(() -> Component.literal(playerAddress.toString())
+                context.getSource().sendSuccess(() -> Component.literal(playerAddress.getString())
                       .append(" - ")
                       .append(copyableAddressAndPos(address, position)), true);
             });
@@ -129,20 +129,20 @@ public class EnvelopeCommand {
     private static int mailboxPosition(CommandContext<CommandSourceStack> context, BlockAddress address) {
         ServerLevel level = context.getSource().getLevel();
         if (!MailService.of(level).getMailboxes().exists(address)) {
-            context.getSource().sendFailure(address.getDisplayComponent().append(" does not exist."));
+            context.getSource().sendFailure(address.getComponent().append(" does not exist."));
             return 1;
         }
 
         MailService.of(level).getMailboxes().getPositionOf(address)
               .ifPresentOrElse(
                     pos -> context.getSource().sendSuccess(() -> copyableAddressAndPos(address, Optional.of(pos)), true),
-                    () -> context.getSource().sendFailure(address.getDisplayComponent()
+                    () -> context.getSource().sendFailure(address.getComponent()
                           .append(" does not have a position associated with it.")));
         return 0;
     }
 
     private static MutableComponent copyableAddressAndPos(Address address, Optional<BlockPos> pos) {
-        String name = address.getDisplayString();
+        String name = address.getString();
         String posStr = pos.map(BlockPos::toShortString).orElse("");
         String posToCopy = posStr.replace(",", "");
 

@@ -283,7 +283,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
 
-        String sender = getDisplayedSender(mail).getDisplayString();
+        String sender = getDisplayedSender(mail).getString();
         if (font.width(sender) > 76) {
             sender = font.plainSubstrByWidth(sender, 72) + "...";
         }
@@ -351,7 +351,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
         // Show full sender address if it doesn't fit on the widget
         Address sender = getDisplayedSender(hoveredMail);
-        if (font.width(sender.getDisplayString()) > 76) {
+        if (font.width(sender.getString()) > 76) {
             tooltip.add(sender.format()
                   .withIcon()
                   .withIconColor(AddressFormatter.NEUTRAL_COLOR)

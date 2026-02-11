@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.mail.address;
 
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
-import net.minecraft.core.RegistryAccess;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -40,8 +39,10 @@ public class AddressUniquifierTests {
 
     public static AddressUniquifier createDefaultUniquifier() {
         AllAddresses addresses = new AllAddresses(
-              Set.of("Addr", "Addr-1", "Addr-2", "Addr-5", "Addr-", "Addr----").stream().map(BlockAddress::new).collect(Collectors.toSet()),
-              Set.of("Addr-too-long-of-an-A", "Addr-too-long-of-an--9", "Addr-too-long-of-an-address-asdasdaasdas", "Addr-too-long-of-an-address-asdasdaasd-4").stream().map(PlayerAddress::new).collect(Collectors.toSet()),
+              Set.of("Addr", "Addr-1", "Addr-2", "Addr-5", "Addr-", "Addr----",
+                    "Addr-too-long-of-an-address-asdasdaasdas",
+                    "Addr-too-long-of-an-address-asdasdaasd-4").stream().map(BlockAddress::new).collect(Collectors.toSet()),
+              Set.of("Addrtoo", "Addrtoolon9", "Addrtsdas", "sssdaasd4").stream().map(PlayerAddress::new).collect(Collectors.toSet()),
               Set.of());
         return new AddressUniquifier(addresses);
     }

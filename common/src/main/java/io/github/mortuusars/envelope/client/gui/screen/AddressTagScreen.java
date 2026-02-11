@@ -68,7 +68,7 @@ public class AddressTagScreen extends Screen {
 
         addressBox = new EditBox(font, leftPos + 26, topPos + 21, 125, 9, Component.empty());
         addressBox.setValue(getInitialAddressValue());
-        addressBox.setMaxLength(Address.MAX_LENGTH);
+        addressBox.setMaxLength(BlockAddress.MAX_LENGTH);
         addressBox.setTextColor(0xFFFFFFFF);
         addressBox.setResponder(this::addressTextChanged);
         addressBox.setBordered(false);
@@ -102,7 +102,7 @@ public class AddressTagScreen extends Screen {
 
     protected String getInitialAddressValue() {
         return existingAddress
-              .map(Address::getDisplayString)
+              .map(Address::getString)
               .orElse("");
     }
 

@@ -66,7 +66,7 @@ public class Mailboxes {
         getMailboxes().entrySet().removeIf(entry -> {
             if (entry.getValue().getPos().equals(pos)) {
                 LOGGER.info("Removing mailbox '{}'@[{}] because new mailbox '{}' is being registered at the same blockpos.",
-                      entry.getValue().getAddress().getId(), entry.getValue().getPos().toShortString(), address.getId());
+                      entry.getValue().getAddress().getString(), entry.getValue().getPos().toShortString(), address.getString());
                 return true;
             }
             return false;
@@ -74,7 +74,7 @@ public class Mailboxes {
 
         RegisteredMailbox data = new RegisteredMailbox(address, pos);
         getMailboxes().put(address, data);
-        if (Envelope.debug()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.getId(), pos.toShortString());
+        if (Envelope.debug()) LOGGER.info("Registered new mailbox '{}'@[{}]", address.getString(), pos.toShortString());
         setDirty();
         return address;
     }
@@ -85,7 +85,7 @@ public class Mailboxes {
             MailService.of(level).getKnownPlayers().removeDefaultAddress(address);
             setDirty();
             if (Envelope.debug()) LOGGER.info("Removed mailbox '{}'@[{}]",
-                  removed.getAddress().getId(), removed.getPos().toShortString());
+                  removed.getAddress().getString(), removed.getPos().toShortString());
         }
     }
 
@@ -104,7 +104,7 @@ public class Mailboxes {
         getMailboxes().put(newAddress, newData);
 
         if (Envelope.debug()) {
-            LOGGER.info("Renamed mailbox '{}'@[{}] to '{}'", data.getAddress().getId(), data.getPos().toShortString(), newAddress.getId());
+            LOGGER.info("Renamed mailbox '{}'@[{}] to '{}'", data.getAddress().getString(), data.getPos().toShortString(), newAddress.getString());
         }
 
         setDirty();
@@ -160,7 +160,7 @@ public class Mailboxes {
             return address;
         }
         AddressUniquifier uniquifier = new AddressUniquifier(knownAddresses);
-        String uniqueId = uniquifier.uniquify(address.getId());
+        String uniqueId = uniquifier.uniquify(address.getString());
         return new BlockAddress(uniqueId);
     }
 }

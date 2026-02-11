@@ -1,5 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,9 +34,9 @@ public class AddressUniquifier {
             candidate = address + "-" + number;
         }
 
-        if (candidate.length() > Address.MAX_LENGTH) {
+        if (candidate.length() > BlockAddress.MAX_LENGTH) {
             String suffix = "-" + number;
-            candidate = address.substring(0, Address.MAX_LENGTH - suffix.length()) + suffix;
+            candidate = address.substring(0, BlockAddress.MAX_LENGTH - suffix.length()) + suffix;
         }
 
         return candidate;

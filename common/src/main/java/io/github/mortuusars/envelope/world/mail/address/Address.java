@@ -15,10 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.IntFunction;
 
 public interface Address {
-    int MAX_LENGTH = 40;
-
-    Codec<String> ID_CODEC = Codec.STRING.xmap(String::trim, String::trim).validate(AddressValidation::validateId);
-
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::getType, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::getType, Type::getStreamCodec);
 
@@ -26,14 +22,12 @@ public interface Address {
 
     Type getType();
 
-    String getId();
+    String getString();
 
-    MutableComponent getDisplayComponent();
-
-    String getDisplayString();
+    MutableComponent getComponent();
 
     default boolean matches(String name) {
-        return getDisplayString().equalsIgnoreCase(name);
+        return getString().equalsIgnoreCase(name);
     }
 
     default AddressFormatter format() {
@@ -41,7 +35,7 @@ public interface Address {
     }
 
     default boolean isMailService() {
-        return this instanceof EntityAddress entityAddress && entityAddress.getEntity().is(EntityAddresses.MAIL_SERVICE);
+        return this instanceof EntityAddress entityAddress && entityAddress.getEntityHolder().is(EntityAddresses.MAIL_SERVICE);
     }
 
     default boolean isUnknown() {

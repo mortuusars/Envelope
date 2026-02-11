@@ -88,7 +88,7 @@ public class MailDeliveryRecipe implements Recipe<CraftingInput> {
     public record Serializer() implements RecipeSerializer<MailDeliveryRecipe> {
         public static final MapCodec<MailDeliveryRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
               RegistryFixedCodec.create(Envelope.Registries.ENTITY_ADDRESS)
-                    .xmap(EntityAddress::new, EntityAddress::getEntity)
+                    .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
                     .fieldOf("entity")
                     .forGetter(MailDeliveryRecipe::getEntityAddress),
               Ingredient.CODEC_NONEMPTY.listOf()

@@ -11,6 +11,6 @@ public class EntityAddresses {
 
     public static void bootstrap(BootstrapContext<EntityAddressDefinition> context) {
         context.register(MAIL_SERVICE,
-              new EntityAddressDefinition("Mail Service", Component.translatable("address.envelope.mail_service")));
+              new EntityAddressDefinition(Component.translatable("address.envelope.mail_service")));
     }
 }

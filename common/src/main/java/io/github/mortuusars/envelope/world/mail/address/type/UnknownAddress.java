@@ -14,17 +14,12 @@ public enum UnknownAddress implements Address {
     }
 
     @Override
-    public String getId() {
-        return "Unknown";
+    public String getString() {
+        return getComponent().getString();
     }
 
     @Override
-    public String getDisplayString() {
-        return getDisplayComponent().getString();
-    }
-
-    @Override
-    public MutableComponent getDisplayComponent() {
+    public MutableComponent getComponent() {
         return Component.translatable("address.envelope.unknown");
     }
 

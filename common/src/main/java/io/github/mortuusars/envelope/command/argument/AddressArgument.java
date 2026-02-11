@@ -53,7 +53,7 @@ public class AddressArgument implements ArgumentType<Address> {
     public Address parse(StringReader reader) throws CommandSyntaxException {
         String id = reader.readString();
 
-        Optional<Error> error = AddressValidation.id().test(id).getError();
+        Optional<Error> error = BlockAddressValidation.id().test(id).getError();
 
         if (error.isPresent()) {
             Component message = Component.literal("Invalid address: ").append(error.get().getTranslation());

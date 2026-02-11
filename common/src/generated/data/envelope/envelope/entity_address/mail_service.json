@@ -1,6 +1,5 @@
 {
-  "display_name": {
+  "name": {
     "translate": "address.envelope.mail_service"
-  },
-  "id": "Mail Service"
+  }
 }
