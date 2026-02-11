@@ -14,13 +14,13 @@ public class MailServiceEntity extends MailEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public MailServiceEntity(MailService service) {
-        super(service, Address.MAIL_SERVICE, AddressLocation.VIRTUAL);
+        super(service, service.getAddress(), AddressLocation.VIRTUAL);
     }
 
     // --
 
     @Override
     public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
-        return returned(mail, DeliveryRecord.Message.REJECTED);
+        return returned(mail, getAddress(), DeliveryRecord.Message.REJECTED);
     }
 }

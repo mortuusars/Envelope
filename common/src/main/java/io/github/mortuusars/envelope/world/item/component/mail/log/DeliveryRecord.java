@@ -52,9 +52,9 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
               Optional.empty(), MessageType.NEUTRAL);
     }
 
-    public static DeliveryRecord returned(Component reason) {
+    public static DeliveryRecord returned(Address by, Component reason) {
         Preconditions.checkNotNull(reason);
-        return new DeliveryRecord(Type.RETURNED, Optional.of(Address.MAIL_SERVICE), Optional.empty(),
+        return new DeliveryRecord(Type.RETURNED, Optional.of(by), Optional.empty(),
               Optional.of(reason), MessageType.NEGATIVE);
     }
 

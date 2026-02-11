@@ -4,8 +4,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
 import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
-import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -57,10 +55,7 @@ public class MailDeliveryRecipeCategory extends AbstractRecipeCategory<RecipeHol
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailDeliveryRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
-        Component component = recipeHolder.value().getEntity()
-              .unwrapKey()
-              .map(key -> new EntityAddress(key).represent(Minecrft.registryAccess()))
-              .orElse(Address.UNKNOWN)
+        Component component = recipeHolder.value().getEntityAddress()
               .format()
               .withIcon()
               .toComponent();

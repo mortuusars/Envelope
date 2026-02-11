@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
 import com.mojang.serialization.*;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
 import net.minecraft.core.RegistryAccess;
@@ -25,7 +24,6 @@ public interface Address {
     Codec<Address> CODEC = Type.CODEC.dispatch(Address::getType, Type::getCodec);
     StreamCodec<RegistryFriendlyByteBuf, Address> STREAM_CODEC = Type.STREAM_CODEC.dispatch(Address::getType, Type::getStreamCodec);
 
-    EntityAddress MAIL_SERVICE = new EntityAddress(Envelope.resource("mail_service"));
     UnknownAddress UNKNOWN = UnknownAddress.INSTANCE;
 
     Type getType();
@@ -33,7 +31,7 @@ public interface Address {
     String getId();
 
     default boolean isMailService() {
-        return this instanceof EntityAddress entityAddress && entityAddress.getKey().equals(MAIL_SERVICE.getKey());
+        return this instanceof EntityAddress entityAddress && entityAddress.getEntity().is(EntityAddresses.MAIL_SERVICE);
     }
 
     default boolean isUnknown() {

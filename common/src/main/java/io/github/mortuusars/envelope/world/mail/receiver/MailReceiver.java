@@ -17,8 +17,8 @@ public interface MailReceiver {
      */
     ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail);
 
-    default ItemStack returned(ItemStack mail, Component message) {
-        Mail.writeToLog(mail, DeliveryRecord.returned(message));
+    default ItemStack returned(ItemStack mail, Address by, Component message) {
+        Mail.writeToLog(mail, DeliveryRecord.returned(by, message));
         Mail.setReturned(mail);
         return mail;
     }

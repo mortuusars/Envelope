@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
@@ -9,6 +10,7 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
+import io.github.mortuusars.envelope.world.mail.address.EntityAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
@@ -184,16 +186,18 @@ public class MailService {
     }
 
     public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
-        if (!(delivery.getSender() instanceof BlockAddress address)) {
-            return null;
+        Address recipient = delivery.getSender();
+
+        if (!(recipient instanceof BlockAddress) && !(recipient instanceof PlayerAddress)) {
+            return Result.error("Cannot send death notice: recipient is not 'real' (player).");
         }
 
         ItemStack letter = createCourierDeathNoticeLetter(entity, delivery, damageSource);
 
         return getDeliveryManager().startService(Delivery.draft()
               .deliver(letter)
-              .from(Address.MAIL_SERVICE)
-              .to(address));
+              .from(getAddress())
+              .to(recipient));
     }
 
     public ItemStack createCourierDeathNoticeLetter(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
@@ -216,5 +220,9 @@ public class MailService {
         return Mail.createLetter(text)
               .set(DataComponents.CUSTOM_NAME, Component.translatable("letter.envelope.courier_death_notice.name"))
               .get();
+    }
+
+    public EntityAddress getAddress() {
+        return EntityAddress.get(getLevel().registryAccess(), EntityAddresses.MAIL_SERVICE);
     }
 }

@@ -9,32 +9,29 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Optional;
 
-public class EntityAddress implements Address.Representable {
+public class EntityAddress implements Address.Presentable {
     public static final MapCodec<EntityAddress> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-          ResourceKey.codec(Envelope.Registries.ENTITY_ADDRESS).fieldOf("key").forGetter(EntityAddress::getKey)
+          RegistryFixedCodec.create(Envelope.Registries.ENTITY_ADDRESS).fieldOf("entity").forGetter(EntityAddress::getEntity)
     ).apply(i, EntityAddress::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityAddress> STREAM_CODEC = StreamCodec.composite(
-          ResourceKey.streamCodec(Envelope.Registries.ENTITY_ADDRESS), EntityAddress::getKey,
+          ByteBufCodecs.holderRegistry(Envelope.Registries.ENTITY_ADDRESS), EntityAddress::getEntity,
           EntityAddress::new
     );
 
-    private final ResourceKey<EntityAddressDefinition> key;
+    private final Holder<EntityAddressDefinition> entity;
 
-    public EntityAddress(ResourceKey<EntityAddressDefinition> key) {
-        this.key = key;
-    }
-
-    public EntityAddress(ResourceLocation key) {
-        this(ResourceKey.create(Envelope.Registries.ENTITY_ADDRESS, key));
+    public EntityAddress(Holder<EntityAddressDefinition> entity) {
+        this.entity = entity;
     }
 
     @Override
@@ -44,29 +41,31 @@ public class EntityAddress implements Address.Representable {
 
     @Override
     public String getId() {
-        return key.location().toString();
+        return getEntity().value().id();
     }
 
-    public ResourceKey<EntityAddressDefinition> getKey() {
-        return key;
+    public Holder<EntityAddressDefinition> getEntity() {
+        return entity;
     }
 
     @Override
-    public Address.Presentable represent(RegistryAccess access) {
-        return access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS)
-              .getHolder(key)
-              .map(holder -> new Presentable(key, holder))
-              .map(Address.Presentable.class::cast)
-              .orElse(Address.UNKNOWN);
+    public MutableComponent getDisplayComponent() {
+        return getEntity().value().displayName().copy();
+    }
+
+    @Override
+    public String getDisplayString() {
+        return getEntity().value().displayName().getString();
     }
 
     // --
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         EntityAddress that = (EntityAddress) o;
-        return Objects.equals(key, that.key);
+        return entity.is(that.getEntity());
     }
 
     @Override
@@ -81,22 +80,15 @@ public class EntityAddress implements Address.Representable {
 
     // --
 
-    public static class Presentable extends EntityAddress implements Address.Presentable {
-        private final Holder<EntityAddressDefinition> entity;
+    public static EntityAddress get(RegistryAccess access, ResourceKey<EntityAddressDefinition> key) {
+        return new EntityAddress(getHolderOrThrow(access, key));
+    }
 
-        public Presentable(ResourceKey<EntityAddressDefinition> key, Holder<EntityAddressDefinition> entity) {
-            super(key);
-            this.entity = entity;
-        }
+    public static Holder.Reference<EntityAddressDefinition> getHolderOrThrow(RegistryAccess access, ResourceKey<EntityAddressDefinition> key) {
+        return access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS).getHolderOrThrow(key);
+    }
 
-        @Override
-        public String getDisplayString() {
-            return getDisplayComponent().getString();
-        }
-
-        @Override
-        public MutableComponent getDisplayComponent() {
-            return entity.value().displayName().copy();
-        }
+    public static Optional<Holder.Reference<EntityAddressDefinition>> getHolder(RegistryAccess access, ResourceKey<EntityAddressDefinition> key) {
+        return access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS).getHolder(key);
     }
 }

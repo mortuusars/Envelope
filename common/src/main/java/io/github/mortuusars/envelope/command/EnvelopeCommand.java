@@ -38,7 +38,7 @@ public class EnvelopeCommand {
                           .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
                                 .executes(c -> sendMail(c,
                                       ItemArgument.getItem(c, "mail"),
-                                      parseAddress(CompoundTagArgument.getCompoundTag(c, "sender")))))))
+                                      parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))))
               .then(Commands.literal("mailbox")
                     .then(Commands.literal("list")
                           .executes(EnvelopeCommand::listAllMailboxes)
@@ -81,8 +81,8 @@ public class EnvelopeCommand {
         return 0;
     }
 
-    private static Address parseAddress(CompoundTag tag) {
-        return Address.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow();
+    private static Address parseAddress(CommandContext<CommandSourceStack> context, CompoundTag tag) {
+        return Address.CODEC.parse(context.getSource().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
     }
 
     // -- Mailbox
