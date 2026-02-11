@@ -7,9 +7,10 @@
   - JEI shows available recipes 
 
 #### Address
+- Player address type definition has been changed. Field `id` is now `name`: `{ type:"player", name:"mortuusars" }`
 - Entity addresses are now data-driven
-  - Address component now references a definition by its key: `{ type:"entity", key:"envelope:mail_service" }`
-- Added "custom" address type: `{ type:"custom", id:"Example", display_name:{translate:"optional.display.name"} }`
+  - Address component now references registered entity by its key: `{ type:"entity", entity:"envelope:mail_service" }`
+- Added "custom" address type: `{ type:"custom", name:{translate:"display.name"} }`
   - Can be used as a virtual address for display purposes (commands, scripts, etc.). Cannot receive mail.
 - Unknown address is now a separate type: `{ type:"unknown" }`
 
