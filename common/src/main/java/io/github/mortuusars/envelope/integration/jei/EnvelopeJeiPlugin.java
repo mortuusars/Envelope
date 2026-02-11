@@ -3,10 +3,10 @@ package io.github.mortuusars.envelope.integration.jei;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.integration.jei.category.DeliveryRecipeCategory;
+import io.github.mortuusars.envelope.integration.jei.category.MailDeliveryRecipeCategory;
 import io.github.mortuusars.envelope.integration.jei.util.InHandRecipeTransferInfo;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
-import io.github.mortuusars.envelope.world.inventory.recipe.DeliveryRecipe;
+import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -29,36 +29,36 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        registration.addRecipeCategories(new DeliveryRecipeCategory(registration.getJeiHelpers()));
+        registration.addRecipeCategories(new MailDeliveryRecipeCategory(registration.getJeiHelpers()));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(Envelope.Items.PAPER_BOX.get()), EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE);
-        registration.addRecipeCatalyst(new ItemStack(Envelope.Items.PACKAGE.get()), EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(Envelope.Items.PAPER_BOX.get()), EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(Envelope.Items.PACKAGE.get()), EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE);
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        List<RecipeHolder<DeliveryRecipe>> deliveryRecipes = Minecrft.level()
+        List<RecipeHolder<MailDeliveryRecipe>> deliveryRecipes = Minecrft.level()
               .getRecipeManager()
-              .getAllRecipesFor(Envelope.RecipeTypes.DELIVERY.get());
+              .getAllRecipesFor(Envelope.RecipeTypes.MAIL_DELIVERY.get());
 
-        registration.addRecipes(EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE, deliveryRecipes);
+        registration.addRecipes(EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE, deliveryRecipes);
     }
 
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        var transferInfo = new InHandRecipeTransferInfo<>(PackingMenu.class, EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE,
+        var transferInfo = new InHandRecipeTransferInfo<>(PackingMenu.class, EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE,
               0, PackageContents.SLOTS, PackageContents.SLOTS, 36);
         registration.addRecipeTransferHandler(transferInfo);
     }
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addRecipeClickArea(PackingScreen.class, 61, 17, 54, 15, EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE);
-        registration.addRecipeClickArea(PackingScreen.class, 45, 32, 16, 36, EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE);
-        registration.addRecipeClickArea(PackingScreen.class, 61, 68, 54, 13, EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE);
-        registration.addRecipeClickArea(PackingScreen.class, 115, 32, 11, 36, EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE);
+        registration.addRecipeClickArea(PackingScreen.class, 61, 17, 54, 15, EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE);
+        registration.addRecipeClickArea(PackingScreen.class, 45, 32, 16, 36, EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE);
+        registration.addRecipeClickArea(PackingScreen.class, 61, 68, 54, 13, EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE);
+        registration.addRecipeClickArea(PackingScreen.class, 115, 32, 11, 36, EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE);
     }
 }

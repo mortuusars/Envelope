@@ -239,5 +239,5 @@
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
-  "envelope.jei.category.delivery": "Delivery"
+  "envelope.jei.category.mail_delivery": "Mail Delivery"
 }

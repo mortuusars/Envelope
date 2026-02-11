@@ -19,12 +19,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Function;
 
-public class DeliveryRecipe implements Recipe<CraftingInput> {
+public class MailDeliveryRecipe implements Recipe<CraftingInput> {
     private final EntityAddress address;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
 
-    public DeliveryRecipe(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result) {
+    public MailDeliveryRecipe(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result) {
         this.address = address;
         this.ingredients = ingredients;
         this.result = result;
@@ -73,27 +73,27 @@ public class DeliveryRecipe implements Recipe<CraftingInput> {
 
     @Override
     public @NotNull RecipeType<?> getType() {
-        return Envelope.RecipeTypes.DELIVERY.get();
+        return Envelope.RecipeTypes.MAIL_DELIVERY.get();
     }
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
 
-        return Envelope.RecipeSerializers.DELIVERY.get();
+        return Envelope.RecipeSerializers.MAIL_DELIVERY.get();
     }
 
-    public record Serializer() implements RecipeSerializer<DeliveryRecipe> {
-        public static final MapCodec<DeliveryRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-              EntityAddress.DIRECT_CODEC.fieldOf("address").forGetter(DeliveryRecipe::getAddress),
+    public record Serializer() implements RecipeSerializer<MailDeliveryRecipe> {
+        public static final MapCodec<MailDeliveryRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+              EntityAddress.DIRECT_CODEC.fieldOf("address").forGetter(MailDeliveryRecipe::getAddress),
               Ingredient.CODEC_NONEMPTY.listOf()
                     .fieldOf("ingredients")
                     .flatXmap(Serializer::validateIngredients, DataResult::success)
-                    .forGetter(DeliveryRecipe::getIngredients),
+                    .forGetter(MailDeliveryRecipe::getIngredients),
               ItemStack.STRICT_CODEC
                     .fieldOf("result")
                     .flatXmap(Serializer::validateResult, DataResult::success)
-                    .forGetter(DeliveryRecipe::getResult)
-        ).apply(i, DeliveryRecipe::new));
+                    .forGetter(MailDeliveryRecipe::getResult)
+        ).apply(i, MailDeliveryRecipe::new));
 
         private static final StreamCodec<RegistryFriendlyByteBuf, NonNullList<Ingredient>> INGREDIENTS_STREAM_CODEC =
               Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(PackageContents.SLOTS))
@@ -105,20 +105,20 @@ public class DeliveryRecipe implements Recipe<CraftingInput> {
                         return ingredients;
                     }, Function.identity());
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, DeliveryRecipe> STREAM_CODEC = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, DeliveryRecipe::getAddress,
-              INGREDIENTS_STREAM_CODEC, DeliveryRecipe::getIngredients,
-              ItemStack.STREAM_CODEC, DeliveryRecipe::getResult,
-              DeliveryRecipe::new
+        public static final StreamCodec<RegistryFriendlyByteBuf, MailDeliveryRecipe> STREAM_CODEC = StreamCodec.composite(
+              EntityAddress.STREAM_CODEC, MailDeliveryRecipe::getAddress,
+              INGREDIENTS_STREAM_CODEC, MailDeliveryRecipe::getIngredients,
+              ItemStack.STREAM_CODEC, MailDeliveryRecipe::getResult,
+              MailDeliveryRecipe::new
         );
 
         @Override
-        public @NotNull MapCodec<DeliveryRecipe> codec() {
+        public @NotNull MapCodec<MailDeliveryRecipe> codec() {
             return CODEC;
         }
 
         @Override
-        public @NotNull StreamCodec<RegistryFriendlyByteBuf, DeliveryRecipe> streamCodec() {
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, MailDeliveryRecipe> streamCodec() {
             return STREAM_CODEC;
         }
 

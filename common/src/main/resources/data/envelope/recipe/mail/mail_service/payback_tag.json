@@ -1,5 +1,5 @@
 {
-  "type": "envelope:delivery",
+  "type": "envelope:mail_delivery",
   "address": "envelope:mail_service",
   "ingredients": [
     {

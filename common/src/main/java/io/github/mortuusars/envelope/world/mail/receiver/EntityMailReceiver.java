@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.mail.receiver;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.inventory.recipe.DeliveryRecipe;
+import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
@@ -49,8 +49,8 @@ public class EntityMailReceiver implements MailReceiver {
               .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 
-    public List<RecipeHolder<DeliveryRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
-        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.DELIVERY.get()).stream()
+    public List<RecipeHolder<MailDeliveryRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
+        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAIL_DELIVERY.get()).stream()
               .filter(recipeHolder -> recipeHolder.value().getAddress().equals(address))
               .collect(Collectors.toList());
     }
@@ -69,7 +69,7 @@ public class EntityMailReceiver implements MailReceiver {
             return returned(mail, DeliveryRecord.Message.REJECTED);
         }
 
-        List<RecipeHolder<DeliveryRecipe>> recipes = getRecipesByAddress(level, address);
+        List<RecipeHolder<MailDeliveryRecipe>> recipes = getRecipesByAddress(level, address);
         if (recipes.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -77,7 +77,7 @@ public class EntityMailReceiver implements MailReceiver {
         List<ItemStack> inputItems = new ArrayList<>(packageContents.copyItems());
         CraftingInput input = CraftingInput.of(3, 2, inputItems);
 
-        @Nullable DeliveryRecipe recipe = recipes.stream()
+        @Nullable MailDeliveryRecipe recipe = recipes.stream()
               .filter(holder -> holder.value().matches(input, level))
               .findFirst()
               .map(RecipeHolder::value)
@@ -98,7 +98,7 @@ public class EntityMailReceiver implements MailReceiver {
         return sendResultPackages(level, packages, sender);
     }
 
-    protected List<ItemStack> craft(ServerLevel level, DeliveryRecipe recipe, List<ItemStack> inputItems) {
+    protected List<ItemStack> craft(ServerLevel level, MailDeliveryRecipe recipe, List<ItemStack> inputItems) {
         SimpleContainer resultContainer = new SimpleContainer(36);
 
         CraftingInput input = CraftingInput.of(3, 2, inputItems);

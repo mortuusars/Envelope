@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.integration.jei.category;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
-import io.github.mortuusars.envelope.world.inventory.recipe.DeliveryRecipe;
+import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -19,20 +19,20 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
-public class DeliveryRecipeCategory extends AbstractRecipeCategory<RecipeHolder<DeliveryRecipe>> {
+public class MailDeliveryRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailDeliveryRecipe>> {
     private final IDrawable background;
 
-    public DeliveryRecipeCategory(IJeiHelpers helper) {
-        super(EnvelopeJeiRecipeTypes.DELIVERY_RECIPE_TYPE,
-              Component.translatable("envelope.jei.category.delivery"),
+    public MailDeliveryRecipeCategory(IJeiHelpers helper) {
+        super(EnvelopeJeiRecipeTypes.MAIL_DELIVERY_RECIPE_TYPE,
+              Component.translatable("envelope.jei.category.mail_delivery"),
               helper.getGuiHelper().createDrawableItemLike(Envelope.Items.PACKAGE.get()), 148, 74);
         background = helper.getGuiHelper().createDrawable(
-              Envelope.resource("textures/gui/jei/delivery_category.png"), 0, 0, getWidth(), getHeight());
+              Envelope.resource("textures/gui/jei/category_mail_delivery.png"), 0, 0, getWidth(), getHeight());
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<DeliveryRecipe> recipeHolder, IFocusGroup focuses) {
-        DeliveryRecipe recipe = recipeHolder.value();
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailDeliveryRecipe> recipeHolder, IFocusGroup focuses) {
+        MailDeliveryRecipe recipe = recipeHolder.value();
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
 
         for (int row = 0; row < 2; row++) {
@@ -54,7 +54,7 @@ public class DeliveryRecipeCategory extends AbstractRecipeCategory<RecipeHolder<
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<DeliveryRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, IFocusGroup focuses) {
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailDeliveryRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
         Address.Realized address = recipeHolder.value().getAddress().realize(Minecrft.registryAccess());

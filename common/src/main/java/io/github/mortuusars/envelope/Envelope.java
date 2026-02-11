@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.*;
-import io.github.mortuusars.envelope.world.inventory.recipe.DeliveryRecipe;
+import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
@@ -333,11 +333,11 @@ public class Envelope {
     }
 
     public static class RecipeTypes {
-        public static final Supplier<RecipeType<DeliveryRecipe>> DELIVERY = Register.recipeType("delivery",
+        public static final Supplier<RecipeType<MailDeliveryRecipe>> MAIL_DELIVERY = Register.recipeType("mail_delivery",
               () -> new RecipeType<>() {
                   @Override
                   public String toString() {
-                      return ID + ":delivery";
+                      return ID + ":mail_delivery";
                   }
               });
 
@@ -348,8 +348,8 @@ public class Envelope {
         public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> DELIVERY =
-              Register.recipeSerializer("delivery", DeliveryRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<?>> MAIL_DELIVERY =
+              Register.recipeSerializer("mail_delivery", MailDeliveryRecipe.Serializer::new);
 
         static void init() {
         }
