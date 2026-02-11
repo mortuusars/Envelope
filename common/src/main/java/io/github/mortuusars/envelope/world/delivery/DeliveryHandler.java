@@ -112,7 +112,7 @@ public interface DeliveryHandler {
         MailService mailService = MailService.of(level);
 
         if (!mailService.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(mailService.getAddress(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
             Mail.setReturned(delivery.getMail());
             delivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return true;

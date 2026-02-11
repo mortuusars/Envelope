@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 import java.util.Objects;
 
-public final class BlockAddress implements Address.Presentable {
+public final class BlockAddress implements Address {
     public static final MapCodec<BlockAddress> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
           ID_CODEC.fieldOf("id").forGetter(BlockAddress::getId)
     ).apply(instance, BlockAddress::new));

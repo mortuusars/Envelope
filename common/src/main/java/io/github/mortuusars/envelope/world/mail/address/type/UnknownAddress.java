@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 
-public enum UnknownAddress implements Address.Presentable {
+public enum UnknownAddress implements Address {
     INSTANCE;
 
     @Override

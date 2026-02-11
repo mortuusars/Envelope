@@ -110,7 +110,7 @@ public class PaybackDepartment {
 
         Mail.setReturned(mail);
         Mail.writeToLog(mail,
-              DeliveryRecord.returned(getAddress(), reason),
+              DeliveryRecord.returned(reason),
               DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
 
         return getMailService().getDeliveryManager()
@@ -195,7 +195,7 @@ public class PaybackDepartment {
             subjectDelivery.setMail(ItemStack.EMPTY);
         } else {
             Mail.writeToLog(subject,
-                  DeliveryRecord.returned(getAddress(), DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
+                  DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
         }
 
@@ -227,7 +227,7 @@ public class PaybackDepartment {
         @Nullable PaybackSubject paybackSubject = paybackPackage.get(Envelope.DataComponents.PAYBACK_SUBJECT);
         if (paybackSubject == null) {
             Mail.writeToLog(paybackPackage,
-                  DeliveryRecord.returned(getAddress(), DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
+                  DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
@@ -236,7 +236,7 @@ public class PaybackDepartment {
         paybackSubject = getPendingPaybackSubject(paybackSubject.id());
         if (paybackSubject == null) {
             Mail.writeToLog(paybackPackage,
-                  DeliveryRecord.returned(getAddress(), DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
+                  DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
@@ -244,7 +244,7 @@ public class PaybackDepartment {
 
         if (!paybackDelivery.getRecipient().equals(paybackSubject.returnAddress())) {
             Mail.writeToLog(paybackPackage,
-                  DeliveryRecord.returned(getAddress(), DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
+                  DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
@@ -254,7 +254,7 @@ public class PaybackDepartment {
         PackageContents packageContents = PackageContents.from(paybackPackage);
         if (!paybackRequest.matches(packageContents)) {
             Mail.writeToLog(paybackPackage,
-                  DeliveryRecord.returned(getAddress(), DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
+                  DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
@@ -262,7 +262,7 @@ public class PaybackDepartment {
 
         if (!sendPaymentPackageToSeller(paybackDelivery, packageContents, paybackPackage)) {
             Mail.writeToLog(paybackPackage,
-                  DeliveryRecord.returned(getAddress(), DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
+                  DeliveryRecord.returned(DeliveryRecord.Message.RETURNED_PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(getAddress(), getMailService().getGameTime()));
             paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;

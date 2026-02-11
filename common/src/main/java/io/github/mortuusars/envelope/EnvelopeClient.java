@@ -123,7 +123,7 @@ public class EnvelopeClient {
                 } else {
                     consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
                           .append(": ").withStyle(ChatFormatting.GRAY)
-                          .append(sender.represent(Minecrft.registryAccess()).format().asNeutral().toComponent()));
+                          .append(sender.format().asNeutral().toComponent()));
                 }
             });
 

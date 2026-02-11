@@ -72,7 +72,7 @@ public class EnvelopeCommand {
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")
-                              .append(delivery.delivery().getRecipient().represent(level).format().asRecipient().toComponent());
+                              .append(delivery.delivery().getRecipient().format().asRecipient().toComponent());
                         context.getSource().sendSuccess(() -> message, true);
                     },
                     error -> context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()))
@@ -142,17 +142,17 @@ public class EnvelopeCommand {
     }
 
     private static MutableComponent copyableAddressAndPos(Address address, Optional<BlockPos> pos) {
-        String addressId = address.getId();
+        String name = address.getDisplayString();
         String posStr = pos.map(BlockPos::toShortString).orElse("");
         String posToCopy = posStr.replace(",", "");
 
-        return Component.literal(addressId)
+        return Component.literal(name)
               .withStyle(Style.EMPTY
                     .withColor(AddressFormatter.NEUTRAL_COLOR)
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Address")
                           .append("\n")
-                          .append(Component.literal(addressId).withStyle(ChatFormatting.GRAY))))
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, addressId)))
+                          .append(Component.literal(name).withStyle(ChatFormatting.GRAY))))
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, name)))
               .append(Component.literal("@[" + posStr + "]").withStyle(Style.EMPTY
                     .withColor(ChatFormatting.WHITE)
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Copy Position")

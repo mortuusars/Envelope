@@ -46,7 +46,7 @@ public class EntityMailReceiver implements MailReceiver {
 
         return MailService.of(level).getMailEntities().byAddress(address)
               .map(entity -> entity.receiveMail(level, sender, mail))
-              .orElseGet(() -> returned(mail, MailService.of(level).getAddress(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+              .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 
     public List<RecipeHolder<MailDeliveryRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
@@ -57,7 +57,7 @@ public class EntityMailReceiver implements MailReceiver {
 
     protected ItemStack tryHandleCrafting(ServerLevel level, Address sender, ItemStack mail) {
         if (sender.isUnknown()) {
-            return returned(mail, MailService.of(level).getAddress(), DeliveryRecord.Message.NO_RETURN_ADDRESS);
+            return returned(mail, DeliveryRecord.Message.NO_RETURN_ADDRESS);
         }
 
         if (!(mail.getItem() instanceof PackageItem)) {
@@ -66,7 +66,7 @@ public class EntityMailReceiver implements MailReceiver {
 
         PackageContents packageContents = PackageContents.from(mail);
         if (packageContents.isEmpty()) {
-            return returned(mail, MailService.of(level).getAddress(), DeliveryRecord.Message.REJECTED);
+            return returned(mail, DeliveryRecord.Message.REJECTED);
         }
 
         List<RecipeHolder<MailDeliveryRecipe>> recipes = getRecipesByAddress(level, address);
@@ -91,7 +91,7 @@ public class EntityMailReceiver implements MailReceiver {
 
         if (outputItemsItems.isEmpty()) {
             LOGGER.warn("No results from the mail crafting.");
-            return returned(mail, MailService.of(level).getAddress(), Component.translatable("gui.envelope.delivery_log.message.returned_unable_to_process"));
+            return returned(mail, Component.translatable("gui.envelope.delivery_log.message.returned_unable_to_process"));
         }
 
         List<ItemStack> packages = createResultPackages(mail, inputItems, outputItemsItems, sender);
@@ -165,7 +165,7 @@ public class EntityMailReceiver implements MailReceiver {
               });
 
         if (packages.size() > 1) {
-            return returned(packages.getFirst(), MailService.of(level).getAddress(), Component.literal("Unprocessed Items"));
+            return returned(packages.getFirst(), Component.literal("Unprocessed Items"));
         } else {
             return Mail.of(packages.getFirst())
                   .sender(address)

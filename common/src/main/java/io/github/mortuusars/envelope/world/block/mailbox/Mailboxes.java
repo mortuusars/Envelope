@@ -149,13 +149,13 @@ public class Mailboxes {
     // --
 
     private boolean inUseAsPlayerOrEntity(BlockAddress address) {
-        AllAddresses.Realized knownAddresses = MailService.of(level).getKnownAddresses();
+        AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
               || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
     }
 
     private BlockAddress uniquifyIfKnown(BlockAddress address) {
-        AllAddresses.Realized knownAddresses = MailService.of(level).getKnownAddresses();
+        AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         if (!knownAddresses.isKnown(address)) {
             return address;
         }

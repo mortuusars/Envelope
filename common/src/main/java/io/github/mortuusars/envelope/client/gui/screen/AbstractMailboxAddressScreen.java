@@ -28,11 +28,11 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     protected final LocalPlayer player;
     protected CachedValidator<String> addressValidator;
 
-    public AbstractMailboxAddressScreen(InteractionHand hand, AllAddresses.Realized knownAddresses,
+    public AbstractMailboxAddressScreen(InteractionHand hand, AllAddresses knownAddresses,
                                         Optional<BlockAddress> existingAddress, Component title) {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
-        this.existingAddress = existingAddress.map(Address.Presentable.class::cast);
+        this.existingAddress = existingAddress.map(Address.class::cast);
         this.addressValidator = AddressValidation.forMailbox(knownAddresses, player).cached();
     }
 
@@ -46,15 +46,15 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     @Override
     protected String getInitialAddressValue() {
         return existingAddress
-              .map(Address.Presentable::getDisplayString)
+              .map(Address::getDisplayString)
               .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
-                    .map(address -> address.represent(Minecrft.registryAccess()).getDisplayString())
+                    .map(Address::getDisplayString)
                     .orElse(""));
     }
 
     @Override
-    protected AllAddresses.Realized getAddressesForSuggestions() {
-        return AllAddresses.EMPTY.realized(RegistryAccess.EMPTY); // Don't suggest anything
+    protected AllAddresses getAddressesForSuggestions() {
+        return AllAddresses.EMPTY; // Don't suggest anything
     }
 
     // -- Validation

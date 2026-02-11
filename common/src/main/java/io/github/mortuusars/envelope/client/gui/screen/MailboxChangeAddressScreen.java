@@ -25,7 +25,7 @@ public class MailboxChangeAddressScreen extends AbstractMailboxAddressScreen {
     protected final BlockState state;
     protected final BlockEntity blockEntity;
 
-    public MailboxChangeAddressScreen(InteractionHand hand, AllAddresses.Realized knownAddresses,
+    public MailboxChangeAddressScreen(InteractionHand hand, AllAddresses knownAddresses,
                                       BlockPos pos, BlockAddress existingAddress,
                                       Component title) {
         super(hand, knownAddresses, Optional.ofNullable(existingAddress), title);

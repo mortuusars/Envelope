@@ -21,7 +21,7 @@ public class MailAddressTagTooltipComponent implements ClientTooltipComponent {
     private final @NotNull Component component;
 
     public MailAddressTagTooltipComponent(Address address) {
-        component = address.represent(Minecrft.registryAccess()).format().withIcon()
+        component = address.format().withIcon()
               .withIconColor(AddressFormatter.NEUTRAL_COLOR)
               .withColor(AddressFormatter.NEUTRAL_COLOR).toComponent();
     }

@@ -21,6 +21,6 @@ public class MailServiceEntity extends MailEntity {
 
     @Override
     public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
-        return returned(mail, getAddress(), DeliveryRecord.Message.REJECTED);
+        return returned(mail, DeliveryRecord.Message.REJECTED);
     }
 }

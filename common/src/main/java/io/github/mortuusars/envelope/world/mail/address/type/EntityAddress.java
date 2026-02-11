@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 import java.util.Optional;
 
-public class EntityAddress implements Address.Presentable {
+public class EntityAddress implements Address {
     public static final MapCodec<EntityAddress> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
           RegistryFixedCodec.create(Envelope.Registries.ENTITY_ADDRESS).fieldOf("entity").forGetter(EntityAddress::getEntity)
     ).apply(i, EntityAddress::new));

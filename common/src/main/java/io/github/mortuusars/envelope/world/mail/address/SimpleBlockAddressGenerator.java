@@ -7,10 +7,10 @@ import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleBlockAddressGenerator {
-    private final AllAddresses.Realized knownAddresses;
+    private final AllAddresses knownAddresses;
     private final int tries;
 
-    public SimpleBlockAddressGenerator(AllAddresses.Realized knownAddresses, int tries) {
+    public SimpleBlockAddressGenerator(AllAddresses knownAddresses, int tries) {
         Preconditions.checkArgument(tries > 0, "Should have at least 1 try.");
         this.knownAddresses = knownAddresses;
         this.tries = tries;

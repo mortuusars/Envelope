@@ -19,6 +19,6 @@ public class PlayerMailReceiver implements MailReceiver {
         return MailService.of(level).getKnownPlayers().getDefaultAddressOf(address)
               .map(MailboxMailReceiver::new)
               .map(receiver -> receiver.receiveMail(level, sender, mail))
-              .orElseGet(() -> returned(mail, MailService.of(level).getAddress(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+              .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 }

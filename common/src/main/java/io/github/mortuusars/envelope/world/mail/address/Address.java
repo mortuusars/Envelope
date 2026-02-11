@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.serialization.*;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -11,7 +10,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.IntFunction;
@@ -30,6 +28,18 @@ public interface Address {
 
     String getId();
 
+    MutableComponent getDisplayComponent();
+
+    String getDisplayString();
+
+    default boolean matches(String name) {
+        return getDisplayString().equalsIgnoreCase(name);
+    }
+
+    default AddressFormatter format() {
+        return AddressFormatter.of(this);
+    }
+
     default boolean isMailService() {
         return this instanceof EntityAddress entityAddress && entityAddress.getEntity().is(EntityAddresses.MAIL_SERVICE);
     }
@@ -40,29 +50,20 @@ public interface Address {
 
     // --
 
+    /**
+     * Returns an endpoint from a given address. Registered block address, default address of a player, etc. Or unknown if missing.
+     * @return Endpoint address or Unknown address.
+     */
     default Address resolve(MailService service) {
-        if (this instanceof PlayerAddress player) {
-            return service.getPlayerDefaultAddress(player)
+        return switch (this) {
+            case BlockAddress blockAddress -> service.getKnownAddresses().isKnown(blockAddress)
+                  ? blockAddress
+                  : UNKNOWN;
+            case PlayerAddress playerAddress -> service.getPlayerDefaultAddress(playerAddress)
                   .map(Address.class::cast)
-                  .orElse(Address.UNKNOWN);
-        }
-        return this;
-    }
-
-    // --
-
-    default Presentable represent(RegistryAccess access) {
-        if (this instanceof Presentable presentable) return presentable;
-        if (this instanceof Representable representable) return representable.represent(access);
-        throw new IllegalStateException("Address " + this + " cannot be realized.");
-    }
-
-    default Presentable represent(Level level) {
-        return represent(level.registryAccess());
-    }
-
-    default Presentable represent(MailService service) {
-        return represent(service.getLevel());
+                  .orElse(UNKNOWN);
+            default -> this;
+        };
     }
 
     // --
@@ -104,24 +105,5 @@ public interface Address {
         public MutableComponent translate() {
             return Component.translatable("address_type.envelope." + getSerializedName());
         }
-    }
-
-    // --
-
-    interface Presentable extends Address {
-        MutableComponent getDisplayComponent();
-        String getDisplayString();
-
-        default boolean matches(String name) {
-            return getDisplayString().equalsIgnoreCase(name);
-        }
-
-        default AddressFormatter format() {
-            return AddressFormatter.of(this);
-        }
-    }
-
-    interface Representable extends Address {
-        Presentable represent(RegistryAccess access);
     }
 }

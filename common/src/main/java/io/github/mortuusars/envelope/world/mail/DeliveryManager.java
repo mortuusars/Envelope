@@ -76,7 +76,7 @@ public class DeliveryManager {
 
     public boolean canDeliverTo(Address address) {
         return switch (address.resolve(getMailService())) {
-            case BlockAddress block -> getMailService().getKnownAddresses().isKnown(block);
+            case BlockAddress block -> true;
             case EntityAddress entity -> true;
             default -> false;
         };

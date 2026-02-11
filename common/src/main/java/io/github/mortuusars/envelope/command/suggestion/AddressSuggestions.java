@@ -40,7 +40,9 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         MailService mailService = context.getSource().getLevel().getEnvelopeMailService();
         Stream<String> addresses = mailService.getKnownAddressesOfType(type).stream()
-              .map(address -> address.getId().indexOf(" ") > 0 ? "\"" + address.getId() + "\"" : address.getId());
+              .map(address -> address.getDisplayString().indexOf(" ") > 0
+                    ? "\"" + address.getDisplayString() + "\""
+                    : address.getDisplayString());
         return SharedSuggestionProvider.suggest(addresses, builder);
     }
 }

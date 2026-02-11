@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import net.minecraft.client.gui.Font;
@@ -26,7 +27,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
     protected final Font font = Minecrft.get().font;
 
     protected final EditBox editBox;
-    protected final AllAddresses.Realized addresses;
+    protected final AllAddresses addresses;
 
     protected final List<Suggestion> suggestions = new ArrayList<>();
     protected int maxDisplayedLines;
@@ -34,7 +35,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
     protected int scroll = 0;
     protected boolean show;
 
-    public AddressBoxSuggestions(EditBox addressBox, AllAddresses.Realized addresses, int maxDisplayedLines) {
+    public AddressBoxSuggestions(EditBox addressBox, AllAddresses addresses, int maxDisplayedLines) {
         super(addressBox.getX(), addressBox.getY() + addressBox.getHeight() + 3, addressBox.getWidth(), 1, Component.empty());
         this.editBox = addressBox;
         this.addresses = addresses;
@@ -50,8 +51,12 @@ public class AddressBoxSuggestions extends AbstractWidget {
         String text = editBox.getValue();
 
         if (!addresses.isKnown(text)) {
-            suggestions.addAll(SharedSuggestionProvider.suggest(addresses.stream()
-                  .map(a -> a.represent(Minecrft.registryAccess()).getDisplayString()), new SuggestionsBuilder(text, 0)).join().getList());
+            suggestions.addAll(SharedSuggestionProvider.suggest(
+                        addresses.stream().map(Address::getDisplayString),
+                        new SuggestionsBuilder(text, 0)
+                  )
+                  .join()
+                  .getList());
             show = !text.isEmpty();
         }
     }
@@ -111,7 +116,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
 
             float scrollRatio = maxScroll != 0 ? (float) scroll / maxScroll : 0;
 
-            int thumbY = (int)((trackHeight - thumbHeight) * scrollRatio);
+            int thumbY = (int) ((trackHeight - thumbHeight) * scrollRatio);
 
             guiGraphics.fill(getX() + getWidth(), getY(), getX() + getWidth() + 3, getY() + getHeight(), 0xD0111111);
             guiGraphics.fill(getX() + getWidth() + 1, getY() + thumbY + 1,

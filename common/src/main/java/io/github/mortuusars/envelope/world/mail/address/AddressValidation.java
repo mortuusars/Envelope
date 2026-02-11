@@ -26,7 +26,7 @@ public interface AddressValidation {
         return ID;
     }
 
-    static Validator<String> forMailbox(AllAddresses.Realized addresses, Player player) {
+    static Validator<String> forMailbox(AllAddresses addresses, Player player) {
         return id()
               .and(isNotTaken(addresses))
               .and(hasEnoughXp(player, Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get()));
@@ -34,7 +34,7 @@ public interface AddressValidation {
 
     // --
 
-    static Rule<String> isNotTaken(AllAddresses.Realized addresses) {
+    static Rule<String> isNotTaken(AllAddresses addresses) {
         return Rule.when(addresses::isKnown, TAKEN);
     }
 

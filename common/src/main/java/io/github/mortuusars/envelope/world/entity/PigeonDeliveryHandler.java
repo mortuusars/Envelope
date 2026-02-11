@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
@@ -50,14 +49,14 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
     public boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
             Mail.writeToLog(delivery.getMail(),
-                  DeliveryRecord.returned(MailService.of(level).getAddress(), DeliveryRecord.Message.UNABLE_TO_REACH));
+                  DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.APPROACHING_SENDER);
             return true;
         }
 
         if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
             Mail.writeToLog(delivery.getMail(),
-                  DeliveryRecord.returned(MailService.of(level).getAddress(), DeliveryRecord.Message.UNABLE_TO_REACH));
+                  DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
             delivery.setPhaseAndResetProgress(DeliveryPhase.DEPARTING_RECIPIENT);
             return true;
         }

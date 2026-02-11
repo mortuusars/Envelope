@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
@@ -118,12 +117,11 @@ public class MailService {
 
     // -- Address
 
-    public AllAddresses.Realized getKnownAddresses() {
-        return new AllAddresses.Realized(
+    public AllAddresses getKnownAddresses() {
+        return new AllAddresses(
               getMailboxes().getAllAddresses(),
               getKnownPlayers().getDefaultAddresses().keySet(),
-              getMailEntities().getAllAddresses(),
-              getLevel().registryAccess()
+              getMailEntities().getAllAddresses()
         );
     }
     public AllAddresses getKnownAddressesOfType(@Nullable Address.Type type) {
@@ -206,7 +204,7 @@ public class MailService {
               .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + entity.getRandom().nextInt(5),
                           damageSource.getLocalizedDeathMessage(entity)))
               .append(Component.translatable("letter.envelope.courier_death_notice.delivery." + delivery.getPhase().getSerializedName(),
-                    delivery.getRecipient().represent(this).format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
+                    delivery.getRecipient().format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
               .append(!delivery.getMail().isEmpty()
                     ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + entity.getRandom().nextInt(6),
                     delivery.getMail().getHoverName().copy()

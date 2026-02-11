@@ -350,8 +350,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         List<Component> tooltip = new ArrayList<>();
 
         // Show full sender address if it doesn't fit on the widget
-        Address.Presentable sender = getDisplayedSender(hoveredMail);
-        if (font.width(sender.toString()) > 76) {
+        Address sender = getDisplayedSender(hoveredMail);
+        if (font.width(sender.getDisplayString()) > 76) {
             tooltip.add(sender.format()
                   .withIcon()
                   .withIconColor(AddressFormatter.NEUTRAL_COLOR)
@@ -501,18 +501,18 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         if (Mail.isReturned(mail)) return Component.translatable("gui.envelope.mail.returned");
         Address sender = Mail.getSenderOrUnknown(mail);
         return switch (sender.getType()) {
-            case BLOCK -> Component.translatable("address.envelope.type.block");
-            case PLAYER -> Component.translatable("address.envelope.type.player");
+            case BLOCK -> Component.translatable("address_type.envelope.block");
+            case PLAYER -> Component.translatable("address_type.envelope.player");
             case ENTITY -> sender.isMailService()
                   ? Component.translatable("address.envelope.mail_service")
-                  : Component.translatable("address.envelope.type.entity");
-            case CUSTOM -> Component.translatable("address.envelope.type.custom");
-            case UNKNOWN -> Component.translatable("address.envelope.type.unknown");
+                  : Component.translatable("address_type.envelope.entity");
+            case CUSTOM -> Component.translatable("address_type.envelope.custom");
+            case UNKNOWN -> Component.translatable("address_type.envelope.unknown");
         };
     }
 
-    protected Address.Presentable getDisplayedSender(ItemStack mail) {
-        return Mail.getSenderOrUnknown(mail).represent(Minecrft.registryAccess());
+    protected Address getDisplayedSender(ItemStack mail) {
+        return Mail.getSenderOrUnknown(mail);
     }
 
     // --

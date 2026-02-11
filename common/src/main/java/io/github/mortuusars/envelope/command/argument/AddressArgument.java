@@ -3,14 +3,11 @@ package io.github.mortuusars.envelope.command.argument;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.world.mail.address.*;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -61,6 +58,12 @@ public class AddressArgument implements ArgumentType<Address> {
         if (error.isPresent()) {
             Component message = Component.literal("Invalid address: ").append(error.get().getTranslation());
             throw new SimpleCommandExceptionType(message).create();
+        }
+
+        //TODO: this is not what it should be probably
+
+        if (type == null) {
+            return Address.UNKNOWN;
         }
 
         return switch (type) {

@@ -52,10 +52,10 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
               Optional.empty(), MessageType.NEUTRAL);
     }
 
-    public static DeliveryRecord returned(Address by, Component reason) {
+    public static DeliveryRecord returned(Component reason) {
         Preconditions.checkNotNull(reason);
-        return new DeliveryRecord(Type.RETURNED, Optional.of(by), Optional.empty(),
-              Optional.of(reason), MessageType.NEGATIVE);
+        return new DeliveryRecord(Type.RETURNED, Optional.empty(),
+              Optional.empty(), Optional.of(reason), MessageType.NEGATIVE);
     }
 
     public static DeliveryRecord payback(@NotNull Component message, MessageType type) {
@@ -72,7 +72,7 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
             case RETURNED, PAYBACK, CUSTOM -> AddressFormatter.NEUTRAL_COLOR;
         };
 
-        Component addressComponent = this.address.map(a -> a.represent(level).format()
+        Component addressComponent = this.address.map(a -> a.format()
                     .withIcon()
                     .withIconColor(addressColor)
                     .withColor(addressColor)

@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.mail.address;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -45,10 +44,6 @@ public class AllAddresses {
 
     // --
 
-    public Realized realized(RegistryAccess access) {
-        return new Realized(blocks, players, entities, access);
-    }
-
     public Stream<Address> stream() {
         return Stream.of(blocks, players, entities).flatMap(Set::stream);
     }
@@ -64,6 +59,33 @@ public class AllAddresses {
     public Set<EntityAddress> entities() {
         return entities;
     }
+
+    // --
+
+    public Optional<Address> byName(String name) {
+        return stream()
+              .filter(address -> address.matches(name))
+              .findFirst();
+    }
+
+    public boolean isKnown(String name) {
+        return byName(name).isPresent();
+    }
+
+    public boolean isKnown(Address address) {
+        return stream().anyMatch(a -> a.equals(address));
+    }
+
+    public boolean isKnownOfType(Address address, Address.Type type) {
+        if (type == Address.Type.CUSTOM || type == Address.Type.UNKNOWN) {
+            return false;
+        }
+        return stream()
+              .filter(a -> a.getType() == type)
+              .anyMatch(a -> a.equals(address));
+    }
+
+    // --
 
     @Override
     public boolean equals(Object obj) {
@@ -86,39 +108,5 @@ public class AllAddresses {
               "blocks=" + blocks + ", " +
               "players=" + players + ", " +
               "entities=" + entities + ']';
-    }
-
-    // --
-
-    public static class Realized extends AllAddresses {
-        private final RegistryAccess access;
-
-        public Realized(Set<BlockAddress> blocks, Set<PlayerAddress> players, Set<EntityAddress> entities, RegistryAccess access) {
-            super(blocks, players, entities);
-            this.access = access;
-        }
-
-        public Optional<Address> byName(String name) {
-            return stream()
-                  .filter(address -> address.represent(access).matches(name))
-                  .findFirst();
-        }
-
-        public boolean isKnown(String name) {
-            return byName(name).isPresent();
-        }
-
-        public boolean isKnown(Address address) {
-            return stream().anyMatch(a -> a.represent(access).equals(address));
-        }
-
-        public boolean isKnownOfType(Address address, Address.Type type) {
-            if (type == Address.Type.CUSTOM || type == Address.Type.UNKNOWN) {
-                return false;
-            }
-            return stream()
-                  .filter(a -> a.getType() == type)
-                  .anyMatch(a -> a.represent(access).equals(address));
-        }
     }
 }

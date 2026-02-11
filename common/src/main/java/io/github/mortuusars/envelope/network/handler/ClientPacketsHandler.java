@@ -27,7 +27,7 @@ public class ClientPacketsHandler {
 
     public static void openAddressTagScreen(OpenAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
-            AddressTagScreen screen = new AddressTagScreen(packet.hand(), packet.knownAddresses().realized(Minecrft.registryAccess()),
+            AddressTagScreen screen = new AddressTagScreen(packet.hand(), packet.knownAddresses(),
                   Component.translatable("gui.envelope.address_tag.title"));
             Minecrft.get().setScreen(screen);
         }
@@ -35,7 +35,7 @@ public class ClientPacketsHandler {
 
     public static void openMailboxPlacingScreen(OpenMailboxPlacingScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof MailboxBlockItem) {
-            MailboxPlacingScreen screen = new MailboxPlacingScreen(packet.hand(), packet.knownAddresses().realized(Minecrft.registryAccess()),
+            MailboxPlacingScreen screen = new MailboxPlacingScreen(packet.hand(), packet.knownAddresses(),
                   packet.hitResult(), Component.translatable("gui.envelope.mailbox_choose_address.title"));
             Minecrft.get().setScreen(screen);
         }
@@ -44,7 +44,7 @@ public class ClientPacketsHandler {
     public static void openMailboxAddressTagScreen(OpenMailboxAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
             MailboxChangeAddressScreen screen = new MailboxChangeAddressScreen(packet.hand(),
-                  packet.knownAddresses().realized(Minecrft.registryAccess()), packet.pos(), packet.currentAddress(),
+                  packet.knownAddresses(), packet.pos(), packet.currentAddress(),
                   Component.translatable("gui.envelope.mailbox_change_address.title"));
             Minecrft.get().setScreen(screen);
         }

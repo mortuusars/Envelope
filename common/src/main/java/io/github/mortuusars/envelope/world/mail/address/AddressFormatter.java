@@ -16,18 +16,18 @@ public class AddressFormatter {
     public static final int SENDER_COLOR = 0xFF7AB5E1;
     public static final int RECIPIENT_COLOR = 0xFFE8AD77;
 
-    protected final Address.Presentable address;
+    protected final Address address;
     protected boolean icon = false;
     protected String iconSeparator = " ";
     protected Either<ChatFormatting, Style> iconStyle = Either.right(Style.EMPTY);
     protected Either<ChatFormatting, Style> textStyle = Either.right(Style.EMPTY);
     protected int maxLength = Integer.MAX_VALUE;
 
-    protected AddressFormatter(Address.Presentable address) {
+    protected AddressFormatter(Address address) {
         this.address = address;
     }
 
-    public static AddressFormatter of(Address.Presentable address) {
+    public static AddressFormatter of(Address address) {
         return new AddressFormatter(address);
     }
 

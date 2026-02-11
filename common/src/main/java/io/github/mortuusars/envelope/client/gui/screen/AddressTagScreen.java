@@ -35,8 +35,8 @@ public class AddressTagScreen extends Screen {
 
     protected final InteractionHand hand;
     protected final ItemStack tag;
-    protected final AllAddresses.Realized knownAddresses;
-    protected Optional<Address.Presentable> existingAddress;
+    protected final AllAddresses knownAddresses;
+    protected Optional<Address> existingAddress;
 
     protected int imageWidth, imageHeight;
     protected int leftPos, topPos;
@@ -49,13 +49,12 @@ public class AddressTagScreen extends Screen {
     protected Optional<Address> matchedKnownAddress = Optional.empty();
     protected @Nullable String currentSuggestion;
 
-    public AddressTagScreen(InteractionHand hand, AllAddresses.Realized knownAddresses, Component title) {
+    public AddressTagScreen(InteractionHand hand, AllAddresses knownAddresses, Component title) {
         super(title);
         this.hand = hand;
         this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.knownAddresses = knownAddresses;
-        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS))
-              .map(a -> a.represent(Minecrft.registryAccess()));
+        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS));
     }
 
     @Override
@@ -103,7 +102,7 @@ public class AddressTagScreen extends Screen {
 
     protected String getInitialAddressValue() {
         return existingAddress
-              .map(Address.Presentable::getDisplayString)
+              .map(Address::getDisplayString)
               .orElse("");
     }
 
@@ -120,7 +119,7 @@ public class AddressTagScreen extends Screen {
         return getMatchedKnownAddress().or(() -> Optional.of(new BlockAddress(addressId)));
     }
 
-    protected AllAddresses.Realized getAddressesForSuggestions() {
+    protected AllAddresses getAddressesForSuggestions() {
         return knownAddresses;
     }
 
