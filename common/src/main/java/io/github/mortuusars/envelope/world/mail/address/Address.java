@@ -42,27 +42,29 @@ public interface Address {
 
     // --
 
-    default Address.Realized realize(RegistryAccess access) {
-        if (this instanceof Address.Realized realized) return realized;
-        if (this instanceof Address.Realizable realizable) return realizable.realize(access);
-        throw new IllegalStateException("Address " + this + " cannot be realized.");
-    }
-
-    default Address.Realized realize(Level level) {
-        return realize(level.registryAccess());
-    }
-
-    default Address.Realized realize(MailService service) {
-        return realize(service.getLevel());
+    default Address resolve(MailService service) {
+        if (this instanceof PlayerAddress player) {
+            return service.getPlayerDefaultAddress(player)
+                  .map(Address.class::cast)
+                  .orElse(Address.UNKNOWN);
+        }
+        return this;
     }
 
     // --
 
-    default Address.Realized resolve(MailService service) {
-        if (this instanceof PlayerAddress player) {
-            return service.getPlayerDefaultAddress(player).map(a -> a.realize(service)).orElse(Address.UNKNOWN);
-        }
-        return realize(service);
+    default Presentable represent(RegistryAccess access) {
+        if (this instanceof Presentable presentable) return presentable;
+        if (this instanceof Representable representable) return representable.represent(access);
+        throw new IllegalStateException("Address " + this + " cannot be realized.");
+    }
+
+    default Presentable represent(Level level) {
+        return represent(level.registryAccess());
+    }
+
+    default Presentable represent(MailService service) {
+        return represent(service.getLevel());
     }
 
     // --
@@ -102,16 +104,15 @@ public interface Address {
         }
 
         public MutableComponent translate() {
-            return Component.translatable("address.envelope.type." + getSerializedName());
+            return Component.translatable("address_type.envelope." + getSerializedName());
         }
     }
 
     // --
 
-    interface Realized extends Address {
-        String getDisplayString();
-
+    interface Presentable extends Address {
         MutableComponent getDisplayComponent();
+        String getDisplayString();
 
         default boolean matches(String name) {
             return getDisplayString().equalsIgnoreCase(name);
@@ -122,7 +123,7 @@ public interface Address {
         }
     }
 
-    interface Realizable extends Address {
-        Address.Realized realize(RegistryAccess access);
+    interface Representable extends Address {
+        Presentable represent(RegistryAccess access);
     }
 }

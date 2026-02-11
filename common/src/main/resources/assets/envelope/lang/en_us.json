@@ -149,11 +149,11 @@
   "address.envelope.mail_service": "Mail Service",
   "address.envelope.unknown": "Unknown",
 
-  "address.envelope.type.block": "Block",
-  "address.envelope.type.player": "Player",
-  "address.envelope.type.entity": "Entity",
-  "address.envelope.type.custom": "Address",
-  "address.envelope.type.unknown": "Unknown",
+  "address_type.envelope.block": "Block",
+  "address_type.envelope.player": "Player",
+  "address_type.envelope.entity": "Entity",
+  "address_type.envelope.custom": "Address",
+  "address_type.envelope.unknown": "Unknown",
 
   "subtitle.envelope.paper.crackle": "Paper crackles",
   "subtitle.envelope.paper.tear": "Paper tears",

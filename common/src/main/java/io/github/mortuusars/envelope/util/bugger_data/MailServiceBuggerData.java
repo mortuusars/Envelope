@@ -55,9 +55,9 @@ public class MailServiceBuggerData extends NbtData {
         Delivery delivery = courier.getCurrentDelivery().orElseThrow();
         int phaseDuration = courier.getDeliveryHandler().getPhaseDuration(mailService.getLevel(), delivery, delivery.getPhase());
 
-        return ChatFormatting.AQUA + delivery.getSender().realize(mailService).format().withIcon().toString() + ChatFormatting.RESET +
+        return ChatFormatting.AQUA + delivery.getSender().represent(mailService).format().withIcon().toString() + ChatFormatting.RESET +
               " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +
-              ChatFormatting.GREEN + delivery.getRecipient().realize(mailService).format().withIcon().toString() + ChatFormatting.RESET +
+              ChatFormatting.GREEN + delivery.getRecipient().represent(mailService).format().withIcon().toString() + ChatFormatting.RESET +
 
               ChatFormatting.GRAY +
               " | " + (courier.getOrigin().isService() ? "Service" : "Regular") +

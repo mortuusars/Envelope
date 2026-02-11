@@ -5,12 +5,14 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -20,18 +22,20 @@ import java.util.List;
 import java.util.function.Function;
 
 public class MailDeliveryRecipe implements Recipe<CraftingInput> {
-    private final EntityAddress address;
+    private final Holder<EntityAddressDefinition> entityAddressDefinition;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
 
-    public MailDeliveryRecipe(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result) {
-        this.address = address;
+    public MailDeliveryRecipe(Holder<EntityAddressDefinition> entityAddressDefinition,
+                              NonNullList<Ingredient> ingredients,
+                              ItemStack result) {
+        this.entityAddressDefinition = entityAddressDefinition;
         this.ingredients = ingredients;
         this.result = result;
     }
 
-    public EntityAddress getAddress() {
-        return address;
+    public Holder<EntityAddressDefinition> getEntity() {
+        return entityAddressDefinition;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class MailDeliveryRecipe implements Recipe<CraftingInput> {
 
     public record Serializer() implements RecipeSerializer<MailDeliveryRecipe> {
         public static final MapCodec<MailDeliveryRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-              EntityAddress.DIRECT_CODEC.fieldOf("address").forGetter(MailDeliveryRecipe::getAddress),
+              RegistryFixedCodec.create(Envelope.Registries.ENTITY_ADDRESS).fieldOf("entity").forGetter(MailDeliveryRecipe::getEntity),
               Ingredient.CODEC_NONEMPTY.listOf()
                     .fieldOf("ingredients")
                     .flatXmap(Serializer::validateIngredients, DataResult::success)
@@ -106,7 +110,7 @@ public class MailDeliveryRecipe implements Recipe<CraftingInput> {
                     }, Function.identity());
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MailDeliveryRecipe> STREAM_CODEC = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, MailDeliveryRecipe::getAddress,
+              ByteBufCodecs.holderRegistry(Envelope.Registries.ENTITY_ADDRESS), MailDeliveryRecipe::getEntity,
               INGREDIENTS_STREAM_CODEC, MailDeliveryRecipe::getIngredients,
               ItemStack.STREAM_CODEC, MailDeliveryRecipe::getResult,
               MailDeliveryRecipe::new

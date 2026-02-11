@@ -51,7 +51,7 @@ public class EntityMailReceiver implements MailReceiver {
 
     public List<RecipeHolder<MailDeliveryRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
         return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAIL_DELIVERY.get()).stream()
-              .filter(recipeHolder -> recipeHolder.value().getAddress().equals(address))
+              .filter(recipeHolder -> recipeHolder.value().getEntity().is(address.getKey()))
               .collect(Collectors.toList());
     }
 

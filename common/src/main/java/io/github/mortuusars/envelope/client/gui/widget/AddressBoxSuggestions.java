@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import net.minecraft.client.gui.Font;
@@ -52,7 +51,7 @@ public class AddressBoxSuggestions extends AbstractWidget {
 
         if (!addresses.isKnown(text)) {
             suggestions.addAll(SharedSuggestionProvider.suggest(addresses.stream()
-                  .map(a -> a.realize(Minecrft.registryAccess()).getDisplayString()), new SuggestionsBuilder(text, 0)).join().getList());
+                  .map(a -> a.represent(Minecrft.registryAccess()).getDisplayString()), new SuggestionsBuilder(text, 0)).join().getList());
             show = !text.isEmpty();
         }
     }

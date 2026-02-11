@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
@@ -13,18 +13,14 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Objects;
 
-public class EntityAddress implements Address.Realizable {
+public class EntityAddress implements Address.Representable {
     public static final MapCodec<EntityAddress> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
           ResourceKey.codec(Envelope.Registries.ENTITY_ADDRESS).fieldOf("key").forGetter(EntityAddress::getKey)
     ).apply(i, EntityAddress::new));
-
-    public static final Codec<EntityAddress> DIRECT_CODEC = ResourceKey.codec(Envelope.Registries.ENTITY_ADDRESS)
-          .xmap(EntityAddress::new, EntityAddress::getKey);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityAddress> STREAM_CODEC = StreamCodec.composite(
           ResourceKey.streamCodec(Envelope.Registries.ENTITY_ADDRESS), EntityAddress::getKey,
@@ -56,12 +52,12 @@ public class EntityAddress implements Address.Realizable {
     }
 
     @Override
-    public Address.Realized realize(RegistryAccess access) {
-        Registry<EntityAddressDefinition> registry = access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS);
-        @Nullable EntityAddressDefinition definition = registry.get(key);
-        return definition != null
-              ? new Realized(key, definition)
-              : Address.UNKNOWN;
+    public Address.Presentable represent(RegistryAccess access) {
+        return access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS)
+              .getHolder(key)
+              .map(holder -> new Presentable(key, holder))
+              .map(Address.Presentable.class::cast)
+              .orElse(Address.UNKNOWN);
     }
 
     // --
@@ -85,17 +81,12 @@ public class EntityAddress implements Address.Realizable {
 
     // --
 
-    public static class Realized extends EntityAddress implements Address.Realized {
-        private final EntityAddressDefinition definition;
+    public static class Presentable extends EntityAddress implements Address.Presentable {
+        private final Holder<EntityAddressDefinition> entity;
 
-        public Realized(ResourceKey<EntityAddressDefinition> key, EntityAddressDefinition definition) {
+        public Presentable(ResourceKey<EntityAddressDefinition> key, Holder<EntityAddressDefinition> entity) {
             super(key);
-            this.definition = definition;
-        }
-
-        public Realized(ResourceLocation key, EntityAddressDefinition definition) {
-            super(key);
-            this.definition = definition;
+            this.entity = entity;
         }
 
         @Override
@@ -105,7 +96,7 @@ public class EntityAddress implements Address.Realizable {
 
         @Override
         public MutableComponent getDisplayComponent() {
-            return definition.displayName().copy();
+            return entity.value().displayName().copy();
         }
     }
 }

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public final class PlayerAddress implements Address.Realized {
+public final class PlayerAddress implements Address.Presentable {
     public static final MapCodec<PlayerAddress> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
           Address.ID_CODEC.fieldOf("id").forGetter(PlayerAddress::getId)
     ).apply(instance, PlayerAddress::new));

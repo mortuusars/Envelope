@@ -72,7 +72,7 @@ public class EnvelopeCommand {
               .ifPresentOrElse(
                     delivery -> {
                         Component message = Component.literal("Mail sent to ")
-                              .append(delivery.delivery().getRecipient().realize(level).format().asRecipient().toComponent());
+                              .append(delivery.delivery().getRecipient().represent(level).format().asRecipient().toComponent());
                         context.getSource().sendSuccess(() -> message, true);
                     },
                     error -> context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()))

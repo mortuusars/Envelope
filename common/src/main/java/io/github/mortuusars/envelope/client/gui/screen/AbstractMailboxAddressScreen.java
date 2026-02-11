@@ -32,7 +32,7 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
                                         Optional<BlockAddress> existingAddress, Component title) {
         super(hand, knownAddresses, title);
         this.player = Minecrft.player();
-        this.existingAddress = existingAddress.map(Address.Realized.class::cast);
+        this.existingAddress = existingAddress.map(Address.Presentable.class::cast);
         this.addressValidator = AddressValidation.forMailbox(knownAddresses, player).cached();
     }
 
@@ -46,9 +46,9 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     @Override
     protected String getInitialAddressValue() {
         return existingAddress
-              .map(Address.Realized::getDisplayString)
+              .map(Address.Presentable::getDisplayString)
               .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
-                    .map(address -> address.realize(Minecrft.registryAccess()).getDisplayString())
+                    .map(address -> address.represent(Minecrft.registryAccess()).getDisplayString())
                     .orElse(""));
     }
 

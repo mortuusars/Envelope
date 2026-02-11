@@ -72,7 +72,7 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
             case RETURNED, PAYBACK, CUSTOM -> AddressFormatter.NEUTRAL_COLOR;
         };
 
-        Component addressComponent = this.address.map(a -> a.realize(level).format()
+        Component addressComponent = this.address.map(a -> a.represent(level).format()
                     .withIcon()
                     .withIconColor(addressColor)
                     .withColor(addressColor)

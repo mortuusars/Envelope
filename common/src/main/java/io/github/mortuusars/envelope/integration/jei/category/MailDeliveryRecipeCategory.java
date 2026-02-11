@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
 import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -15,7 +16,6 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.AbstractRecipeCategory;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -57,8 +57,13 @@ public class MailDeliveryRecipeCategory extends AbstractRecipeCategory<RecipeHol
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailDeliveryRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
-        Address.Realized address = recipeHolder.value().getAddress().realize(Minecrft.registryAccess());
-        MutableComponent component = address.format().withIcon().toComponent();
+        Component component = recipeHolder.value().getEntity()
+              .unwrapKey()
+              .map(key -> new EntityAddress(key).represent(Minecrft.registryAccess()))
+              .orElse(Address.UNKNOWN)
+              .format()
+              .withIcon()
+              .toComponent();
 
         builder.addText(component,
                     0,

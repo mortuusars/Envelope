@@ -1,6 +1,6 @@
 {
   "type": "envelope:mail_delivery",
-  "address": "envelope:mail_service",
+  "entity": "envelope:mail_service",
   "ingredients": [
     {
       "item": "envelope:address_tag"

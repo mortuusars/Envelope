@@ -202,7 +202,7 @@ public class MailService {
               .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + entity.getRandom().nextInt(5),
                           damageSource.getLocalizedDeathMessage(entity)))
               .append(Component.translatable("letter.envelope.courier_death_notice.delivery." + delivery.getPhase().getSerializedName(),
-                    delivery.getRecipient().realize(this).format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
+                    delivery.getRecipient().represent(this).format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
               .append(!delivery.getMail().isEmpty()
                     ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + entity.getRandom().nextInt(6),
                     delivery.getMail().getHoverName().copy()

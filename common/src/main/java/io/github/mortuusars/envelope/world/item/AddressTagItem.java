@@ -40,7 +40,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
         if (address != null) {
-            tooltipComponents.add(address.realize(Minecrft.registryAccess()).format()
+            tooltipComponents.add(address.represent(Minecrft.registryAccess()).format()
                   .withIcon()
                   .withIconColor(AddressFormatter.NEUTRAL_COLOR)
                   .withColor(AddressFormatter.NEUTRAL_COLOR)

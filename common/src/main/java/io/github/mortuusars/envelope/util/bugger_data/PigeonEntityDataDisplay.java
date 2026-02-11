@@ -18,9 +18,9 @@ public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataD
         if (pigeon.getCurrentDelivery().isPresent()) {
             Delivery delivery = pigeon.getCurrentDelivery().get();
             lines.add(Component.empty()
-                  .append(delivery.getSender().realize(entity.level()).getDisplayString())
+                  .append(delivery.getSender().represent(entity.level()).getDisplayString())
                   .append(" → ")
-                  .append(delivery.getRecipient().realize(entity.level()).getDisplayString()));
+                  .append(delivery.getRecipient().represent(entity.level()).getDisplayString()));
             lines.add(line(delivery.getPhase().toPrettyString()));
             return;
         }

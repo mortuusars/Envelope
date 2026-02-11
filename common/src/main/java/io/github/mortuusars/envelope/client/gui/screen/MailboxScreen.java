@@ -350,7 +350,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         List<Component> tooltip = new ArrayList<>();
 
         // Show full sender address if it doesn't fit on the widget
-        Address.Realized sender = getDisplayedSender(hoveredMail);
+        Address.Presentable sender = getDisplayedSender(hoveredMail);
         if (font.width(sender.toString()) > 76) {
             tooltip.add(sender.format()
                   .withIcon()
@@ -511,8 +511,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         };
     }
 
-    protected Address.Realized getDisplayedSender(ItemStack mail) {
-        return Mail.getSenderOrUnknown(mail).realize(Minecrft.registryAccess());
+    protected Address.Presentable getDisplayedSender(ItemStack mail) {
+        return Mail.getSenderOrUnknown(mail).represent(Minecrft.registryAccess());
     }
 
     // --

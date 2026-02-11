@@ -100,7 +100,7 @@ public class AllAddresses {
 
         public Optional<Address> byName(String name) {
             return stream()
-                  .filter(address -> address.realize(access).matches(name))
+                  .filter(address -> address.represent(access).matches(name))
                   .findFirst();
         }
 
@@ -109,7 +109,7 @@ public class AllAddresses {
         }
 
         public boolean isKnown(Address address) {
-            return stream().anyMatch(a -> a.realize(access).equals(address));
+            return stream().anyMatch(a -> a.represent(access).equals(address));
         }
 
         public boolean isKnownOfType(Address address, Address.Type type) {
@@ -118,7 +118,7 @@ public class AllAddresses {
             }
             return stream()
                   .filter(a -> a.getType() == type)
-                  .anyMatch(a -> a.realize(access).equals(address));
+                  .anyMatch(a -> a.represent(access).equals(address));
         }
     }
 }

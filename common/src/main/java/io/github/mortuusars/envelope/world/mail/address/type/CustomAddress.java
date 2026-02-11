@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class CustomAddress implements Address.Realized {
+public final class CustomAddress implements Address.Presentable {
     public static final MapCodec<CustomAddress> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
           Address.ID_CODEC.fieldOf("id").forGetter(CustomAddress::getId),
           ComponentSerialization.CODEC.optionalFieldOf("display_name").forGetter(CustomAddress::getDisplayName)
