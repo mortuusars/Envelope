@@ -128,7 +128,7 @@ public class RecipesDatagen extends RecipeProvider {
         sealStamp(output, mailService, new StackIngredient(ItemTags.SHOVELS), SealImpression.SHOVEL);
         sealStamp(output, mailService, new StackIngredient(ItemTags.AXES), SealImpression.AXE);
         sealStamp(output, mailService, new StackIngredient(ItemTags.HOES), SealImpression.HOE);
-        sealStamp(output, mailService, new StackIngredient(ItemTags.LECTERN_BOOKS), SealImpression.BOOK);
+        sealStamp(output, mailService, new StackIngredient(Items.BOOK), SealImpression.BOOK);
         sealStamp(output, mailService, new StackIngredient(Items.SKELETON_SKULL), SealImpression.SKELETON);
 
         // --

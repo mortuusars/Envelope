@@ -6,7 +6,7 @@
       "item": "envelope:seal_stamp"
     },
     {
-      "item": "#minecraft:lectern_books"
+      "item": "minecraft:book"
     }
   ],
   "result": {
