@@ -157,17 +157,20 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
     }
 
     public interface Message {
-        Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_not_found");
-        Component RECIPIENT_CANNOT_BE_DETERMINED = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_cannot_be_determined");
-        Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.returned_recipient_inbox_is_full");
-        Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.returned_unable_to_reach");
-        Component NO_RETURN_ADDRESS = Component.translatable("gui.envelope.delivery_log.message.returned_no_sender");
-        Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.returned_rejected");
+        Component FULFILLED = Component.translatable("gui.envelope.delivery_log.message.fulfilled");
 
-        Component PAYBACK_FULFILLED = Component.translatable("gui.envelope.delivery_log.message.payback_fulfilled");
-        Component RETURNED_PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.returned_payback_subject_not_found");
-        Component RETURNED_PAYBACK_IS_NOT_VALID = Component.translatable("gui.envelope.delivery_log.message.returned_payback_is_not_valid");
-        Component RETURNED_PAYBACK_EXPIRED = Component.translatable("gui.envelope.delivery_log.message.returned_payback_expired");
+        Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.recipient_not_found");
+        Component RECIPIENT_CANNOT_BE_DETERMINED = Component.translatable("gui.envelope.delivery_log.message.recipient_cannot_be_determined");
+        Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.recipient_inbox_is_full");
+        Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.unable_to_reach");
+        Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.rejected");
+
+        Component PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.payback.subject_not_found");
+        Component PAYBACK_IS_NOT_VALID = Component.translatable("gui.envelope.delivery_log.message.payback.is_not_valid");
+        Component PAYBACK_EXPIRED = Component.translatable("gui.envelope.delivery_log.message.payback.expired");
+
+        Component CRAFTING_UNPROCESSED_ITEMS = Component.translatable("gui.envelope.delivery_log.message.crafting.unprocessed_items");
+        Component CRAFTING_UNABLE_TO_PROCESS = Component.translatable("gui.envelope.delivery_log.message.crafting.unable_to_process");
     }
 
     public enum MessageType implements StringRepresentable {

@@ -1,26 +1,21 @@
 package io.github.mortuusars.envelope.command;
 
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.serialization.JsonOps;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryHandlerTests;
-import io.github.mortuusars.envelope.util.bugger.test.cases.RequestedItemTests;
-import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
+import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
+import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.ItemStack;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -50,8 +45,10 @@ public class EnvelopeDebugCommand {
 
     private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
         TestResults testResults = new BuggerTests()
-              .add(new RequestedItemTests(context.getSource().getServer()))
+              .add(new StackIngredientTests(context.getSource().getServer()))
               .add(new DeliveryHandlerTests(context.getSource().getServer()))
+              .add(new MailCraftingRecipeTests(context.getSource().getServer()))
+              .add(new MailCraftingTests(context.getSource().getServer()))
               .run(count -> context.getSource().sendSuccess(() ->
                     Component.literal("Running " + count + " bugger tests."), true));
 
@@ -77,54 +74,25 @@ public class EnvelopeDebugCommand {
     // --
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-//        EntityAddress value = MAIL_SERVICE.value(player.registryAccess());
-
-        String keyJson = """
-              {
-                  "id":"envelope:letter",
-                  "count":1,
-                  "components":{
-                    "envelope:mail_sender": {
-                        "type": "new_entity",
-                        "key": "envelope:mail_service"
-                    }
-                  }
-              }
-              """;
-        JsonObject keyObj = GsonHelper.parse(keyJson);
-        ItemStack keyStack = ItemStack.CODEC.parse(player.registryAccess().createSerializationContext(JsonOps.INSTANCE), keyObj)
-              .result()
-              .orElse(ItemStack.EMPTY);
-
-        String valueJson = """
-              {
-                  "id":"envelope:letter",
-                  "count":1,
-                  "components":{
-                    "envelope:mail_sender": {
-                        "type": "new_entity",
-                        "id": "mail_service",
-                        "display_name": {
-                            "translate": "block.envelope.mailbox"
-                        }
-                    }
-                  }
-              }
-              """;
-
-        JsonObject valueObj = GsonHelper.parse(valueJson);
-        ItemStack valueStack = ItemStack.CODEC.parse(player.registryAccess().createSerializationContext(JsonOps.INSTANCE), valueObj)
-              .result()
-              .orElse(ItemStack.EMPTY);
-
-
-//        Registry<Address.Entity> registry = context.getSource().getLevel().registryAccess().registryOrThrow(Envelope.Registries.ENTITY_ADDRESS);
-
-
-
+//        List<RecipeHolder<MailRecipe>> recipes = player.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get());
+//
+//        List<ItemStack> items = List.of(
+//              new ItemStack(Envelope.Items.ADDRESS_TAG.get(), 3),
+//              new ItemStack(Items.RED_DYE),
+//              new ItemStack(Items.RED_DYE),
+//              new ItemStack(Items.RED_DYE)
+//        );
+//
+//        SimpleRecipeInput input = new SimpleRecipeInput(items);
+//        @Nullable MailRecipe recipe = null;
+//
+//        for (RecipeHolder<MailRecipe> holder : recipes) {
+//            if (holder.value().matches(input, player.level())) {
+//                recipe = holder.value();
+//            }
+//        }
 
         boolean a = true;
 

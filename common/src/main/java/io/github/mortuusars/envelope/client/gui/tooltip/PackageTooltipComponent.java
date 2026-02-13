@@ -38,7 +38,7 @@ public class PackageTooltipComponent implements ClientTooltipComponent {
                 int slotIndex = (column + row * 3);
                 int slotX = x + column * 18 + 3;
                 int slotY = y + row * 18 + 3;
-                ItemStack stack = packageContents.getItemForReading(slotIndex);
+                ItemStack stack = packageContents.getItem(slotIndex);
                 guiGraphics.renderItem(stack, slotX, slotY, slotIndex);
                 guiGraphics.renderItemDecorations(font, stack, slotX, slotY);
             }

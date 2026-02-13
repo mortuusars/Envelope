@@ -7,13 +7,14 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.inventory.*;
-import io.github.mortuusars.envelope.world.inventory.recipe.MailDeliveryRecipe;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -333,11 +334,11 @@ public class Envelope {
     }
 
     public static class RecipeTypes {
-        public static final Supplier<RecipeType<MailDeliveryRecipe>> MAIL_DELIVERY = Register.recipeType("mail_delivery",
+        public static final Supplier<RecipeType<MailRecipe>> MAILING = Register.recipeType("mailing",
               () -> new RecipeType<>() {
                   @Override
                   public String toString() {
-                      return ID + ":mail_delivery";
+                      return ID + ":mailing";
                   }
               });
 
@@ -348,8 +349,8 @@ public class Envelope {
         public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> MAIL_DELIVERY =
-              Register.recipeSerializer("mail_delivery", MailDeliveryRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<?>> MAIL_CRAFTING =
+              Register.recipeSerializer("mail_crafting", MailCraftingRecipe.Serializer::new);
 
         static void init() {
         }

@@ -10,7 +10,9 @@ import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
 import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -30,8 +32,8 @@ public class DeliveryHandlerTests extends BuggerTests {
         Delivery delivery = new Delivery(
               Id.createUnsafe(0),
               Optional.empty(),
-              Address.UNKNOWN,
-              Address.UNKNOWN,
+              new CustomAddress(Component.literal("test sender")),
+              new CustomAddress(Component.literal("test recipient")),
               ItemStack.EMPTY,
               DeliveryRoute.EMPTY,
               DeliveryPhase.STARTED,

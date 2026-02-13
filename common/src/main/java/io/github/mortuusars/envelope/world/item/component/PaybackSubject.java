@@ -26,6 +26,6 @@ public record PaybackSubject(Id id, ItemStack mail, Address returnAddress, long 
     );
 
     public PaybackRequest getRequest() {
-        return mail.getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.DEFAULT);
+        return mail.getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.createDefault());
     }
 }

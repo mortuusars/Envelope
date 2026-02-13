@@ -4,9 +4,10 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
-import io.github.mortuusars.envelope.world.inventory.RequestedItem;
+import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.network.chat.Component;
@@ -70,26 +71,27 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     public PaybackRequest createPayback(Level level, ItemStack stack) {
         PaybackTagContents tagContents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.DEFAULT);
 
-        List<RequestedItem> requestedItems = tagContents.getItemsForReading().stream()
+        List<StackIngredient> stackIngredients = tagContents.getItemsForReading().stream()
               .limit(PaybackRequest.SLOTS)
               .filter(item -> !item.isEmpty())
               .map(this::createRequestedItemFromStack)
               .toList();
 
-        return PaybackRequest.createOrDefault(requestedItems);
+        return PaybackRequest.createOrDefault(stackIngredients);
     }
 
-    public RequestedItem createRequestedItemFromStack(ItemStack stack) {
+    public StackIngredient createRequestedItemFromStack(ItemStack stack) {
         if (stack.isEmpty()) {
             Envelope.LOGGER.warn("Tried to create RequestedItem from empty ItemStack.");
-            return RequestedItem.DEFAULT;
+            return StackIngredient.createDefault();
         }
 
         DataComponentMap defaultComponents = new ItemStack(stack.getItem(), stack.getCount()).getComponents();
         DataComponentMap components = stack.copy().getComponents();
         DataComponentMap uniqueComponents = components.filter(type ->
               !Objects.equals(components.get(type), defaultComponents.get(type)));
-        return new RequestedItem(stack.getItem(), stack.getCount(), DataComponentPredicate.allOf(uniqueComponents));
+        return new StackIngredient(HolderSet.direct(stack.getItemHolder()), stack.getCount(),
+              DataComponentPredicate.allOf(uniqueComponents), false);
     }
 
     @Override

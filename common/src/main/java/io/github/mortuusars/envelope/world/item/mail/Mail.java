@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item.mail;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
@@ -20,7 +21,10 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public final class Mail {
@@ -164,6 +168,26 @@ public final class Mail {
     public static MailBuilder<?> createPackage(PackageContents contents) {
         return new MailBuilder<>(Envelope.Items.PACKAGE.get())
               .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
+    }
+
+    public static List<ItemStack> createPackages(List<ItemStack> items, Consumer<MailBuilder<?>> builderConsumer) {
+        items = new ArrayList<>(items); // Ensure mutability
+        List<ItemStack> packages = new ArrayList<>();
+
+        items.removeIf(stack -> {
+            if (stack.getItem() instanceof PackageItem) {
+                packages.add(Mail.of(stack).apply(builderConsumer).get());
+                return true;
+            }
+            return false;
+        });
+
+        for (int i = 0; i < items.size(); i += PackageContents.SLOTS) {
+            PackageContents contents = new PackageContents(items.subList(i, Math.min(i + PackageContents.SLOTS, items.size())));
+            packages.add(Mail.createPackage(contents).apply(builderConsumer).get());
+        }
+
+        return packages;
     }
 
     public static MailBuilder<?> createPaybackBox(PaybackSubject subject) {

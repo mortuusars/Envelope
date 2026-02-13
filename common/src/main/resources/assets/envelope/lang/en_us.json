@@ -93,19 +93,20 @@
   "gui.envelope.delivery_log.record.payback": " Payback: %2$s %3$s",
   "gui.envelope.delivery_log.record.custom": " %2$s",
 
-  "gui.envelope.delivery_log.message.returned_recipient_not_found": "Recipient Not Found",
-  "gui.envelope.delivery_log.message.returned_recipient_cannot_be_determined": "Recipient Cannot Be Determined",
-  "gui.envelope.delivery_log.message.returned_recipient_inbox_is_full": "Recipient Inbox Is Full",
-  "gui.envelope.delivery_log.message.returned_unable_to_reach": "Unable To Reach",
-  "gui.envelope.delivery_log.message.returned_no_sender": "Sender Cannot Be Determined",
-  "gui.envelope.delivery_log.message.returned_unable_to_process": "Unable To Process",
-  "gui.envelope.delivery_log.message.returned_rejected": "Rejected",
-  "gui.envelope.delivery_log.message.payback_fulfilled": "Fulfilled",
-  "gui.envelope.delivery_log.message.returned_payback_subject_not_found": "Payback Subject Not Found",
-  "gui.envelope.delivery_log.message.returned_payback_is_not_valid": "Payback Is Not Valid",
-  "gui.envelope.delivery_log.message.returned_payback_expired": "Payback Request Expired",
+  "gui.envelope.delivery_log.message.fulfilled": "Fulfilled",
 
-  "gui.envelope.letter.subject": "Subject: ",
+  "gui.envelope.delivery_log.message.unable_to_reach": "Unable To Reach",
+  "gui.envelope.delivery_log.message.recipient_cannot_be_determined": "Recipient Cannot Be Determined",
+  "gui.envelope.delivery_log.message.recipient_not_found": "Recipient Not Found",
+  "gui.envelope.delivery_log.message.recipient_inbox_is_full": "Recipient Inbox Is Full",
+  "gui.envelope.delivery_log.message.rejected": "Rejected",
+
+  "gui.envelope.delivery_log.message.payback.subject_not_found": "Payback Subject Not Found",
+  "gui.envelope.delivery_log.message.payback.is_not_valid": "Payback Is Not Valid",
+  "gui.envelope.delivery_log.message.payback.expired": "Payback Request Expired",
+
+  "gui.envelope.delivery_log.message.crafting.unable_to_process": "Unable To Process",
+  "gui.envelope.delivery_log.message.crafting.unprocessed_items": "Unprocessed Items",
 
   "gui.envelope.time.remaining": "Remaining: ",
   "gui.envelope.time.years": "%sy",
@@ -239,5 +240,5 @@
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
-  "envelope.jei.category.mail_delivery": "Mail Delivery"
+  "envelope.jei.category.mailing": "Mailing"
 }

@@ -10,12 +10,14 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class PackageContents implements TooltipComponent {
+public final class PackageContents implements RecipeInput, TooltipComponent {
     public static final int SLOTS = 6;
 
     public static final Codec<PackageContents> CODEC = ItemStack.OPTIONAL_CODEC.listOf(0, SLOTS)
@@ -50,7 +52,7 @@ public final class PackageContents implements TooltipComponent {
     // --
 
     public boolean isEmpty() {
-        return this.equals(EMPTY) || getItemsForReading().isEmpty() || getItemsForReading().stream().allMatch(ItemStack::isEmpty);
+        return this == EMPTY || getItemsForReading().isEmpty() || getItemsForReading().stream().allMatch(ItemStack::isEmpty);
     }
 
     public int size() {
@@ -75,7 +77,7 @@ public final class PackageContents implements TooltipComponent {
         return list;
     }
 
-    public ItemStack getItemForReading(int index) {
+    public @NotNull ItemStack getItem(int index) {
         return index < size() ? items.get(index) : ItemStack.EMPTY;
     }
 

@@ -13,6 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class MailBuilder<T extends MailBuilder<T>> implements DataComponentHolder {
@@ -60,6 +62,11 @@ public class MailBuilder<T extends MailBuilder<T>> implements DataComponentHolde
 
     public T writeToLog(DeliveryRecord.Builder record) {
         Mail.writeToLog(item, record);
+        return self();
+    }
+
+    public T apply(Consumer<MailBuilder<?>> consumer) {
+        consumer.accept(this);
         return self();
     }
 

@@ -3,95 +3,49 @@ package io.github.mortuusars.envelope.world.mail.receiver;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.item.crafting.*;
-import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.crafting.CraftingResult;
+import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.PackageRecipeInput;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EntityMailReceiver implements MailReceiver {
+public class EntityCraftingMailReceiver implements MailReceiver {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final EntityAddress address;
-    private final EntityCraftingMailReceiver craftingReceiver;
 
-    public EntityMailReceiver(EntityAddress address) {
+    public EntityCraftingMailReceiver(EntityAddress address) {
         this.address = address;
-        this.craftingReceiver = new EntityCraftingMailReceiver(address);
-    }
-
-    public EntityCraftingMailReceiver getCraftingReceiver() {
-        return craftingReceiver;
     }
 
     @Override
     public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
-        if (Mail.isReturned(mail)) {
-            LOGGER.info("Mail Entity received returned mail [{}] from '{}'. Voiding.", mail, sender);
-            return ItemStack.EMPTY;
-        }
-
-        ItemStack craftingResult = getCraftingReceiver().receiveMail(level, sender, mail);
-        if (!craftingResult.isEmpty()) {
-            return craftingResult;
-        }
-
-        return MailService.of(level).getMailEntities().byAddress(address)
-              .map(entity -> entity.receiveMail(level, sender, mail))
-              .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
-    }
-
-    /*
-    public List<RecipeHolder<MailRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
-        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get()).stream()
-              .filter(recipeHolder -> recipeHolder.value().getEntityAddress().equals(address))
-              .collect(Collectors.toList());
-    }
-
-    protected ItemStack tryHandleCrafting(ServerLevel level, Address sender, ItemStack mail) {
-        if (sender.isUnknown()) {
-            return ItemStack.EMPTY;
-        }
-
-        if (!(mail.getItem() instanceof PackageItem)) {
-            return ItemStack.EMPTY;
-        }
-
         PackageContents packageContents = PackageContents.from(mail);
         if (packageContents.isEmpty()) {
             return ItemStack.EMPTY;
         }
 
-        List<RecipeHolder<MailRecipe>> recipes = getRecipesByAddress(level, address);
-        if (recipes.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
         PackageRecipeInput input = PackageRecipeInput.of(packageContents);
 
-        @Nullable MailRecipe recipe = recipes.stream()
-              .filter(holder -> holder.value().matches(input, level))
-              .findFirst()
-              .map(RecipeHolder::value)
-              .orElse(null);
-
+        @Nullable MailRecipe recipe = findMatchingRecipe(level, input);
         if (recipe == null) {
             return ItemStack.EMPTY;
         }
 
-        CraftingResult result = craft(level, recipe, input, PackageContents.SLOTS);
+        CraftingResult result = craft(level, recipe, input);
 
         if (result.output().isEmpty()) {
             LOGGER.warn("No results from the mail crafting.");
@@ -102,8 +56,24 @@ public class EntityMailReceiver implements MailReceiver {
         return sendResults(level, mail, result.remainingInput(), packages, sender);
     }
 
-    protected CraftingResult craft(ServerLevel level, MailRecipe recipe, PackageRecipeInput input, int outputSlots) {
-        SimpleContainer outputContainer = new SimpleContainer(outputSlots);
+    public List<RecipeHolder<MailRecipe>> getAllRecipes(ServerLevel level) {
+        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get()).stream()
+              .filter(recipeHolder -> recipeHolder.value().getEntityAddress().equals(address))
+              .collect(Collectors.toList());
+    }
+
+    public @Nullable MailRecipe findMatchingRecipe(ServerLevel level, PackageRecipeInput input) {
+        for (RecipeHolder<MailRecipe> recipeHolder : getAllRecipes(level)) {
+            MailRecipe recipe = recipeHolder.value();
+            if (recipe.matches(input, level)) {
+                return recipe;
+            }
+        }
+        return null;
+    }
+
+    public CraftingResult craft(ServerLevel level, MailRecipe recipe, PackageRecipeInput input) {
+        SimpleContainer outputContainer = new SimpleContainer(PackageContents.SLOTS);
 
         do {
             ItemStack result = recipe.assemble(input, level.registryAccess());
@@ -114,6 +84,10 @@ public class EntityMailReceiver implements MailReceiver {
             }
 
             input = PackageRecipeInput.of(recipe.consumeOnce(input));
+
+            if (!PackageContents.canHold(result)) {
+                break;
+            }
         }
         while (recipe.matches(input, level));
 
@@ -154,5 +128,4 @@ public class EntityMailReceiver implements MailReceiver {
               .writeToLog(DeliveryRecord.sentFrom(address, level.getGameTime()))
               .get();
     }
-    */
 }

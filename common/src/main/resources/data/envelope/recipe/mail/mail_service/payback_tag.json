@@ -1,12 +1,12 @@
 {
-  "type": "envelope:mail_delivery",
+  "type": "envelope:mail_crafting",
   "entity": "envelope:mail_service",
   "ingredients": [
     {
       "item": "envelope:address_tag"
     },
     {
-      "tag": "c:dyes/red"
+      "item": "#c:dyes/red"
     }
   ],
   "result": {

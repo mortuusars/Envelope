@@ -1,8 +1,7 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.RequestedItemDisplay;
-import io.github.mortuusars.envelope.world.inventory.RequestedItem;
+import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,9 +31,8 @@ public record PaybackTooltipComponent(PaybackRequest paybackRequest) implements 
         int slots = paybackRequest().items().size();
 
         for (int i = 0; i < slots; i++) {
-            RequestedItem requestedItem = paybackRequest().items().get(i);
-            RequestedItemDisplay display = new RequestedItemDisplay(requestedItem);
-            ItemStack stack = display.getDisplayedItem();
+            StackIngredient ingredient = paybackRequest().items().get(i);
+            ItemStack stack = ingredient.getRollingDisplayedStack();
 
             int slotX = x + 17 + 2 + (i * 18);
             int slotY = y + 2;
@@ -53,7 +51,7 @@ public record PaybackTooltipComponent(PaybackRequest paybackRequest) implements 
             guiGraphics.renderFakeItem(stack, slotX + 1, slotY + 1, 0);
             guiGraphics.renderItemDecorations(font, stack, slotX + 1, slotY + 1);
 
-            if (requestedItem.item().left().isPresent()) {
+            if (ingredient.items().unwrapKey().isPresent()) {
                 guiGraphics.pose().translate(0, 0, 200);
                 guiGraphics.drawString(font, "#", slotX + 1 + 19 - 2 - font.width("#"), y + 1, 0xFFFFFFFF, true);
             }

@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.RequestedItemDisplay;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
@@ -74,20 +73,19 @@ public class PaybackPackingScreen extends AbstractContainerScreen<PaybackPacking
     protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
         if (slot instanceof RequestedItemSlot requestedItemSlot) {
             if (!slot.hasItem()) {
-                RequestedItemDisplay display = new RequestedItemDisplay(requestedItemSlot.getRequestedItem());
-                ItemStack preview = display.getDisplayedItem();
+                ItemStack preview = requestedItemSlot.getIngredient().getRollingDisplayedStack();
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, -100);
                 guiGraphics.renderItem(preview, slot.x, slot.y);
                 guiGraphics.renderItemDecorations(Minecrft.get().font, preview, slot.x, slot.y);
-                if (requestedItemSlot.getRequestedItem().item().left().isPresent()) {
+                if (requestedItemSlot.getIngredient().items().unwrapKey().isPresent()) {
                     guiGraphics.pose().translate(0, 0, 200);
                     guiGraphics.drawString(font, "#", slot.x + 1 + 19 - 2 - font.width("#"), slot.y - 1, 0xFFFFFFFF, true);
                 }
                 guiGraphics.pose().popPose();
             }
 
-            boolean isFulfilled = requestedItemSlot.getRequestedItem().matches(slot.getItem());
+            boolean isFulfilled = requestedItemSlot.getIngredient().test(slot.getItem());
 
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0, 0, 150);
@@ -126,14 +124,14 @@ public class PaybackPackingScreen extends AbstractContainerScreen<PaybackPacking
         if (menu.getCarried().isEmpty() && hoveredSlot instanceof RequestedItemSlot requestedItemSlot && !requestedItemSlot.hasItem()) {
             ItemStack stack = requestedItemSlot.getRequestedItemPreview();
 
-            List<Component> lines = requestedItemSlot.getRequestedItem().item().map(
-                  tag -> {
+            List<Component> lines = requestedItemSlot.getIngredient().items().unwrapKey()
+                  .map(tag -> {
                       List<Component> list = new ArrayList<>(getTooltipFromContainerItem(stack));
                       list.addLast(Component.literal("Accepts Tag:").withStyle(ChatFormatting.GRAY));
                       list.addLast(Component.literal("#" + tag.location()).withStyle(ChatFormatting.GRAY));
                       return list;
-                  },
-                  item -> getTooltipFromContainerItem(stack));
+                  })
+                  .orElseGet(() -> getTooltipFromContainerItem(stack));
 
             guiGraphics.renderTooltip(this.font, lines, stack.getTooltipImage(), x, y);
         } else {
