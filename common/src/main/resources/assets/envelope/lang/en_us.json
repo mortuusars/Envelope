@@ -148,6 +148,7 @@
   "gui.envelope.formatting.yellow": "Yellow",
 
   "address.envelope.mail_service": "Mail Service",
+  "address.envelope.trade_office": "Trade Office",
   "address.envelope.unknown": "Unknown",
 
   "address_type.envelope.block": "Block",
@@ -240,5 +241,7 @@
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
-  "envelope.jei.category.mailing": "Mailing"
+  "envelope.jei.category.mailing": "Mailing",
+
+  "envelope.empty_tag": "Empty Tag"
 }

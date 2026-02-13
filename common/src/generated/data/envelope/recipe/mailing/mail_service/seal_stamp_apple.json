@@ -1,0 +1,19 @@
+{
+  "type": "envelope:mail_crafting",
+  "entity": "envelope:mail_service",
+  "ingredients": [
+    {
+      "item": "envelope:seal_stamp"
+    },
+    {
+      "item": "minecraft:golden_apple"
+    }
+  ],
+  "result": {
+    "components": {
+      "envelope:seal_stamp_impression": "envelope:apple"
+    },
+    "count": 1,
+    "id": "envelope:seal_stamp"
+  }
+}

@@ -1,10 +1,19 @@
 # Changelog
 
 ## UNRELEASED
-- Added mail delivery crafting:
-  - Send a Package with ingredients to a mail entity - receive crafted result back
-  - Similar to shapeless recipes
-  - JEI shows available recipes 
+#### Added Mailing recipes
+Send a Package with ingredients to a mail entity - receive crafted result back.
+  - Similar to shapeless recipe, but can accept ingredients larger than single item
+  - Can do multiple crafts at a time, if more ingredients are provided. As long as they are in same stacks.
+  - Results are returned using the same courier, or with service courier, if some of the ingredients were unprocessed 
+  - Recipes are data-driven, of course
+  - JEI shows available recipes
+
+Included recipes:
+  - Payback Tag (no longer craftable in Crafting Table)
+  - Seal Stamps of several custom impressions
+  - Rotten Flesh -> Leather
+  - Saddle
 
 #### Address
 - Player address type definition has been changed. Field `id` is now `name`: `{ type:"player", name:"mortuusars" }`

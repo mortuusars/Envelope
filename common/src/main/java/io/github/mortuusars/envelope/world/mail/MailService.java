@@ -49,7 +49,7 @@ public class MailService {
         Preconditions.checkArgument(operatesIn(level), "MailService cannot exist in the '" + level.dimension().location() + "' dimension.");
         this.level = level;
         this.mailboxes = new Mailboxes(level);
-        this.mailEntities = new MailEntities();
+        this.mailEntities = new MailEntities(this);
         this.mailServiceEntity = new MailServiceEntity(this);
         this.paybackDepartment = new PaybackDepartment(this);
         this.deliveryManager = new DeliveryManager(this);

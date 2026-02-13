@@ -1,14 +1,17 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import com.google.common.base.Preconditions;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.Util;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.HolderSetCodec;
@@ -17,9 +20,13 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Advanced ingredient to allow matching stacks of specific count and/or components.
@@ -58,7 +65,7 @@ public class StackIngredient {
     private final int count;
     private final DataComponentPredicate components;
     private final boolean strict;
-    private final ItemStack[] stacks;
+    private @Nullable ItemStack[] stacks;
 
     public StackIngredient(HolderSet<Item> items, int count, DataComponentPredicate components, boolean strict) {
         Preconditions.checkArgument(count >= 1 && count <= 99, "Count must be in range 1-99.");
@@ -66,9 +73,6 @@ public class StackIngredient {
         this.count = count;
         this.components = components;
         this.strict = strict;
-        this.stacks = items.stream()
-              .map(item -> new ItemStack(item, count, components.asPatch()))
-              .toArray(ItemStack[]::new);
     }
 
     public StackIngredient(Item item, int count, DataComponentPredicate components) {
@@ -84,7 +88,14 @@ public class StackIngredient {
     }
 
     public StackIngredient(TagKey<Item> tag, int count, DataComponentPredicate components) {
-        this(BuiltInRegistries.ITEM.getTag(tag).orElseThrow(), count, components, false);
+        this(BuiltInRegistries.ITEM.getTag(tag)
+              .or(() -> {
+                  // This fallback is for datagen, where getting tag from registry fails.
+                  LogUtils.getLogger().warn("Failed to get tag '#{}' from BuiltInRegistries.ITEM. Will use empty set.", tag.location());
+                  return Optional.of(HolderSet.emptyNamed(BuiltInRegistries.ITEM.holderOwner(), tag));
+              })
+              .orElseThrow(),
+              count, components, false);
     }
 
     public StackIngredient(TagKey<Item> tag, int count) {
@@ -120,7 +131,19 @@ public class StackIngredient {
         return strict;
     }
 
-    public ItemStack[] stacks() {
+    public @NotNull ItemStack[] stacks() {
+        if (stacks == null) {
+            stacks = items.stream()
+                  .map(item -> new ItemStack(item, count, components.asPatch()))
+                  .toArray(ItemStack[]::new);
+            if (stacks.length == 0) {
+                ItemStack barrier = new ItemStack(Items.BARRIER, count);
+                barrier.set(DataComponents.CUSTOM_NAME, Component.translatable("envelope.empty_tag"));
+                stacks = List.of(barrier).toArray(ItemStack[]::new);
+            }
+        }
+
+        //noinspection NullableProblems
         return stacks;
     }
 
@@ -140,16 +163,16 @@ public class StackIngredient {
 
     public boolean componentsMatch(ItemStack stack) {
         return strict
-              ? stacks.length != 0 && Objects.equals(stack.getComponents(), stacks[0].getComponents())
+              ? stacks().length != 0 && Objects.equals(stack.getComponents(), stacks()[0].getComponents())
               : components().test(stack);
     }
 
     // --
 
     public ItemStack getRollingDisplayedStack() {
-        if (stacks.length == 0) return ItemStack.EMPTY;
-        int index = (int)(Util.getMillis() / 1000) % stacks.length;
-        return stacks[index];
+        if (stacks().length == 0) return ItemStack.EMPTY;
+        int index = (int)(Util.getMillis() / 1000) % stacks().length;
+        return stacks()[index];
     }
 
     // --
@@ -163,7 +186,7 @@ public class StackIngredient {
 
     @Override
     public int hashCode() {
-        return Objects.hash(items, count, components, strict, Arrays.hashCode(stacks));
+        return Objects.hash(items, count, components, strict);
     }
 
     @Override

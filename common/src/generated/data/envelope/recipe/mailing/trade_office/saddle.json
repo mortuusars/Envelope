@@ -1,0 +1,22 @@
+{
+  "type": "envelope:mail_crafting",
+  "entity": "envelope:trade_office",
+  "ingredients": [
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "#c:ingots/iron"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:saddle"
+  }
+}

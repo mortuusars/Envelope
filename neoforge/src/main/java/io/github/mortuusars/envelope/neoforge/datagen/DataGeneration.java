@@ -21,7 +21,7 @@ public class DataGeneration {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        CompletableFuture<HolderLookup.Provider> registries = event.getLookupProvider();
+        CompletableFuture<HolderLookup.Provider> registries = new BuiltInDatapackEntries(output, event.getLookupProvider()).getRegistryProvider();
 
         generator.addProvider(event.includeClient(), new ModelsDatagen(output, existingFileHelper));
 
