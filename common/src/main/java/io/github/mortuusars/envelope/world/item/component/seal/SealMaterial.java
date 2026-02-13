@@ -102,7 +102,7 @@ public final class SealMaterial {
 
     public static void bootstrap(BootstrapContext<SealMaterial> context) {
         Function<ResourceKey<SealMaterial>, ResourceLocation> keyToTexture = key ->
-              key.location().withPath(path -> "gui/seal/material/" + path);
+              key.location().withPath(path -> "seal/material/" + path);
 
         context.register(RED_WAX, new SealMaterial(
               keyToTexture.apply(RED_WAX),

@@ -23,6 +23,11 @@ Included recipes:
   - Can be used as a virtual address for display purposes (commands, scripts, etc.). Cannot receive mail.
 - Unknown address is now a separate type: `{ type:"unknown" }`
 
+Misc:
+- Moved seal textures from `textures/gui/seal` to `textures/seal` folder.
+- Moved letters and numbers seal impressions into their respective subfolders. Example: `envelope:c` -> `envelope:letter/c`
+  - Sealed Letters and Packages will lose their sealer data when updating to this version.
+
 ## 0.5.2 - 2026-02-06
 #### Reworked Packages:
 - `Paper Box` is now used to create a package; `Packing Box` has been removed

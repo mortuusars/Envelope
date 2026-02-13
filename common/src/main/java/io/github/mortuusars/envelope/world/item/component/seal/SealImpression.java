@@ -40,12 +40,12 @@ public final class SealImpression {
 
     public static final Map<Character, ResourceKey<SealImpression>> LETTERS = Util.make(new HashMap<>(), map -> {
         for (char c = 'a'; c <= 'z'; c++) {
-            map.put(c, key(String.valueOf(c)));
+            map.put(c, key("letter/" + c));
         }
     });
     public static final Map<Character, ResourceKey<SealImpression>> NUMBERS = Util.make(new HashMap<>(), map -> {
         for (char c = '0'; c <= '9'; c++) {
-            map.put(c, key(String.valueOf(c)));
+            map.put(c, key("number/" + c));
         }
     });
     public static final Map<String, ResourceKey<SealImpression>> SYMBOLS = new HashMap<>();
@@ -130,7 +130,7 @@ public final class SealImpression {
 
     public static void bootstrap(BootstrapContext<SealImpression> context) {
         Function<ResourceKey<SealImpression>, ResourceLocation> keyToTexture = key ->
-              key.location().withPath(path -> "gui/seal/impression/" + path);
+              key.location().withPath(path -> "seal/impression/" + path);
 
         NUMBERS.values().forEach(key -> context.register(key, new SealImpression(keyToTexture.apply(key))));
         LETTERS.values().forEach(key -> context.register(key, new SealImpression(keyToTexture.apply(key))));

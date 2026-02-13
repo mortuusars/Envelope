@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public class SealRenderer {
-    public static final ResourceLocation IRON_DIE_TEXTURE = Envelope.resource("textures/gui/seal/die/iron.png");
+    public static final ResourceLocation IRON_DIE_TEXTURE = Envelope.resource("textures/seal/die/iron.png");
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
         SealMaterial material = seal.material().value();
