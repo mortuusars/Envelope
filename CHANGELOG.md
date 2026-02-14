@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## 0.6.0-Snapshot 1
 #### Added Mailing recipes
 Send a Package with ingredients to a mail entity - receive crafted result back.
   - Similar to shapeless recipe, but can accept ingredients larger than single item
