@@ -17,8 +17,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MailCraftingRecipe implements MailRecipe {
     private final EntityAddress address;
@@ -54,96 +54,27 @@ public class MailCraftingRecipe implements MailRecipe {
         return Arrays.stream(ingredients.get(index).stacks()).toList();
     }
 
-    /* Easier to read method of matching, but slower by about 20% then new one.
-    @Override
-    public boolean matches(MailRecipeInput input, Level level) {
-        List<ItemStack> inputs = input.getItems()
-              .filter(stack -> !stack.isEmpty())
-              .map(ItemStack::copy)
-              .collect(Collectors.toCollection(ArrayList::new));
-
-        if (inputs.size() != ingredients.size()) {
-            return false;
-        }
-
-        for (StackIngredient ingredient : ingredients) {
-            int requiredCount = ingredient.count();
-
-            for (ItemStack stack : inputs) {
-                if (stack.isEmpty()) {
-                    continue;
-                }
-
-                if (ingredient.testWithoutCount(stack)) {
-                    requiredCount -= stack.split(requiredCount).getCount();
-                }
-
-                if (requiredCount <= 0) {
-                    break;
-                }
-            }
-
-            if (requiredCount > 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-    */
-
     @Override
     public boolean matches(PackageRecipeInput input, Level level) {
-        int size = input.size();
-        int[] remaining = new int[size];
-
-        int nonEmptyInputs = 0;
-
-        for (int i = 0; i < size; i++) {
-            ItemStack stack = input.getItem(i);
-            if (stack.isEmpty()) {
-                remaining[i] = 0;
-
-            } else {
-                remaining[i] = stack.getCount();
-                nonEmptyInputs++;
-            }
-        }
-
-        if (nonEmptyInputs != ingredients.size()) {
-            return false;
-        }
+        BitSet matchedSlots = new BitSet();
 
         for (StackIngredient ingredient : ingredients) {
-            int required = ingredient.count();
-
-            for (int i = 0; i < size; i++) {
-                if (remaining[i] <= 0) {
+            for (int slot = 0; slot < input.size(); slot++) {
+                if (matchedSlots.get(slot)) {
                     continue;
                 }
 
-                ItemStack stack = input.getItem(i);
-                if (stack.isEmpty()) {
-                    continue;
-                }
+                ItemStack stack = input.getItem(slot);
 
-                if (ingredient.testWithoutCount(stack)) {
-                    int taken = Math.min(required, remaining[i]);
-                    required -= taken;
-                    remaining[i] -= taken;
-                }
-
-                if (required <= 0) {
+                if (ingredient.testIgnoreCount(stack) && ingredient.count() <= stack.getCount()) {
+                    matchedSlots.set(slot);
                     break;
                 }
             }
-
-            if (required > 0) {
-                return false;
-            }
         }
 
-        return true;
+        int matchedCount = matchedSlots.cardinality();
+        return input.size() == matchedCount && ingredients.size() == matchedCount;
     }
 
     @Override
@@ -153,33 +84,27 @@ public class MailCraftingRecipe implements MailRecipe {
 
     @Override
     public List<ItemStack> consumeOnce(PackageRecipeInput input) {
-        List<ItemStack> inputs = input.getItems()
-              .map(ItemStack::copy)
-              .collect(Collectors.toCollection(ArrayList::new));
+        BitSet processedSlots = new BitSet();
+
+        List<ItemStack> result = new ArrayList<>();
 
         for (StackIngredient ingredient : ingredients) {
-            int requiredCount = ingredient.count();
-
-            for (ItemStack stack : inputs) {
-                if (stack.isEmpty()) {
+            for (int slot = 0; slot < input.size(); slot++) {
+                if (processedSlots.get(slot)) {
                     continue;
                 }
 
-                if (ingredient.testWithoutCount(stack)) {
-                    requiredCount -= stack.split(requiredCount).getCount();
-                }
+                ItemStack stack = input.getItem(slot);
 
-                if (requiredCount <= 0) {
+                if (ingredient.testIgnoreCount(stack) && ingredient.count() <= stack.getCount()) {
+                    result.add(stack.copyWithCount(stack.getCount() - ingredient.count()));
+                    processedSlots.set(slot);
                     break;
                 }
             }
-
-            if (requiredCount > 0) {
-                return inputs;
-            }
         }
 
-        return inputs;
+        return result;
     }
 
     @Override

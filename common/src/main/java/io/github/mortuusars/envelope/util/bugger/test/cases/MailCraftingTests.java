@@ -22,14 +22,16 @@ public class MailCraftingTests extends BuggerTests {
 
         EntityCraftingMailReceiver craftingReceiver = new EntityCraftingMailReceiver(MailService.of(server.overworld()).getAddress());
 
-        add("MailCrafting_Crafting_CraftsWithoutRemainder", Test.isTrue(() -> {
+        add("MailCrafting_CraftsWithoutRemainder", Test.isTrue(() -> {
             CraftingResult result = craftingReceiver.craft(server.overworld(),
                   recipe(
                         new StackIngredient(Items.EMERALD, 12),
+                        new StackIngredient(Items.DIAMOND, 6),
                         new StackIngredient(Items.DIAMOND, 6)
                   ),
                   input(
                         new ItemStack(Items.EMERALD, 12),
+                        new ItemStack(Items.DIAMOND, 6),
                         new ItemStack(Items.DIAMOND, 6)
                   ));
 
@@ -37,20 +39,38 @@ public class MailCraftingTests extends BuggerTests {
                   && result.output().size() == 1;
         }));
 
-        add("MailCrafting_Crafting_CraftsWithRemainder", Test.isTrue(() -> {
+        add("MailCrafting_CraftsWithRemainder", Test.isTrue(() -> {
             CraftingResult result = craftingReceiver.craft(server.overworld(),
                   recipe(
                         new StackIngredient(Items.EMERALD, 12),
+                        new StackIngredient(Items.DIAMOND, 6),
                         new StackIngredient(Items.DIAMOND, 6)
                   ),
                   input(
                         new ItemStack(Items.EMERALD, 16),
+                        new ItemStack(Items.DIAMOND, 6),
                         new ItemStack(Items.DIAMOND, 6)
                   ));
 
             return result.hasRemainder()
                   && result.remainingInput().getItems().filter(stack -> !stack.isEmpty()).toList().getFirst().getCount() == 4
                   && result.output().size() == 1;
+        }));
+
+        add("MailCrafting_CraftsMultiple", Test.isTrue(() -> {
+            CraftingResult result = craftingReceiver.craft(server.overworld(),
+                  recipe(
+                        new StackIngredient(Items.EMERALD, 12),
+                        new StackIngredient(Items.DIAMOND, 6),
+                        new StackIngredient(Items.DIAMOND, 6)
+                  ),
+                  input(
+                        new ItemStack(Items.EMERALD, 36),
+                        new ItemStack(Items.DIAMOND, 18),
+                        new ItemStack(Items.DIAMOND, 18)
+                  ));
+
+            return !result.hasRemainder() && result.output().getFirst().getCount() == 3;
         }));
     }
 

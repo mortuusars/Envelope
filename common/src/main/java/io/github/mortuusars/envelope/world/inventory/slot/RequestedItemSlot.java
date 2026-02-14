@@ -56,7 +56,7 @@ public class RequestedItemSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return getIngredient().testWithoutCount(stack); // Ignore count to allow placing in parts.
+        return getIngredient().testIgnoreCount(stack); // Ignore count to allow placing in parts.
     }
 
     @Override

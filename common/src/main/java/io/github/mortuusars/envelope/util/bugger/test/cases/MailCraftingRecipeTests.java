@@ -29,7 +29,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
     }
 
     private void matching() {
-        add("MailCraftingRecipe_Matching_PassesIfCorrect", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfCorrect", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6)
@@ -39,7 +39,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.DIAMOND, 6)
               ))));
 
-        add("MailCraftingRecipe_Matching_PassesIfCorrectMultipleOfSame", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfCorrectMultipleOfSame", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6),
@@ -53,7 +53,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.COPPER_INGOT, 6)
               ))));
 
-        add("MailCraftingRecipe_Matching_PassesIfMore", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfMore", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6)
@@ -64,7 +64,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_PassesIfMoreMultipleOfSame", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesIfMoreMultipleOfSame", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6),
@@ -78,7 +78,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.COPPER_INGOT, 30)
               ))));
 
-        add("MailCraftingRecipe_Matching_PassesWhenOutOfOrder", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesWhenOutOfOrder", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6),
@@ -92,7 +92,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                     new ItemStack(Items.DIAMOND, 30)
               ))));
 
-        add("MailCraftingRecipe_Matching_PassesWithEmptyItems", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesWithEmptyItems", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6)
@@ -106,7 +106,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_PassesWithComponents", Test.isTrue(() -> matches(
+        add("MailCraftingRecipe_MatchesWithComponents", Test.isTrue(() -> matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12, DataComponentPredicate.builder()
                           .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
@@ -125,6 +125,17 @@ public class MailCraftingRecipeTests extends BuggerTests {
         )));
 
         // --
+
+        add("MailCraftingRecipe_Matching_FailsIfInputEmpty", Test.isFalse(() -> matches(
+              recipe(
+                    new StackIngredient(Items.EMERALD, 12),
+                    new StackIngredient(Items.DIAMOND, 6)
+              ),
+              input(
+                    ItemStack.EMPTY,
+                    ItemStack.EMPTY
+              )
+        )));
 
         add("MailCraftingRecipe_Matching_FailsIfNotEnough", Test.isFalse(() -> matches(
               recipe(
@@ -161,7 +172,8 @@ public class MailCraftingRecipeTests extends BuggerTests {
               )
         )));
 
-        add("MailCraftingRecipe_Matching_FailsIfMoreInputsOfCorrectItem", Test.isFalse(() -> matches(
+        add("MailCraftingRecipe_Matching_FailsIfMoreInputsOfCorrectItem", Test.isFalse(() ->
+              matches(
               recipe(
                     new StackIngredient(Items.EMERALD, 12),
                     new StackIngredient(Items.DIAMOND, 6)
@@ -175,7 +187,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
     }
 
     private void consuming() {
-        add("MailCraftingRecipe_Consuming_ConsumesCorrectly", Test.isTrue(() -> {
+        add("MailCraftingRecipe_ConsumesCorrectly", Test.isTrue(() -> {
             MailCraftingRecipe recipe = recipe(
                   new StackIngredient(Items.EMERALD, 12),
                   new StackIngredient(Items.DIAMOND, 6)
@@ -190,7 +202,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                   .allMatch(ItemStack::isEmpty);
         }));
 
-        add("MailCraftingRecipe_Consuming_ReturnsRemainder", Test.isTrue(() -> {
+        add("MailCraftingRecipe_ConsumesAndReturnsRemainder", Test.isTrue(() -> {
             MailCraftingRecipe recipe = recipe(
                   new StackIngredient(Items.EMERALD, 12),
                   new StackIngredient(Items.DIAMOND, 6)
@@ -208,7 +220,7 @@ public class MailCraftingRecipeTests extends BuggerTests {
                   .orElse(false);
         }));
 
-        add("MailCraftingRecipe_Consuming_ConsumesOnlyForOneOperation", Test.isTrue(() -> {
+        add("MailCraftingRecipe_ConsumesOnlyForOneOperation", Test.isTrue(() -> {
             MailCraftingRecipe recipe = recipe(
                   new StackIngredient(Items.EMERALD, 12),
                   new StackIngredient(Items.DIAMOND, 6)

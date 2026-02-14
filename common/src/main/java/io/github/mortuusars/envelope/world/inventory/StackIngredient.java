@@ -23,7 +23,6 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -150,11 +149,19 @@ public class StackIngredient {
     // --
 
     public boolean test(ItemStack stack) {
-        return countEquals(stack) && testWithoutCount(stack);
+        return countMatches(stack) && testIgnoreCount(stack);
     }
 
-    public boolean testWithoutCount(ItemStack stack) {
+    public boolean testExactCount(ItemStack stack) {
+        return countEquals(stack) && testIgnoreCount(stack);
+    }
+
+    public boolean testIgnoreCount(ItemStack stack) {
         return stack.is(items()) && componentsMatch(stack);
+    }
+
+    public boolean countMatches(ItemStack stack) {
+        return stack.getCount() >= count();
     }
 
     public boolean countEquals(ItemStack stack) {

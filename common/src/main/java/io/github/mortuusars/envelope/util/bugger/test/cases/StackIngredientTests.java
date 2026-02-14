@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import net.minecraft.Util;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.ItemTags;
@@ -41,34 +42,38 @@ public class StackIngredientTests extends BuggerTests {
               .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
               .build());
 
-        add("StackIngredient_equality_passesIfSame", Test.isTrue(() -> ingredient.equals(ingredient2)));
-        add("StackIngredient_equality_failsIfDifferent", Test.isFalse(() -> ingredient.equals(new StackIngredient(Items.EMERALD, 23))));
+        add("StackIngredient_EqualsIfSame", Test.isTrue(() -> ingredient.equals(ingredient2)));
+        add("StackIngredient_NotEqualsIfDifferent", Test.isFalse(() -> ingredient.equals(new StackIngredient(Items.EMERALD, 23))));
     }
 
     private void itemMatching() {
         StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3);
 
-        add("StackIngredient_itemMatching", Test.isTrue(() -> ingredient.test(new ItemStack(Items.FEATHER, 3))));
-        add("StackIngredient_itemMatching_failsWhenItemIsDifferent", Test.isFalse(() -> ingredient.test(new ItemStack(Items.WRITTEN_BOOK, 3))));
-        add("StackIngredient_itemMatching_failsWhenCountIsLesser", Test.isFalse(() -> ingredient.test(new ItemStack(Items.FEATHER, 1))));
-        add("StackIngredient_itemMatching_failsWhenMoreThanCount", Test.isFalse(() -> ingredient.test(new ItemStack(Items.FEATHER, 5))));
+        add("StackIngredient_ItemMatches_WhenSameCount", Test.isTrue(() -> ingredient.test(new ItemStack(Items.FEATHER, 3))));
+        add("StackIngredient_ItemMatches_WhenMoreThanCount", Test.isTrue(() -> ingredient.test(new ItemStack(Items.FEATHER, 23))));
+        add("StackIngredient_ItemMatches_WithRandomComponents", Test.isTrue(() -> ingredient.test(Util.make(() -> {
+            ItemStack stack = new ItemStack(Items.FEATHER, 3);
+            stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+            return stack;
+        }))));
 
-        ItemStack stack = new ItemStack(Items.FEATHER, 3);
-        stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-        add("StackIngredient_itemMatching_withRandomComponents", Test.isTrue(() -> ingredient.test(stack)));
+        add("StackIngredient_ItemMatches_FailsWhenItemIsDifferent", Test.isFalse(() -> ingredient.test(new ItemStack(Items.WRITTEN_BOOK, 3))));
+        add("StackIngredient_ItemMatches_FailsWhenCountIsLesser", Test.isFalse(() -> ingredient.test(new ItemStack(Items.FEATHER, 1))));
     }
 
     private void tagMatching() {
         StackIngredient ingredient = new StackIngredient(ItemTags.LOGS, 12);
 
-        add("StackIngredient_tagMatching", Test.isTrue(() -> ingredient.test(new ItemStack(Items.OAK_LOG, 12))));
-        add("StackIngredient_tagMatching_failsWhenItemIsDifferent", Test.isFalse(() -> ingredient.test(new ItemStack(Items.WRITTEN_BOOK, 20))));
-        add("StackIngredient_tagMatching_failsWhenCountIsLesser", Test.isFalse(() -> ingredient.test(new ItemStack(Items.OAK_LOG, 5))));
-        add("StackIngredient_tagMatching_failsWhenMoreThanCount", Test.isFalse(() -> ingredient.test(new ItemStack(Items.OAK_LOG, 30))));
+        add("StackIngredient_TagMatches_WithSameCount", Test.isTrue(() -> ingredient.test(new ItemStack(Items.OAK_LOG, 12))));
+        add("StackIngredient_TagMatches_MoreThanCount", Test.isTrue(() -> ingredient.test(new ItemStack(Items.OAK_LOG, 30))));
+        add("StackIngredient_TagMatches_WithRandomComponents", Test.isTrue(() -> ingredient.test(Util.make(() -> {
+            ItemStack stack = new ItemStack(Items.OAK_LOG, 12);
+            stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+            return stack;
+        }))));
 
-        ItemStack stack = new ItemStack(Items.OAK_LOG, 12);
-        stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-        add("StackIngredient_tagMatching_withRandomComponents", Test.isTrue(() -> ingredient.test(stack)));
+        add("StackIngredient_TagMatches_FailsWhenItemIsDifferent", Test.isFalse(() -> ingredient.test(new ItemStack(Items.WRITTEN_BOOK, 20))));
+        add("StackIngredient_TagMatches_FailsWhenCountIsLesser", Test.isFalse(() -> ingredient.test(new ItemStack(Items.OAK_LOG, 5))));
     }
 
     private void componentMatching() {
@@ -81,17 +86,17 @@ public class StackIngredientTests extends BuggerTests {
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
         stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-        add("StackIngredient_componentMatching", Test.isTrue(() -> ingredient.test(stack)));
+        add("StackIngredient_ComponentMatches", Test.isTrue(() -> ingredient.test(stack)));
 
         ItemStack stack2 = stack.copy();
         stack2.remove(Envelope.DataComponents.MAIL_SENDER);
-        add("StackIngredient_componentMatching_failsWhenMissing", Test.isFalse(() -> ingredient.test(stack2)));
+        add("StackIngredient_ComponentMatches_failsWhenMissing", Test.isFalse(() -> ingredient.test(stack2)));
     }
 
     private void matchingItemFromJson() {
-        add("StackIngredient_matchingItemFromJson",
+        add("StackIngredient_MatchesItemFromJson",
               Test.isTrue(() -> decodeFromJson("{\"item\":\"minecraft:emerald\"}").test(new ItemStack(Items.EMERALD))));
-        add("StackIngredient_matchingItemFromJson_failsWhenCountIsLesser",
+        add("StackIngredient_MatchesItemFromJson_failsWhenCountIsLesser",
               Test.isFalse(() -> decodeFromJson("{\"item\":\"minecraft:emerald\",\"count\":5}").test(new ItemStack(Items.EMERALD))));
     }
 
@@ -113,7 +118,7 @@ public class StackIngredientTests extends BuggerTests {
                 }
               }
               """;
-        add("StackIngredient_matchingItemWithComponentsFromJson",
+        add("StackIngredient_MatchesItemWithComponentsFromJson",
               Test.isTrue(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
@@ -142,7 +147,7 @@ public class StackIngredientTests extends BuggerTests {
                 "strict": true
               }
               """;
-        add("StackIngredient_matchingItemWithComponentsStrictFromJson",
+        add("StackIngredient_MatchesItemWithComponentsStrictFromJson",
               Test.isTrue(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
@@ -151,7 +156,7 @@ public class StackIngredientTests extends BuggerTests {
                   return decodeFromJson(json).test(stack);
               }));
 
-        add("StackIngredient_matchingItemWithComponentsStrictFromJson_fails_with_less",
+        add("StackIngredient_MatchesItemWithComponentsStrictFromJson_Fails_with_less",
               Test.isFalse(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
@@ -159,7 +164,7 @@ public class StackIngredientTests extends BuggerTests {
                   return decodeFromJson(json).test(stack);
               }));
 
-        add("StackIngredient_matchingItemWithComponentsStrictFromJson_fails_with_additional",
+        add("StackIngredient_MatchesItemWithComponentsStrictFromJson_Fails_with_additional",
               Test.isFalse(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
@@ -171,9 +176,9 @@ public class StackIngredientTests extends BuggerTests {
     }
 
     private void matchingTagFromJson() {
-        add("StackIngredient_matchingTagFromJson",
+        add("StackIngredient_MatchesTagFromJson",
               Test.isTrue(() -> decodeFromJson("{\"item\":\"#minecraft:planks\"}").test(new ItemStack(Items.BIRCH_PLANKS))));
-        add("StackIngredient_matchingTagFromJson_failsWhenCountIsLesser",
+        add("StackIngredient_MatchesTagFromJson_FailsWhenCountIsLesser",
               Test.isFalse(() -> decodeFromJson("{\"item\":\"#minecraft:planks\",\"count\":5}").test(new ItemStack(Items.BIRCH_PLANKS))));
     }
 

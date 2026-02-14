@@ -6,6 +6,7 @@ import net.minecraft.world.item.crafting.RecipeInput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -22,7 +23,17 @@ public interface PackageRecipeInput extends RecipeInput {
         return of(contents.getItemsForReading());
     }
 
-    record Simple(List<ItemStack> items) implements PackageRecipeInput {
+    class Simple implements PackageRecipeInput {
+        private final List<ItemStack> items;
+
+        public Simple(List<ItemStack> items) {
+            this.items = items.stream().filter(stack -> !stack.isEmpty()).toList();
+        }
+
+        public List<ItemStack> items() {
+            return items;
+        }
+
         public Stream<ItemStack> getItems() {
             return items.stream();
         }

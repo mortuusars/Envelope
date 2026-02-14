@@ -9,7 +9,6 @@ import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
 import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
 import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
@@ -24,7 +23,7 @@ public class DeliveryHandlerTests extends BuggerTests {
 
     public DeliveryHandlerTests(MinecraftServer server) {
         this.server = server;
-        add(new Test("tickDelivery_callsCallbacksProperly", this::testCallbacks));
+        add(new Test("TickDelivery_CallsCallbacksProperly", this::testCallbacks));
     }
 
     private DataResult<Boolean> testCallbacks() {
