@@ -22,6 +22,8 @@ import java.util.*;
  */
 public class DeliveryRoute {
     public static final Codec<DeliveryRoute> CODEC = RecordCodecBuilder.create(i -> i.group(
+          AddressLocation.CODEC.fieldOf("sender_location").forGetter(DeliveryRoute::getSenderLocation),
+          AddressLocation.CODEC.fieldOf("recipient_location").forGetter(DeliveryRoute::getRecipientLocation),
           BlockPos.CODEC.optionalFieldOf("sender_pos").forGetter(DeliveryRoute::getSenderPos),
           BlockPos.CODEC.optionalFieldOf("sender_ascend_pos").forGetter(DeliveryRoute::getSenderAscendPos),
           TravelDuration.CODEC.optionalFieldOf("sender_to_hub_duration", TravelDuration.DEFAULT).forGetter(DeliveryRoute::getSenderToHubDuration),
@@ -32,10 +34,13 @@ public class DeliveryRoute {
     ).apply(i, DeliveryRoute::new));
 
     public static final DeliveryRoute EMPTY = new DeliveryRoute(
+          AddressLocation.DEFAULT, AddressLocation.DEFAULT,
           Optional.empty(), Optional.empty(),
           TravelDuration.DEFAULT, Optional.empty(), TravelDuration.DEFAULT,
           Optional.empty(), Optional.empty());
 
+    private final AddressLocation senderLocation;
+    private final AddressLocation recipientLocation;
     private final Optional<BlockPos> senderPos;
     private final Optional<BlockPos> senderAscendPos;
     private final TravelDuration senderToHubDuration;
@@ -46,9 +51,12 @@ public class DeliveryRoute {
 
     private @Nullable Map<DeliveryPhase, Segment> segments;
 
-    public DeliveryRoute(Optional<BlockPos> senderPos, Optional<BlockPos> senderAscendPos,
+    public DeliveryRoute(AddressLocation senderLocation, AddressLocation recipientLocation,
+                         Optional<BlockPos> senderPos, Optional<BlockPos> senderAscendPos,
                          TravelDuration senderToHubDuration, Optional<BlockPos> hubPos, TravelDuration recipientToHubDuration,
                          Optional<BlockPos> recipientAscendPos, Optional<BlockPos> recipientPos) {
+        this.senderLocation = senderLocation;
+        this.recipientLocation = recipientLocation;
         this.senderPos = senderPos;
         this.senderAscendPos = senderAscendPos;
         this.senderToHubDuration = senderToHubDuration;
@@ -69,6 +77,8 @@ public class DeliveryRoute {
         Optional<BlockPos> hubPos = getHubPosition(senderLocation, recipientLocation);
 
         return new DeliveryRoute(
+              senderLocation,
+              recipientLocation,
               senderPos,
               senderLocation.ascendTowards(level, hubPos),
               senderLocation.getTravelDurationTo(hubPos),
@@ -83,6 +93,14 @@ public class DeliveryRoute {
     }
 
     // --
+
+    public AddressLocation getSenderLocation() {
+        return senderLocation;
+    }
+
+    public AddressLocation getRecipientLocation() {
+        return recipientLocation;
+    }
 
     public Optional<BlockPos> getSenderPos() {
         return senderPos;
@@ -116,9 +134,8 @@ public class DeliveryRoute {
         return new TravelDuration(getSenderToHubDuration().ticks() + getRecipientToHubDuration().ticks());
     }
 
-    public Optional<Integer> getDistance() {
-        return Optional.of(Position.getDistanceBetween(senderAscendPos, hubPos).orElse(0)
-              + Position.getDistanceBetween(hubPos, recipientAscendPos).orElse(0));
+    public int getDistance() {
+        return senderLocation.getDistanceTo(hubPos) + recipientLocation.getDistanceTo(hubPos);
     }
 
     // --

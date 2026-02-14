@@ -28,6 +28,7 @@ Misc:
 - Moved seal textures from `textures/gui/seal` to `textures/seal` folder.
 - Moved letters and numbers seal impressions into their respective subfolders. Example: `envelope:c` -> `envelope:letter/c`
   - Sealed Letters and Packages will lose their sealer data when updating to this version.
+- Fixed total delivery distance calculation in debug-mode overlay.
 
 ## 0.5.2 - 2026-02-06
 #### Reworked Packages:
