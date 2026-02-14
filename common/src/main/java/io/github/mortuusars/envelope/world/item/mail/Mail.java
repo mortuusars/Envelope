@@ -96,8 +96,13 @@ public final class Mail {
     }
 
     public static ItemStack setReturned(ItemStack stack) {
-        stack.set(Envelope.DataComponents.MAIL_RETURNED, Unit.INSTANCE);
-        return stack;
+        return setReturned(stack, true);
+    }
+
+    public static ItemStack returned(ItemStack mail, Component message) {
+        writeToLog(mail, DeliveryRecord.returned(message));
+        setReturned(mail);
+        return mail;
     }
 
     // -- Log

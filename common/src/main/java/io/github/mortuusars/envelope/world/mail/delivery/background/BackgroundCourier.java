@@ -1,15 +1,17 @@
-package io.github.mortuusars.envelope.world.delivery.background;
+package io.github.mortuusars.envelope.world.mail.delivery.background;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.world.delivery.*;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
+import io.github.mortuusars.envelope.world.mail.delivery.Courier;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryExecutor;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.Optional;
 
-public class BackgroundCourier implements Courier, DeliveryHandler {
+public class BackgroundCourier implements Courier, DeliveryExecutor {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::getEntityData),
           CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::getOrigin),
@@ -45,7 +47,7 @@ public class BackgroundCourier implements Courier, DeliveryHandler {
     }
 
     @Override
-    public DeliveryHandler getDeliveryHandler() {
+    public DeliveryExecutor getDeliveryExecutor() {
         return this;
     }
 

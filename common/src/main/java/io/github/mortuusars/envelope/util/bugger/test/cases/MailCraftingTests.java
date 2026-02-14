@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.item.crafting.CraftingResult;
 import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.PackageRecipeInput;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.receiver.EntityCraftingMailReceiver;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.CraftingMailHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -20,7 +20,7 @@ public class MailCraftingTests extends BuggerTests {
     public MailCraftingTests(MinecraftServer server) {
         this.server = server;
 
-        EntityCraftingMailReceiver craftingReceiver = new EntityCraftingMailReceiver(MailService.of(server.overworld()).getAddress());
+        CraftingMailHandler craftingReceiver = new CraftingMailHandler(MailService.of(server.overworld()).getAddress());
 
         add("MailCrafting_CraftsWithoutRemainder", Test.isTrue(() -> {
             CraftingResult result = craftingReceiver.craft(server.overworld(),

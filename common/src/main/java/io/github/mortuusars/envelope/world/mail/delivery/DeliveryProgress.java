@@ -1,9 +1,8 @@
-package io.github.mortuusars.envelope.world.delivery;
+package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import net.minecraft.util.Mth;
 
 public class DeliveryProgress {

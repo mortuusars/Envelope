@@ -1,10 +1,10 @@
-package io.github.mortuusars.envelope.world.delivery;
+package io.github.mortuusars.envelope.world.mail.delivery;
 
 import java.util.Optional;
 
 public interface Courier {
     Optional<Delivery> getCurrentDelivery();
-    DeliveryHandler getDeliveryHandler();
+    DeliveryExecutor getDeliveryExecutor();
     CourierOrigin getOrigin();
 
     default boolean isDelivering() {

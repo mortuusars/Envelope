@@ -3,11 +3,11 @@ package io.github.mortuusars.envelope.util.bugger.test.cases;
 import com.mojang.serialization.DataResult;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.Test;
-import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
-import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryExecutor;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
 import net.minecraft.Util;
@@ -27,7 +27,7 @@ public class DeliveryHandlerTests extends BuggerTests {
     }
 
     private DataResult<Boolean> testCallbacks() {
-        TestDeliveryHandler handler = new TestDeliveryHandler();
+        TestDeliveryExecutor handler = new TestDeliveryExecutor();
         Delivery delivery = new Delivery(
               Id.createUnsafe(0),
               Optional.empty(),
@@ -58,7 +58,7 @@ public class DeliveryHandlerTests extends BuggerTests {
         return DataResult.success(true);
     }
 
-    private static class TestDeliveryHandler implements DeliveryHandler {
+    private static class TestDeliveryExecutor implements DeliveryExecutor {
         public final Map<DeliveryPhase, BitSet> checks = Util.make(new HashMap<>(), map -> {
             for (DeliveryPhase phase : DeliveryPhase.values()) {
                 map.put(phase, new BitSet());
@@ -87,7 +87,7 @@ public class DeliveryHandlerTests extends BuggerTests {
 
         @Override
         public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
-            return DeliveryHandler.super.getPhaseDuration(level, delivery, phase) - 1;
+            return DeliveryExecutor.super.getPhaseDuration(level, delivery, phase) - 1;
         }
 
         @Override

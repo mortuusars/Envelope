@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.delivery.background;
+package io.github.mortuusars.envelope.world.mail.delivery.background;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;

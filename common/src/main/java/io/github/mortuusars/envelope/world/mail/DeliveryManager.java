@@ -3,13 +3,17 @@ package io.github.mortuusars.envelope.world.mail;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.util.result.Error;
 import io.github.mortuusars.envelope.util.result.Result;
-import io.github.mortuusars.envelope.world.delivery.Courier;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.DeliveryDraft;
-import io.github.mortuusars.envelope.world.delivery.route.DeliveryRoute;
+import io.github.mortuusars.envelope.world.mail.delivery.Courier;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryDraft;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.BlockMailHandler;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.EntityMailHandler;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.IncomingMailHandler;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.PlayerMailHandler;
 import org.slf4j.Logger;
 
 import java.util.function.Function;
@@ -79,6 +83,17 @@ public class DeliveryManager {
             case BlockAddress block -> true;
             case EntityAddress entity -> true;
             default -> false;
+        };
+    }
+
+    public IncomingMailHandler getIncomingMailHandler(Address address) {
+        return switch (address) {
+            case BlockAddress block -> new BlockMailHandler(block);
+            case PlayerAddress player -> new PlayerMailHandler(player);
+            case EntityAddress entity -> new EntityMailHandler(entity);
+            case CustomAddress ignored -> IncomingMailHandler.RETURN_NOT_FOUND;
+            case UnknownAddress ignored -> IncomingMailHandler.RETURN_CANNOT_BE_DETERMINED;
+            default -> throw new IllegalStateException("Unexpected type of address: " + address.getType());
         };
     }
 }

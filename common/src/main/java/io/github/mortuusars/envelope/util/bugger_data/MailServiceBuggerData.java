@@ -3,9 +3,9 @@ package io.github.mortuusars.envelope.util.bugger_data;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.data.NbtData;
-import io.github.mortuusars.envelope.world.delivery.Courier;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
+import io.github.mortuusars.envelope.world.mail.delivery.Courier;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.ChatFormatting;
@@ -53,7 +53,7 @@ public class MailServiceBuggerData extends NbtData {
 
     private @NotNull String formDeliveryString(MailService mailService, Courier courier) {
         Delivery delivery = courier.getCurrentDelivery().orElseThrow();
-        int phaseDuration = courier.getDeliveryHandler().getPhaseDuration(mailService.getLevel(), delivery, delivery.getPhase());
+        int phaseDuration = courier.getDeliveryExecutor().getPhaseDuration(mailService.getLevel(), delivery, delivery.getPhase());
 
         return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
               " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +

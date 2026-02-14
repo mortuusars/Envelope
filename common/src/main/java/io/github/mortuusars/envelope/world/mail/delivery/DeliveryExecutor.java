@@ -1,18 +1,18 @@
-package io.github.mortuusars.envelope.world.delivery;
+package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.IncomingMailHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
-public interface DeliveryHandler {
+public interface DeliveryExecutor {
     CourierOrigin getOrigin();
 
     default void tickDelivery(ServerLevel level, Delivery delivery) {
@@ -49,6 +49,7 @@ public interface DeliveryHandler {
     /**
      * Allows manually handling selection of next phase. <br>
      * Jumping to phases non-linearly should be done here. (to return early, etc.)
+     *
      * @return {@code true} to skip selection of next phase.<br>
      * {@code false} to select next phase in order.
      */
@@ -69,7 +70,8 @@ public interface DeliveryHandler {
             case STARTED, FINISHED -> 8;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
             case TRAVELING_FROM_SENDER_TO_HUB, TRAVELING_FROM_HUB_TO_SENDER -> delivery.getRoute().getSenderToHubDuration().ticks();
-            case TRAVELING_FROM_HUB_TO_RECIPIENT, TRAVELING_FROM_RECIPIENT_TO_HUB -> delivery.getRoute().getRecipientToHubDuration().ticks();
+            case TRAVELING_FROM_HUB_TO_RECIPIENT, TRAVELING_FROM_RECIPIENT_TO_HUB ->
+                  delivery.getRoute().getRecipientToHubDuration().ticks();
             case DISPATCHING_DELIVERY, DISPATCHING_RETURN -> 20;
             case HANDLING_DELIVERY, HANDLING_RETURN -> 10;
         };
@@ -93,11 +95,13 @@ public interface DeliveryHandler {
 
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                ItemStack result = MailService.of(level).deliverMail(delivery.getRecipient(), delivery.getSender(), delivery.getMail());
+                ItemStack result = MailService.of(level).getDeliveryManager().getIncomingMailHandler(delivery.getRecipient())
+                      .handle(level, delivery);
                 delivery.setMail(result);
             }
             case HANDLING_RETURN -> {
-                ItemStack result = MailService.of(level).deliverMail(delivery.getSender(), delivery.getRecipient(), delivery.getMail());
+                ItemStack result = MailService.of(level).getDeliveryManager().getIncomingMailHandler(delivery.getSender())
+                      .handle(level, delivery);
                 delivery.setMail(result);
             }
         }

@@ -1,8 +1,8 @@
-package io.github.mortuusars.envelope.world.mail.receiver;
+package io.github.mortuusars.envelope.world.mail.delivery.incoming;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.crafting.CraftingResult;
@@ -11,7 +11,6 @@ import io.github.mortuusars.envelope.world.item.crafting.PackageRecipeInput;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -22,17 +21,19 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EntityCraftingMailReceiver implements MailReceiver {
+public class CraftingMailHandler implements IncomingMailHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final EntityAddress address;
+    private final Address address;
 
-    public EntityCraftingMailReceiver(EntityAddress address) {
+    public CraftingMailHandler(Address address) {
         this.address = address;
     }
 
     @Override
-    public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
+    public ItemStack handle(ServerLevel level, Delivery delivery) {
+        ItemStack mail = delivery.getMail();
+
         PackageContents packageContents = PackageContents.from(mail);
         if (packageContents.isEmpty()) {
             return ItemStack.EMPTY;
@@ -49,11 +50,11 @@ public class EntityCraftingMailReceiver implements MailReceiver {
 
         if (result.output().isEmpty()) {
             LOGGER.warn("No results from the mail crafting.");
-            return returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
+            return Mail.returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
         }
 
-        List<ItemStack> packages = Mail.createPackages(result.output(), pkg -> pkg.recipient(sender));
-        return sendResults(level, mail, result.remainingInput(), packages, sender);
+        List<ItemStack> packages = Mail.createPackages(result.output(), pkg -> pkg.recipient(delivery.getSender()));
+        return sendResults(level, mail, result.remainingInput(), packages, delivery.getSender());
     }
 
     public List<RecipeHolder<MailRecipe>> getAllRecipes(ServerLevel level) {
@@ -94,7 +95,7 @@ public class EntityCraftingMailReceiver implements MailReceiver {
         return new CraftingResult(input, outputContainer.removeAllItems());
     }
 
-    protected ItemStack sendResults(ServerLevel level, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address sender) {
+    protected ItemStack sendResults(ServerLevel level, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address destination) {
         boolean hasRemainder = false;
 
         if (!remainingInput.isEmpty()) {
@@ -116,11 +117,11 @@ public class EntityCraftingMailReceiver implements MailReceiver {
                         .startService(Delivery.draft()
                               .deliver(pkg)
                               .from(address)
-                              .to(sender));
+                              .to(destination));
               });
 
         if (hasRemainder) {
-            return returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
+            return Mail.returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
         }
 
         return Mail.of(packages.getFirst())

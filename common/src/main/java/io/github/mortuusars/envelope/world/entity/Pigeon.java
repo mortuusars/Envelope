@@ -6,12 +6,12 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
-import io.github.mortuusars.envelope.world.delivery.*;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.delivery.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -110,7 +110,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     protected PigeonholeHandler pigeonholeHandler;
     protected MailboxHandler mailboxHandler;
-    protected PigeonDeliveryHandler deliveryHandler;
+    protected PigeonDeliveryExecutor deliveryHandler;
 
     protected @Nullable Delivery delivery;
     protected @Nullable CourierOrigin origin;
@@ -121,7 +121,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         pigeonholeHandler = new PigeonholeHandler();
         pigeonholeHandler.setRandomWantCooldownUpToDefault(level.getRandom());
         mailboxHandler = new MailboxHandler();
-        deliveryHandler = new PigeonDeliveryHandler(this);
+        deliveryHandler = new PigeonDeliveryExecutor(this);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
         setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
     }
@@ -599,7 +599,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     // -- Courier
 
     @Override
-    public DeliveryHandler getDeliveryHandler() {
+    public DeliveryExecutor getDeliveryExecutor() {
         return deliveryHandler;
     }
 

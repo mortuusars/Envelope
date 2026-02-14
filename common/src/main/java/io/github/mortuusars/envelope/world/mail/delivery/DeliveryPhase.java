@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.delivery.phase;
+package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;

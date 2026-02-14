@@ -3,16 +3,16 @@ package io.github.mortuusars.envelope.world.mail;
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.util.result.Result;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.*;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
-import io.github.mortuusars.envelope.world.mail.receiver.*;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import io.github.mortuusars.envelope.world.KnownPlayers;
 import net.minecraft.ChatFormatting;
@@ -136,25 +136,6 @@ public class MailService {
             case EntityAddress entity -> entity.getEntity().location();
             default -> AddressLocation.DEFAULT;
         };
-    }
-
-    // --
-
-    public ItemStack deliverMail(Address recipient, Address sender, ItemStack mail) {
-        if (mail.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
-        MailReceiver receiver = switch (recipient) {
-            case BlockAddress block -> new MailboxMailReceiver(block);
-            case PlayerAddress player -> new PlayerMailReceiver(player);
-            case EntityAddress entity -> new EntityMailReceiver(entity);
-            case CustomAddress custom -> new CustomMailReceiver(custom);
-            case UnknownAddress ignored -> new UnknownMailReceiver();
-            default -> throw new IllegalStateException("Unexpected type of recipient address: " + sender.getType());
-        };
-
-        return receiver.receiveMail(level, sender, mail);
     }
 
     // --

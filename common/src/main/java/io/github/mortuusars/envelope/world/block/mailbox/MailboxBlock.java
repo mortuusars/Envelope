@@ -5,7 +5,8 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
-import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.address.BlockAddressValidation;
@@ -13,6 +14,11 @@ import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.BlockMailHandler;
+import io.github.mortuusars.envelope.world.mail.delivery.incoming.IncomingMailHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,6 +51,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class MailboxBlock extends BaseEntityBlock {
     public static final MapCodec<MailboxBlock> CODEC = simpleCodec(MailboxBlock::new);
@@ -157,7 +165,9 @@ public class MailboxBlock extends BaseEntityBlock {
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(recipientAddress)) {
             if (level instanceof ServerLevel serverLevel) {
-                ItemStack result = MailService.of(serverLevel).deliverMail(recipientAddress, new PlayerAddress(player), stack.split(1));
+                Delivery delivery = new Delivery(Id.create(serverLevel), Optional.of(player.getUUID()), new PlayerAddress(player),
+                      recipientAddress, stack.split(1), DeliveryRoute.EMPTY, DeliveryPhase.HANDLING_DELIVERY, 0, false);
+                ItemStack result = new BlockMailHandler(recipientAddress).handle(serverLevel, delivery);
                 if (player.getItemInHand(hand).isEmpty()) {
                     player.setItemInHand(hand, result.copy());
                 } else if (!player.addItem(result)) {

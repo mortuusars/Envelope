@@ -2,19 +2,19 @@ package io.github.mortuusars.envelope.world.entity;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.Ticks;
-import io.github.mortuusars.envelope.world.delivery.CourierOrigin;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.DeliveryHandler;
-import io.github.mortuusars.envelope.world.delivery.phase.DeliveryPhase;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryExecutor;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
-public class PigeonDeliveryHandler implements DeliveryHandler {
+public class PigeonDeliveryExecutor implements DeliveryExecutor {
     private final Pigeon pigeon;
 
-    public PigeonDeliveryHandler(Pigeon pigeon) {
+    public PigeonDeliveryExecutor(Pigeon pigeon) {
         this.pigeon = pigeon;
     }
 
@@ -32,13 +32,13 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
         return switch (phase) {
             // Longer approach/depart phases to allow for pathfinding to finish
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 30 * Ticks.SECOND;
-            default -> DeliveryHandler.super.getPhaseDuration(level, delivery, phase);
+            default -> DeliveryExecutor.super.getPhaseDuration(level, delivery, phase);
         };
     }
 
     @Override
     public void phaseStarted(ServerLevel level, Delivery delivery) {
-        DeliveryHandler.super.phaseStarted(level, delivery);
+        DeliveryExecutor.super.phaseStarted(level, delivery);
         if (delivery.getPhase().isTraveling()) {
             pigeon().transitionToBackground(level);
         }
@@ -61,7 +61,7 @@ public class PigeonDeliveryHandler implements DeliveryHandler {
             return true;
         }
 
-        return DeliveryHandler.super.handlePhaseTransition(level, delivery);
+        return DeliveryExecutor.super.handlePhaseTransition(level, delivery);
     }
 
     @Override

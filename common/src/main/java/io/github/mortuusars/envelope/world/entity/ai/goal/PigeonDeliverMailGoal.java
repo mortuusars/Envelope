@@ -48,7 +48,7 @@ public class PigeonDeliverMailGoal extends Goal {
         }
 
         pigeon.getCurrentDelivery().ifPresent(delivery -> {
-            pigeon().getDeliveryHandler().tickDelivery(level, delivery);
+            pigeon().getDeliveryExecutor().tickDelivery(level, delivery);
 
             delivery.getRoute().getSegment(delivery.getPhase()).endPos()
                   .ifPresentOrElse(pos -> {
@@ -62,7 +62,7 @@ public class PigeonDeliverMailGoal extends Goal {
                       if ((delivery.getPhase().isAscending() || delivery.getPhase().isDescending())
                             && pigeon.hasReachedTarget(pos)) {
                           // Complete the phase instantly
-                          delivery.setPhaseProgress(pigeon().getDeliveryHandler().getPhaseDuration(level, delivery, delivery.getPhase()));
+                          delivery.setPhaseProgress(pigeon().getDeliveryExecutor().getPhaseDuration(level, delivery, delivery.getPhase()));
                           return;
                       }
 

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.mail.receiver;
+package io.github.mortuusars.envelope.world.mail.delivery.incoming;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
@@ -6,26 +6,28 @@ import io.github.mortuusars.envelope.world.block.mailbox.InboxStorage;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 
-public class MailboxMailReceiver implements MailReceiver {
+public class BlockMailHandler implements IncomingMailHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final BlockAddress address;
 
-    public MailboxMailReceiver(BlockAddress address) {
+    public BlockMailHandler(BlockAddress address) {
         this.address = address;
     }
 
     @Override
-    public ItemStack receiveMail(ServerLevel level, Address sender, ItemStack mail) {
+    public ItemStack handle(ServerLevel level, Delivery delivery) {
+        ItemStack mail = delivery.getMail();
+
         if (mail.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -34,7 +36,7 @@ public class MailboxMailReceiver implements MailReceiver {
               .map(inbox -> {
                   if (inbox.isInboxFull()) {
                       LOGGER.info("Cannot deliver mail to mailbox '{}': inbox is full. Returning to sender.", address);
-                      return returned(mail, DeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL);
+                      return Mail.returned(mail, DeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL);
                   }
 
                   ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
@@ -46,12 +48,12 @@ public class MailboxMailReceiver implements MailReceiver {
                       return ItemStack.EMPTY;
                   } else {
                       LOGGER.info("Cannot deliver mail to mailbox '{}': mail cannot be inserted. Returning to sender.", address);
-                      return returned(mail, DeliveryRecord.Message.UNABLE_TO_REACH);
+                      return Mail.returned(mail, DeliveryRecord.Message.UNABLE_TO_REACH);
                   }
               })
               .orElseGet(() -> {
                   LOGGER.info("Cannot deliver mail to mailbox '{}': address not found. Returning to sender.", address);
-                  return returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
+                  return Mail.returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
               });
     }
 

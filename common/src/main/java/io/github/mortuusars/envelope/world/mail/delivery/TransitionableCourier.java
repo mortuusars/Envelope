@@ -1,6 +1,6 @@
-package io.github.mortuusars.envelope.world.delivery;
+package io.github.mortuusars.envelope.world.mail.delivery;
 
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
+import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.particles.ParticleTypes;

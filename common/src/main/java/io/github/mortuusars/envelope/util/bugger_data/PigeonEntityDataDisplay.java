@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.util.bugger_data;
 
 import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;

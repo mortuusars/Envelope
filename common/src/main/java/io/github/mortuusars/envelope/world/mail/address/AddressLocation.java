@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.delivery.TravelDuration;
+import io.github.mortuusars.envelope.world.mail.delivery.TravelDuration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;

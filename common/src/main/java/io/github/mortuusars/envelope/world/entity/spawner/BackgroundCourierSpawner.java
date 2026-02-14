@@ -1,10 +1,10 @@
 package io.github.mortuusars.envelope.world.entity.spawner;
 
 import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
-import io.github.mortuusars.envelope.world.delivery.TransitionableCourier;
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundCourier;
-import io.github.mortuusars.envelope.world.delivery.background.BackgroundDelivery;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.TransitionableCourier;
+import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
+import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.Util;
 import net.minecraft.server.level.ServerLevel;

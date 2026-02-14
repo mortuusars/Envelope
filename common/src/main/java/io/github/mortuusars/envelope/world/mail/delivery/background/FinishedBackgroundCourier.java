@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.delivery.background;
+package io.github.mortuusars.envelope.world.mail.delivery.background;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
