@@ -24,6 +24,7 @@ Included recipes:
 - Unknown address is now a separate type: `{ type:"unknown" }`
 
 Misc:
+- Updated some address type icons (little flags)
 - Moved seal textures from `textures/gui/seal` to `textures/seal` folder.
 - Moved letters and numbers seal impressions into their respective subfolders. Example: `envelope:c` -> `envelope:letter/c`
   - Sealed Letters and Packages will lose their sealer data when updating to this version.

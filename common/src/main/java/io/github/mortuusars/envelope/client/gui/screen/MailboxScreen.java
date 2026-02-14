@@ -42,6 +42,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail_button"));
 
+    public static final WidgetSprites ICON_ADDRESS_GENERIC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_generic"));
     public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_block"));
     public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
     public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_entity"));
@@ -491,9 +492,12 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         return switch (sender.getType()) {
             case BLOCK -> ICON_ADDRESS_BLOCK_SPRITES;
             case PLAYER -> ICON_ADDRESS_PLAYER_SPRITES;
-            case ENTITY -> sender.isMailService() ? ICON_ADDRESS_MAIL_SERVICE_SPRITES : ICON_ADDRESS_ENTITY_SPRITES;
-            case CUSTOM -> ICON_ADDRESS_ENTITY_SPRITES;
+            case ENTITY -> sender.isMailService()
+                  ? ICON_ADDRESS_MAIL_SERVICE_SPRITES
+                  : ICON_ADDRESS_ENTITY_SPRITES;
+            case CUSTOM -> ICON_ADDRESS_CUSTOM_SPRITES;
             case UNKNOWN -> ICON_ADDRESS_UNKNOWN_SPRITES;
+            default -> ICON_ADDRESS_GENERIC_SPRITES;
         };
     }
 
