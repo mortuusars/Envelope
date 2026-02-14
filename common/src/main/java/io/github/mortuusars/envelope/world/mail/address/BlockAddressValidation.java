@@ -10,6 +10,8 @@ import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public interface BlockAddressValidation {
     Error CANNOT_BE_EMPTY = new Error("Id cannot be empty", "error.envelope.address.id_cannot_be_empty");
     Error TOO_LONG = new Error("Id is too long", "error.envelope.address.id_too_long");
@@ -17,10 +19,16 @@ public interface BlockAddressValidation {
     Error TAKEN = new Error("Id is in use", "error.envelope.address.taken");
     Error NOT_ENOUGH_XP = new Error("Not enough xp levels", "error.envelope.address.not_enough_xp_levels");
 
+    List<String> RESERVED_IDS = List.of(
+          "Mail Service",
+          "Unknown"
+    );
+
     Validator<String> ID = Validator.of(
           Rule.when(StringUtil::isBlank, CANNOT_BE_EMPTY),
           Rule.when(id -> id.length() > BlockAddress.MAX_LENGTH, TOO_LONG),
-          Rule.when(id -> !StringUtil.filterText(id).equals(id), CONTAINS_INVALID_CHARS)
+          Rule.when(id -> !StringUtil.filterText(id).equals(id), CONTAINS_INVALID_CHARS),
+          Rule.when(RESERVED_IDS::contains, TAKEN)
     );
 
     static Validator<String> id() {

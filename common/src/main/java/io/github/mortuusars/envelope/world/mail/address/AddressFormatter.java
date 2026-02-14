@@ -106,7 +106,7 @@ public class AddressFormatter {
     public MutableComponent toComponent() {
         MutableComponent addressComponent;
         if (maxLength < Integer.MAX_VALUE) {
-            String string = StringUtil.truncateStringIfNecessary(address.toString(), maxLength, true);
+            String string = StringUtil.truncateStringIfNecessary(address.getString(), maxLength, true);
             addressComponent = Component.literal(string);
         } else {
             addressComponent = address.getComponent();
