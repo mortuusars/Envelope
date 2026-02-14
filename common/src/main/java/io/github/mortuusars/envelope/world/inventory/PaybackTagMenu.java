@@ -1,10 +1,7 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.ItemAndStack;
-import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.FilteredSlot;
-import io.github.mortuusars.envelope.world.item.PaybackTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
@@ -17,11 +14,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaybackTagMenu extends AbstractContainerMenu {
+public class PaybackTagMenu extends AbstractInHandContainerMenu {
     public static final int CONFIRM_BUTTON_ID = 0;
 
     public static final int COUNT_START_BUTTON_ID = 100;
@@ -38,22 +33,8 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     public static final int DECREASE_COUNT_START_BUTTON_ID = INCREASE_COUNT_FAST_START_BUTTON_ID + PaybackTagContents.SLOTS;
     public static final int DECREASE_COUNT_FAST_START_BUTTON_ID = DECREASE_COUNT_START_BUTTON_ID + PaybackTagContents.SLOTS;
 
-    private final Player player;
-    private final InteractionHand hand;
-    private final int tagSlot;
-    private final ItemAndStack<Item> tagStack;
-    private final SimpleContainer paybackContainer;
-
-    protected PaybackTagMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
-        super(menuType, containerId);
-        this.player = playerInventory.player;
-        this.hand = hand;
-        this.tagSlot = hand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : playerInventory.selected;
-        this.tagStack = new ItemAndStack<>(playerInventory.getItem(tagSlot));
-        this.paybackContainer = createPaybackContainer();
-
-        addPaybackSlots();
-        addPlayerSlots(playerInventory, 13, 72, tagSlot);
+    protected PaybackTagMenu(@Nullable MenuType<?> menuType, int containerId, Inventory inventory, InteractionHand hand) {
+        super(menuType, containerId, inventory, hand);
     }
 
     public PaybackTagMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -66,10 +47,19 @@ public class PaybackTagMenu extends AbstractContainerMenu {
 
     // --
 
-    protected SimpleContainer createPaybackContainer() {
+
+    @Override
+    protected void init() {
+        playerSlotsX = 13;
+        playerSlotsY = 72;
+        super.init();
+    }
+
+    @Override
+    protected Container createContainer() {
         List<ItemStack> items = new ArrayList<>();
 
-        @Nullable PaybackTagContents paybackTagContents = tagStack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+        @Nullable PaybackTagContents paybackTagContents = getItemInHand().get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
         if (paybackTagContents != null) {
             for (int i = 0; i < Math.min(paybackTagContents.size(), PaybackTagContents.SLOTS); i++) {
                 items.add(paybackTagContents.getItemForReading(i));
@@ -83,7 +73,8 @@ public class PaybackTagMenu extends AbstractContainerMenu {
         return new SimpleContainer(items.toArray(ItemStack[]::new));
     }
 
-    protected void addPaybackSlots() {
+    @Override
+    protected void addContainerSlots() {
         int slotsX = 67;
         int slotsY = 20;
 
@@ -92,50 +83,9 @@ public class PaybackTagMenu extends AbstractContainerMenu {
                 int index = column + row * 3;
                 int x = slotsX + column * 18;
                 int y = slotsY + row * 18;
-                addSlot(new FilteredSlot(paybackContainer, index, x, y, PaybackRequest::isValidPaybackItem));
+                addSlot(new FilteredSlot(getContainer(), index, x, y, PaybackRequest::isValidPaybackItem));
             }
         }
-    }
-
-    protected void addPlayerSlots(Container inventory, int x, int y, int tagSlot) {
-        // Hotbar
-        for (int index = 0; index < 9; index++) {
-            int slotX = x + index * 18;
-            int slotY = y + 58;
-            addSlot(index == tagSlot
-                  ? new DisabledSlot(inventory, index, slotX, slotY)
-                  : new Slot(inventory, index, slotX, slotY));
-        }
-
-        // Inventory
-        for (int row = 0; row < 3; row++) {
-            for (int column = 0; column < 9; column++) {
-                int index = (column + row * 9) + 9;
-                int slotX = x + column * 18;
-                int slotY = y + row * 18;
-                addSlot(index == tagSlot
-                      ? new DisabledSlot(inventory, index, slotX, slotY)
-                      : new Slot(inventory, index, slotX, slotY));
-            }
-        }
-    }
-
-    // --
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public InteractionHand getHand() {
-        return hand;
-    }
-
-    public int getTagSlot() {
-        return tagSlot;
-    }
-
-    public ItemAndStack<Item> getTag() {
-        return tagStack;
     }
 
     // --
@@ -146,8 +96,8 @@ public class PaybackTagMenu extends AbstractContainerMenu {
         ItemStack clickedStack = slot.getItem();
 
         if (index < PackageContents.SLOTS) {
-            paybackContainer.setItem(index, ItemStack.EMPTY);
-            paybackContainer.setChanged();
+            getContainer().setItem(index, ItemStack.EMPTY);
+            getContainer().setChanged();
         }
         else if (index < slots.size()) {
             for (int i = 0; i < PaybackTagContents.SLOTS; i++) {
@@ -166,15 +116,16 @@ public class PaybackTagMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(@NotNull Player player, int buttonId) {
         if (buttonId == CONFIRM_BUTTON_ID) {
-            PaybackTagContents contents = PaybackTagContents.create(paybackContainer);
+            PaybackTagContents contents = PaybackTagContents.create(getContainer());
             if (contents.isEmpty()) {
-                getTag().remove(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+                getItemInHand().remove(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
             } else {
-                getTag().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, contents);
+                getItemInHand().set(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, contents);
             }
             player.level().playSound(player, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
                   1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
-            player.setItemInHand(getHand(), getTag().getItemStack());
+            player.setItemInHand(getHand(), getItemInHand());
+            player.swing(getHand());
             return true;
         }
 
@@ -190,9 +141,9 @@ public class PaybackTagMenu extends AbstractContainerMenu {
                 change *= -1;
             }
 
-            ItemStack stack = paybackContainer.getItem(slotIndex);
+            ItemStack stack = getContainer().getItem(slotIndex);
             stack.setCount(Mth.clamp(stack.getCount() + change, 1, stack.getMaxStackSize()));
-            paybackContainer.setChanged();
+            getContainer().setChanged();
         }
 
         return false;
@@ -221,10 +172,5 @@ public class PaybackTagMenu extends AbstractContainerMenu {
         } else {
             paybackSlot.set(ItemStack.EMPTY);
         }
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return player.getItemInHand(hand).getItem() instanceof PaybackTagItem;
     }
 }

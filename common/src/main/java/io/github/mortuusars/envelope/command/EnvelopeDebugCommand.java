@@ -3,19 +3,25 @@ package io.github.mortuusars.envelope.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryHandlerTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
+import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
+import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -75,6 +81,15 @@ public class EnvelopeDebugCommand {
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
+
+        ItemStack box = new ItemStack(Envelope.Items.PAYBACK_BOX.get());
+        ItemStack mail = new ItemStack(Envelope.Items.LETTER.get());
+        mail.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.createDefault());
+        box.set(Envelope.DataComponents.PAYBACK_SUBJECT, new PaybackSubject(Id.createUnsafe(1), mail,
+              Address.UNKNOWN, 30));
+
+        player.drop(box, false);
+
 
 //        List<RecipeHolder<MailRecipe>> recipes = player.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get());
 //

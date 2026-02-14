@@ -243,5 +243,7 @@
 
   "envelope.jei.category.mailing": "Mailing",
 
-  "envelope.empty_tag": "Empty Tag"
+  "envelope.empty_tag": "Empty Tag",
+
+  "gui.envelope.payback.expired": "Expired"
 }

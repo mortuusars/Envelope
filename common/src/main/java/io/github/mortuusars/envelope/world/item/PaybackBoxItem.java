@@ -37,9 +37,16 @@ public class PaybackBoxItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
         if (subject != null && !subject.mail().isEmpty()) {
-            tooltipComponents.add(Component.literal("⌛ ")
-                  .append(GameTime.formatLargest(subject.timeoutTick() - Minecrft.level().getGameTime(), false))
-                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+            long remainingTicks = subject.timeoutTick() - Minecrft.level().getGameTime();
+            if (remainingTicks < 1) {
+                tooltipComponents.add(Component.translatable("gui.envelope.payback.expired")
+                      .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+            } else {
+                //TODO: change color based on time remaining
+                tooltipComponents.add(Component.literal("⌛ ")
+                      .append(GameTime.formatLargest(remainingTicks, false))
+                      .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+            }
         }
     }
 
