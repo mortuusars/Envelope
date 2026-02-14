@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.neoforge.datagen;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
-import io.github.mortuusars.envelope.world.mail.address.EntityAddresses;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.PackOutput;
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class BuiltInDatapackEntries extends DatapackBuiltinEntriesProvider {
     public static final RegistrySetBuilder REGISTRIES = new RegistrySetBuilder()
-          .add(Envelope.Registries.ENTITY_ADDRESS, EntityAddresses::bootstrap)
+          .add(Envelope.Registries.MAIL_ENTITY, MailEntities::bootstrap)
           .add(Envelope.Registries.SEAL_MATERIAL, SealMaterial::bootstrap)
           .add(Envelope.Registries.SEAL_IMPRESSION, SealImpression::bootstrap);
 

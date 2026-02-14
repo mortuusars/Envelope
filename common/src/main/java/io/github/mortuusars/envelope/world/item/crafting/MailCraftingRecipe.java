@@ -203,7 +203,7 @@ public class MailCraftingRecipe implements MailRecipe {
 
     public record Serializer() implements RecipeSerializer<MailCraftingRecipe> {
         public static final MapCodec<MailCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-              RegistryFixedCodec.create(Envelope.Registries.ENTITY_ADDRESS)
+              RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
                     .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
                     .fieldOf("entity")
                     .forGetter(MailCraftingRecipe::getEntityAddress),

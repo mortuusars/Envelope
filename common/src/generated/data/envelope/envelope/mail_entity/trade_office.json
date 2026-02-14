@@ -1,4 +1,8 @@
 {
+  "location": {
+    "type": "relative",
+    "distance": 2000
+  },
   "name": {
     "translate": "address.envelope.trade_office"
   }

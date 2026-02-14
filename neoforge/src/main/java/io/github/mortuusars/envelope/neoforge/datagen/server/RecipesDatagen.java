@@ -4,8 +4,8 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipeBuilder;
-import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
-import io.github.mortuusars.envelope.world.mail.address.EntityAddresses;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
@@ -114,7 +114,7 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void buildMailRecipes(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
-        EntityAddress mailService = address(EntityAddresses.MAIL_SERVICE);
+        EntityAddress mailService = address(MailEntities.MAIL_SERVICE);
 
         MailRecipeBuilder.crafting(mailService)
               .requires(new StackIngredient(Envelope.Items.ADDRESS_TAG.get()))
@@ -133,7 +133,7 @@ public class RecipesDatagen extends RecipeProvider {
 
         // --
 
-        EntityAddress tradeOffice = address(EntityAddresses.TRADE_OFFICE);
+        EntityAddress tradeOffice = address(MailEntities.TRADE_OFFICE);
 
         MailRecipeBuilder.crafting(tradeOffice)
               .requires(new StackIngredient(Items.ROTTEN_FLESH), 6)
@@ -161,8 +161,8 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output, "seal_stamp_" + impression.location().getPath());
     }
 
-    protected EntityAddress address(ResourceKey<EntityAddressDefinition> key) {
-        return new EntityAddress(Objects.requireNonNull(registries).lookupOrThrow(Envelope.Registries.ENTITY_ADDRESS)
+    protected EntityAddress address(ResourceKey<MailEntity> key) {
+        return new EntityAddress(Objects.requireNonNull(registries).lookupOrThrow(Envelope.Registries.MAIL_ENTITY)
               .get(key)
               .orElseThrow());
     }

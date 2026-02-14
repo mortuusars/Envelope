@@ -9,11 +9,8 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.world.mail.address.EntityAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.MailServiceEntity;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
 import io.github.mortuusars.envelope.world.mail.receiver.*;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
@@ -38,7 +35,6 @@ public class MailService {
 
     protected final Mailboxes mailboxes;
     protected final MailEntities mailEntities;
-    protected final MailServiceEntity mailServiceEntity;
     protected final PaybackDepartment paybackDepartment;
     protected final DeliveryManager deliveryManager;
 
@@ -50,11 +46,8 @@ public class MailService {
         this.level = level;
         this.mailboxes = new Mailboxes(level);
         this.mailEntities = new MailEntities(this);
-        this.mailServiceEntity = new MailServiceEntity(this);
         this.paybackDepartment = new PaybackDepartment(this);
         this.deliveryManager = new DeliveryManager(this);
-
-        this.mailEntities.register(mailServiceEntity);
     }
 
     /**
@@ -89,10 +82,6 @@ public class MailService {
 
     public MailEntities getMailEntities() {
         return mailEntities;
-    }
-
-    public MailServiceEntity getMailService() {
-        return mailServiceEntity;
     }
 
     public PaybackDepartment getPaybackDepartment() {
@@ -142,10 +131,10 @@ public class MailService {
 
     public AddressLocation getLocationOf(Address address) {
         return switch (address) {
-            case BlockAddress block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact).orElse(AddressLocation.UNKNOWN);
-            case PlayerAddress player -> getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf).orElse(AddressLocation.UNKNOWN);
-            case EntityAddress entity -> getMailEntities().byAddress(entity).map(MailEntity::getLocation).orElse(AddressLocation.UNKNOWN);
-            default -> AddressLocation.UNKNOWN;
+            case BlockAddress block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact).orElse(AddressLocation.DEFAULT);
+            case PlayerAddress player -> getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf).orElse(AddressLocation.DEFAULT);
+            case EntityAddress entity -> entity.getEntity().location();
+            default -> AddressLocation.DEFAULT;
         };
     }
 
@@ -221,6 +210,6 @@ public class MailService {
     }
 
     public EntityAddress getAddress() {
-        return EntityAddress.get(getLevel().registryAccess(), EntityAddresses.MAIL_SERVICE);
+        return EntityAddress.get(getLevel().registryAccess(), MailEntities.MAIL_SERVICE);
     }
 }

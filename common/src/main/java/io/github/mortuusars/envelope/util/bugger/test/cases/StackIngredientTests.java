@@ -165,7 +165,7 @@ public class StackIngredientTests extends BuggerTests {
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
                   stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new BlockAddress("Mortuusars Laboratory"));
-                  stack.set(Envelope.DataComponents.MAIL_ID, Id.create(123));
+                  stack.set(Envelope.DataComponents.MAIL_ID, Id.createUnsafe(123));
                   return decodeFromJson(json).test(stack);
               }));
     }

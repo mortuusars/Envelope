@@ -4,7 +4,7 @@ import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -20,17 +20,17 @@ import java.util.Optional;
 
 public class EntityAddress implements Address {
     public static final MapCodec<EntityAddress> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-          RegistryFixedCodec.create(Envelope.Registries.ENTITY_ADDRESS).fieldOf("entity").forGetter(EntityAddress::getEntityHolder)
+          RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY).fieldOf("entity").forGetter(EntityAddress::getEntityHolder)
     ).apply(i, EntityAddress::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityAddress> STREAM_CODEC = StreamCodec.composite(
-          ByteBufCodecs.holderRegistry(Envelope.Registries.ENTITY_ADDRESS), EntityAddress::getEntityHolder,
+          ByteBufCodecs.holderRegistry(Envelope.Registries.MAIL_ENTITY), EntityAddress::getEntityHolder,
           EntityAddress::new
     );
 
-    private final Holder<EntityAddressDefinition> entity;
+    private final Holder<MailEntity> entity;
 
-    public EntityAddress(Holder<EntityAddressDefinition> entity) {
+    public EntityAddress(Holder<MailEntity> entity) {
         this.entity = entity;
     }
 
@@ -39,22 +39,22 @@ public class EntityAddress implements Address {
         return Type.ENTITY;
     }
 
-    public Holder<EntityAddressDefinition> getEntityHolder() {
+    public Holder<MailEntity> getEntityHolder() {
         return entity;
     }
 
-    public EntityAddressDefinition getEntity() {
+    public MailEntity getEntity() {
         return getEntityHolder().value();
     }
 
     @Override
     public String getString() {
-        return getEntity().displayName().getString();
+        return getEntity().name().getString();
     }
 
     @Override
     public MutableComponent getComponent() {
-        return getEntity().displayName().copy();
+        return getEntity().name().copy();
     }
 
     // --
@@ -79,15 +79,15 @@ public class EntityAddress implements Address {
 
     // --
 
-    public static EntityAddress get(RegistryAccess access, ResourceKey<EntityAddressDefinition> key) {
+    public static EntityAddress get(RegistryAccess access, ResourceKey<MailEntity> key) {
         return new EntityAddress(getHolderOrThrow(access, key));
     }
 
-    public static Holder.Reference<EntityAddressDefinition> getHolderOrThrow(RegistryAccess access, ResourceKey<EntityAddressDefinition> key) {
-        return access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS).getHolderOrThrow(key);
+    public static Holder.Reference<MailEntity> getHolderOrThrow(RegistryAccess access, ResourceKey<MailEntity> key) {
+        return access.registryOrThrow(Envelope.Registries.MAIL_ENTITY).getHolderOrThrow(key);
     }
 
-    public static Optional<Holder.Reference<EntityAddressDefinition>> getHolder(RegistryAccess access, ResourceKey<EntityAddressDefinition> key) {
-        return access.registryOrThrow(Envelope.Registries.ENTITY_ADDRESS).getHolder(key);
+    public static Optional<Holder.Reference<MailEntity>> getHolder(RegistryAccess access, ResourceKey<MailEntity> key) {
+        return access.registryOrThrow(Envelope.Registries.MAIL_ENTITY).getHolder(key);
     }
 }

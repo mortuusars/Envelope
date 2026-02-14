@@ -2,9 +2,7 @@ package io.github.mortuusars.envelope.util.bugger;
 
 import com.google.common.base.Strings;
 import com.mojang.blaze3d.platform.InputConstants;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.mixin.bugger.ScreenRenderLinesInvoker;
 import io.github.mortuusars.envelope.util.bugger.page.BuggerPage;
 import io.github.mortuusars.envelope.util.bugger.page.DataPage;
 import io.github.mortuusars.envelope.util.bugger.page.LogPage;
@@ -88,6 +86,7 @@ public class BuggerDebugScreen {
               : Optional.empty();
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean render(GuiGraphics guiGraphics) {
         if (!active()) return false;
 
@@ -97,7 +96,6 @@ public class BuggerDebugScreen {
             zoom = ((int) Minecrft.get().getWindow().getGuiScale());
         }
 
-        //noinspection deprecation
         guiGraphics.drawManaged(() -> {
             drawPageTabs(guiGraphics);
 

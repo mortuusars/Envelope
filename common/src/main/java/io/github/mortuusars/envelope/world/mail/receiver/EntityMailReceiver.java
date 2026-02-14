@@ -1,25 +1,15 @@
 package io.github.mortuusars.envelope.world.mail.receiver;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.delivery.Delivery;
 import io.github.mortuusars.envelope.world.item.crafting.*;
-import io.github.mortuusars.envelope.world.item.PackageItem;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EntityMailReceiver implements MailReceiver {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -48,111 +38,6 @@ public class EntityMailReceiver implements MailReceiver {
             return craftingResult;
         }
 
-        return MailService.of(level).getMailEntities().byAddress(address)
-              .map(entity -> entity.receiveMail(level, sender, mail))
-              .orElseGet(() -> returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
+        return returned(mail, DeliveryRecord.Message.REJECTED);
     }
-
-    /*
-    public List<RecipeHolder<MailRecipe>> getRecipesByAddress(ServerLevel level, EntityAddress address) {
-        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get()).stream()
-              .filter(recipeHolder -> recipeHolder.value().getEntityAddress().equals(address))
-              .collect(Collectors.toList());
-    }
-
-    protected ItemStack tryHandleCrafting(ServerLevel level, Address sender, ItemStack mail) {
-        if (sender.isUnknown()) {
-            return ItemStack.EMPTY;
-        }
-
-        if (!(mail.getItem() instanceof PackageItem)) {
-            return ItemStack.EMPTY;
-        }
-
-        PackageContents packageContents = PackageContents.from(mail);
-        if (packageContents.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
-        List<RecipeHolder<MailRecipe>> recipes = getRecipesByAddress(level, address);
-        if (recipes.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
-        PackageRecipeInput input = PackageRecipeInput.of(packageContents);
-
-        @Nullable MailRecipe recipe = recipes.stream()
-              .filter(holder -> holder.value().matches(input, level))
-              .findFirst()
-              .map(RecipeHolder::value)
-              .orElse(null);
-
-        if (recipe == null) {
-            return ItemStack.EMPTY;
-        }
-
-        CraftingResult result = craft(level, recipe, input, PackageContents.SLOTS);
-
-        if (result.output().isEmpty()) {
-            LOGGER.warn("No results from the mail crafting.");
-            return returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
-        }
-
-        List<ItemStack> packages = Mail.createPackages(result.output(), pkg -> pkg.recipient(sender));
-        return sendResults(level, mail, result.remainingInput(), packages, sender);
-    }
-
-    protected CraftingResult craft(ServerLevel level, MailRecipe recipe, PackageRecipeInput input, int outputSlots) {
-        SimpleContainer outputContainer = new SimpleContainer(outputSlots);
-
-        do {
-            ItemStack result = recipe.assemble(input, level.registryAccess());
-            result.onCraftedBySystem(level);
-
-            if (!outputContainer.addItem(result).isEmpty()) {
-                break;
-            }
-
-            input = PackageRecipeInput.of(recipe.consumeOnce(input));
-        }
-        while (recipe.matches(input, level));
-
-        return new CraftingResult(input, outputContainer.removeAllItems());
-    }
-
-    protected ItemStack sendResults(ServerLevel level, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address sender) {
-        boolean hasRemainder = false;
-
-        if (!remainingInput.isEmpty()) {
-            ItemStack remainderPackage = mail.copy();
-            PackageContents remainderContents = new PackageContents(remainingInput.getItems().toList());
-            remainderPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, remainderContents);
-            packages.addFirst(remainderPackage);
-            hasRemainder = true;
-        }
-
-        if (packages.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
-        packages.stream()
-              .skip(1)
-              .forEach(pkg -> {
-                  MailService.of(level).getDeliveryManager()
-                        .startService(Delivery.draft()
-                              .deliver(pkg)
-                              .from(address)
-                              .to(sender));
-              });
-
-        if (hasRemainder) {
-            return returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
-        }
-
-        return Mail.of(packages.getFirst())
-              .sender(address)
-              .writeToLog(DeliveryRecord.sentFrom(address, level.getGameTime()))
-              .get();
-    }
-    */
 }

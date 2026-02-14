@@ -22,7 +22,7 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
-import io.github.mortuusars.envelope.world.mail.address.EntityAddressDefinition;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -481,8 +481,8 @@ public class Envelope {
     }
 
     public static class Registries {
-        public static final ResourceKey<Registry<EntityAddressDefinition>> ENTITY_ADDRESS =
-              ResourceKey.createRegistryKey(resource("entity_address"));
+        public static final ResourceKey<Registry<MailEntity>> MAIL_ENTITY =
+              ResourceKey.createRegistryKey(resource("mail_entity"));
 
         public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIAL =
               ResourceKey.createRegistryKey(resource("seal_material"));
