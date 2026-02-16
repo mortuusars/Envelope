@@ -1,5 +1,8 @@
 # Changelog
 
+## UNRELEASED
+- Added `envelope:package_experience` item component. Awarded when Package is opened.
+
 ## 0.6.0-Snapshot 1
 #### Added Mailing recipes
 Send a Package with ingredients to a mail entity - receive crafted result back.

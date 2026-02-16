@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +57,7 @@ public class PackageBlockEntity extends BlockEntity {
             if (packageStack.getItem() instanceof PackageItem packageItem) {
                 packageItem.unpack(packageStack, level, pos, null).forEach(stored ->
                       Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
+                packageItem.dropExperience(packageStack, level, Vec3.atCenterOf(pos).subtract(0, 0.2, 0));
             }
             if (level.getRandom().nextDouble() < Config.Server.PACKAGE_PAPER_BOX_RETURN_CHANCE.get()) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Envelope.Items.PAPER_BOX.get()));

@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
@@ -63,6 +64,13 @@ public class PackageItem extends BlockItem implements Sealable {
                       .append(Component.literal(loot.lootTable().location().toString()).withStyle(ChatFormatting.DARK_GRAY)));
             }
         }
+
+        if (tooltipFlag.isAdvanced()) {
+            int xp = stack.getOrDefault(Envelope.DataComponents.PACKAGE_EXPERIENCE, 0);
+            if (xp > 0) {
+                components.add(Component.literal("Experience: " + xp).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        }
     }
 
     // --
@@ -81,13 +89,15 @@ public class PackageItem extends BlockItem implements Sealable {
 
         if (player instanceof ServerPlayer serverPlayer) {
             unpackLootTableIfPresent(stack, level, player.blockPosition(), player);
+            Vec3 xpOrigin = player.position().add(player.getLookAngle().add(0, 0.5, 0));
+            dropExperience(stack, level, xpOrigin);
 
             // Force update the stack on client before opening, so the client has correct initial state.
             player.inventoryMenu.broadcastChanges();
 
             SimpleMenuProvider menuProvider = new SimpleMenuProvider(
                   (id, inventory, pl) -> new PackageMenu(id, inventory, hand), stack.getHoverName());
-            PlatformHelper.openMenu(serverPlayer, menuProvider,buffer -> buffer.writeEnum(hand));
+            PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
         }
 
         player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
@@ -129,6 +139,16 @@ public class PackageItem extends BlockItem implements Sealable {
         PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
         stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);
         return contents.copyItems();
+    }
+
+    public void dropExperience(ItemStack stack, Level level, Vec3 pos) {
+        if (level instanceof ServerLevel serverLevel) {
+            int points = stack.getOrDefault(Envelope.DataComponents.PACKAGE_EXPERIENCE, 0);
+            stack.remove(Envelope.DataComponents.PACKAGE_EXPERIENCE);
+            if (points > 0) {
+                ExperienceOrb.award(serverLevel, pos, points);
+            }
+        }
     }
 
     // --
