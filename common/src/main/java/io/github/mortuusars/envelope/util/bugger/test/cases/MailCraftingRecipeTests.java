@@ -243,7 +243,8 @@ public class MailCraftingRecipeTests extends BuggerTests {
         return new MailCraftingRecipe(
               MailService.of(server.overworld()).getAddress(),
               Arrays.stream(ingredients).toList(),
-              new ItemStack(Items.BARRIER));
+              new ItemStack(Items.BARRIER),
+              0);
     }
 
     private PackageRecipeInput input(ItemStack... items) {

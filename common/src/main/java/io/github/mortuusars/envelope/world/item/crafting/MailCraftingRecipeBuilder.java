@@ -13,6 +13,7 @@ import java.util.List;
 public class MailCraftingRecipeBuilder extends MailRecipeBuilder {
     private final List<StackIngredient> ingredients = new ArrayList<>();
     private ItemStack result = ItemStack.EMPTY;
+    private float experience;
 
     public MailCraftingRecipeBuilder(EntityAddress address) {
         super(address);
@@ -50,8 +51,13 @@ public class MailCraftingRecipeBuilder extends MailRecipeBuilder {
         return this;
     }
 
+    public MailCraftingRecipeBuilder experience(float experience) {
+        this.experience = experience;
+        return this;
+    }
+
     public void save(RecipeOutput output, ResourceLocation id) {
-        MailCraftingRecipe recipe = new MailCraftingRecipe(getAddress(), ingredients, result);
+        MailCraftingRecipe recipe = new MailCraftingRecipe(getAddress(), ingredients, result, experience);
         output.accept(id, recipe, null);
     }
 }

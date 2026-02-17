@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 - Added `envelope:package_experience` item component. Awarded when Package is opened.
+- Added `experience` field to mail crafting recipes. Applied to resulting package and awarded when player opens it.
+  - Works the same as in smelting recipes.
+- Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
 - Holding _sneak_ while using a Package will unpack it without opening the menu.  
 - Fixed overlays not rendering over package slots. 
 

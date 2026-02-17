@@ -158,6 +158,7 @@ public class RecipesDatagen extends RecipeProvider {
                   stamp.set(Envelope.DataComponents.SEAL_STAMP_IMPRESSION, lookup.getOrThrow(impression));
                   return stamp;
               }))
+              .experience(1.5f)
               .save(output, "seal_stamp_" + impression.location().getPath());
     }
 

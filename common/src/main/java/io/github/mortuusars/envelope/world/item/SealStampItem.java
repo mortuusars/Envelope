@@ -1,16 +1,13 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -32,14 +29,13 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        if (tooltipFlag.isAdvanced()) {
-            //TODO: Something is wrong with getting impressions here. Server is crashing due to client class loading.
-            // Maybe use context.registries() here? Or just extract into inner class.
-            ResourceLocation texture = getImpressionOrDefault(stack, Minecrft.registryAccess(), null).value().textureId();
-            tooltipComponents.add(Component.literal("Impression:").withStyle(ChatFormatting.DARK_GRAY)
-                  .append(CommonComponents.SPACE)
-                  .append(Component.literal(texture.toString()).withStyle(ChatFormatting.GRAY)));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
+        Holder<SealImpression> impression = stack.get(Envelope.DataComponents.SEAL_STAMP_IMPRESSION);
+        if (flag.isAdvanced() && impression != null) {
+            impression.unwrapKey().ifPresent(key -> {
+                components.add(Component.literal("Impression: ").withStyle(ChatFormatting.DARK_GRAY)
+                      .append(Component.literal(key.location().toString()).withStyle(ChatFormatting.GRAY)));
+            });
         }
     }
 

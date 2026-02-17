@@ -3,6 +3,8 @@ package io.github.mortuusars.envelope.world.item.crafting;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -12,6 +14,7 @@ import java.util.List;
 
 public interface MailRecipe extends Recipe<PackageRecipeInput> {
     EntityAddress getEntityAddress();
+    float getExperience();
     int getIngredientsCount();
     List<ItemStack> getIngredientStacks(int index);
     List<ItemStack> consumeOnce(PackageRecipeInput input);
@@ -24,5 +27,14 @@ public interface MailRecipe extends Recipe<PackageRecipeInput> {
     @Override
     default boolean canCraftInDimensions(int width, int height) {
         return width * height >= PackageContents.SLOTS;
+    }
+
+    static int calculateExperiencePoints(float experience) {
+        int points = Mth.floor(experience);
+        float remainder = Mth.frac(experience);
+        if (remainder != 0.0F && Math.random() < remainder) {
+            points++;
+        }
+        return points;
     }
 }

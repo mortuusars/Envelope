@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public record CraftingResult(PackageRecipeInput remainingInput, List<ItemStack> output) {
+public record CraftingResult(PackageRecipeInput remainingInput, List<ItemStack> output, float experience) {
     public boolean hasRemainder() {
         return !remainingInput().isEmpty();
     }

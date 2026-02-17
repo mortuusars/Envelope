@@ -53,7 +53,14 @@ public class CraftingMailHandler implements IncomingMailHandler {
             return Mail.returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
         }
 
-        List<ItemStack> packages = Mail.createPackages(result.output(), pkg -> pkg.recipient(delivery.getSender()));
+        List<ItemStack> packages = Mail.createPackages(result.output(),
+              pkg -> pkg.recipient(delivery.getSender()));
+
+        // It's not ideal that all experience is on one package.
+        // But implementing it per package would be more complicated, and usually there's only one anyway.
+        packages.stream().findFirst().ifPresent(pkg ->
+              pkg.set(Envelope.DataComponents.PACKAGE_EXPERIENCE, MailRecipe.calculateExperiencePoints(result.experience())));
+
         return sendResults(level, mail, result.remainingInput(), packages, delivery.getSender());
     }
 
@@ -75,10 +82,12 @@ public class CraftingMailHandler implements IncomingMailHandler {
 
     public CraftingResult craft(ServerLevel level, MailRecipe recipe, PackageRecipeInput input) {
         SimpleContainer outputContainer = new SimpleContainer(PackageContents.SLOTS);
+        float experience = 0;
 
         do {
             ItemStack result = recipe.assemble(input, level.registryAccess());
             result.onCraftedBySystem(level);
+            experience += recipe.getExperience();
 
             if (!outputContainer.addItem(result).isEmpty()) {
                 break;
@@ -87,12 +96,14 @@ public class CraftingMailHandler implements IncomingMailHandler {
             input = PackageRecipeInput.of(recipe.consumeOnce(input));
 
             if (!PackageContents.canHold(result)) {
+                // If package cannot hold a result, then it's likely another package.
+                // Stop the crafting to return only one package.
                 break;
             }
         }
         while (recipe.matches(input, level));
 
-        return new CraftingResult(input, outputContainer.removeAllItems());
+        return new CraftingResult(input, outputContainer.removeAllItems(), experience);
     }
 
     protected ItemStack sendResults(ServerLevel level, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address destination) {
@@ -122,11 +133,11 @@ public class CraftingMailHandler implements IncomingMailHandler {
 
         if (hasRemainder) {
             return Mail.returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
+        } else {
+            return Mail.of(packages.getFirst())
+                  .sender(address)
+                  .writeToLog(DeliveryRecord.sentFrom(address, level.getGameTime()))
+                  .get();
         }
-
-        return Mail.of(packages.getFirst())
-              .sender(address)
-              .writeToLog(DeliveryRecord.sentFrom(address, level.getGameTime()))
-              .get();
     }
 }

@@ -14,8 +14,8 @@ import java.util.Optional;
 public class MailTransformingRecipe extends MailCraftingRecipe {
     private final StackIngredient base;
 
-    public MailTransformingRecipe(EntityAddress address, StackIngredient base, List<StackIngredient> ingredients, ItemStack result) {
-        super(address, ingredients, result);
+    public MailTransformingRecipe(EntityAddress address, StackIngredient base, List<StackIngredient> ingredients, ItemStack result, int experience) {
+        super(address, ingredients, result, experience);
         this.base = base;
     }
 

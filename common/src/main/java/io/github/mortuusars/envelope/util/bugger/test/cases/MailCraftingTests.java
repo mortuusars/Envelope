@@ -15,6 +15,7 @@ import net.minecraft.world.item.Items;
 import java.util.Arrays;
 
 public class MailCraftingTests extends BuggerTests {
+    public static final int RECIPE_EXPERIENCE = 3;
     private final MinecraftServer server;
 
     public MailCraftingTests(MinecraftServer server) {
@@ -72,6 +73,22 @@ public class MailCraftingTests extends BuggerTests {
 
             return !result.hasRemainder() && result.output().getFirst().getCount() == 3;
         }));
+
+        add("MailCrafting_CraftingReturnsCorrectTotalExperience", Test.isTrue(() -> {
+            CraftingResult result = craftingReceiver.craft(server.overworld(),
+                  recipe(
+                        new StackIngredient(Items.EMERALD, 12),
+                        new StackIngredient(Items.DIAMOND, 6),
+                        new StackIngredient(Items.DIAMOND, 6)
+                  ),
+                  input(
+                        new ItemStack(Items.EMERALD, 36),
+                        new ItemStack(Items.DIAMOND, 18),
+                        new ItemStack(Items.DIAMOND, 18)
+                  ));
+
+            return !result.hasRemainder() && result.experience() == 9;
+        }));
     }
 
     // --
@@ -80,7 +97,8 @@ public class MailCraftingTests extends BuggerTests {
         return new MailCraftingRecipe(
               MailService.of(server.overworld()).getAddress(),
               Arrays.stream(ingredients).toList(),
-              new ItemStack(Items.BARRIER));
+              new ItemStack(Items.BARRIER),
+              RECIPE_EXPERIENCE);
     }
 
     private PackageRecipeInput input(ItemStack... items) {

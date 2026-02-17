@@ -175,13 +175,17 @@ public final class Mail {
               .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
     }
 
-    public static List<ItemStack> createPackages(List<ItemStack> items, Consumer<MailBuilder<?>> builderConsumer) {
+    /**
+     * Splits items into packages, however many are required to fit all items.
+     * @param builder callback for each package builder, allows setting necessary data for all created packages.
+     */
+    public static List<ItemStack> createPackages(List<ItemStack> items, Consumer<MailBuilder<?>> builder) {
         items = new ArrayList<>(items); // Ensure mutability
         List<ItemStack> packages = new ArrayList<>();
 
         items.removeIf(stack -> {
             if (stack.getItem() instanceof PackageItem) {
-                packages.add(Mail.of(stack).apply(builderConsumer).get());
+                packages.add(Mail.of(stack).apply(builder).get());
                 return true;
             }
             return false;
@@ -189,7 +193,7 @@ public final class Mail {
 
         for (int i = 0; i < items.size(); i += PackageContents.SLOTS) {
             PackageContents contents = new PackageContents(items.subList(i, Math.min(i + PackageContents.SLOTS, items.size())));
-            packages.add(Mail.createPackage(contents).apply(builderConsumer).get());
+            packages.add(Mail.createPackage(contents).apply(builder).get());
         }
 
         return packages;

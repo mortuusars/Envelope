@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item.crafting;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
@@ -24,11 +25,13 @@ public class MailCraftingRecipe implements MailRecipe {
     private final EntityAddress address;
     private final List<StackIngredient> ingredients;
     private final ItemStack result;
+    private final float experience;
 
-    public MailCraftingRecipe(EntityAddress address, List<StackIngredient> ingredients, ItemStack result) {
+    public MailCraftingRecipe(EntityAddress address, List<StackIngredient> ingredients, ItemStack result, float experience) {
         this.address = address;
         this.ingredients = ingredients;
         this.result = result;
+        this.experience = experience;
     }
 
     @Override
@@ -42,6 +45,10 @@ public class MailCraftingRecipe implements MailRecipe {
 
     public ItemStack getResult() {
         return result;
+    }
+
+    public float getExperience() {
+        return experience;
     }
 
     @Override
@@ -123,6 +130,7 @@ public class MailCraftingRecipe implements MailRecipe {
               "address=" + address +
               ", ingredients=" + ingredients +
               ", result=" + result +
+              (experience > 0 ? ", experience=" + experience : "") +
               '}';
     }
 
@@ -137,13 +145,17 @@ public class MailCraftingRecipe implements MailRecipe {
                     .forGetter(MailCraftingRecipe::getRequestedIngredients),
               ItemStack.STRICT_CODEC
                     .fieldOf("result")
-                    .forGetter(MailCraftingRecipe::getResult)
+                    .forGetter(MailCraftingRecipe::getResult),
+              Codec.FLOAT
+                    .optionalFieldOf("experience", 0.0f)
+                    .forGetter(MailCraftingRecipe::getExperience)
         ).apply(i, MailCraftingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MailCraftingRecipe> STREAM_CODEC = StreamCodec.composite(
               EntityAddress.STREAM_CODEC, MailCraftingRecipe::getEntityAddress,
               StackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list(6)), MailCraftingRecipe::getRequestedIngredients,
               ItemStack.STREAM_CODEC, MailCraftingRecipe::getResult,
+              ByteBufCodecs.FLOAT, MailCraftingRecipe::getExperience,
               MailCraftingRecipe::new
         );
 
