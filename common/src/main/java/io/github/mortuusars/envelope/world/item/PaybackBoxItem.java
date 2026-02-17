@@ -2,10 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
-import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,25 +26,8 @@ public class PaybackBoxItem extends Item {
     }
 
     @Override
-    public boolean canFitInsideContainerItems() {
-        return false;
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
-        if (subject != null && !subject.mail().isEmpty()) {
-            long remainingTicks = subject.timeoutTick() - Minecrft.level().getGameTime();
-            if (remainingTicks < 1) {
-                tooltipComponents.add(Component.translatable("gui.envelope.payback.expired")
-                      .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
-            } else {
-                //TODO: change color based on time remaining
-                tooltipComponents.add(Component.literal("⌛ ")
-                      .append(GameTime.formatLargest(remainingTicks, false))
-                      .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
-            }
-        }
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
+        PaybackPackageItem.appendPaybackHoverText(stack, context, components, flag);
     }
 
     // --

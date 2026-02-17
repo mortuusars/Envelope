@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.inventory;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.slot.PickupOnlySlot;
+import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
@@ -79,8 +80,10 @@ public class PackageMenu extends AbstractInHandContainerMenu {
         if (isDestroyedOnClose()) {
             Containers.dropContents(player.level(), player.blockPosition(), getContainer());
             getContainer().clearContent();
-            onPackageDestroyed();
-            getItemInHand().shrink(1);
+
+            ItemStack stack = getItemInHand();
+            onDestroyed(player, stack);
+            stack.shrink(1);
 
             player.level().playSound(player, player, SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1, 1);
         }
@@ -88,18 +91,9 @@ public class PackageMenu extends AbstractInHandContainerMenu {
         super.removed(player);
     }
 
-    protected void onPackageDestroyed() {
-        if (getPlayer().getRandom().nextDouble() < getBoxReturnChance()) {
-            Containers.dropItemStack(getPlayer().level(), getPlayer().getX(), getPlayer().getY() + 1, getPlayer().getZ(),
-                  createBoxReturnItem());
+    protected void onDestroyed(@NotNull Player player, ItemStack stack) {
+        if (stack.getItem() instanceof PackageItem item) {
+            item.onDestroyed(stack, player.level(), player.position());
         }
-    }
-
-    protected double getBoxReturnChance() {
-        return Config.Server.PACKAGE_PAPER_BOX_RETURN_CHANCE.get();
-    }
-
-    protected ItemStack createBoxReturnItem() {
-        return new ItemStack(Envelope.Items.PAPER_BOX.get());
     }
 }

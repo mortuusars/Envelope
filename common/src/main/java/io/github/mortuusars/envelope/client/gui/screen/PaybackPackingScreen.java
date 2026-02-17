@@ -4,11 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -114,10 +113,7 @@ public class PaybackPackingScreen extends AbstractInHandContainerScreen<PaybackP
         List<Component> components = super.getTooltipFromContainerItem(stack);
 
         if (hoveredSlot instanceof PreviewSlot) {
-            components.add(Component.literal("⌛ ")
-                  .append(GameTime.formatLargest(
-                        getMenu().getPaybackSubject().timeoutTick() - Minecrft.level().getGameTime(), false))
-                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+            PaybackPackageItem.appendPaybackSubjectHoverText(components, getMenu().getPaybackSubject());
         }
 
         return components;

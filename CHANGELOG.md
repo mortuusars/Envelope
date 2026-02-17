@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 - Added `envelope:package_experience` item component. Awarded when Package is opened.
+- Holding _sneak_ while using a Package will unpack it without opening the menu.  
+- Fixed overlays not rendering over package slots. 
 
 ## 0.6.0-Snapshot 1
 #### Added Mailing recipes

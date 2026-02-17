@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
@@ -7,7 +8,6 @@ import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -73,6 +73,14 @@ public class PackageItem extends BlockItem implements Sealable {
         }
     }
 
+    public double getBoxReturnChance(ItemStack stack) {
+        return Config.Server.PACKAGE_PAPER_BOX_RETURN_CHANCE.get();
+    }
+
+    public ItemStack createBoxReturnItem(ItemStack stack) {
+        return new ItemStack(Envelope.Items.PAPER_BOX.get());
+    }
+
     // --
 
     @Override
@@ -87,38 +95,43 @@ public class PackageItem extends BlockItem implements Sealable {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (player instanceof ServerPlayer serverPlayer) {
-            unpackLootTableIfPresent(stack, level, player.blockPosition(), player);
-            Vec3 xpOrigin = player.position().add(player.getLookAngle().add(0, 0.5, 0));
-            dropExperience(stack, level, xpOrigin);
+        if (Config.Server.PACKAGE_SNEAK_QUICK_UNPACK.get() && player.isSecondaryUseActive()) {
+            destroy(stack, level, player.position(), player);
+            player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
+            stack.shrink(1);
+            return InteractionResultHolder.success(stack);
+        } else {
+            unpackLootTableIfPresent(stack, level, player.position(), player);
+            dropExperience(stack, level, player.position());
 
-            // Force update the stack on client before opening, so the client has correct initial state.
-            player.inventoryMenu.broadcastChanges();
+            if (player instanceof ServerPlayer serverPlayer) {
+                // Force update the stack on client before opening, so the client has correct initial state.
+                player.inventoryMenu.broadcastChanges();
 
-            SimpleMenuProvider menuProvider = new SimpleMenuProvider(
-                  (id, inventory, pl) -> new PackageMenu(id, inventory, hand), stack.getHoverName());
-            PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
+                SimpleMenuProvider menuProvider = new SimpleMenuProvider(
+                      (id, inventory, pl) -> new PackageMenu(id, inventory, hand), stack.getHoverName());
+                PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
+            }
+
+            player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
+            return InteractionResultHolder.success(stack);
         }
-
-        player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
-        return InteractionResultHolder.success(stack);
     }
 
-    protected void unpackLootTableIfPresent(ItemStack stack, Level level, BlockPos pos, @Nullable Player player) {
-        @Nullable SeededContainerLoot loot = stack.get(DataComponents.CONTAINER_LOOT);
-        if (level instanceof ServerLevel serverLevel && loot != null) {
-            ResourceKey<LootTable> table = loot.lootTable();
+    protected void unpackLootTableIfPresent(ItemStack stack, Level level, Vec3 pos, @Nullable Player player) {
+        if (level instanceof ServerLevel serverLevel
+              && stack.get(DataComponents.CONTAINER_LOOT) instanceof SeededContainerLoot(ResourceKey<LootTable> table, long seed)) {
             LootTable lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(table);
 
             LootParams.Builder builder = new LootParams.Builder(serverLevel)
-                  .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos));
+                  .withParameter(LootContextParams.ORIGIN, pos);
 
             if (player != null) {
                 builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
             }
 
             SimpleContainer container = new SimpleContainer(PackageContents.SLOTS);
-            lootTable.fill(container, builder.create(LootContextParamSets.CHEST), loot.seed());
+            lootTable.fill(container, builder.create(LootContextParamSets.CHEST), seed);
 
             if (stack.has(Envelope.DataComponents.PACKAGE_CONTENTS)) {
                 Envelope.LOGGER.warn("Unpacking container loot into the Package, that already has contents inside. " +
@@ -134,7 +147,20 @@ public class PackageItem extends BlockItem implements Sealable {
         }
     }
 
-    public List<ItemStack> unpack(ItemStack stack, Level level, BlockPos pos, @Nullable Player player) {
+    public void destroy(ItemStack stack, Level level, Vec3 pos, @Nullable Player player) {
+        unpack(stack, level, pos, player).forEach(item ->
+              Containers.dropItemStack(level, pos.x(), pos.y(), pos.z(), item));
+        dropExperience(stack, level, pos);
+        onDestroyed(stack, level, pos);
+    }
+
+    public void onDestroyed(ItemStack stack, Level level, Vec3 pos) {
+        if (!level.isClientSide() && level.getRandom().nextDouble() < getBoxReturnChance(stack)) {
+            Containers.dropItemStack(level, pos.x(), pos.y(), pos.z(), createBoxReturnItem(stack));
+        }
+    }
+
+    public List<ItemStack> unpack(ItemStack stack, Level level, Vec3 pos, @Nullable Player player) {
         unpackLootTableIfPresent(stack, level, pos, player);
         PackageContents contents = stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.EMPTY);
         stack.remove(Envelope.DataComponents.PACKAGE_CONTENTS);

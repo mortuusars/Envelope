@@ -32,6 +32,7 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
 
         // Package
+        public static final ModConfigSpec.BooleanValue PACKAGE_SNEAK_QUICK_UNPACK;
         public static final ModConfigSpec.DoubleValue PACKAGE_PAPER_BOX_RETURN_CHANCE;
         public static final ModConfigSpec.DoubleValue PAYBACK_PACKAGE_BOX_RETURN_CHANCE;
 
@@ -119,6 +120,10 @@ public abstract class Config {
 
             {
                 builder.push("package");
+                PACKAGE_SNEAK_QUICK_UNPACK = builder
+                      .comment("Holding Sneak while using the Package will unpack and destroy it immediately, instead of opening the menu.",
+                            "Default: true")
+                      .define("sneak_quick_unpack", true);
                 PACKAGE_PAPER_BOX_RETURN_CHANCE = builder
                       .comment("Chance of a Package \"recycling\" back into Paper Box after opening.")
                       .defineInRange("paper_box_return_chance", 0.5, 0.0, 1.0);

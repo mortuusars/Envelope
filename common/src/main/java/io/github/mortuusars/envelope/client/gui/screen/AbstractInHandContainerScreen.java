@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.world.inventory.AbstractInHandContainerMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.DisabledSlot;
+import io.github.mortuusars.envelope.world.inventory.slot.PickupOnlySlot;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -66,6 +67,8 @@ public class AbstractInHandContainerScreen<T extends AbstractInHandContainerMenu
     }
 
     protected boolean shouldRenderDisabledOverlayOver(Slot slot) {
-        return slot instanceof DisabledSlot || (!slot.hasItem() && !slot.mayPickup(getMenu().getPlayer()));
+        return slot instanceof DisabledSlot
+              || slot instanceof PickupOnlySlot && !slot.hasItem()
+              || (!slot.hasItem() && !slot.mayPickup(getMenu().getPlayer()));
     }
 }

@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.network.chat.Component;
@@ -42,20 +41,27 @@ public class PaybackPackageItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        //TODO: eliminate duplication with PaybackBoxItem
-        @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
-        if (subject != null && !subject.mail().isEmpty()) {
-            long remainingTicks = subject.timeoutTick() - Minecrft.level().getGameTime();
-            if (remainingTicks < 1) {
-                tooltipComponents.add(Component.translatable("gui.envelope.payback.expired")
-                      .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
-            } else {
-                //TODO: change color based on time remaining
-                tooltipComponents.add(Component.literal("⌛ ")
-                      .append(GameTime.formatLargest(remainingTicks, false))
-                      .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
-            }
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
+        appendPaybackHoverText(stack, context, components, flag);
+    }
+
+    public static void appendPaybackHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
+        appendPaybackSubjectHoverText(components, stack.get(Envelope.DataComponents.PAYBACK_SUBJECT));
+    }
+
+    public static void appendPaybackSubjectHoverText(List<Component> components, @Nullable PaybackSubject subject) {
+        if (subject == null || subject.mail().isEmpty()) {
+            return;
+        }
+
+        long remainingTicks = subject.timeoutTick() - Minecrft.level().getGameTime();
+        if (remainingTicks < 1) {
+            components.add(Component.translatable("gui.envelope.payback.expired")
+                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+        } else {
+            components.add(Component.literal("⌛ ")
+                  .append(GameTime.formatLargest(remainingTicks, false))
+                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
         }
     }
 

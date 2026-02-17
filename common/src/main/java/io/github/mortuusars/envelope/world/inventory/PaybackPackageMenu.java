@@ -6,10 +6,15 @@ import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -42,11 +47,18 @@ public class PaybackPackageMenu extends PackageMenu {
     }
 
     @Override
+    protected void onDestroyed(@NotNull Player player, ItemStack stack) {
+        Level level = player.level();
+        Vec3 pos = player.position();
+        if (!level.isClientSide() && level.getRandom().nextDouble() < getBoxReturnChance()) {
+            Containers.dropItemStack(level, pos.x(), pos.y(), pos.z(), createBoxReturnItem());
+        }
+    }
+
     protected double getBoxReturnChance() {
         return Config.Server.PAYBACK_PACKAGE_BOX_RETURN_CHANCE.get();
     }
 
-    @Override
     protected ItemStack createBoxReturnItem() {
         return Mail.createPaybackBox(getPaybackSubject()).get();
     }

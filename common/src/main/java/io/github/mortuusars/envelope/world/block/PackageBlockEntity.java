@@ -52,18 +52,11 @@ public class PackageBlockEntity extends BlockEntity {
     }
 
     public void dropContents(Level level, BlockPos pos) {
-        ItemStack packageStack = getPackage();
-        if (unpackWhenBroken()) {
-            if (packageStack.getItem() instanceof PackageItem packageItem) {
-                packageItem.unpack(packageStack, level, pos, null).forEach(stored ->
-                      Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stored));
-                packageItem.dropExperience(packageStack, level, Vec3.atCenterOf(pos).subtract(0, 0.2, 0));
-            }
-            if (level.getRandom().nextDouble() < Config.Server.PACKAGE_PAPER_BOX_RETURN_CHANCE.get()) {
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Envelope.Items.PAPER_BOX.get()));
-            }
+        ItemStack stack = getPackage();
+        if (unpackWhenBroken() && stack.getItem() instanceof PackageItem packageItem) {
+            packageItem.destroy(stack, level, Vec3.atCenterOf(pos), null);
         } else {
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), packageStack);
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
         }
         setChanged();
     }
