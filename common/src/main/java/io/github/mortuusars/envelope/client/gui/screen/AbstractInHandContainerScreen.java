@@ -26,6 +26,14 @@ public class AbstractInHandContainerScreen<T extends AbstractInHandContainerMenu
         inventoryLabelY = imageHeight - 94;
     }
 
+    public int getLeftPos() {
+        return leftPos;
+    }
+
+    public int getTopPos() {
+        return topPos;
+    }
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         updateButtons();

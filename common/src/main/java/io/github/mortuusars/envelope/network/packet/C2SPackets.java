@@ -14,7 +14,8 @@ public class C2SPackets {
                  new CustomPacketPayload.TypeAndCodec<>(LetterViewScreenClosedS2CP.TYPE, LetterViewScreenClosedS2CP.STREAM_CODEC),
                  new CustomPacketPayload.TypeAndCodec<>(AddressTagApplyC2SP.TYPE, AddressTagApplyC2SP.STREAM_CODEC),
                  new CustomPacketPayload.TypeAndCodec<>(MailboxPlaceC2SP.TYPE, MailboxPlaceC2SP.STREAM_CODEC),
-                 new CustomPacketPayload.TypeAndCodec<>(MailboxAddressTagApplyC2SP.TYPE, MailboxAddressTagApplyC2SP.STREAM_CODEC)
+                 new CustomPacketPayload.TypeAndCodec<>(MailboxAddressTagApplyC2SP.TYPE, MailboxAddressTagApplyC2SP.STREAM_CODEC),
+                 new CustomPacketPayload.TypeAndCodec<>(PaybackTagMenuSetSlotC2SP.TYPE, PaybackTagMenuSetSlotC2SP.STREAM_CODEC)
         );
     }
 }

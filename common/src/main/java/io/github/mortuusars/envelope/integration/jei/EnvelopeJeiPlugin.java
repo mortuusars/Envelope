@@ -2,9 +2,11 @@ package io.github.mortuusars.envelope.integration.jei;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
+import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
 import io.github.mortuusars.envelope.integration.jei.util.InHandRecipeTransferInfo;
+import io.github.mortuusars.envelope.integration.jei.util.PaybackTagGhostIngredientHandler;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
@@ -59,5 +61,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(PackingScreen.class, 45, 32, 16, 36, EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE);
         registration.addRecipeClickArea(PackingScreen.class, 61, 68, 54, 13, EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE);
         registration.addRecipeClickArea(PackingScreen.class, 115, 32, 11, 36, EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE);
+
+        registration.addGhostIngredientHandler(PaybackTagScreen.class, new PaybackTagGhostIngredientHandler());
     }
 }

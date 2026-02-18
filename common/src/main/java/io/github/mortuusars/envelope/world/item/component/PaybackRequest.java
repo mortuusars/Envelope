@@ -98,7 +98,7 @@ public record PaybackRequest(List<StackIngredient> items, PaybackDuration durati
 
     // --
 
-    public static boolean isValidPaybackItem(ItemStack stack) {
+    public static boolean isValid(ItemStack stack) {
         return stack.getItem().canFitInsideContainerItems() && !stack.is(Envelope.Tags.Items.CANNOT_BE_PACKAGED) && !stack.is(Envelope.Tags.Items.CANNOT_BE_USED_AS_PAYBACK);
     }
 }

@@ -105,7 +105,7 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
                 int index = column + row * 3;
                 int x = slotsX + column * 18;
                 int y = slotsY + row * 18;
-                addSlot(new FilteredSlot(getContainer(), index, x, y, PaybackRequest::isValidPaybackItem));
+                addSlot(new FilteredSlot(getContainer(), index, x, y, PaybackRequest::isValid));
             }
         }
     }
@@ -159,7 +159,7 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
             return true;
         }
 
-        if (buttonId >= COUNT_START_BUTTON_ID) {
+        if (buttonId >= COUNT_START_BUTTON_ID && buttonId < DECREASE_COUNT_FAST_START_BUTTON_ID + PaybackRequest.SLOTS) {
             int id = buttonId - COUNT_START_BUTTON_ID;
             int slotIndex = id % PaybackRequest.SLOTS;
 

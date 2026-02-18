@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 Payback
+- **Payback Tag** now supports setting requested items from JEI. Just drag and drop into the slot.
 - Added duration selector to **Payback Tag** menu.
   - Controls how much time buyer has to pay for the mail. 
   - **Payback Tag** item texture changes slightly based on duration defined. 
