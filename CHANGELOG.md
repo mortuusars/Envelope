@@ -4,7 +4,7 @@
 Payback Tag
 - Added drag and drop from JEI support.
 - Added payback request duration selector.
-  - Controls how much time buyer will have to pay for the mail. 
+  - Controls how much time buyer will have to pay for the mail.
   - Item texture changes slightly based on duration defined.
 - Using the tag while holding [**Sneak**] will clear the data from it.
 - Menu UI/UX improvements.
@@ -22,6 +22,8 @@ Crafting
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
 
 Misc
+- **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
+- Small updates of **Payback Box** and **Payback Package** menu textures.
 - Small change to how `envelope:payback_subject` component is defined.
 
 ## 0.6.0-Snapshot 1

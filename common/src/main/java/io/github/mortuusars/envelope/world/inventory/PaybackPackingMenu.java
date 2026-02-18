@@ -58,7 +58,7 @@ public class PaybackPackingMenu extends PackingMenu {
               "Item in hand does not have 'envelope:payback_subject' component.");
         this.request = subject.getRequest();
         super.init();
-        addSlot(new PreviewSlot(subject.mail(), 0, 21, 42));
+        addSlot(new PreviewSlot(subject.mail(), 0, 19, 42));
     }
 
     @Override
