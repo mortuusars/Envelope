@@ -10,6 +10,7 @@ Payback Tag
 - Menu UI/UX improvements.
 - Removed crafting table recipes.
 - Changed `envelope:payback_tag_contents` item component: its structure is now the same as `envelope:mail_payback_request`.
+- `delivery.payback_timeout_minutes` config option was replaced by three `payback.request_duration_<duration>` options.
 
 Package
 - Added `envelope:package_experience` item component. Awarded when Package is opened.
