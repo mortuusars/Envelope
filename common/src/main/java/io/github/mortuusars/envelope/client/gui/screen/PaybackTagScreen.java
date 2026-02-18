@@ -1,13 +1,13 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.CycleButton;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
+import io.github.mortuusars.envelope.world.inventory.slot.GhostSlot;
 import io.github.mortuusars.envelope.world.item.component.PaybackDuration;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import net.minecraft.ChatFormatting;
@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMenu> {
@@ -132,6 +133,13 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
 
     // -- Input
 
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        lastQuickMoved = ItemStack.EMPTY; // Prevents fast shift-clicking moving more items that needed
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
@@ -167,6 +175,25 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
         }
 
         return false;
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
+        if (hoveredSlot instanceof GhostSlot slot && slot.hasItem()) {
+            // Prevents tooltip overlapping the slot, to not obstruct the item count
+            x = Math.max(x, leftPos + slot.x + 11);
+        }
+        super.renderTooltip(guiGraphics, x, y);
+    }
+
+    @Override
+    protected @NotNull List<Component> getTooltipFromContainerItem(ItemStack stack) {
+        if (hoveredSlot instanceof GhostSlot slot && slot.getItem() == stack) {
+            List<Component> components = super.getTooltipFromContainerItem(stack);
+            components.add(Component.translatable("gui.envelope.payback_tag.tooltip.scroll"));
+            return components;
+        }
+        return super.getTooltipFromContainerItem(stack);
     }
 
     protected void changeRequestedItemCount(boolean decreasing, boolean fast) {

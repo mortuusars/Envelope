@@ -1,19 +1,19 @@
 # Changelog
 
 ## UNRELEASED
-Payback
-- **Payback Tag** now supports setting requested items from JEI. Just drag and drop into the slot.
-- Added duration selector to **Payback Tag** menu.
-  - Controls how much time buyer has to pay for the mail. 
-  - **Payback Tag** item texture changes slightly based on duration defined. 
-- Holding _sneak_ while using **Payback Tag** will clear it.
-- Changed `envelope:payback_tag_contents` item component. It is now the same object as `envelope:mail_payback_request`.
-- Updated **Payback Tag** related visuals.
-- Removed **Payback Tag** crafting table recipes.
+Payback Tag
+- Added drag and drop from JEI support.
+- Added payback request duration selector.
+  - Controls how much time buyer will have to pay for the mail. 
+  - Item texture changes slightly based on duration defined.
+- Using the tag while holding [**Sneak**] will clear the data from it.
+- Menu UI/UX improvements.
+- Removed crafting table recipes.
+- Changed `envelope:payback_tag_contents` item component: its structure is now the same as `envelope:mail_payback_request`.
 
 Package
 - Added `envelope:package_experience` item component. Awarded when Package is opened.
-- Holding _sneak_ while using a Package will unpack it without opening the menu.
+- Using the **Package** while holding [**Sneak**] will unpack it without opening the menu.
 - Fixed overlays not rendering over package slots.
 
 Crafting

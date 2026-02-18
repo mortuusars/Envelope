@@ -1,7 +1,8 @@
 package io.github.mortuusars.envelope.world.inventory;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.inventory.slot.FilteredSlot;
+import io.github.mortuusars.envelope.world.inventory.slot.GhostSlot;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.PaybackDuration;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
@@ -105,7 +106,7 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
                 int index = column + row * 3;
                 int x = slotsX + column * 18;
                 int y = slotsY + row * 18;
-                addSlot(new FilteredSlot(getContainer(), index, x, y, PaybackRequest::isValid));
+                addSlot(new GhostSlot(getContainer(), index, x, y, PaybackRequest::isValid));
             }
         }
     }
@@ -166,7 +167,7 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
             boolean decrease = id >= PaybackRequest.SLOTS * 2;
             boolean fast = id % (PaybackRequest.SLOTS * 2) >= PaybackRequest.SLOTS;
 
-            int change = (fast ? 5 : 1);
+            int change = (fast ? 10 : 1);
             if (decrease) {
                 change *= -1;
             }
@@ -188,20 +189,27 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
 
         Slot paybackSlot = this.slots.get(slotId);
 
-        if (!getCarried().isEmpty() && paybackSlot.mayPlace(getCarried())) {
-            ItemStack result = getCarried().copy();
-
-            if (button == 1) {
-                if (ItemStack.isSameItemSameComponents(paybackSlot.getItem(), result)) {
-                    result.setCount(paybackSlot.getItem().getCount() + 1);
-                } else {
-                    result.setCount(1);
-                }
-            }
-            paybackSlot.set(result);
-        } else {
+        if (getCarried().isEmpty() || !paybackSlot.mayPlace(getCarried())) {
             paybackSlot.set(ItemStack.EMPTY);
+            return;
         }
+
+        ItemStack result = getCarried().copy();
+
+        if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
+            if (ItemStack.isSameItemSameComponents(paybackSlot.getItem(), result)) {
+                result.setCount(paybackSlot.getItem().getCount() + 1);
+            } else {
+                result.setCount(1);
+            }
+        }
+        paybackSlot.set(result);
+    }
+
+    @Override
+    public boolean canDragTo(Slot slot) {
+        // Prevent dragging (QUICK_CRAFT) from working on payback slots. It's difficult to make it work correctly.
+        return !(slot instanceof GhostSlot);
     }
 
     // --

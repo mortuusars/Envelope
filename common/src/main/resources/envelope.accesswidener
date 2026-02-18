@@ -2,3 +2,8 @@ accessWidener   v2  named
 
 accessible method net/minecraft/client/renderer/item/ItemProperties register (Lnet/minecraft/world/item/Item;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/item/ClampedItemPropertyFunction;)V
 accessible field net/minecraft/util/ExtraCodecs GAME_PROFILE_WITHOUT_PROPERTIES Lcom/mojang/serialization/MapCodec;
+
+accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftType I
+accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftStatus I
+accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftSlots Ljava/util/Set;
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen lastQuickMoved Lnet/minecraft/world/item/ItemStack;

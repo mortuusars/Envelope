@@ -120,10 +120,6 @@
   "gui.envelope.time.less_than_one_minute": "<1min",
   "gui.envelope.time.less_than_one_second": "<1s",
 
-  "gui.envelope.fill_recipient.tooltip.title": "Recipient",
-  "gui.envelope.fill_recipient.tooltip.lclick_last_recipient": "§8[§7Click§8] - last recipient",
-  "gui.envelope.fill_recipient.tooltip.rclick_last_sender": "§8[§7Right+Click§8] - last sender",
-
   "gui.envelope.formatting.aqua": "Aqua",
   "gui.envelope.formatting.black": "Black",
   "gui.envelope.formatting.blue": "Blue",
@@ -250,5 +246,7 @@
 
   "gui.envelope.payback_tag.duration_short": "Duration: Short",
   "gui.envelope.payback_tag.duration_medium": "Duration: Medium",
-  "gui.envelope.payback_tag.duration_long": "Duration: Long"
+  "gui.envelope.payback_tag.duration_long": "Duration: Long",
+
+  "gui.envelope.payback_tag.tooltip.scroll": "§8[§7Scroll§8] to change amount"
 }
