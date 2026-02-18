@@ -4,12 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
-import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
-import io.github.mortuusars.envelope.world.item.component.PaybackTagContents;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -26,8 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class PaybackTagItem extends Item implements ApplicatorItem {
@@ -46,52 +39,25 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
         if (!slot.allowModification(player)) return false;
         if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
 
-        PaybackTagContents contents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.EMPTY);
-        @Nullable PaybackRequest existingPaybackRequest = slot.getItem().get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+        @Nullable PaybackRequest request = stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+        @Nullable PaybackRequest currentRequest = slot.getItem().get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
 
-        if (contents.isEmpty()) {
-            if (existingPaybackRequest == null) {
+        if (request != null) {
+            if (request.equals(currentRequest)) {
+                return true; // do nothing
+            }
+            slot.getItem().set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
+        } else {
+            if (currentRequest == null) {
                 return true; // do nothing
             }
             slot.getItem().remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
-        } else {
-            PaybackRequest paybackRequest = createPayback(player.level(), stack);
-            if (existingPaybackRequest != null && existingPaybackRequest.equals(paybackRequest)) {
-                return true; // do nothing
-            }
-            slot.getItem().set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, paybackRequest);
         }
 
         slot.setChanged();
         stack.shrink(1);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
         return true;
-    }
-
-    public PaybackRequest createPayback(Level level, ItemStack stack) {
-        PaybackTagContents tagContents = stack.getOrDefault(Envelope.DataComponents.PAYBACK_TAG_CONTENTS, PaybackTagContents.DEFAULT);
-
-        List<StackIngredient> stackIngredients = tagContents.getItemsForReading().stream()
-              .limit(PaybackRequest.SLOTS)
-              .filter(item -> !item.isEmpty())
-              .map(this::createRequestedItemFromStack)
-              .toList();
-
-        return PaybackRequest.createOrDefault(stackIngredients);
-    }
-
-    public StackIngredient createRequestedItemFromStack(ItemStack stack) {
-        if (stack.isEmpty()) {
-            Envelope.LOGGER.warn("Tried to create RequestedItem from empty ItemStack.");
-            return StackIngredient.createDefault();
-        }
-
-        DataComponentMap defaultComponents = new ItemStack(stack.getItem(), stack.getCount()).getComponents();
-        DataComponentMap components = stack.copy().getComponents();
-        DataComponentMap uniqueComponents = components.filter(type ->
-              !Objects.equals(components.get(type), defaultComponents.get(type)));
-        return new StackIngredient(HolderSet.direct(stack.getItemHolder()), stack.getCount(),
-              DataComponentPredicate.allOf(uniqueComponents), false);
     }
 
     @Override
@@ -105,17 +71,25 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        if (player.isSecondaryUseActive()) {
+            @Nullable PaybackRequest removedRequest = player.getItemInHand(hand).remove(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
+            if (removedRequest != null) {
+                player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
+                return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
+            }
+        }
+
         if (player instanceof ServerPlayer serverPlayer) {
             PlatformHelper.openMenu(
                   serverPlayer,
                   new SimpleMenuProvider((id, inventory, pl) ->
-                        new PaybackTagMenu(id, inventory, usedHand), Component.translatable("container.envelope.payback_tag")),
-                  buffer -> buffer.writeEnum(usedHand));
+                        new PaybackTagMenu(id, inventory, hand), Component.translatable("container.envelope.payback_tag")),
+                  buffer -> buffer.writeEnum(hand));
             player.getCooldowns().addCooldown(this, 3);
         }
 
-        return InteractionResultHolder.sidedSuccess(player.getItemInHand(usedHand), level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
     }
 
     @Override

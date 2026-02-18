@@ -97,9 +97,7 @@ public class PackageItem extends BlockItem implements Sealable {
 
         if (Config.Server.PACKAGE_SNEAK_QUICK_UNPACK.get() && player.isSecondaryUseActive()) {
             destroy(stack, level, player.position(), player);
-            player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
             stack.shrink(1);
-            return InteractionResultHolder.success(stack);
         } else {
             unpackLootTableIfPresent(stack, level, player.position(), player);
             dropExperience(stack, level, player.position());
@@ -112,10 +110,10 @@ public class PackageItem extends BlockItem implements Sealable {
                       (id, inventory, pl) -> new PackageMenu(id, inventory, hand), stack.getHoverName());
                 PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
             }
-
-            player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
-            return InteractionResultHolder.success(stack);
         }
+
+        player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);
+        return InteractionResultHolder.success(stack);
     }
 
     protected void unpackLootTableIfPresent(ItemStack stack, Level level, Vec3 pos, @Nullable Player player) {

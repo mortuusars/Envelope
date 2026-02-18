@@ -1,11 +1,10 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
@@ -42,8 +41,8 @@ public class AddressTagItem extends Item implements ApplicatorItem {
         if (address != null) {
             tooltipComponents.add(address.format()
                   .withIcon()
-                  .withIconColor(AddressFormatter.NEUTRAL_COLOR)
-                  .withColor(AddressFormatter.NEUTRAL_COLOR)
+                  .withIconColor(Colors.ADDRESS_NEUTRAL)
+                  .withColor(Colors.ADDRESS_NEUTRAL)
                   .toComponent());
         }
     }

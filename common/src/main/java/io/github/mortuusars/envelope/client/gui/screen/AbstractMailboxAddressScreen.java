@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.validation.CachedValidator;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -87,10 +88,10 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
         if (isRenaming() && !isCurrentIdSameAsExistingAddress()) {
             confirmTooltip.append("\n")
                   .append(Component.translatable("gui.envelope.mailbox_address.rename_warning.inbox")
-                        .withStyle(Style.EMPTY.withColor(0xFFE76A6A)))
+                        .withColor(Colors.TOOLTIP_RED))
                   .append("\n")
                   .append(Component.translatable("gui.envelope.mailbox_address.rename_warning.traveling")
-                        .withStyle(Style.EMPTY.withColor(0xFFE76A6A)));
+                        .withColor(Colors.TOOLTIP_RED));
         }
         confirmButton.setTooltip(Tooltip.create(confirmTooltip));
     }

@@ -2,17 +2,13 @@ package io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_dep
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
 import io.github.mortuusars.envelope.world.item.PaybackBoxItem;
-import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
@@ -65,8 +61,10 @@ public class PaybackDepartment {
         return subject;
     }
 
-    protected long getPaybackTimeoutTicksFor(ItemStack mail) {
-        return Ticks.fromMinutes(Config.Server.DELIVERY_PAYBACK_TIMEOUT_MINUTES.get());
+    protected long calculateExpireTick(ItemStack subject) {
+        PaybackDuration duration = subject.getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.createDefault())
+              .duration();
+        return getMailService().getGameTime() + duration.getTicks();
     }
 
     protected void awaitPayback(PaybackSubject paybackSubject) {
@@ -82,7 +80,7 @@ public class PaybackDepartment {
 
         if (getMailService().getGameTime() % 200 == 0) { // Check every minute
             getData().getPaybackPendingSubjects().entrySet().removeIf(entry -> {
-                if (entry.getValue().timeoutTick() <= getMailService().getGameTime()) {
+                if (entry.getValue().expiresAt() <= getMailService().getGameTime()) {
                     returnSubjectToSender(entry.getValue(), DeliveryRecord.Message.PAYBACK_EXPIRED);
                     getData().setDirty();
                     return true;
@@ -182,12 +180,10 @@ public class PaybackDepartment {
 
         ItemStack subject = subjectDelivery.getMail();
 
-        Mail.writeToLog(subject,
-              DeliveryRecord.arrivedTo(getAddress(), getMailService().getGameTime()));
+        Mail.writeToLog(subject, DeliveryRecord.arrivedTo(getAddress(), getMailService().getGameTime()));
 
         Id subjectId = Id.create(getMailService().getLevel());
-        long timeoutTick = getMailService().getGameTime() + getPaybackTimeoutTicksFor(subject);
-        PaybackSubject paybackSubject = new PaybackSubject(subjectId, subject, subjectDelivery.getSender(), timeoutTick);
+        PaybackSubject paybackSubject = new PaybackSubject(subjectId, subject, subjectDelivery.getSender(), calculateExpireTick(subject));
 
         if (sendPaybackPackingBoxToBuyer(subjectDelivery, paybackSubject)) {
             awaitPayback(paybackSubject);

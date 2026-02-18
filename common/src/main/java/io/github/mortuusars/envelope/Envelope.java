@@ -2,9 +2,7 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
-import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
@@ -252,6 +250,8 @@ public class Envelope {
 
         public static final DataComponentType<Id> MAIL_ID = Register.dataComponentType("mail_id", b ->
               b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
+        public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
+              b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_REQUEST = Register.dataComponentType("mail_payback_request",
@@ -260,8 +260,6 @@ public class Envelope {
               b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
         public static final DataComponentType<Unit> MAIL_RETURNED = Register.dataComponentType("mail_returned", b ->
               b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
-        public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
-              b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
         // -- Letter
 
@@ -291,8 +289,8 @@ public class Envelope {
 
         // -- Payback
 
-        public static final DataComponentType<PaybackTagContents> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
-              b -> b.persistent(PaybackTagContents.CODEC).networkSynchronized(PaybackTagContents.STREAM_CODEC));
+        public static final DataComponentType<PaybackRequest> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
+              b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
               b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC).cacheEncoding());
 

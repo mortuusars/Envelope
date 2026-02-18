@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public class Sprites {
     public static final WidgetSprites CONFIRM_BUTTON_SPRITES =
-            threeStates(Envelope.resource("button/confirm_button"));
+            threeStates(Envelope.resource("button/confirm"));
     public static final WidgetSprites CANCEL_BUTTON_SPRITES =
             threeStates(Envelope.resource("button/cancel_button"));
 

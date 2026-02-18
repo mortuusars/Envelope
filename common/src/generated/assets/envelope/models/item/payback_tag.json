@@ -1,6 +1,23 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "envelope:item/payback_tag"
-  }
+  "parent": "envelope:payback_tag_medium",
+  "overrides": [
+    {
+      "model": "envelope:item/payback_tag_short",
+      "predicate": {
+        "envelope:payback_tag_duration": 0.0
+      }
+    },
+    {
+      "model": "envelope:item/payback_tag_medium",
+      "predicate": {
+        "envelope:payback_tag_duration": 0.1
+      }
+    },
+    {
+      "model": "envelope:item/payback_tag_long",
+      "predicate": {
+        "envelope:payback_tag_duration": 0.2
+      }
+    }
+  ]
 }

@@ -4,8 +4,10 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.Util;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -110,6 +112,20 @@ public class StackIngredient {
     public static StackIngredient createDefault() {
         return new StackIngredient(HolderSet.direct(Items.EMERALD.builtInRegistryHolder()),
               1, DataComponentPredicate.EMPTY, false);
+    }
+
+    public static StackIngredient createFromStack(ItemStack stack) {
+        if (stack.isEmpty()) {
+            Envelope.LOGGER.warn("Tried to create StackIngredient from empty ItemStack. Default will be returned instead.");
+            return StackIngredient.createDefault();
+        }
+
+        DataComponentMap defaultComponents = new ItemStack(stack.getItem(), stack.getCount()).getComponents();
+        DataComponentMap components = stack.copy().getComponents();
+        DataComponentMap uniqueComponents = components.filter(type ->
+              !Objects.equals(components.get(type), defaultComponents.get(type)));
+        return new StackIngredient(HolderSet.direct(stack.getItemHolder()), stack.getCount(),
+              DataComponentPredicate.allOf(uniqueComponents), false);
     }
 
     // --

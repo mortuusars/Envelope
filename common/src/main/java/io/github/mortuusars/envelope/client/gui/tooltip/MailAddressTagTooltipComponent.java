@@ -1,9 +1,8 @@
 package io.github.mortuusars.envelope.client.gui.tooltip;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -22,8 +21,8 @@ public class MailAddressTagTooltipComponent implements ClientTooltipComponent {
 
     public MailAddressTagTooltipComponent(Address address) {
         component = address.format().withIcon()
-              .withIconColor(AddressFormatter.NEUTRAL_COLOR)
-              .withColor(AddressFormatter.NEUTRAL_COLOR).toComponent();
+              .withIconColor(Colors.ADDRESS_NEUTRAL)
+              .withColor(Colors.ADDRESS_NEUTRAL).toComponent();
     }
 
     @Override

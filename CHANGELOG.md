@@ -1,12 +1,27 @@
 # Changelog
 
 ## UNRELEASED
+Payback
+- Added duration selector to **Payback Tag** menu.
+  - Controls how much time buyer has to pay for the mail. 
+  - **Payback Tag** item texture changes slightly based on duration defined. 
+- Holding _sneak_ while using **Payback Tag** will clear it.
+- Changed `envelope:payback_tag_contents` item component. It is now the same object as `envelope:mail_payback_request`.
+- Updated **Payback Tag** related visuals.
+- Removed **Payback Tag** crafting table recipes.
+
+Package
 - Added `envelope:package_experience` item component. Awarded when Package is opened.
+- Holding _sneak_ while using a Package will unpack it without opening the menu.
+- Fixed overlays not rendering over package slots.
+
+Crafting
 - Added `experience` field to mail crafting recipes. Applied to resulting package and awarded when player opens it.
   - Works the same as in smelting recipes.
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
-- Holding _sneak_ while using a Package will unpack it without opening the menu.  
-- Fixed overlays not rendering over package slots. 
+
+Misc
+- Small change to how `envelope:payback_subject` component is defined.
 
 ## 0.6.0-Snapshot 1
 #### Added Mailing recipes

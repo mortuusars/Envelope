@@ -54,6 +54,8 @@ public class PaybackDepartmentData extends SavedData {
     }
 
     private static PaybackDepartmentData load(CompoundTag tag, HolderLookup.Provider registries) {
+
+
         return CODEC.decode(registries.createSerializationContext(NbtOps.INSTANCE), tag)
               .ifError(e -> Envelope.LOGGER.error("Cannot load PaybackDepartmentData: {}", e.message()))
               .result()

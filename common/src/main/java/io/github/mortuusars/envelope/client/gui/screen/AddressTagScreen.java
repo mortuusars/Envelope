@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.gui.widget.AddressBoxSuggestions;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
@@ -69,7 +70,7 @@ public class AddressTagScreen extends Screen {
         addressBox = new EditBox(font, leftPos + 26, topPos + 21, 125, 9, Component.empty());
         addressBox.setValue(getInitialAddressValue());
         addressBox.setMaxLength(BlockAddress.MAX_LENGTH);
-        addressBox.setTextColor(0xFFFFFFFF);
+        addressBox.setTextColor(Colors.WHITE);
         addressBox.setResponder(this::addressTextChanged);
         addressBox.setBordered(false);
         addressBox.setCanLoseFocus(false);
@@ -206,7 +207,7 @@ public class AddressTagScreen extends Screen {
     }
 
     protected void renderLabels(@NotNull GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, 0xFF3C3C3C, false);
+        guiGraphics.drawString(font, title, titleLabelX, titleLabelY, Colors.GUI_LABEL, false);
     }
 
     protected void renderAddressIcon(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {

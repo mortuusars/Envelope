@@ -3,11 +3,14 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -54,14 +57,15 @@ public class PaybackPackageItem extends Item {
             return;
         }
 
-        long remainingTicks = subject.timeoutTick() - Minecrft.level().getGameTime();
+        long remainingTicks = subject.expiresAt() - Minecrft.level().getGameTime();
         if (remainingTicks < 1) {
-            components.add(Component.translatable("gui.envelope.payback.expired")
-                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+            components.add(Component.translatable("gui.envelope.payback.expired").withColor(Colors.TOOLTIP_RED));
         } else {
-            components.add(Component.literal("⌛ ")
-                  .append(GameTime.formatLargest(remainingTicks, false))
-                  .withStyle(DeliveryRecord.MessageType.NEGATIVE.getStyle()));
+            MutableComponent time = Screen.hasShiftDown()
+                  ? GameTime.format(remainingTicks, false)
+                  : GameTime.formatLargest(remainingTicks, false);
+
+            components.add(Component.literal("⌛ ").append(time).withColor(Colors.TOOLTIP_RED));
         }
     }
 

@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.world.block.PaperBoxBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
+import io.github.mortuusars.envelope.world.item.component.PaybackDuration;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -80,13 +81,36 @@ public class ModelsDatagen extends BlockStateProvider {
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());
 
-//        itemModels().basicItem(Envelope.Items.PACKAGE.get())
-//              .override()
-//              .predicate(EnvelopeClient.ItemModelOverrides.PACKAGE_EMPTY, 1)
-//              .model(model(Envelope.resource("package_empty")))
-//              .end();
+        // -- Payback Tag
+        {
+            ItemModelBuilder paybackTagShort = itemModels().getBuilder("envelope:payback_tag_short")
+                  .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                  .texture("layer0", Envelope.resource("item/payback_tag_short"));
 
-        itemModels().basicItem(Envelope.Items.PAYBACK_TAG.get());
+            ItemModelBuilder paybackTagMedium = itemModels().getBuilder("envelope:payback_tag_medium")
+                  .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                  .texture("layer0", Envelope.resource("item/payback_tag_medium"));
+
+            ItemModelBuilder paybackTagLong = itemModels().getBuilder("envelope:payback_tag_long")
+                  .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                  .texture("layer0", Envelope.resource("item/payback_tag_long"));
+
+            itemModels().getBuilder("envelope:payback_tag")
+                  .parent(new ModelFile.UncheckedModelFile("envelope:payback_tag_medium"))
+                  .override()
+                  .predicate(EnvelopeClient.ItemModelOverrides.PAYBACK_TAG_DURATION, PaybackDuration.SHORT.ordinal() / 10f)
+                  .model(paybackTagShort)
+                  .end()
+                  .override()
+                  .predicate(EnvelopeClient.ItemModelOverrides.PAYBACK_TAG_DURATION, PaybackDuration.MEDIUM.ordinal() / 10f)
+                  .model(paybackTagMedium)
+                  .end()
+                  .override()
+                  .predicate(EnvelopeClient.ItemModelOverrides.PAYBACK_TAG_DURATION, PaybackDuration.LONG.ordinal() / 10f)
+                  .model(paybackTagLong)
+                  .end();
+        }
+
         itemModels().basicItem(Envelope.Items.PAYBACK_BOX.get());
         itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get());
 
@@ -141,12 +165,8 @@ public class ModelsDatagen extends BlockStateProvider {
         getVariantBuilder(block).forAllStates(state -> {
             Direction facing = state.getValue(PigeonholeBlock.FACING);
             int waste = state.getValue(PigeonholeBlock.WASTE_LEVEL);
-//            boolean hasAddress = state.getValue(PigeonholeBlock.HAS_ADDRESS);
-//            boolean hasMail = state.getValue(PigeonholeBlock.HAS_MAIL);
 
-            String suffix = (waste >= PigeonholeBlock.MAX_WASTE_LEVEL ? "_waste" : "")
-                  /*+ (hasAddress ? "_address" : "")
-                  + (hasMail && hasAddress ? "_mail" : "")*/;
+            String suffix = (waste >= PigeonholeBlock.MAX_WASTE_LEVEL ? "_waste" : "");
 
             ModelFile model = models().orientableWithBottom(baseName + suffix,
                   Envelope.resource("block/" + baseName + "_side"),

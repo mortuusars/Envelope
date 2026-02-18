@@ -43,6 +43,11 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue DELIVERY_PAYBACK_TIMEOUT_MINUTES;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
 
+        // PAYBACK
+        public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
+        public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_MEDIUM;
+        public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_LONG;
+
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
 
@@ -151,6 +156,20 @@ public abstract class Config {
                       .comment("Delivering pigeons will not spawn when 'doMobSpawning' rule is set to 'false'.",
                             "Default: false (spawn anyway)")
                       .define("spawning_respects_domobspawning_rule", false);
+                builder.pop();
+            }
+
+            {
+                builder.push("payback");
+                PAYBACK_REQUEST_DURATION_SHORT = builder
+                      .comment("'Short' payback request duration (in minutes).")
+                      .defineInRange("request_duration_short", 30, 1, Integer.MAX_VALUE);
+                PAYBACK_REQUEST_DURATION_MEDIUM = builder
+                      .comment("'Medium' payback request duration (in minutes). Default.")
+                      .defineInRange("request_duration_medium", 180, 1, Integer.MAX_VALUE);
+                PAYBACK_REQUEST_DURATION_LONG = builder
+                      .comment("'Long' payback request duration (in minutes).")
+                      .defineInRange("request_duration_long", 4320, 1, Integer.MAX_VALUE);
                 builder.pop();
             }
 

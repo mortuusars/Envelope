@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
@@ -12,7 +13,6 @@ import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.serverbound.MailboxMenuInboxActionC2SP;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
-import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -355,7 +355,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         if (font.width(sender.getString()) > 76) {
             tooltip.add(sender.format()
                   .withIcon()
-                  .withIconColor(AddressFormatter.NEUTRAL_COLOR)
+                  .withIconColor(Colors.ADDRESS_NEUTRAL)
                   .withColor(ChatFormatting.WHITE)
                   .toComponent());
         }

@@ -74,10 +74,7 @@ public class LetterCloningRecipe extends CustomRecipe {
 		if (!sourceStack.isEmpty() && copies > 0) {
 			ItemStack result = sourceStack.copyWithCount(copies);
 			result.remove(Envelope.DataComponents.LETTER_TATTERED);
-			Mail.removePreviousDeliveryData(result);
-			result.remove(Envelope.DataComponents.MAIL_RECIPIENT);
-			result.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
-			return result;
+			return Mail.removeAllDeliveryData(result);
 		}
 
         return ItemStack.EMPTY;

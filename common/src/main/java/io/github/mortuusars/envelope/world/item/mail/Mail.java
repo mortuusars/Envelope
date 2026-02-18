@@ -148,6 +148,14 @@ public final class Mail {
         return mail;
     }
 
+    public static ItemStack removeAllDeliveryData(ItemStack mail) {
+        if (mail.isEmpty()) return ItemStack.EMPTY;
+
+        mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
+        mail.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+        return removePreviousDeliveryData(mail);
+    }
+
     public static ItemStack asDelivered(ItemStack mail) {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 

@@ -1,24 +1,36 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
+import io.github.mortuusars.envelope.client.gui.widget.CycleButton;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
+import io.github.mortuusars.envelope.world.item.component.PaybackDuration;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Map;
+
 public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/payback_tag.png");
 
+    protected CycleButton<PaybackDuration> durationButton;
     protected ImageButton confirmButton;
 
     public PaybackTagScreen(PaybackTagMenu menu, Inventory playerInventory, Component title) {
@@ -28,16 +40,50 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
     @Override
     protected void init() {
         imageWidth = 186;
-        imageHeight = 154;
+        imageHeight = 161;
         super.init();
         inventoryLabelX = 12;
 
         titleLabelX = (imageWidth / 2) - (font.width(getTitle()) / 2);
 
-        confirmButton = new ImageButton(leftPos + 128, topPos + 28, 19, 19,
+        durationButton = addRenderableWidget(createDurationButton());
+
+        confirmButton = new ImageButton(leftPos + 133, topPos + 31, 19, 19,
               Sprites.CONFIRM_BUTTON_SPRITES, button -> confirm(), Component.translatable("gui.envelope.confirm"));
         confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
         addRenderableWidget(confirmButton);
+    }
+
+    protected CycleButton<PaybackDuration> createDurationButton() {
+        Map<PaybackDuration, WidgetSprites> durationSprites = Map.of(
+              PaybackDuration.SHORT, Sprites.threeStates(Envelope.resource("payback/duration_short")),
+              PaybackDuration.MEDIUM, Sprites.threeStates(Envelope.resource("payback/duration_medium")),
+              PaybackDuration.LONG, Sprites.threeStates(Envelope.resource("payback/duration_long"))
+        );
+
+        Map<PaybackDuration, Tooltip> durationTooltips = Map.of(
+              PaybackDuration.SHORT, Tooltip.create(Component.translatable("gui.envelope.payback_tag.duration_short")
+                    .append(CommonComponents.NEW_LINE)
+                    .append(GameTime.format(PaybackDuration.SHORT.getTicks(), false).withStyle(ChatFormatting.GRAY))),
+              PaybackDuration.MEDIUM, Tooltip.create(Component.translatable("gui.envelope.payback_tag.duration_medium")
+                    .append(CommonComponents.NEW_LINE)
+                    .append(GameTime.format(PaybackDuration.MEDIUM.getTicks(), false).withStyle(ChatFormatting.GRAY))),
+              PaybackDuration.LONG, Tooltip.create(Component.translatable("gui.envelope.payback_tag.duration_long")
+                    .append(CommonComponents.NEW_LINE)
+                    .append(GameTime.format(PaybackDuration.LONG.getTicks(), false).withStyle(ChatFormatting.GRAY)))
+        );
+
+        return new CycleButton<>(leftPos + 24, topPos + 32, 29, 16,
+              Arrays.stream(PaybackDuration.values()).toList(), getMenu().getPaybackDuration(), durationSprites)
+              .setTooltips(durationTooltips)
+              .setLooping(true)
+              .setClickSound(SoundEvents.UI_BUTTON_CLICK.value())
+              .onCycle(this::changeDuration);
+    }
+
+    protected void changeDuration(PaybackDuration duration) {
+        getMenu().clickMenuButton(getMenu().getPlayer(), PaybackTagMenu.DURATION_BUTTON_ID + duration.ordinal());
+        Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, PaybackTagMenu.DURATION_BUTTON_ID + duration.ordinal());
     }
 
     protected void confirm() {
@@ -47,13 +93,21 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
     }
 
     @Override
+    protected void containerTick() {
+        PaybackDuration duration = getMenu().getPaybackDuration();
+        if (durationButton.getCurrentValue() != duration) {
+            durationButton.setCurrentValue(duration);
+        }
+    }
+
+    @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTargetPreview(guiGraphics, mouseX, mouseY);
     }
 
     protected void renderTargetPreview(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack target = getMenu().getItemInHand();
+        ItemStack target = getMenu().getTargetPreview();
         if (target.isEmpty()) {
             return;
         }
@@ -62,7 +116,7 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
         int size = (int) (16 * scale);
 
         int x = leftPos - size - 4;
-        int y = topPos + 36 - size / 2;
+        int y = topPos + 38 - size / 2;
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(x + (float) size / 2, y + (float) size / 2, 0);
@@ -96,7 +150,7 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (super.keyPressed(keyCode, scanCode, modifiers)){
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
 

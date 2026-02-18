@@ -246,5 +246,9 @@
 
   "envelope.empty_tag": "Empty Tag",
 
-  "gui.envelope.payback.expired": "Expired"
+  "gui.envelope.payback.expired": "Expired",
+
+  "gui.envelope.payback_tag.duration_short": "Duration: Short",
+  "gui.envelope.payback_tag.duration_medium": "Duration: Medium",
+  "gui.envelope.payback_tag.duration_long": "Duration: Long"
 }

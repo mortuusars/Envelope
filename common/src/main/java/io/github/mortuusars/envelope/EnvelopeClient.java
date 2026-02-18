@@ -52,6 +52,8 @@ public class EnvelopeClient {
         public static final ResourceLocation LETTER_UNFOLDED = Envelope.resource("letter_unfolded");
         public static final ResourceLocation LETTER_CONTENT = Envelope.resource("letter_content");
 
+        public static final ResourceLocation PAYBACK_TAG_DURATION = Envelope.resource("payback_tag_duration");
+
         public static void register() {
             ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
@@ -60,6 +62,8 @@ public class EnvelopeClient {
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
             ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
+
+            ItemProperties.register(Envelope.Items.PAYBACK_TAG.get(), PAYBACK_TAG_DURATION, ItemModelOverrides::getPaybackDuration);
         }
 
         public static float isLetterTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
@@ -80,6 +84,13 @@ public class EnvelopeClient {
             }
             return 0;
         }
+
+        public static float getPaybackDuration(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
+            PaybackDuration duration = stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS) instanceof PaybackRequest request
+                  ? request.duration()
+                  : PaybackDuration.MEDIUM;
+            return duration.ordinal() / 10f; // 0.0, 0.1, 0.2, etc.
+        }
     }
 
     public static class TooltipComponents {
@@ -87,8 +98,7 @@ public class EnvelopeClient {
             return switch (component) {
                 case MailAddressTagTooltip mailAddress -> new MailAddressTagTooltipComponent(mailAddress.address());
                 case PackageContents packageContents -> new PackageTooltipComponent(packageContents);
-                case PaybackRequest paybackRequest -> new PaybackTooltipComponent(paybackRequest);
-                case PaybackTagContents paybackTagContents -> new PaybackTagContentsTooltipComponent(paybackTagContents);
+                case PaybackRequest paybackRequest -> new PaybackRequestTooltipComponent(paybackRequest);
                 case Seal seal -> new SealTooltipComponent(seal);
                 case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die ->
                       new SealDieTooltipComponent(die.impression());
@@ -129,7 +139,7 @@ public class EnvelopeClient {
 
             if (tooltipFlag.isAdvanced()) {
                 Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {
-                    consumer.accept(Component.literal("Mail Id: " + id).withStyle(ChatFormatting.GRAY));
+                    consumer.accept(Component.literal("Mail Id: " + id).withStyle(ChatFormatting.DARK_GRAY));
                 });
             }
         }

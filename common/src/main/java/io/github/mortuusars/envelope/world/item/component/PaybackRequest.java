@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item.component;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -14,31 +15,49 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.Optional;
 
-public record PaybackRequest(List<StackIngredient> items) implements TooltipComponent {
+public record PaybackRequest(List<StackIngredient> items, PaybackDuration duration) implements TooltipComponent {
     public static final int SLOTS = 6;
 
-    public static final Codec<PaybackRequest> CODEC =
-          Codec.list(StackIngredient.CODEC, 1, 6).xmap(PaybackRequest::new, PaybackRequest::items);
+    private static final Codec<PaybackRequest> FULL_CODEC = RecordCodecBuilder.create(i -> i.group(
+          Codec.list(StackIngredient.CODEC, 1, SLOTS).fieldOf("ingredients").forGetter(PaybackRequest::items),
+          PaybackDuration.CODEC.optionalFieldOf("duration", PaybackDuration.MEDIUM).forGetter(PaybackRequest::duration)
+    ).apply(i, PaybackRequest::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, PaybackRequest> STREAM_CODEC =
-          StackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list(6)).map(PaybackRequest::new, PaybackRequest::items);
+    private static final Codec<PaybackRequest> SIMPLE_CODEC = Codec.list(StackIngredient.CODEC, 1, 6)
+          .xmap(PaybackRequest::new, PaybackRequest::items);
+
+    public static final Codec<PaybackRequest> CODEC = Codec.withAlternative(FULL_CODEC, SIMPLE_CODEC);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, PaybackRequest> STREAM_CODEC = StreamCodec.composite(
+          StackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list(SLOTS)), PaybackRequest::items,
+          PaybackDuration.STREAM_CODEC, PaybackRequest::duration,
+          PaybackRequest::new
+    );
 
     public PaybackRequest {
         Preconditions.checkArgument(!items.isEmpty(), "Payback must have at least one requested item.");
     }
 
-    public static Optional<PaybackRequest> create(List<StackIngredient> items) {
-        return !items.isEmpty() ? Optional.of(new PaybackRequest(items)) : Optional.empty();
+    public PaybackRequest(List<StackIngredient> items) {
+        this(items, PaybackDuration.MEDIUM);
     }
 
-    public static PaybackRequest createOrDefault(List<StackIngredient> items) {
+    public static Optional<PaybackRequest> create(List<StackIngredient> items, PaybackDuration duration) {
+        return !items.isEmpty() ? Optional.of(new PaybackRequest(items, duration)) : Optional.empty();
+    }
+
+    public static PaybackRequest createOrDefault(List<StackIngredient> items, PaybackDuration duration) {
         return !items.isEmpty()
-              ? new PaybackRequest(items)
-              : createDefault();
+              ? new PaybackRequest(items, duration)
+              : createDefault(duration);
     }
 
     public static PaybackRequest createDefault() {
-        return new PaybackRequest(List.of(StackIngredient.createDefault()));
+        return new PaybackRequest(List.of(StackIngredient.createDefault()), PaybackDuration.MEDIUM);
+    }
+
+    public static PaybackRequest createDefault(PaybackDuration duration) {
+        return new PaybackRequest(List.of(StackIngredient.createDefault()), duration);
     }
 
     // --

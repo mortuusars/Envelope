@@ -3,9 +3,9 @@ package io.github.mortuusars.envelope.world.item.component.mail.log;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -67,9 +67,9 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
 
     public MutableComponent toComponent(Level level) {
         int addressColor = switch (type()) {
-            case SENT -> AddressFormatter.SENDER_COLOR;
-            case ARRIVED -> AddressFormatter.RECIPIENT_COLOR;
-            case RETURNED, PAYBACK, CUSTOM -> AddressFormatter.NEUTRAL_COLOR;
+            case SENT -> Colors.ADDRESS_SENDER;
+            case ARRIVED -> Colors.ADDRESS_RECIPIENT;
+            case RETURNED, PAYBACK, CUSTOM -> Colors.ADDRESS_NEUTRAL;
         };
 
         Component addressComponent = this.address.map(a -> a.format()
@@ -175,8 +175,8 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
 
     public enum MessageType implements StringRepresentable {
         NEUTRAL("neutral", Style.EMPTY.withColor(ChatFormatting.GRAY)),
-        POSITIVE("positive", Style.EMPTY.withColor(0xFF75DC7C)),
-        NEGATIVE("negative", Style.EMPTY.withColor(0xFFE48174));
+        POSITIVE("positive", Style.EMPTY.withColor(Colors.TOOLTIP_GREEN)),
+        NEGATIVE("negative", Style.EMPTY.withColor(Colors.TOOLTIP_RED));
 
         public static final Codec<MessageType> CODEC = StringRepresentable.fromEnum(MessageType::values);
         public static final StreamCodec<ByteBuf, MessageType> STREAM_CODEC = ByteBufCodecs.idMapper(

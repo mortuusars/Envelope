@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
 import com.mojang.datafixers.util.Either;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -12,10 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 public class AddressFormatter {
-    public static final int NEUTRAL_COLOR = 0xFFE6CB98;
-    public static final int SENDER_COLOR = 0xFF7AB5E1;
-    public static final int RECIPIENT_COLOR = 0xFFE8AD77;
-
     protected final Address address;
     protected boolean icon = false;
     protected String iconSeparator = " ";
@@ -36,22 +33,22 @@ public class AddressFormatter {
     public AddressFormatter asNeutral() {
         return this
               .withIcon()
-              .withIconColor(NEUTRAL_COLOR)
-              .withColor(NEUTRAL_COLOR);
+              .withIconColor(Colors.ADDRESS_NEUTRAL)
+              .withColor(Colors.ADDRESS_NEUTRAL);
     }
 
     public AddressFormatter asSender() {
         return this
               .withIcon()
-              .withIconColor(SENDER_COLOR)
-              .withColor(SENDER_COLOR);
+              .withIconColor(Colors.ADDRESS_SENDER)
+              .withColor(Colors.ADDRESS_SENDER);
     }
 
     public AddressFormatter asRecipient() {
         return this
               .withIcon()
-              .withIconColor(RECIPIENT_COLOR)
-              .withColor(RECIPIENT_COLOR);
+              .withIconColor(Colors.ADDRESS_RECIPIENT)
+              .withColor(Colors.ADDRESS_RECIPIENT);
     }
 
     // --

@@ -9,19 +9,19 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
-public record PaybackSubject(Id id, ItemStack mail, Address returnAddress, long timeoutTick) {
+public record PaybackSubject(Id id, ItemStack mail, Address returnAddress, long expiresAt) {
     public static final Codec<PaybackSubject> CODEC = RecordCodecBuilder.create(i -> i.group(
           Id.CODEC.fieldOf("id").forGetter(PaybackSubject::id),
           ItemStack.CODEC.fieldOf("mail").forGetter(PaybackSubject::mail),
           Address.CODEC.fieldOf("return_address").forGetter(PaybackSubject::returnAddress),
-          Codec.LONG.fieldOf("timeout_tick").forGetter(PaybackSubject::timeoutTick)
+          Codec.LONG.fieldOf("expires_at").forGetter(PaybackSubject::expiresAt)
     ).apply(i, PaybackSubject::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PaybackSubject> STREAM_CODEC = StreamCodec.composite(
           Id.STREAM_CODEC, PaybackSubject::id,
           ItemStack.STREAM_CODEC, PaybackSubject::mail,
           Address.STREAM_CODEC, PaybackSubject::returnAddress,
-          ByteBufCodecs.VAR_LONG, PaybackSubject::timeoutTick,
+          ByteBufCodecs.VAR_LONG, PaybackSubject::expiresAt,
           PaybackSubject::new
     );
 

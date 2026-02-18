@@ -78,19 +78,6 @@ public class RecipesDatagen extends RecipeProvider {
               .unlockedBy("has_paper", has(Items.PAPER))
               .save(output);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PAYBACK_TAG.get())
-              .requires(Items.PAPER)
-              .requires(ItemTags.SIGNS)
-              .requires(Tags.Items.DYES_RED)
-              .unlockedBy("has_paper", has(Items.PAPER))
-              .save(output);
-
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Envelope.Items.PAYBACK_TAG.get())
-              .requires(Envelope.Items.ADDRESS_TAG.get())
-              .requires(Tags.Items.DYES_RED)
-              .unlockedBy("has_paper", has(Items.PAPER))
-              .save(output, "payback_tag_from_address_tag");
-
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Envelope.Items.SEAL_STAMP.get(), 1)
               .define('S', ItemTags.WOODEN_SLABS)
               .define('I', Tags.Items.INGOTS_IRON)

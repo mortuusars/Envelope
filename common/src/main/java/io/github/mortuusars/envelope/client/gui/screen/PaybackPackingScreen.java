@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.Sprites;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.inventory.slot.PreviewSlot;
 import io.github.mortuusars.envelope.world.inventory.slot.RequestedItemSlot;
@@ -70,7 +71,7 @@ public class PaybackPackingScreen extends AbstractInHandContainerScreen<PaybackP
                 guiGraphics.renderItemDecorations(Minecrft.get().font, preview, slot.x, slot.y);
                 if (requestedItemSlot.getIngredient().items().unwrapKey().isPresent()) {
                     guiGraphics.pose().translate(0, 0, 200);
-                    guiGraphics.drawString(font, "#", slot.x + 1 + 19 - 2 - font.width("#"), slot.y - 1, 0xFFFFFFFF, true);
+                    guiGraphics.drawString(font, "#", slot.x + 1 + 19 - 2 - font.width("#"), slot.y - 1, Colors.WHITE, true);
                 }
                 guiGraphics.pose().popPose();
             }
