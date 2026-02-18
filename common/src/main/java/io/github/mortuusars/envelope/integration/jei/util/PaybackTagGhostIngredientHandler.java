@@ -41,6 +41,7 @@ public class PaybackTagGhostIngredientHandler implements IGhostIngredientHandler
                 @Override
                 public void accept(I ingredient) {
                     if (ingredient instanceof ItemStack stackIngredient) {
+                        slot.setByPlayer(stackIngredient);
                         Packets.sendToServer(new PaybackTagMenuSetSlotC2SP(slot.index, stackIngredient));
                     }
                 }

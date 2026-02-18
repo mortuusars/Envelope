@@ -74,7 +74,7 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
                     .append(GameTime.format(PaybackDuration.LONG.getTicks(), false).withStyle(ChatFormatting.GRAY)))
         );
 
-        return new CycleButton<>(leftPos + 24, topPos + 32, 29, 16,
+        return new CycleButton<>(leftPos + 34, topPos + 32, 27, 16,
               Arrays.stream(PaybackDuration.values()).toList(), getMenu().getPaybackDuration(), durationSprites)
               .setTooltips(durationTooltips)
               .setLooping(true)
@@ -197,10 +197,19 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
     }
 
     protected void changeRequestedItemCount(boolean decreasing, boolean fast) {
-        if (hoveredSlot == null) return;
+        if (!(hoveredSlot instanceof GhostSlot slot)) {
+            return;
+        }
+
+//        int countBeforeChange = slot.getItem().getCount();
+
         int startId = decreasing ? PaybackTagMenu.DECREASE_COUNT_START_BUTTON_ID : PaybackTagMenu.INCREASE_COUNT_START_BUTTON_ID;
         int id = startId + hoveredSlot.index + (fast ? PaybackRequest.SLOTS : 0);
         getMenu().clickMenuButton(getMenu().getPlayer(), id);
         Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, id);
+
+//        if (countBeforeChange != slot.getItem().getCount()) {
+//            Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 2, 0.15f));
+//        }
     }
 }

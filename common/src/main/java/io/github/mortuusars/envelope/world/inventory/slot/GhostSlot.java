@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.inventory.slot;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -33,5 +34,12 @@ public class GhostSlot extends Slot {
     public @NotNull ItemStack remove(int amount) {
         super.remove(amount);
         return ItemStack.EMPTY; // Returning original will dupe items in some cases
+    }
+
+    public void setCount(int count) {
+        count = Mth.clamp(count, 1, getMaxStackSize(getItem()));
+        if (getItem().getCount() != count) {
+            setByPlayer(getItem().copyWithCount(count));
+        }
     }
 }

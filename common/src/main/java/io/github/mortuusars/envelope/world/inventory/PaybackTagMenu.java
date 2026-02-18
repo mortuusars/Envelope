@@ -106,7 +106,16 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
                 int index = column + row * 3;
                 int x = slotsX + column * 18;
                 int y = slotsY + row * 18;
-                addSlot(new GhostSlot(getContainer(), index, x, y, PaybackRequest::isValid));
+                addSlot(new GhostSlot(getContainer(), index, x, y, PaybackRequest::isValid) {
+                    @Override
+                    public void setByPlayer(ItemStack newStack, ItemStack oldStack) {
+                        super.setByPlayer(newStack, oldStack);
+                        if (getPlayer().level().isClientSide()
+                              && (newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount())) {
+                            getPlayer().playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.15f, 2);
+                        }
+                    }
+                });
             }
         }
     }
@@ -119,14 +128,12 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
         ItemStack clickedStack = slot.getItem();
 
         if (index < PackageContents.SLOTS) {
-            getContainer().setItem(index, ItemStack.EMPTY);
-            getContainer().setChanged();
+            slots.get(index).setByPlayer(ItemStack.EMPTY);
         } else if (index < slots.size()) {
             for (int i = 0; i < PaybackRequest.SLOTS; i++) {
                 Slot paybackSlot = slots.get(i);
                 if (paybackSlot.getItem().isEmpty() && paybackSlot.mayPlace(clickedStack)) {
-                    paybackSlot.set(clickedStack.copy());
-                    paybackSlot.setChanged();
+                    paybackSlot.setByPlayer(clickedStack.copy());
                     break;
                 }
             }
@@ -172,9 +179,11 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
                 change *= -1;
             }
 
-            ItemStack stack = getContainer().getItem(slotIndex);
-            stack.setCount(Mth.clamp(stack.getCount() + change, 1, stack.getMaxStackSize()));
-            getContainer().setChanged();
+            if (slots.get(slotIndex) instanceof GhostSlot slot) {
+                slot.setCount(Mth.clamp(slot.getItem().getCount() + change, 1, slot.getItem().getMaxStackSize()));
+            }
+
+            return true;
         }
 
         return false;
@@ -190,7 +199,7 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
         Slot paybackSlot = this.slots.get(slotId);
 
         if (getCarried().isEmpty() || !paybackSlot.mayPlace(getCarried())) {
-            paybackSlot.set(ItemStack.EMPTY);
+            paybackSlot.setByPlayer(ItemStack.EMPTY);
             return;
         }
 
@@ -203,7 +212,7 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
                 result.setCount(1);
             }
         }
-        paybackSlot.set(result);
+        paybackSlot.setByPlayer(result);
     }
 
     @Override
