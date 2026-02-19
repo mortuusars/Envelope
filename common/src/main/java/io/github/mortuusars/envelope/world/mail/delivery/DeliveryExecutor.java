@@ -8,11 +8,13 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.IncomingMailHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import org.slf4j.Logger;
 
 public interface DeliveryExecutor {
+    Logger LOGGER = LogUtils.getLogger();
+
     CourierOrigin getOrigin();
 
     default void tickDelivery(ServerLevel level, Delivery delivery) {
@@ -140,15 +142,23 @@ public interface DeliveryExecutor {
             Mail.setSender(delivery.getMail(), delivery.getRecipient());
         }
 
-        if (getOrigin().isService() && delivery.getMail().isEmpty()) {
-            // Skipping rest of the delivery, as it does not matter anymore, just taking up cpu cycles.
-            // This can technically cause side effects, if some logic depends on courier completing specific phase, even if empty.
-            LogUtils.getLogger().debug("Finishing service delivery [{}] early, as it does not carry returning mail.", delivery.getId());
+        if (getOrigin().isService() && shouldTerminateServiceDeliveryEarly(level, delivery)) {
+            LOGGER.debug("Terminating service delivery [{}] early.", delivery.getId());
             delivery.setPhaseAndResetProgress(DeliveryPhase.FINISHED);
             return true;
         }
 
         delivery.updateRoute(level);
         return false;
+    }
+
+    /**
+     * Whether a service delivery should be ended early (when dispatching return),
+     * to save on processing and avoid spawning the courier when it doesn't deliver anything.
+     * <br>
+     * This can cause side effects, if some logic depends on courier completing specific phase, even if empty.
+     */
+    default boolean shouldTerminateServiceDeliveryEarly(ServerLevel level, Delivery delivery) {
+        return delivery.getMail().isEmpty();
     }
 }
