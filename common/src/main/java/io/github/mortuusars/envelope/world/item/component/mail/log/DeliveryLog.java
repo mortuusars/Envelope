@@ -25,21 +25,9 @@ public record DeliveryLog(List<DeliveryRecord> records) {
         return new DeliveryLog(records);
     }
 
-    public DeliveryLog append(DeliveryRecord.Builder recordBuilder) {
-        return append(recordBuilder.build());
-    }
-
     public DeliveryLog append(DeliveryRecord... list) {
         List<DeliveryRecord> records = new ArrayList<>(this.records);
         records.addAll(Arrays.asList(list));
-        return new DeliveryLog(records);
-    }
-
-    public DeliveryLog append(DeliveryRecord.Builder... list) {
-        List<DeliveryRecord> records = new ArrayList<>(this.records);
-        for (DeliveryRecord.Builder record : list) {
-            records.add(record.build());
-        }
         return new DeliveryLog(records);
     }
 }

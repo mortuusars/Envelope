@@ -24,6 +24,7 @@ Crafting
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
 
 Misc
+- Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
 - **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
 - Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.
 - Small change to how `envelope:payback_subject` component is defined.

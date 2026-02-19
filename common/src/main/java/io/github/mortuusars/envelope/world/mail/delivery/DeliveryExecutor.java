@@ -80,7 +80,7 @@ public interface DeliveryExecutor {
     default void phaseStarted(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.STARTED) {
             Mail.setSender(delivery.getMail(), delivery.getSender());
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender(), level.getGameTime()));
+            Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()));
         }
     }
 

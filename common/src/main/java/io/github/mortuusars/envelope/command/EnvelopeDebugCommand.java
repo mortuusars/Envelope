@@ -11,8 +11,11 @@ import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTe
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
 import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.ChatFormatting;
@@ -82,13 +85,14 @@ public class EnvelopeDebugCommand {
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-        ItemStack box = new ItemStack(Envelope.Items.PAYBACK_BOX.get());
-        ItemStack mail = new ItemStack(Envelope.Items.LETTER.get());
-        mail.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.createDefault());
-        box.set(Envelope.DataComponents.PAYBACK_SUBJECT, new PaybackSubject(Id.createUnsafe(1), mail,
-              Address.UNKNOWN, 30));
-
-        player.drop(box, false);
+//        ItemStack item = new ItemStack(Envelope.Items.LETTER.get());
+//        item.set(Envelope.DataComponents.LETTER_CONTENT,
+//              new LetterContent(Component.translatable("gui.abuseReport.comments").withColor(0xFFAA7733)));
+//        Mail.writeToLog(item, DeliveryRecord.sentFrom(Address.UNKNOWN, 123141L),
+//              DeliveryRecord.payback(Component.literal("Test"), DeliveryRecord.MessageType.POSITIVE));
+//        Mail.setSender(item, Address.UNKNOWN);
+//
+//        player.drop(item, false);
 
 
 //        List<RecipeHolder<MailRecipe>> recipes = player.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get());
@@ -108,8 +112,6 @@ public class EnvelopeDebugCommand {
 //                recipe = holder.value();
 //            }
 //        }
-
-        boolean a = true;
 
 //        MailService.of(player.serverLevel()).getDeliveryManager()
 //              .startService(Delivery.draft()

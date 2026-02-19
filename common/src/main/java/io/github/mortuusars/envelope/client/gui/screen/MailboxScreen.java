@@ -364,7 +364,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         if (!deliveryLog.isEmpty()) {
             tooltip.add(Component.translatable("gui.envelope.delivery_log"));
             for (DeliveryRecord record : deliveryLog.records()) {
-                tooltip.add(record.toComponent(Minecrft.level()));
+                tooltip.add(record.getDisplayComponent());
             }
         }
 

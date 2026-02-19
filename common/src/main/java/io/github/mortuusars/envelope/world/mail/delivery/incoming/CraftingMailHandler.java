@@ -136,7 +136,7 @@ public class CraftingMailHandler implements IncomingMailHandler {
         } else {
             return Mail.of(packages.getFirst())
                   .sender(address)
-                  .writeToLog(DeliveryRecord.sentFrom(address, level.getGameTime()))
+                  .writeToLog(DeliveryRecord.sentFrom(address))
                   .get();
         }
     }

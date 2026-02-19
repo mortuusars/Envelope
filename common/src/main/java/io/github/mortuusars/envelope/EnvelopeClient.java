@@ -126,9 +126,9 @@ public class EnvelopeClient {
             Mail.getSender(stack).ifPresent(sender -> {
                 DeliveryLog deliveryLog = Mail.getLog(stack);
                 if (Screen.hasShiftDown() && !deliveryLog.isEmpty()) {
-                    consumer.accept(Component.translatable("gui.envelope.delivery_log").withStyle(ChatFormatting.DARK_GRAY));
+                    consumer.accept(Component.translatable("gui.envelope.delivery_log"));
                     for (DeliveryRecord record : deliveryLog.records()) {
-                        consumer.accept(record.toComponent(Minecrft.level()));
+                        consumer.accept(record.getDisplayComponent());
                     }
                 } else {
                     consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)

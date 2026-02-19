@@ -121,16 +121,7 @@ public final class Mail {
         return stack;
     }
 
-    public static ItemStack writeToLog(ItemStack stack, DeliveryRecord.Builder record) {
-        return writeToLog(stack, record.build());
-    }
-
     public static ItemStack writeToLog(ItemStack stack, DeliveryRecord... records) {
-        stack.update(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY, log -> log.append(records));
-        return stack;
-    }
-
-    public static ItemStack writeToLog(ItemStack stack, DeliveryRecord.Builder... records) {
         stack.update(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY, log -> log.append(records));
         return stack;
     }

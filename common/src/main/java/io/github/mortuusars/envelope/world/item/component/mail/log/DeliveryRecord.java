@@ -1,149 +1,105 @@
 package io.github.mortuusars.envelope.world.item.component.mail.log;
 
-import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.serialization.MapCodec;
+import io.github.mortuusars.envelope.PlatformHelper;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
+import io.github.mortuusars.envelope.world.item.component.mail.log.record.ArrivedRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.record.MessageRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.record.ReturnedRecord;
+import io.github.mortuusars.envelope.world.item.component.mail.log.record.SentRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.IntFunction;
 
-public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long> timestamp,
-                             Optional<Component> message, MessageType messageType) {
-    public static final Codec<DeliveryRecord> CODEC = RecordCodecBuilder.create(i -> i.group(
-          Type.CODEC.fieldOf("type").forGetter(DeliveryRecord::type),
-          Address.CODEC.optionalFieldOf("address").forGetter(DeliveryRecord::address),
-          Codec.LONG.optionalFieldOf("timestamp").forGetter(DeliveryRecord::timestamp),
-          ComponentSerialization.CODEC.optionalFieldOf("message").forGetter(DeliveryRecord::message),
-          MessageType.CODEC.optionalFieldOf("message_type", MessageType.NEUTRAL).forGetter(DeliveryRecord::messageType)
-    ).apply(i, DeliveryRecord::new));
+public interface DeliveryRecord {
+    Codec<DeliveryRecord> CODEC = DeliveryRecord.Type.CODEC.dispatch(DeliveryRecord::getType, DeliveryRecord.Type::getCodec);
+    StreamCodec<RegistryFriendlyByteBuf, DeliveryRecord> STREAM_CODEC = DeliveryRecord.Type.STREAM_CODEC.dispatch(DeliveryRecord::getType, DeliveryRecord.Type::getStreamCodec);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, DeliveryRecord> STREAM_CODEC = StreamCodec.composite(
-          Type.STREAM_CODEC, DeliveryRecord::type,
-          ByteBufCodecs.optional(Address.STREAM_CODEC), DeliveryRecord::address,
-          ByteBufCodecs.optional(ByteBufCodecs.VAR_LONG), DeliveryRecord::timestamp,
-          ByteBufCodecs.optional(ComponentSerialization.STREAM_CODEC), DeliveryRecord::message,
-          MessageType.STREAM_CODEC, DeliveryRecord::messageType,
-          DeliveryRecord::new
-    );
+    DeliveryRecord.Type getType();
 
-    // --
+    MutableComponent getDisplayComponent();
 
-    public static DeliveryRecord sentFrom(@NotNull Address address, long timestamp) {
-        Preconditions.checkNotNull(address);
-        return new DeliveryRecord(Type.SENT, Optional.of(address), Optional.of(timestamp),
-              Optional.empty(), MessageType.NEUTRAL);
-    }
-
-    public static DeliveryRecord arrivedTo(@NotNull Address address, long timestamp) {
-        Preconditions.checkNotNull(address);
-        return new DeliveryRecord(Type.ARRIVED, Optional.of(address), Optional.of(timestamp),
-              Optional.empty(), MessageType.NEUTRAL);
-    }
-
-    public static DeliveryRecord returned(Component reason) {
-        Preconditions.checkNotNull(reason);
-        return new DeliveryRecord(Type.RETURNED, Optional.empty(),
-              Optional.empty(), Optional.of(reason), MessageType.NEGATIVE);
-    }
-
-    public static DeliveryRecord payback(@NotNull Component message, MessageType type) {
-        return new DeliveryRecord(Type.PAYBACK, Optional.empty(), Optional.empty(),
-              Optional.of(message), type);
+    default Optional<Component> getElapsedTime(long timestamp) {
+        if (timestamp <= 0) return Optional.empty();
+        return getCurrentGameTime().map(time -> GameTime.formatLargest(time - timestamp, false)
+              .withStyle(ChatFormatting.DARK_GRAY));
     }
 
     // --
 
-    public MutableComponent toComponent(Level level) {
-        int addressColor = switch (type()) {
-            case SENT -> Colors.ADDRESS_SENDER;
-            case ARRIVED -> Colors.ADDRESS_RECIPIENT;
-            case RETURNED, PAYBACK, CUSTOM -> Colors.ADDRESS_NEUTRAL;
-        };
+    static DeliveryRecord sentFrom(Address address, long timestamp) {
+        return new SentRecord(Objects.requireNonNull(address), timestamp);
+    }
 
-        Component addressComponent = this.address.map(a -> a.format()
-                    .withIcon()
-                    .withIconColor(addressColor)
-                    .withColor(addressColor)
-                    .toComponent())
-              .orElse(Component.empty());
+    /**
+     * Uses current server time as timestamp.
+     */
+    static DeliveryRecord sentFrom(Address address) {
+        return new SentRecord(Objects.requireNonNull(address), getCurrentGameTime().orElse(-1L));
+    }
 
-        MutableComponent messageComponent = Component.empty().append(message.orElse(CommonComponents.EMPTY))
-              .withStyle(messageType().getStyle());
+    static DeliveryRecord arrivedTo(Address address, long timestamp) {
+        return new ArrivedRecord(Objects.requireNonNull(address), timestamp);
+    }
 
-        Component elapsedTimeComponent = timestamp.map(time -> GameTime.formatLargest(level.getGameTime() - time, false)
-              .withStyle(ChatFormatting.DARK_GRAY)).orElse(Component.empty());
+    /**
+     * Uses current server time as timestamp.
+     */
+    static DeliveryRecord arrivedTo(Address address) {
+        return new ArrivedRecord(Objects.requireNonNull(address), getCurrentGameTime().orElse(-1L));
+    }
 
-        return Component.translatable("gui.envelope.delivery_log.record." + this.type().getSerializedName(),
-              addressComponent, messageComponent, elapsedTimeComponent).withStyle(ChatFormatting.GRAY);
+    static DeliveryRecord returned(Component message) {
+        return new ReturnedRecord(Objects.requireNonNull(message));
+    }
+
+    static DeliveryRecord message(Component message) {
+        return new MessageRecord(Objects.requireNonNull(message));
     }
 
     // --
 
-    public static class Builder {
-        private final Type type;
-        private Optional<Address> address = Optional.empty();
-        private Optional<Long> timestamp = Optional.empty();
-        private Optional<Component> message = Optional.empty();
-        private MessageType messageType = MessageType.NEUTRAL;
-
-        public Builder(Type type) {
-            this.type = type;
-        }
-
-        public Builder address(Address address) {
-            this.address = Optional.of(address);
-            return this;
-        }
-
-        public Builder at(long timestamp) {
-            this.timestamp = Optional.of(timestamp);
-            return this;
-        }
-
-        public Builder message(Component message) {
-            this.message = Optional.ofNullable(message);
-            return this;
-        }
-
-        public Builder messageType(MessageType messageType) {
-            this.messageType = messageType;
-            return this;
-        }
-
-        public DeliveryRecord build() {
-            return new DeliveryRecord(type, address, timestamp, message, messageType);
-        }
+    static Optional<Long> getCurrentGameTime() {
+        @Nullable MinecraftServer server = PlatformHelper.getCurrentServer();
+        if (server == null) return Optional.empty();
+        return Optional.of(server.overworld().getGameTime());
     }
 
     // --
 
-    public enum Type implements StringRepresentable {
-        SENT("sent"),
-        ARRIVED("arrived"),
-        RETURNED("returned"),
-        PAYBACK("payback"),
-        CUSTOM("custom");
+    enum Type implements StringRepresentable {
+        SENT("sent", SentRecord.CODEC, SentRecord.STREAM_CODEC),
+        ARRIVED("arrived", ArrivedRecord.CODEC, ArrivedRecord.STREAM_CODEC),
+        RETURNED("returned", ReturnedRecord.CODEC, ReturnedRecord.STREAM_CODEC),
+        MESSAGE("message", MessageRecord.CODEC, MessageRecord.STREAM_CODEC);
 
-        public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
-        public static final StreamCodec<ByteBuf, Type> STREAM_CODEC = ByteBufCodecs.idMapper(
-              ByIdMap.continuous(Type::ordinal, Type.values(), ByIdMap.OutOfBoundsStrategy.ZERO), Type::ordinal);
+        public static final Codec<DeliveryRecord.Type> CODEC = StringRepresentable.fromEnum(DeliveryRecord.Type::values);
+        public static final IntFunction<DeliveryRecord.Type> BY_ID = ByIdMap.continuous(DeliveryRecord.Type::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+        public static final StreamCodec<RegistryFriendlyByteBuf, DeliveryRecord.Type> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, DeliveryRecord.Type::ordinal).cast();
 
         private final String name;
+        private final MapCodec<? extends DeliveryRecord> codec;
+        private final StreamCodec<RegistryFriendlyByteBuf, ? extends DeliveryRecord> streamCodec;
 
-        Type(String name) {
+        Type(String name, MapCodec<? extends DeliveryRecord> codec, StreamCodec<RegistryFriendlyByteBuf, ? extends DeliveryRecord> streamCodec) {
             this.name = name;
+            this.codec = codec;
+            this.streamCodec = streamCodec;
         }
 
         @Override
@@ -151,52 +107,28 @@ public record DeliveryRecord(Type type, Optional<Address> address, Optional<Long
             return name;
         }
 
-        public MutableComponent translate() {
-            return Component.translatable("gui.envelope.delivery_log.record." + getSerializedName());
+        public MapCodec<? extends DeliveryRecord> getCodec() {
+            return codec;
+        }
+
+        public StreamCodec<RegistryFriendlyByteBuf, ? extends DeliveryRecord> getStreamCodec() {
+            return streamCodec;
         }
     }
 
-    public interface Message {
-        Component FULFILLED = Component.translatable("gui.envelope.delivery_log.message.fulfilled");
+    interface Message {
+        Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.recipient_not_found").withColor(Colors.TOOLTIP_RED);
+        Component RECIPIENT_CANNOT_BE_DETERMINED = Component.translatable("gui.envelope.delivery_log.message.recipient_cannot_be_determined").withColor(Colors.TOOLTIP_RED);
+        Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.recipient_inbox_is_full").withColor(Colors.TOOLTIP_RED);
+        Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.unable_to_reach").withColor(Colors.TOOLTIP_RED);
+        Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.rejected").withColor(Colors.TOOLTIP_RED);
 
-        Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.recipient_not_found");
-        Component RECIPIENT_CANNOT_BE_DETERMINED = Component.translatable("gui.envelope.delivery_log.message.recipient_cannot_be_determined");
-        Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.recipient_inbox_is_full");
-        Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.unable_to_reach");
-        Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.rejected");
+        Component PAYBACK_FULFILLED = Component.translatable("gui.envelope.delivery_log.message.payback_fulfilled").withColor(Colors.TOOLTIP_GREEN);
+        Component PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.payback.subject_not_found").withColor(Colors.TOOLTIP_RED);
+        Component PAYBACK_IS_NOT_VALID = Component.translatable("gui.envelope.delivery_log.message.payback.is_not_valid").withColor(Colors.TOOLTIP_RED);
+        Component PAYBACK_EXPIRED = Component.translatable("gui.envelope.delivery_log.message.payback.expired").withColor(Colors.TOOLTIP_RED);
 
-        Component PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.payback.subject_not_found");
-        Component PAYBACK_IS_NOT_VALID = Component.translatable("gui.envelope.delivery_log.message.payback.is_not_valid");
-        Component PAYBACK_EXPIRED = Component.translatable("gui.envelope.delivery_log.message.payback.expired");
-
-        Component CRAFTING_UNPROCESSED_ITEMS = Component.translatable("gui.envelope.delivery_log.message.crafting.unprocessed_items");
-        Component CRAFTING_UNABLE_TO_PROCESS = Component.translatable("gui.envelope.delivery_log.message.crafting.unable_to_process");
-    }
-
-    public enum MessageType implements StringRepresentable {
-        NEUTRAL("neutral", Style.EMPTY.withColor(ChatFormatting.GRAY)),
-        POSITIVE("positive", Style.EMPTY.withColor(Colors.TOOLTIP_GREEN)),
-        NEGATIVE("negative", Style.EMPTY.withColor(Colors.TOOLTIP_RED));
-
-        public static final Codec<MessageType> CODEC = StringRepresentable.fromEnum(MessageType::values);
-        public static final StreamCodec<ByteBuf, MessageType> STREAM_CODEC = ByteBufCodecs.idMapper(
-              ByIdMap.continuous(MessageType::ordinal, MessageType.values(), ByIdMap.OutOfBoundsStrategy.ZERO), MessageType::ordinal);
-
-        private final String name;
-        private final Style style;
-
-        MessageType(String name, Style style) {
-            this.name = name;
-            this.style = style;
-        }
-
-        @Override
-        public @NotNull String getSerializedName() {
-            return name;
-        }
-
-        public Style getStyle() {
-            return style;
-        }
+        Component CRAFTING_UNPROCESSED_ITEMS = Component.translatable("gui.envelope.delivery_log.message.crafting.unprocessed_items").withColor(Colors.TOOLTIP_RED);
+        Component CRAFTING_UNABLE_TO_PROCESS = Component.translatable("gui.envelope.delivery_log.message.crafting.unable_to_process").withColor(Colors.TOOLTIP_RED);
     }
 }

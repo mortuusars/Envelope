@@ -40,7 +40,7 @@ public class BlockMailHandler implements IncomingMailHandler {
                   }
 
                   ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
-                  Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address, level.getGameTime()));
+                  Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address));
                   Mail.setId(deliveredMail, Id.create(level));
 
                   if (inbox.addMail(deliveredMail)) {

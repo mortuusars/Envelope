@@ -8,7 +8,7 @@ public class Colors {
     public static final int GUI_LABEL = 0xFF404040;
 
     public static final int TOOLTIP_RED = 0xFFE48174;
-    public static final int TOOLTIP_GREEN = 0xFF75DC7C;
+    public static final int TOOLTIP_GREEN = 0xFF8DD977;
 
     public static final int ADDRESS_NEUTRAL = 0xFFE6CB98;
     public static final int ADDRESS_SENDER = 0xFF7AB5E1;
