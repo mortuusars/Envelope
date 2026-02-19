@@ -79,7 +79,6 @@ public interface DeliveryExecutor {
 
     default void phaseStarted(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.STARTED) {
-            Mail.setSender(delivery.getMail(), delivery.getSender());
             Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()));
         }
     }
@@ -115,6 +114,8 @@ public interface DeliveryExecutor {
     default boolean dispatchDelivery(ServerLevel level, Delivery delivery) {
         MailService mailService = MailService.of(level);
 
+        Mail.setSender(delivery.getMail(), delivery.getSender());
+
         if (!mailService.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
             Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
             Mail.setReturned(delivery.getMail());
@@ -133,6 +134,10 @@ public interface DeliveryExecutor {
     default boolean dispatchReturn(ServerLevel level, Delivery delivery) {
         if (MailService.of(level).getPaybackDepartment().tryHandleReturn(delivery)) {
             return true;
+        }
+
+        if (!Mail.isReturned(delivery.getMail()) && Mail.getSender(delivery.getMail()).isEmpty()) {
+            Mail.setSender(delivery.getMail(), delivery.getRecipient());
         }
 
         if (getOrigin().isService() && delivery.getMail().isEmpty()) {

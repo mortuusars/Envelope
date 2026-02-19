@@ -305,7 +305,9 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
               + " to "
               + delivery.getRecipient().getString();
 
-        Envelope.LOGGER.info("{} at [{}] while delivering{} from {}!", message, blockPosition().toShortString(), carriedItem, addresses);
+        String service = getOrigin().isService() ? "Service " : "";
+
+        Envelope.LOGGER.info("{}{} at [{}] while delivering{} from {}!", service, message, blockPosition().toShortString(), carriedItem, addresses);
 
         if (!getOrigin().isService()) {
             MailService.of(level).sendCourierDeathNotice(this, delivery, damageSource);
