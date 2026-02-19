@@ -13,9 +13,10 @@ Payback Tag
 - `delivery.payback_timeout_minutes` config option was replaced by three `payback.request_duration_<duration>` options.
 
 Package
-- Added `envelope:package_experience` item component. Awarded when Package is opened.
-- Using the **Package** while holding [**Sneak**] will unpack it without opening the menu.
+- Added `envelope:package_experience` item component. Awarded when package is opened.
+- Using the package while holding [**Sneak**] will unpack it without opening the menu.
 - Fixed overlays not rendering over package slots.
+- Fixed being able to insert items into opened package, if items were the same.
 
 Crafting
 - Added `experience` field to mail crafting recipes. Applied to resulting package and awarded when player opens it.

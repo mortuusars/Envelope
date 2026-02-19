@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.world.inventory;
 
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.slot.PickupOnlySlot;
 import io.github.mortuusars.envelope.world.item.PackageItem;
@@ -73,6 +72,16 @@ public class PackageMenu extends AbstractInHandContainerMenu {
                 addSlot(new PickupOnlySlot(getContainer(), index, x, y));
             }
         }
+    }
+
+    @Override
+    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
+        if (index >= getContainer().getContainerSize() && index < slots.size()) {
+            // Prevent inserting into package.
+            // Otherwise, if items are the same, they will be inserted even if Slot#mayPlace is false.
+            return ItemStack.EMPTY;
+        }
+        return super.quickMoveStack(player, index);
     }
 
     @Override

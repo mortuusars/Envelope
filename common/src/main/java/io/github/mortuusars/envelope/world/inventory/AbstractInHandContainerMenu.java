@@ -99,11 +99,13 @@ public abstract class AbstractInHandContainerMenu extends AbstractContainerMenu 
         ItemStack clickedStack = slot.getItem();
 
         if (index < getContainer().getContainerSize()) {
-            if (!moveItemStackTo(clickedStack, getContainer().getContainerSize(), slots.size(), true))
+            if (!moveItemStackTo(clickedStack, getContainer().getContainerSize(), slots.size(), true)) {
                 return ItemStack.EMPTY;
+            }
         } else if (index < slots.size()) {
-            if (!moveItemStackTo(clickedStack, 0, getContainer().getContainerSize(), false))
+            if (!moveItemStackTo(clickedStack, 0, getContainer().getContainerSize(), false)) {
                 return ItemStack.EMPTY;
+            }
         }
 
         getContainer().setChanged();
