@@ -31,8 +31,7 @@ import java.util.Optional;
 public class AddressTagScreen extends Screen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
 
-    public static final WidgetSprites CONFIRM_BUTTON_SPRITES =
-          Sprites.threeStates(Envelope.resource("address_tag/confirm_button"));
+    public static final WidgetSprites CONFIRM_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("address_tag/confirm"));
 
     protected final InteractionHand hand;
     protected final ItemStack tag;

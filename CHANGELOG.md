@@ -25,7 +25,7 @@ Crafting
 
 Misc
 - **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
-- Small updates of **Payback Box** and **Payback Package** menu textures.
+- Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.
 - Small change to how `envelope:payback_subject` component is defined.
 
 ## 0.6.0-Snapshot 1

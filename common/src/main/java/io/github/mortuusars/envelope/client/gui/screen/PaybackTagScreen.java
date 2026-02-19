@@ -31,6 +31,8 @@ import java.util.Map;
 public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMenu> {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/payback_tag.png");
 
+    public static final WidgetSprites CONFIRM_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("payback/confirm"));
+
     protected CycleButton<PaybackDuration> durationButton;
     protected ImageButton confirmButton;
 
@@ -50,7 +52,9 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
         durationButton = addRenderableWidget(createDurationButton());
 
         confirmButton = new ImageButton(leftPos + 133, topPos + 31, 19, 19,
-              Sprites.CONFIRM_BUTTON_SPRITES, button -> confirm(), Component.translatable("gui.envelope.confirm"));
+              CONFIRM_BUTTON_SPRITES,
+              button -> confirm(),
+              Component.translatable("gui.envelope.confirm"));
         confirmButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.confirm")));
         addRenderableWidget(confirmButton);
     }
@@ -197,19 +201,13 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
     }
 
     protected void changeRequestedItemCount(boolean decreasing, boolean fast) {
-        if (!(hoveredSlot instanceof GhostSlot slot)) {
+        if (!(hoveredSlot instanceof GhostSlot)) {
             return;
         }
-
-//        int countBeforeChange = slot.getItem().getCount();
 
         int startId = decreasing ? PaybackTagMenu.DECREASE_COUNT_START_BUTTON_ID : PaybackTagMenu.INCREASE_COUNT_START_BUTTON_ID;
         int id = startId + hoveredSlot.index + (fast ? PaybackRequest.SLOTS : 0);
         getMenu().clickMenuButton(getMenu().getPlayer(), id);
         Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, id);
-
-//        if (countBeforeChange != slot.getItem().getCount()) {
-//            Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 2, 0.15f));
-//        }
     }
 }
