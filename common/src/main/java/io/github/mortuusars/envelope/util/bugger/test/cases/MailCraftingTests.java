@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.item.crafting.CraftingResult;
 import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.PackageRecipeInput;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.CraftingMailHandler;
+import io.github.mortuusars.envelope.world.mail.handler.CraftingMailHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;

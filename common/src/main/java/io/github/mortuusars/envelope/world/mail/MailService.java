@@ -10,7 +10,6 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.*;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
@@ -55,7 +54,13 @@ public class MailService {
      */
     @ApiStatus.Internal
     public static MailService create(ServerLevel level) {
-        return new MailService(level);
+        MailService service = new MailService(level);
+        service.initialize();
+        return service;
+    }
+
+    private void initialize() {
+
     }
 
     public static MailService of(ServerLevel level) {
@@ -191,6 +196,6 @@ public class MailService {
     }
 
     public EntityAddress getAddress() {
-        return EntityAddress.get(getLevel().registryAccess(), MailEntities.MAIL_SERVICE);
+        return EntityAddress.getOrThrow(getLevel().registryAccess(), MailEntities.MAIL_SERVICE);
     }
 }

@@ -125,12 +125,6 @@ public class Delivery {
         return ended;
     }
 
-//    public boolean hasResult() {
-//        return getPhase().ordinal() >= DeliveryPhase.RETURNING_TO_SENDER.ordinal()
-//              && !mail.isEmpty()
-//              && Mail.getStatus(mail) == MailStatus.REGULAR;
-//    }
-
     // --
 
     @Override

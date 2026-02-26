@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.mail.delivery.incoming;
+package io.github.mortuusars.envelope.world.mail.handler;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CraftingMailHandler implements IncomingMailHandler {
+public class CraftingMailHandler implements MailHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Address address;
@@ -31,26 +31,30 @@ public class CraftingMailHandler implements IncomingMailHandler {
     }
 
     @Override
-    public ItemStack handle(ServerLevel level, Delivery delivery) {
+    public MailHandlingResult handle(MailService service, Delivery delivery) {
         ItemStack mail = delivery.getMail();
+
+        if (mail.isEmpty()) {
+            return MailHandlingResult.CONSUME;
+        }
 
         PackageContents packageContents = PackageContents.from(mail);
         if (packageContents.isEmpty()) {
-            return ItemStack.EMPTY;
+            return MailHandlingResult.PASS;
         }
 
         PackageRecipeInput input = PackageRecipeInput.of(packageContents);
 
-        @Nullable MailRecipe recipe = findMatchingRecipe(level, input);
+        @Nullable MailRecipe recipe = findMatchingRecipe(service.getLevel(), input);
         if (recipe == null) {
-            return ItemStack.EMPTY;
+            return MailHandlingResult.PASS;
         }
 
-        CraftingResult result = craft(level, recipe, input);
+        CraftingResult result = craft(service.getLevel(), recipe, input);
 
         if (result.output().isEmpty()) {
             LOGGER.warn("No results from the mail crafting.");
-            return Mail.returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
+            return MailHandlingResult.returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
         }
 
         List<ItemStack> packages = Mail.createPackages(result.output(),
@@ -61,7 +65,7 @@ public class CraftingMailHandler implements IncomingMailHandler {
         packages.stream().findFirst().ifPresent(pkg ->
               pkg.set(Envelope.DataComponents.PACKAGE_EXPERIENCE, MailRecipe.calculateExperiencePoints(result.experience())));
 
-        return sendResults(level, mail, result.remainingInput(), packages, delivery.getSender());
+        return sendResults(service, mail, result.remainingInput(), packages, delivery.getSender());
     }
 
     public List<RecipeHolder<MailRecipe>> getAllRecipes(ServerLevel level) {
@@ -106,7 +110,7 @@ public class CraftingMailHandler implements IncomingMailHandler {
         return new CraftingResult(input, outputContainer.removeAllItems(), experience);
     }
 
-    protected ItemStack sendResults(ServerLevel level, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address destination) {
+    protected MailHandlingResult sendResults(MailService service, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address destination) {
         boolean hasRemainder = false;
 
         if (!remainingInput.isEmpty()) {
@@ -118,13 +122,13 @@ public class CraftingMailHandler implements IncomingMailHandler {
         }
 
         if (packages.isEmpty()) {
-            return ItemStack.EMPTY;
+            return MailHandlingResult.PASS;
         }
 
         packages.stream()
               .skip(1)
               .forEach(pkg -> {
-                  MailService.of(level).getDeliveryManager()
+                  service.getDeliveryManager()
                         .startService(Delivery.draft()
                               .deliver(pkg)
                               .from(address)
@@ -132,12 +136,12 @@ public class CraftingMailHandler implements IncomingMailHandler {
               });
 
         if (hasRemainder) {
-            return Mail.returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
+            return MailHandlingResult.returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
         } else {
-            return Mail.of(packages.getFirst())
+            return MailHandlingResult.reply(Mail.of(packages.getFirst())
                   .sender(address)
                   .writeToLog(DeliveryRecord.sentFrom(address))
-                  .get();
+                  .get());
         }
     }
 }

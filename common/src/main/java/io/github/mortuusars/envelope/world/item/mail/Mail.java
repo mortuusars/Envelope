@@ -9,7 +9,9 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -17,7 +19,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -174,8 +178,14 @@ public final class Mail {
               .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
     }
 
+    public static MailBuilder<?> createPackage(ResourceKey<LootTable> lootTable) {
+        return new MailBuilder<>(Envelope.Items.PACKAGE.get())
+              .set(DataComponents.CONTAINER_LOOT, new SeededContainerLoot(lootTable, 0L));
+    }
+
     /**
      * Splits items into packages, however many are required to fit all items.
+     *
      * @param builder callback for each package builder, allows setting necessary data for all created packages.
      */
     public static List<ItemStack> createPackages(List<ItemStack> items, Consumer<MailBuilder<?>> builder) {

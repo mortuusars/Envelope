@@ -103,12 +103,10 @@ public class PaybackDepartment {
     }
 
     public boolean returnSubjectToSender(PaybackSubject subject, Component reason) {
-        ItemStack mail = subject.mail();
+        ItemStack mail = subject.mail().copy();
 
-        Mail.setReturned(mail);
-        Mail.writeToLog(mail,
-              DeliveryRecord.returned(reason),
-              DeliveryRecord.sentFrom(getAddress()));
+        Mail.returned(mail, reason);
+        Mail.writeToLog(mail, DeliveryRecord.sentFrom(getAddress()));
 
         return getMailService().getDeliveryManager()
               .startService(Delivery.draft()

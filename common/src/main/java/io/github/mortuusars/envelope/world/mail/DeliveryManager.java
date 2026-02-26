@@ -10,10 +10,8 @@ import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.BlockMailHandler;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.EntityMailHandler;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.IncomingMailHandler;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.PlayerMailHandler;
+import io.github.mortuusars.envelope.world.mail.handler.BlockMailHandler;
+import io.github.mortuusars.envelope.world.mail.handler.*;
 import org.slf4j.Logger;
 
 import java.util.function.Function;
@@ -86,13 +84,13 @@ public class DeliveryManager {
         };
     }
 
-    public IncomingMailHandler getIncomingMailHandler(Address address) {
+    public MailHandler getMailHandler(Address address) {
         return switch (address) {
             case BlockAddress block -> new BlockMailHandler(block);
             case PlayerAddress player -> new PlayerMailHandler(player);
-            case EntityAddress entity -> new EntityMailHandler(entity);
-            case CustomAddress ignored -> IncomingMailHandler.RETURN_NOT_FOUND;
-            case UnknownAddress ignored -> IncomingMailHandler.RETURN_CANNOT_BE_DETERMINED;
+            case EntityAddress entity -> new BaseEntityMailHandler(entity);
+            case CustomAddress ignored -> MailHandler.RETURN_NOT_FOUND;
+            case UnknownAddress ignored -> MailHandler.RETURN_RECIPIENT_CANNOT_BE_DETERMINED;
             default -> throw new IllegalStateException("Unexpected type of address: " + address.getType());
         };
     }

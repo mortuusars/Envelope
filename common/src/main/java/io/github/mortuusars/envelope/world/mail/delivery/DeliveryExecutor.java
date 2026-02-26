@@ -3,13 +3,13 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.handler.MailHandlingResult;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
 public interface DeliveryExecutor {
@@ -94,16 +94,20 @@ public interface DeliveryExecutor {
             return;
         }
 
+        final MailService service = MailService.of(level);
+
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                ItemStack result = MailService.of(level).getDeliveryManager().getIncomingMailHandler(delivery.getRecipient())
-                      .handle(level, delivery);
-                delivery.setMail(result);
+                MailHandlingResult result = service.getDeliveryManager().getMailHandler(delivery.getRecipient()).handle(service, delivery);
+                if (result.isHandled()) {
+                    delivery.setMail(result.getMail());
+                }
             }
             case HANDLING_RETURN -> {
-                ItemStack result = MailService.of(level).getDeliveryManager().getIncomingMailHandler(delivery.getSender())
-                      .handle(level, delivery);
-                delivery.setMail(result);
+                MailHandlingResult result = service.getDeliveryManager().getMailHandler(delivery.getSender()).handle(service, delivery);
+                if (result.isHandled()) {
+                    delivery.setMail(result.getMail());
+                }
             }
         }
     }
@@ -119,8 +123,7 @@ public interface DeliveryExecutor {
         Mail.setSender(delivery.getMail(), delivery.getSender());
 
         if (!mailService.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.returned(DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
-            Mail.setReturned(delivery.getMail());
+            Mail.returned(delivery.getMail(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
             delivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return true;
         }

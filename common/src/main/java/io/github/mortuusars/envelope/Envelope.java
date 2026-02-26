@@ -2,6 +2,10 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
+import io.github.mortuusars.envelope.world.mail.handler.EntityMailHandler;
+import io.github.mortuusars.envelope.api.handler.EntityMailHandlerRegistry;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
@@ -15,6 +19,7 @@ import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
+import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -22,6 +27,9 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.handler.MailHandlingResult;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -56,6 +64,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -84,6 +93,20 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
+
+        EntityMailHandlerRegistry.INSTANCE.register(resource("test"), access ->
+              EntityAddress.get(access, MailEntities.TRADE_OFFICE)
+                    .map(address -> new EntityMailHandler() {
+                        @Override
+                        public EntityAddress getAddress() {
+                            return address;
+                        }
+
+                        @Override
+                        public MailHandlingResult handle(MailService service, Delivery delivery) {
+                            return MailHandlingResult.reply(Mail.createPackage(BuiltInLootTables.SIMPLE_DUNGEON).get());
+                        }
+                    }));
     }
 
     /**
@@ -250,6 +273,9 @@ public class Envelope {
 
         public static final DataComponentType<Id> MAIL_ID = Register.dataComponentType("mail_id", b ->
               b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
+        /**
+         * Only for display purposes. Shouldn't be used delivery in logic.
+         */
         public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
         public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
@@ -345,7 +371,8 @@ public class Envelope {
                   }
               });
 
-        static void init() { }
+        static void init() {
+        }
     }
 
     public static class RecipeSerializers {
@@ -459,7 +486,7 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_pigeon_spawns"));
 
             public static final TagKey<Biome> HAS_PASSENGER_PIGEONS =
-                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("has_passenger_pigeons"));;
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("has_passenger_pigeons"));
         }
 
         public static class Structures {

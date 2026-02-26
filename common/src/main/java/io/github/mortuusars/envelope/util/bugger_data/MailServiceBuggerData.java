@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.util.bugger_data;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.bugger.data.NbtData;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
@@ -61,7 +62,7 @@ public class MailServiceBuggerData extends NbtData {
 
               ChatFormatting.GRAY +
               " | " + (courier.getOrigin().isService() ? "Service" : "Regular") +
-              " | ✉ " + (!delivery.getMail().isEmpty() ? delivery.getMail().getHoverName().getString() : "Empty") +
+              " | " + (Mail.isReturned(delivery.getMail()) ? "← " : "") + "✉ " + (!delivery.getMail().isEmpty() ? delivery.getMail().getHoverName().getString() : "Empty") +
               " | ↔ " + delivery.getRoute().getDistance() +
               " | ⌚" + delivery.getRoute().getFullTravelDuration().seconds() + "s" +
               ChatFormatting.RESET +

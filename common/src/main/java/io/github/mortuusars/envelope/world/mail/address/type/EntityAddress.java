@@ -79,8 +79,12 @@ public class EntityAddress implements Address {
 
     // --
 
-    public static EntityAddress get(RegistryAccess access, ResourceKey<MailEntity> key) {
+    public static EntityAddress getOrThrow(RegistryAccess access, ResourceKey<MailEntity> key) {
         return new EntityAddress(getHolderOrThrow(access, key));
+    }
+
+    public static Optional<EntityAddress> get(RegistryAccess access, ResourceKey<MailEntity> key) {
+        return getHolder(access, key).map(EntityAddress::new);
     }
 
     public static Holder.Reference<MailEntity> getHolderOrThrow(RegistryAccess access, ResourceKey<MailEntity> key) {

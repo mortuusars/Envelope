@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.handler.MailHandlingResult;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.item.component.Id;
@@ -17,8 +18,7 @@ import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.BlockMailHandler;
-import io.github.mortuusars.envelope.world.mail.delivery.incoming.IncomingMailHandler;
+import io.github.mortuusars.envelope.world.mail.handler.BlockMailHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -167,11 +167,12 @@ public class MailboxBlock extends BaseEntityBlock {
             if (level instanceof ServerLevel serverLevel) {
                 Delivery delivery = new Delivery(Id.create(serverLevel), Optional.of(player.getUUID()), new PlayerAddress(player),
                       recipientAddress, stack.split(1), DeliveryRoute.EMPTY, DeliveryPhase.HANDLING_DELIVERY, 0, false);
-                ItemStack result = new BlockMailHandler(recipientAddress).handle(serverLevel, delivery);
+                MailHandlingResult result = new BlockMailHandler(recipientAddress).handle(MailService.of(serverLevel), delivery);
+                ItemStack resultMail = result.getMail().copy();
                 if (player.getItemInHand(hand).isEmpty()) {
-                    player.setItemInHand(hand, result.copy());
-                } else if (!player.addItem(result)) {
-                    player.drop(result, false);
+                    player.setItemInHand(hand, resultMail);
+                } else if (!player.addItem(resultMail)) {
+                    player.drop(resultMail, false);
                 }
             }
             return ItemInteractionResult.SUCCESS;
