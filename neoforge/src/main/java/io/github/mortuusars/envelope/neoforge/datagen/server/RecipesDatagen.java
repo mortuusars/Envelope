@@ -128,14 +128,14 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(new StackIngredient(Items.LEATHER), 3)
+              .requires(new StackIngredient(Items.LEATHER), 5)
               .requires(new StackIngredient(Tags.Items.INGOTS_IRON))
               .forResult(Items.SADDLE)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(new StackIngredient(Items.BONE_MEAL), 5)
               .requires(new StackIngredient(Items.DIORITE), 1)
-              .requires(new StackIngredient(Items.BONE_MEAL), 3)
               .forResult(Items.CALCITE)
               .save(output);
 

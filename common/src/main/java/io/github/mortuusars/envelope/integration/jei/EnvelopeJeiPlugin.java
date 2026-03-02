@@ -43,7 +43,10 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         List<RecipeHolder<MailRecipe>> deliveryRecipes = Minecrft.level()
               .getRecipeManager()
-              .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get());
+              .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
+              .stream()
+              .filter(recipe -> !recipe.value().getEntityAddress().getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
+              .toList();
 
         registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, deliveryRecipes);
     }

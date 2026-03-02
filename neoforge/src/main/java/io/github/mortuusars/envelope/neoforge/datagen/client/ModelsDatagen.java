@@ -96,7 +96,7 @@ public class ModelsDatagen extends BlockStateProvider {
                   .texture("layer0", Envelope.resource("item/payback_tag_long"));
 
             itemModels().getBuilder("envelope:payback_tag")
-                  .parent(new ModelFile.UncheckedModelFile("envelope:payback_tag_medium"))
+                  .parent(new ModelFile.UncheckedModelFile("envelope:item/payback_tag_medium"))
                   .override()
                   .predicate(EnvelopeClient.ItemModelOverrides.PAYBACK_TAG_DURATION, PaybackDuration.SHORT.ordinal() / 10f)
                   .model(paybackTagShort)

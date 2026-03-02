@@ -478,6 +478,11 @@ public class Envelope {
             public static final TagKey<SealImpression> TOOLS =
                   TagKey.create(Registries.SEAL_IMPRESSION, resource("tools"));
         }
+
+        public static class MailEntities {
+            public static final TagKey<MailEntity> HIDDEN =
+                  TagKey.create(Registries.MAIL_ENTITY, resource("hidden"));
+        }
     }
 
     public static class ArgumentTypes {

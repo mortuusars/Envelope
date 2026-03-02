@@ -1,5 +1,5 @@
 {
-  "parent": "envelope:payback_tag_medium",
+  "parent": "envelope:item/payback_tag_medium",
   "overrides": [
     {
       "model": "envelope:item/payback_tag_short",

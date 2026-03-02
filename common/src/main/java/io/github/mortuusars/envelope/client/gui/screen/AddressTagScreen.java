@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AddressTagScreen extends Screen {
     public static final ResourceLocation TEXTURE = Envelope.resource("textures/gui/address_tag.png");
@@ -120,7 +121,12 @@ public class AddressTagScreen extends Screen {
     }
 
     protected AllAddresses getAddressesForSuggestions() {
-        return knownAddresses;
+        return new AllAddresses(
+              knownAddresses.blocks(),
+              knownAddresses.players(),
+              knownAddresses.entities().stream()
+                    .filter(address -> !address.getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
+                    .collect(Collectors.toSet()));
     }
 
     protected boolean isRenaming() {

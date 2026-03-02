@@ -14,7 +14,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Envelope.ID)
 public class DataGeneration {
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
@@ -34,6 +34,6 @@ public class DataGeneration {
         DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
         generator.addProvider(event.includeServer(), datapackRegistries);
         generator.addProvider(event.includeServer(), new SealImpressionTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
+        generator.addProvider(event.includeServer(), new MailEntityTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
     }
-
 }

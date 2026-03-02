@@ -22,6 +22,9 @@ Crafting
 - Added `experience` field to mail crafting recipes. Applied to resulting package and awarded when player opens it.
   - Works the same as in smelting recipes.
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
+- Added **Phantom Membrane + Iron Nugget -> Name Tag** recipe.
+- Added **Diorite + 3x Bone Meal -> Calcite** recipe.
+- Small changes to existing recipes.
 
 Delivery
 - Added support for Entity address "drop-off" handlers. 
@@ -36,9 +39,8 @@ KubeJS
 - No documentation yet.
 
 Mail Entities
+- Added `envelope:hidden` mail entity tag. Allows hiding mail entity from address suggestions and its recipes from JEI.
 - Changed/renamed address **Trade Office** to **Automated Supply Service**.
-- Added **Phantom Membrane + Iron Nugget -> Name Tag** recipe.
-- Added **Diorite + 3x Bone Meal -> Calcite** recipe.
 
 Misc
 - Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
