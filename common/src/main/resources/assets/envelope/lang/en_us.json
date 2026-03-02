@@ -142,7 +142,7 @@
   "gui.envelope.formatting.yellow": "Yellow",
 
   "address.envelope.mail_service": "Mail Service",
-  "address.envelope.trade_office": "Trade Office",
+  "address.envelope.automated_supply_service": "Automated Supply Service",
   "address.envelope.unknown": "Unknown",
 
   "address_type.envelope.block": "Block",

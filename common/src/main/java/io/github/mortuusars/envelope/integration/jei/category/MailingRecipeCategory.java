@@ -8,7 +8,7 @@ import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.gui.placement.HorizontalAlignment;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -63,11 +63,11 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
         builder.addOutputSlot(126, 33)
               .addItemStack(recipe.getResultItem(Minecrft.registryAccess()));
 
-        builder.setShapeless();
+        builder.setShapeless(getWidth() - 9, getHeight() - 9);
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, IFocusGroup focuses) {
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
         Component component = recipeHolder.value().getEntityAddress()
@@ -75,11 +75,9 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               .withIcon()
               .toComponent();
 
-        builder.addText(component,
-                    0,
-                    0, getWidth(),
-                    12)
-              .alignHorizontalCenter()
+        builder.addText(component, getWidth(), 12)
+              .setPosition(0, 0)
+              .setTextAlignment(HorizontalAlignment.CENTER)
               .setColor(0xFF808080);
     }
 }

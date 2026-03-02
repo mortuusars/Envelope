@@ -35,6 +35,9 @@ KubeJS
   - Can be used to modify drop-off of any address type.
 - No documentation yet.
 
+Mail Entities
+- Changed/renamed address **Trade Office** to **Automated Supply Service**.
+
 Misc
 - Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
 - **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.

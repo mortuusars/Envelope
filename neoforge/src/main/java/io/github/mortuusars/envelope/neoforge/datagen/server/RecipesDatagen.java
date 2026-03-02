@@ -120,7 +120,7 @@ public class RecipesDatagen extends RecipeProvider {
 
         // --
 
-        EntityAddress tradeOffice = address(MailEntities.TRADE_OFFICE);
+        EntityAddress tradeOffice = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
 
         MailRecipeBuilder.crafting(tradeOffice)
               .requires(new StackIngredient(Items.ROTTEN_FLESH), 6)

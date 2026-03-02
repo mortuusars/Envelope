@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class MailEntities {
     public static final ResourceKey<MailEntity> MAIL_SERVICE = createKey(Envelope.resource("mail_service"));
-    public static final ResourceKey<MailEntity> TRADE_OFFICE = createKey(Envelope.resource("trade_office"));
+    public static final ResourceKey<MailEntity> AUTOMATED_SUPPLY_SERVICE = createKey(Envelope.resource("automated_supply_service"));
 
     private final MailService service;
 
@@ -45,8 +45,8 @@ public class MailEntities {
         context.register(MAIL_SERVICE, new MailEntity(
               Component.translatable("address.envelope.mail_service"),
               new AddressLocation.Relative(1000)));
-        context.register(TRADE_OFFICE, new MailEntity(
-              Component.translatable("address.envelope.trade_office"),
+        context.register(AUTOMATED_SUPPLY_SERVICE, new MailEntity(
+              Component.translatable("address.envelope.automated_supply_service"),
               new AddressLocation.Relative(2000)));
     }
 
