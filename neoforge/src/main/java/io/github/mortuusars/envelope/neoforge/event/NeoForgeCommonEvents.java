@@ -42,113 +42,108 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.Map;
 
+@EventBusSubscriber(modid = Envelope.ID)
 public class NeoForgeCommonEvents {
-    @EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.MOD)
-    public static class ModBus {
-        @SubscribeEvent
-        public static void commonSetup(FMLCommonSetupEvent event) {
-            event.enqueueWork(() -> {
-                CommonEvents.commonSetup();
-                for (Map.Entry<ResourceLocation, StatFormatter> entry : RegisterImpl.STATS.entrySet()) {
-                    Stats.CUSTOM.get(entry.getKey(), entry.getValue());
-                }
-            });
+    @SubscribeEvent
+    public static void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            CommonEvents.commonSetup();
+            for (Map.Entry<ResourceLocation, StatFormatter> entry : RegisterImpl.STATS.entrySet()) {
+                Stats.CUSTOM.get(entry.getKey(), entry.getValue());
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    @SubscribeEvent
+    public static void registerPackets(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar("1");
+        // This monstrosity is to avoid having to define packets for forge and fabric separately.
+        for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : S2CPackets.getDefinitions()) {
+            registrar.playToClient((CustomPacketPayload.Type<Packet>) definition.type(),
+                  (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
         }
 
-        @SuppressWarnings("unchecked")
-        @SubscribeEvent
-        public static void registerPackets(RegisterPayloadHandlersEvent event) {
-            PayloadRegistrar registrar = event.registrar("1");
-            // This monstrosity is to avoid having to define packets for forge and fabric separately.
-            for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : S2CPackets.getDefinitions()) {
-                registrar.playToClient((CustomPacketPayload.Type<Packet>) definition.type(),
-                        (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
-            }
-
-            for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : C2SPackets.getDefinitions()) {
-                registrar.playToServer((CustomPacketPayload.Type<Packet>) definition.type(),
-                        (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
-            }
-
-            for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : CommonPackets.getDefinitions()) {
-                registrar.playBidirectional((CustomPacketPayload.Type<Packet>) definition.type(),
-                        (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
-            }
+        for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : C2SPackets.getDefinitions()) {
+            registrar.playToServer((CustomPacketPayload.Type<Packet>) definition.type(),
+                  (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
         }
 
-        @SubscribeEvent
-        public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
-            if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
-                Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
-                event.accept(Envelope.Items.PAPER_BOX.get());
-                event.accept(Envelope.Items.MAILBOX.get());
-            }
-            if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
-                event.accept(Envelope.Items.LETTER_AND_QUILL.get());
-                event.accept(Envelope.Items.LETTER.get());
-                event.accept(Envelope.Items.SEALED_LETTER.get());
-                event.accept(Envelope.Items.PACKAGE.get());
-                event.accept(Envelope.Items.SEALED_PACKAGE.get());
-                event.accept(Envelope.Items.ADDRESS_TAG.get());
-                event.accept(Envelope.Items.PAYBACK_TAG.get());
-                event.accept(Envelope.Items.SEAL_STAMP.get());
-            }
-            if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
-                event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
-            }
-        }
-
-        @SubscribeEvent
-        public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
-            event.put(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
-        }
-
-        @SubscribeEvent
-        public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
-            event.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
-                    Pigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        }
-
-        @SubscribeEvent
-        public static void addDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
-            event.dataPackRegistry(Envelope.Registries.MAIL_ENTITY, MailEntity.DIRECT_CODEC, MailEntity.DIRECT_CODEC);
-            event.dataPackRegistry(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
-            event.dataPackRegistry(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
+        for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : CommonPackets.getDefinitions()) {
+            registrar.playBidirectional((CustomPacketPayload.Type<Packet>) definition.type(),
+                  (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
         }
     }
 
-    @EventBusSubscriber(modid = Envelope.ID, bus = EventBusSubscriber.Bus.GAME)
-    public static class GameBus {
-        @SubscribeEvent
-        public static void registerCommands(RegisterCommandsEvent event) {
-            EnvelopeCommand.register(event.getDispatcher(), event.getBuildContext());
+    @SubscribeEvent
+    public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
+            Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
+            event.accept(Envelope.Items.PAPER_BOX.get());
+            event.accept(Envelope.Items.MAILBOX.get());
         }
+        if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
+            event.accept(Envelope.Items.LETTER_AND_QUILL.get());
+            event.accept(Envelope.Items.LETTER.get());
+            event.accept(Envelope.Items.SEALED_LETTER.get());
+            event.accept(Envelope.Items.PACKAGE.get());
+            event.accept(Envelope.Items.SEALED_PACKAGE.get());
+            event.accept(Envelope.Items.ADDRESS_TAG.get());
+            event.accept(Envelope.Items.PAYBACK_TAG.get());
+            event.accept(Envelope.Items.SEAL_STAMP.get());
+        }
+        if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
+            event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+        }
+    }
 
-        @SubscribeEvent
-        public static void serverStarted(ServerStartedEvent event) {
-            ServerEvents.serverStarted(event.getServer());
-        }
+    @SubscribeEvent
+    public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
+        event.put(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
+    }
 
-        @SubscribeEvent
-        public static void serverTick(ServerTickEvent.Post tick) {
-            ServerEvents.serverTick(tick.getServer());
-        }
+    @SubscribeEvent
+    public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
+        event.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
+              Pigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+    }
 
-        @SubscribeEvent
-        public static void levelTick(LevelTickEvent.Post event) {
-            CommonEvents.levelTick(event.getLevel());
-        }
+    @SubscribeEvent
+    public static void addDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(Envelope.Registries.MAIL_ENTITY, MailEntity.DIRECT_CODEC, MailEntity.DIRECT_CODEC);
+        event.dataPackRegistry(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
+        event.dataPackRegistry(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
+    }
 
-        @SubscribeEvent
-        public static void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-            if (event.getEntity() instanceof ServerPlayer player) {
-                ServerEvents.playerLogin(player);
-            }
-        }
+    @SubscribeEvent
+    public static void registerCommands(RegisterCommandsEvent event) {
+        EnvelopeCommand.register(event.getDispatcher(), event.getBuildContext());
+    }
 
-        @SubscribeEvent
-        public static void entityLeaveLevel(EntityLeaveLevelEvent event) {
-            CommonEvents.entityLeaveLevel(event.getLevel(), event.getEntity());
+    @SubscribeEvent
+    public static void serverStarted(ServerStartedEvent event) {
+        ServerEvents.serverStarted(event.getServer());
+    }
+
+    @SubscribeEvent
+    public static void serverTick(ServerTickEvent.Post tick) {
+        ServerEvents.serverTick(tick.getServer());
+    }
+
+    @SubscribeEvent
+    public static void levelTick(LevelTickEvent.Post event) {
+        CommonEvents.levelTick(event.getLevel());
+    }
+
+    @SubscribeEvent
+    public static void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ServerEvents.playerLogin(player);
         }
+    }
+
+    @SubscribeEvent
+    public static void entityLeaveLevel(EntityLeaveLevelEvent event) {
+        CommonEvents.entityLeaveLevel(event.getLevel(), event.getEntity());
     }
 }

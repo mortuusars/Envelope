@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
@@ -81,7 +81,7 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
-            PlatformHelper.openMenu(
+            Platform.openMenu(
                   serverPlayer,
                   new SimpleMenuProvider((id, inventory, pl) ->
                         new PaybackTagMenu(id, inventory, hand), Component.translatable("container.envelope.payback_tag")),

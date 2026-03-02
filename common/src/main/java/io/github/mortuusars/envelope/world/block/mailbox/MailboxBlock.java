@@ -3,7 +3,8 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.handler.MailHandlingResult;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
 import io.github.mortuusars.envelope.world.item.component.Id;
@@ -18,7 +19,6 @@ import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
-import io.github.mortuusars.envelope.world.mail.handler.BlockMailHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -165,9 +165,11 @@ public class MailboxBlock extends BaseEntityBlock {
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(recipientAddress)) {
             if (level instanceof ServerLevel serverLevel) {
+                MailService service = MailService.of(serverLevel);
                 Delivery delivery = new Delivery(Id.create(serverLevel), Optional.of(player.getUUID()), new PlayerAddress(player),
                       recipientAddress, stack.split(1), DeliveryRoute.EMPTY, DeliveryPhase.HANDLING_DELIVERY, 0, false);
-                MailHandlingResult result = new BlockMailHandler(recipientAddress).handle(MailService.of(serverLevel), delivery);
+                MailDropOffContext context = new MailDropOffContext(service, recipientAddress, delivery);
+                MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
                 ItemStack resultMail = result.getMail().copy();
                 if (player.getItemInHand(hand).isEmpty()) {
                     player.setItemInHand(hand, resultMail);

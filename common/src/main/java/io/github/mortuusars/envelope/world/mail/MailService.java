@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
@@ -118,6 +119,7 @@ public class MailService {
               getMailEntities().getAllAddresses()
         );
     }
+
     public AllAddresses getKnownAddressesOfType(@Nullable Address.Type type) {
         if (type == null) {
             return getKnownAddresses();
@@ -137,7 +139,8 @@ public class MailService {
     public AddressLocation getLocationOf(Address address) {
         return switch (address) {
             case BlockAddress block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact).orElse(AddressLocation.DEFAULT);
-            case PlayerAddress player -> getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf).orElse(AddressLocation.DEFAULT);
+            case PlayerAddress player ->
+                  getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf).orElse(AddressLocation.DEFAULT);
             case EntityAddress entity -> entity.getEntity().location();
             default -> AddressLocation.DEFAULT;
         };
@@ -177,7 +180,7 @@ public class MailService {
         Component text = Component.empty()
               .append(Component.translatable("letter.envelope.courier_death_notice.title").withStyle(ChatFormatting.ITALIC))
               .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + entity.getRandom().nextInt(5),
-                          damageSource.getLocalizedDeathMessage(entity)))
+                    damageSource.getLocalizedDeathMessage(entity)))
               .append(Component.translatable("letter.envelope.courier_death_notice.delivery." + delivery.getPhase().getSerializedName(),
                     delivery.getRecipient().format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
               .append(!delivery.getMail().isEmpty()
@@ -197,5 +200,32 @@ public class MailService {
 
     public EntityAddress getAddress() {
         return EntityAddress.getOrThrow(getLevel().registryAccess(), MailEntities.MAIL_SERVICE);
+    }
+
+    // --
+
+    public static void init() {
+        Platform.registerEntityDropOffHandlers();
+
+        /* test
+        EntityMailDropOffHandlerRegistry.register(MailEntities.TRADE_OFFICE, context -> {
+            ResourceLocation dataId = Envelope.resource("test_mail_dropoff_handler");
+            CompoundTag data = context.getPersistentData(dataId);
+
+            long elapsedSinceLastReceive = GameTime.of(context.getLevel()).elapsedSince(data.getLong("last_receive")).get();
+            if (elapsedSinceLastReceive < 600) {
+                return MailDropOffResult.returned(context.getMail(), Component.literal("Is On Cooldown"));
+            }
+
+            data.putLong("last_receive", context.getLevel().getGameTime());
+            data.putInt("count", data.getInt("count") + 1);
+            context.setPersistentData(dataId, data);
+
+            return MailDropOffResult.reply(Mail.createPackage(BuiltInLootTables.SIMPLE_DUNGEON)
+                  .writeToLog(DeliveryRecord.sentFrom(context.getTarget()))
+                  .set(DataComponents.LORE, new ItemLore(List.of(Component.literal("I stole if from the dungeon"))))
+                  .get());
+        });
+        */
     }
 }

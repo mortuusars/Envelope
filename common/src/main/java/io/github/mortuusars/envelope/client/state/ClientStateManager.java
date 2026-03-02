@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.client.state;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,7 +15,7 @@ public class ClientStateManager {
     //TODO: Rework for individual states. Use gameDir instead of configDir.
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path FILE_PATH = PlatformHelper.getConfigDirectory().resolve(Envelope.ID + "/fill_recipient.json");
+    private static final Path FILE_PATH = Platform.getConfigDirectory().resolve(Envelope.ID + "/fill_recipient.json");
     private static FillRecipientState data;
 
     public static void load() {

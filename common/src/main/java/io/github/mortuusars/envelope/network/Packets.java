@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.network;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
@@ -29,7 +29,7 @@ public class Packets {
     // --
 
     public static void sendToAllClients(Packet packet) {
-        MinecraftServer server = Objects.requireNonNull(PlatformHelper.getCurrentServer(),
+        MinecraftServer server = Objects.requireNonNull(Platform.getCurrentServer(),
                 "Cannot send clientbound payloads on the client");
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -38,7 +38,7 @@ public class Packets {
     }
 
     public static void sendToAllClients(Function<RegistryAccess, Packet> packet) {
-        MinecraftServer server = Objects.requireNonNull(PlatformHelper.getCurrentServer(),
+        MinecraftServer server = Objects.requireNonNull(Platform.getCurrentServer(),
               "Cannot send clientbound payloads on the client");
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -55,7 +55,7 @@ public class Packets {
     }
 
     public static void sendToClients(Packet packet, Predicate<ServerPlayer> filter) {
-        MinecraftServer server = Objects.requireNonNull(PlatformHelper.getCurrentServer(),
+        MinecraftServer server = Objects.requireNonNull(Platform.getCurrentServer(),
                 "Cannot send clientbound payloads on the client");
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {

@@ -1,12 +1,11 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -78,7 +77,7 @@ public class PaybackPackageItem extends Item {
         if (player instanceof ServerPlayer serverPlayer) {
             SimpleMenuProvider menuProvider = new SimpleMenuProvider(
                   (id, inventory, pl) -> new PaybackPackageMenu(id, inventory, hand), stack.getHoverName());
-            PlatformHelper.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
+            Platform.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
         }
 
         player.level().playSound(player, player, Envelope.SoundEvents.PAPER_TEAR.get(), SoundSource.PLAYERS, 0.6f, 0.95f);

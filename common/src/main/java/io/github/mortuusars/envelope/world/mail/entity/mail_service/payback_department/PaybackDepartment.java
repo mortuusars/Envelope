@@ -38,7 +38,7 @@ public class PaybackDepartment {
 
     public @NotNull PaybackDepartmentData getData() {
         if (data == null) {
-            data = PaybackDepartmentData.get(mailService.getLevel(), "mail_service_payback_department");
+            data = PaybackDepartmentData.get(mailService.getLevel(), "envelope_mail_service_payback_department");
         }
         return data;
     }

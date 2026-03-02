@@ -64,10 +64,15 @@ public class Data<T> {
     }
 
     public @Nullable T decode(Tag tag, RegistryAccess registryAccess) {
-        return codec().decode(registryAccess.createSerializationContext(NbtOps.INSTANCE), tag)
-              .ifError(e -> LOGGER.error("Cannot decode '{}' bugger data: '{}'. Tag: '{}'", id, e.message(), tag))
-              .result()
-              .map(Pair::getFirst)
-              .orElse(null);
+        try {
+            return codec().decode(registryAccess.createSerializationContext(NbtOps.INSTANCE), tag)
+                  .ifError(e -> LOGGER.error("Cannot decode '{}' bugger data: '{}'. Tag: '{}'", id, e.message(), tag))
+                  .result()
+                  .map(Pair::getFirst)
+                  .orElse(null);
+        } catch (Exception e) {
+            LOGGER.error("Cannot decode '{}' bugger data: '{}'. Tag: '{}'", id, e.getMessage(), tag);
+            return null;
+        }
     }
 }

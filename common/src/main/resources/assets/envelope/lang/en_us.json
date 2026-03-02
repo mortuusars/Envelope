@@ -93,7 +93,7 @@
 
 
   "gui.envelope.delivery_log.message.unable_to_reach": "Unable To Reach",
-  "gui.envelope.delivery_log.message.recipient_cannot_be_determined": "Recipient Cannot Be Determined",
+  "gui.envelope.delivery_log.message.recipient_unknown": "Recipient Is Unknown",
   "gui.envelope.delivery_log.message.recipient_not_found": "Recipient Not Found",
   "gui.envelope.delivery_log.message.recipient_inbox_is_full": "Recipient Inbox Is Full",
   "gui.envelope.delivery_log.message.rejected": "Rejected",

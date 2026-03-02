@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.block.PaperBoxBlock;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,7 +47,7 @@ public class PaperBoxItem extends BlockItem {
         if (player instanceof ServerPlayer serverPlayer) {
             SimpleMenuProvider menuProvider = new SimpleMenuProvider((id, inventory, pl) ->
                   new PackingMenu(id, inventory, hand), stack.getHoverName());
-            PlatformHelper.openMenu(serverPlayer, menuProvider, buffer ->
+            Platform.openMenu(serverPlayer, menuProvider, buffer ->
                   buffer.writeEnum(hand));
         }
 

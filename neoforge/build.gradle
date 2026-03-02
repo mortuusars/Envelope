@@ -36,9 +36,14 @@ dependencies {
     modRuntimeOnly("curse.maven:embeddium-908741:6118392")
     //modRuntimeOnly("maven.modrinth:sodium:${sodium_version}-neoforge") // Doesn't want to work
 
+    modCompileOnlyApi("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
+//    modRuntimeOnly("dev.latvian.mods:rhino:${rhino_version}")
+//    implementation("dev.latvian.apps:tiny-java-server:${tiny_server_version}")
+//    modImplementation("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
+
     modRuntimeOnly("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}" )
 
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
 

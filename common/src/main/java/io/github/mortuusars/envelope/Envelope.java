@@ -2,10 +2,6 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.handler.EntityMailHandler;
-import io.github.mortuusars.envelope.api.handler.EntityMailHandlerRegistry;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
@@ -27,9 +23,6 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
-import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import io.github.mortuusars.envelope.world.mail.handler.MailHandlingResult;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -64,7 +57,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -93,20 +85,6 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
-
-        EntityMailHandlerRegistry.INSTANCE.register(resource("test"), access ->
-              EntityAddress.get(access, MailEntities.TRADE_OFFICE)
-                    .map(address -> new EntityMailHandler() {
-                        @Override
-                        public EntityAddress getAddress() {
-                            return address;
-                        }
-
-                        @Override
-                        public MailHandlingResult handle(MailService service, Delivery delivery) {
-                            return MailHandlingResult.reply(Mail.createPackage(BuiltInLootTables.SIMPLE_DUNGEON).get());
-                        }
-                    }));
     }
 
     /**

@@ -1,6 +1,8 @@
 package io.github.mortuusars.envelope;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class PlatformHelper {
+public class Platform {
     @ExpectPlatform
     public static boolean isInDevEnv() {
         throw new AssertionError();
@@ -54,6 +56,18 @@ public class PlatformHelper {
 
     @ExpectPlatform
     public static Path getConfigDirectory() {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static void registerEntityDropOffHandlers() {
+        throw new AssertionError();
+    }
+
+    // -- Events
+
+    @ExpectPlatform
+    public static MailDropOffResult postHandleMailDropOffEvent(MailDropOffContext context) {
         throw new AssertionError();
     }
 }

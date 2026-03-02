@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackingMenu;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.network.chat.Component;
@@ -48,7 +48,7 @@ public class PaybackBoxItem extends Item {
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
-            PlatformHelper.openMenu(serverPlayer, new SimpleMenuProvider((id, inventory, pl) ->
+            Platform.openMenu(serverPlayer, new SimpleMenuProvider((id, inventory, pl) ->
                         new PaybackPackingMenu(id, inventory, hand), stack.getHoverName()),
                   buffer -> buffer.writeEnum(hand));
         }

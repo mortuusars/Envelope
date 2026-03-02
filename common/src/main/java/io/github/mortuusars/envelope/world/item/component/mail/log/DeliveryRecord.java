@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.item.component.mail.log;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.item.component.mail.log.record.ArrivedRecord;
@@ -75,7 +75,7 @@ public interface DeliveryRecord {
     // --
 
     static Optional<Long> getCurrentGameTime() {
-        @Nullable MinecraftServer server = PlatformHelper.getCurrentServer();
+        @Nullable MinecraftServer server = Platform.getCurrentServer();
         if (server == null) return Optional.empty();
         return Optional.of(server.overworld().getGameTime());
     }
@@ -118,7 +118,7 @@ public interface DeliveryRecord {
 
     interface Message {
         Component RECIPIENT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.recipient_not_found").withColor(Colors.TOOLTIP_RED);
-        Component RECIPIENT_CANNOT_BE_DETERMINED = Component.translatable("gui.envelope.delivery_log.message.recipient_cannot_be_determined").withColor(Colors.TOOLTIP_RED);
+        Component RECIPIENT_IS_UNKNOWN = Component.translatable("gui.envelope.delivery_log.message.recipient_unknown").withColor(Colors.TOOLTIP_RED);
         Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.recipient_inbox_is_full").withColor(Colors.TOOLTIP_RED);
         Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.unable_to_reach").withColor(Colors.TOOLTIP_RED);
         Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.rejected").withColor(Colors.TOOLTIP_RED);

@@ -1,15 +1,15 @@
 package io.github.mortuusars.envelope.integration;
 
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 
 public class Mods {
     public record Mod(String id) {
         public boolean isLoaded() {
-            return PlatformHelper.isModLoaded(id);
+            return Platform.isModLoaded(id);
         }
 
         public boolean isLoading() {
-            return PlatformHelper.isModLoading(id);
+            return Platform.isModLoading(id);
         }
     }
 }

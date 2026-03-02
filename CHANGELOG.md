@@ -23,11 +23,24 @@ Crafting
   - Works the same as in smelting recipes.
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
 
+Delivery
+- Added support for Entity address "drop-off" handlers. 
+  - They can be defined in code (for addons) or through KubeJS.
+  - _Drop-off handler is responsible for actually deciding what happens with delivered mail (consume/return/reply)._ 
+
+KubeJS
+- Added `EnvelopeEvents.registerEntityDropOffHandlers` event.
+- Added `EnvelopeEvents.handleMailDropOff` event.
+  - Called before most of the regular logic is processed.  
+  - Can be used to modify drop-off of any address type.
+- No documentation yet.
+
 Misc
 - Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
 - **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
 - Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.
 - Small change to how `envelope:payback_subject` component is defined.
+- Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
 
 ## 0.6.0-Snapshot 1
 #### Added Mailing recipes

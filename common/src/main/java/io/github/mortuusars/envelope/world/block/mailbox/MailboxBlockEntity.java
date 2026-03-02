@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.PlatformHelper;
+import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
@@ -214,7 +214,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
                 setOwner(player.getUUID());
             }
 
-            PlatformHelper.openMenu(serverPlayer, this, buffer -> {
+            Platform.openMenu(serverPlayer, this, buffer -> {
                 buffer.writeBlockPos(getBlockPos());
                 BlockAddress.STREAM_CODEC.encode(buffer, getAddress());
                 ItemStack.LIST_STREAM_CODEC.encode(buffer, getAllMail());

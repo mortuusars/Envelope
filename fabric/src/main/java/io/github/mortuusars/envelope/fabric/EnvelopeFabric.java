@@ -68,10 +68,10 @@ public class EnvelopeFabric implements ModInitializer {
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            PlatformHelperImpl.server = server;
+            PlatformImpl.server = server;
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            PlatformHelperImpl.server = null;
+            PlatformImpl.server = null;
         });
 
         ServerTickEvents.END_SERVER_TICK.register(ServerEvents::serverTick);

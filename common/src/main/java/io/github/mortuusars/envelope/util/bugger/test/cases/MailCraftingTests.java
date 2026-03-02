@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.item.crafting.CraftingResult;
 import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.PackageRecipeInput;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.handler.CraftingMailHandler;
+import io.github.mortuusars.envelope.world.mail.dropoff.CraftingDropOffHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -21,10 +21,10 @@ public class MailCraftingTests extends BuggerTests {
     public MailCraftingTests(MinecraftServer server) {
         this.server = server;
 
-        CraftingMailHandler craftingReceiver = new CraftingMailHandler(MailService.of(server.overworld()).getAddress());
+        CraftingDropOffHandler crafting = new CraftingDropOffHandler();
 
         add("MailCrafting_CraftsWithoutRemainder", Test.isTrue(() -> {
-            CraftingResult result = craftingReceiver.craft(server.overworld(),
+            CraftingResult result = crafting.craft(server.overworld(),
                   recipe(
                         new StackIngredient(Items.EMERALD, 12),
                         new StackIngredient(Items.DIAMOND, 6),
@@ -41,7 +41,7 @@ public class MailCraftingTests extends BuggerTests {
         }));
 
         add("MailCrafting_CraftsWithRemainder", Test.isTrue(() -> {
-            CraftingResult result = craftingReceiver.craft(server.overworld(),
+            CraftingResult result = crafting.craft(server.overworld(),
                   recipe(
                         new StackIngredient(Items.EMERALD, 12),
                         new StackIngredient(Items.DIAMOND, 6),
@@ -59,7 +59,7 @@ public class MailCraftingTests extends BuggerTests {
         }));
 
         add("MailCrafting_CraftsMultiple", Test.isTrue(() -> {
-            CraftingResult result = craftingReceiver.craft(server.overworld(),
+            CraftingResult result = crafting.craft(server.overworld(),
                   recipe(
                         new StackIngredient(Items.EMERALD, 12),
                         new StackIngredient(Items.DIAMOND, 6),
@@ -75,7 +75,7 @@ public class MailCraftingTests extends BuggerTests {
         }));
 
         add("MailCrafting_CraftingReturnsCorrectTotalExperience", Test.isTrue(() -> {
-            CraftingResult result = craftingReceiver.craft(server.overworld(),
+            CraftingResult result = crafting.craft(server.overworld(),
                   recipe(
                         new StackIngredient(Items.EMERALD, 12),
                         new StackIngredient(Items.DIAMOND, 6),

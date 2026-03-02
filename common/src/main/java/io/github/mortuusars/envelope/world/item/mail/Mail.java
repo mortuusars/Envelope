@@ -104,6 +104,9 @@ public final class Mail {
     }
 
     public static ItemStack returned(ItemStack mail, Component message) {
+        if (mail.isEmpty()) {
+            return mail;
+        }
         writeToLog(mail, DeliveryRecord.returned(message));
         setReturned(mail);
         return mail;

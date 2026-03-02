@@ -3,13 +3,15 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.handler.MailHandlingResult;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
 public interface DeliveryExecutor {
@@ -98,13 +100,19 @@ public interface DeliveryExecutor {
 
         switch (delivery.getPhase()) {
             case HANDLING_DELIVERY -> {
-                MailHandlingResult result = service.getDeliveryManager().getMailHandler(delivery.getRecipient()).handle(service, delivery);
+                MailDropOffContext context = new MailDropOffContext(service, delivery.getRecipient(), delivery);
+                MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
                 if (result.isHandled()) {
-                    delivery.setMail(result.getMail());
+                    ItemStack mail = result.getMail();
+                    if (result.isReply()) {
+                        Mail.writeToLog(mail, DeliveryRecord.sentFrom(delivery.getRecipient()));
+                    }
+                    delivery.setMail(mail);
                 }
             }
             case HANDLING_RETURN -> {
-                MailHandlingResult result = service.getDeliveryManager().getMailHandler(delivery.getSender()).handle(service, delivery);
+                MailDropOffContext context = new MailDropOffContext(service, delivery.getSender(), delivery);
+                MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
                 if (result.isHandled()) {
                     delivery.setMail(result.getMail());
                 }

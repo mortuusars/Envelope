@@ -1,5 +1,9 @@
 package io.github.mortuusars.envelope.neoforge;
 
+import io.github.mortuusars.envelope.neoforge.api.event.HandleMailDropOffEvent;
+import io.github.mortuusars.envelope.neoforge.integration.kubejs.event.EnvelopeJSEvents;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,13 +12,14 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.LoadingModList;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-public class PlatformHelperImpl {
+public class PlatformImpl {
     public static boolean isInDevEnv() {
         return !FMLEnvironment.production;
     }
@@ -41,5 +46,17 @@ public class PlatformHelperImpl {
 
     public static Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get();
+    }
+
+    public static void registerEntityDropOffHandlers() {
+        if (isModLoaded("kubejs")) {
+            EnvelopeJSEvents.registerCustomEntityDropOffHandlers();
+        }
+    }
+
+    // -- Events
+
+    public static MailDropOffResult postHandleMailDropOffEvent(MailDropOffContext context) {
+        return NeoForge.EVENT_BUS.post(new HandleMailDropOffEvent(context)).getResult();
     }
 }
