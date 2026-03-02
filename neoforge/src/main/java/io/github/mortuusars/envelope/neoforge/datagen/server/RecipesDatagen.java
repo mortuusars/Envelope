@@ -120,17 +120,29 @@ public class RecipesDatagen extends RecipeProvider {
 
         // --
 
-        EntityAddress tradeOffice = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
+        EntityAddress automatedSupplyService = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
 
-        MailRecipeBuilder.crafting(tradeOffice)
+        MailRecipeBuilder.crafting(automatedSupplyService)
               .requires(new StackIngredient(Items.ROTTEN_FLESH), 6)
               .forResult(Items.LEATHER, 1)
               .save(output);
 
-        MailRecipeBuilder.crafting(tradeOffice)
+        MailRecipeBuilder.crafting(automatedSupplyService)
               .requires(new StackIngredient(Items.LEATHER), 3)
               .requires(new StackIngredient(Tags.Items.INGOTS_IRON))
               .forResult(Items.SADDLE)
+              .save(output);
+
+        MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(new StackIngredient(Items.DIORITE), 1)
+              .requires(new StackIngredient(Items.BONE_MEAL), 3)
+              .forResult(Items.CALCITE)
+              .save(output);
+
+        MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(new StackIngredient(Items.PHANTOM_MEMBRANE), 1)
+              .requires(new StackIngredient(Items.IRON_NUGGET))
+              .forResult(Items.NAME_TAG)
               .save(output);
     }
 

@@ -37,6 +37,8 @@ KubeJS
 
 Mail Entities
 - Changed/renamed address **Trade Office** to **Automated Supply Service**.
+- Added **Phantom Membrane + Iron Nugget -> Name Tag** recipe.
+- Added **Diorite + 3x Bone Meal -> Calcite** recipe.
 
 Misc
 - Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.

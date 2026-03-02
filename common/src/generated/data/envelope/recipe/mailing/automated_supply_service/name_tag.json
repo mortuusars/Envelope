@@ -1,0 +1,16 @@
+{
+  "type": "envelope:mail_crafting",
+  "entity": "envelope:automated_supply_service",
+  "ingredients": [
+    {
+      "item": "minecraft:phantom_membrane"
+    },
+    {
+      "item": "minecraft:iron_nugget"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:name_tag"
+  }
+}
