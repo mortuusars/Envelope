@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.datafixers.util.Either;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -148,7 +149,7 @@ public class AddressFormatter {
         return switch (address.getType()) {
             case BLOCK -> EnvelopeSymbols.ADDRESS_BLOCK;
             case PLAYER -> EnvelopeSymbols.ADDRESS_PLAYER;
-            case ENTITY -> address.isMailService() ? EnvelopeSymbols.ADDRESS_MAIL_SERVICE : EnvelopeSymbols.ADDRESS_ENTITY;
+            case ENTITY -> ((EntityAddress) address).getEntity().icon();
             case CUSTOM -> EnvelopeSymbols.ADDRESS_CUSTOM;
             case UNKNOWN -> EnvelopeSymbols.ADDRESS_UNKNOWN;
         };

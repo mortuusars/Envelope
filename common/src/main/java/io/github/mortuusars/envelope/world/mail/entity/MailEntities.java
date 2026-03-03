@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.entity;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
@@ -44,9 +45,11 @@ public class MailEntities {
     public static void bootstrap(BootstrapContext<MailEntity> context) {
         context.register(MAIL_SERVICE, new MailEntity(
               Component.translatable("address.envelope.mail_service"),
+              EnvelopeSymbols.ADDRESS_MAIL_SERVICE,
               new AddressLocation.Relative(1000)));
         context.register(AUTOMATED_SUPPLY_SERVICE, new MailEntity(
               Component.translatable("address.envelope.automated_supply_service"),
+              EnvelopeSymbols.ADDRESS_ENTITY,
               new AddressLocation.Relative(2000)));
     }
 

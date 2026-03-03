@@ -19,4 +19,5 @@ public class EnvelopeSymbols {
     public static final String LETTER = "\uEE10";
     public static final String SMALL_FILLED_ARROW_LEFT = "\uEE20";
     public static final String SMALL_FILLED_ARROW_RIGHT = "\uEE21";
+    public static final String COAT_OF_ARMS = "\uEE30";
 }
