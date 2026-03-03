@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.integration.jei;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
@@ -47,18 +48,20 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
-        List<EntityAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
-              .stream()
-              .map(recipe -> recipe.value().getEntityAddress())
-              .distinct()
-              .filter(address -> !address.getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
-              .toList();
+        if (Config.Client.JEI_ENTITY_ADDRESS_INGREDIENT.get()) {
+            List<EntityAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
+                  .stream()
+                  .map(recipe -> recipe.value().getEntityAddress())
+                  .distinct()
+                  .filter(address -> !address.getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
+                  .toList();
 
-        registration.register(ENTITY_ADDRESS_INGREDIENT,
-              addressesWithRecipes,
-              new EntityAddressIngredientHelper(),
-              new EntityAddressIngredientRenderer(),
-              EntityAddress.CODEC.codec());
+            registration.register(ENTITY_ADDRESS_INGREDIENT,
+                  addressesWithRecipes,
+                  new EntityAddressIngredientHelper(),
+                  new EntityAddressIngredientRenderer(),
+                  EntityAddress.CODEC.codec());
+        }
     }
 
     @Override

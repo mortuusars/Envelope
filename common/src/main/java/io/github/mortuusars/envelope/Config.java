@@ -42,7 +42,7 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
 
-        // PAYBACK
+        // Payback
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_MEDIUM;
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_LONG;
@@ -191,13 +191,30 @@ public abstract class Config {
         }
     }*/
 
-//    public static class Client {
-//        public static final ModConfigSpec SPEC;
-//
-//        static {
-//            ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-//
-//            SPEC = builder.build();
-//        }
-//    }
+    public static class Client {
+        public static final ModConfigSpec SPEC;
+
+        // JEI
+        public static final ModConfigSpec.BooleanValue JEI_ENTITY_ADDRESS_INGREDIENT;
+
+        static {
+            ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+
+            {
+                builder.push("integration");
+                {
+                    builder.push("jei");
+                    JEI_ENTITY_ADDRESS_INGREDIENT = builder
+                          .comment("Entity Addresses that have recipes associated with them will be shown in JEI as ingredients.",
+                                "Changing the value requires relogging into the world or /reload to take effect.",
+                                " Default: true.")
+                          .define("entity_address_ingredient", true);
+                    builder.pop();
+                }
+                builder.pop();
+            }
+
+            SPEC = builder.build();
+        }
+    }
 }

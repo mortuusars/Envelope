@@ -212,6 +212,9 @@
   "envelope.configuration.courier_travel_speed": "Courier Travel Speed",
   "envelope.configuration.default_distance": "Default Distance",
   "envelope.configuration.pause": "Pause",
+  "envelope.configuration.integration": "Integration",
+  "envelope.configuration.jei": "JEI",
+  "envelope.configuration.payback": "Payback",
   "envelope.configuration.debug": "Debug",
   "envelope.configuration.spawns_in_village": "Spawns In Village",
   "envelope.configuration.min_ticks_outside_pigeonhole": "Min Ticks Outside Pigeonhole",
@@ -233,6 +236,10 @@
   "envelope.configuration.payback_box_return_chance": "Payback Box Return Chance",
   "envelope.configuration.spawning_respects_domobspawning_rule": "Spawning Respects 'doMobSpawning' Rule",
   "envelope.configuration.sneak_quick_unpack": "Sneak Quick Unpack",
+  "envelope.configuration.entity_address_ingredient": "Entity Address Ingredient",
+  "envelope.configuration.request_duration_medium": "Request Duration - Medium",
+  "envelope.configuration.request_duration_short": "Request Duration - Short",
+  "envelope.configuration.request_duration_long": "Request Duration - Long",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
