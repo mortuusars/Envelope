@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.integration.jei.category;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
 import io.github.mortuusars.envelope.world.item.Unsealable;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
@@ -24,7 +25,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     public MailingRecipeCategory(IJeiHelpers helper) {
         super(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE,
               Component.translatable("envelope.jei.category.mailing"),
-              helper.getGuiHelper().createDrawableItemLike(Envelope.Items.PACKAGE.get()), 148, 74);
+              helper.getGuiHelper().createDrawableItemLike(Envelope.Items.PACKAGE.get()), 146, 74);
         background = helper.getGuiHelper().createDrawable(
               Envelope.resource("textures/gui/jei/category_mailing.png"), 0, 0, getWidth(), getHeight());
     }
@@ -32,6 +33,13 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         MailRecipe recipe = recipeHolder.value();
+
+        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
+              .addItemLike(Envelope.Items.PAPER_BOX.get())
+              .addItemLike(Envelope.Items.PACKAGE.get());
+
+        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
+              .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getEntityAddress());
 
         for (int row = 0; row < 2; row++) {
             for (int column = 0; column < 3; column++) {
@@ -47,21 +55,18 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
             }
         }
 
+        builder.addOutputSlot(122, 33)
+              .addItemStack(recipe.getResultItem(Minecrft.registryAccess()));
+
         ItemStack resultItem = recipe.getResultItem(Minecrft.registryAccess());
-        if (!(resultItem.getItem() instanceof Unsealable)) {
+        if (!(resultItem.getItem() instanceof Unsealable)) { // If not sealed
             PackageContents resultContents = PackageContents.from(resultItem);
             if (!resultContents.isEmpty()) {
+                // Makes contents "known" to jei usages lookup:
                 builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
                       .addItemStacks(resultContents.getItemsForReading());
             }
         }
-
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
-              .addItemLike(Envelope.Items.PAPER_BOX.get())
-              .addItemLike(Envelope.Items.PACKAGE.get());
-
-        builder.addOutputSlot(126, 33)
-              .addItemStack(recipe.getResultItem(Minecrft.registryAccess()));
 
         builder.setShapeless(getWidth() - 9, getHeight() - 9);
     }
@@ -79,5 +84,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               .setPosition(0, 0)
               .setTextAlignment(HorizontalAlignment.CENTER)
               .setColor(0xFF808080);
+
+        builder.addRecipeArrow().setPosition(90, 32);
     }
 }

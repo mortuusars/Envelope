@@ -41,6 +41,8 @@ KubeJS
 Mail Entities
 - Added `envelope:hidden` mail entity tag. Allows hiding mail entity from address suggestions and its recipes from JEI.
 - Changed/renamed address **Trade Office** to **Automated Supply Service**.
+- Mail entities that have recipes now show up in JEI as an ingredient. 
+  - Querying their uses (R-Click or [U]) will show available recipes associated with that address.
 
 Misc
 - Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
