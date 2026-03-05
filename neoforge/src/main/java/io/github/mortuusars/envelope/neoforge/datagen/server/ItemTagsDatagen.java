@@ -57,5 +57,8 @@ public class ItemTagsDatagen extends ItemTagsProvider {
               .add(Envelope.Items.SEALED_PACKAGE.get())
               .add(Envelope.Items.PAYBACK_BOX.get())
               .add(Envelope.Items.PAYBACK_PACKAGE.get());
+
+        tag(Envelope.Tags.Items.LOST_MAIL_EXCLUDED)
+              .addTag(Envelope.Tags.Items.LETTERS);
     }
 }

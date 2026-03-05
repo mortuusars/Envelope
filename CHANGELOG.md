@@ -24,6 +24,7 @@ Crafting
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
 - Added **Phantom Membrane + Iron Nugget -> Name Tag** recipe.
 - Added **Diorite + 3x Bone Meal -> Calcite** recipe.
+- Added **Diamond -> Lost Mail** recipe. 
 - Small changes to existing recipes.
 
 Delivery

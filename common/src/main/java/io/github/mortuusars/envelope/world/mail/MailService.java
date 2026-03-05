@@ -35,8 +35,8 @@ public class MailService {
 
     protected final Mailboxes mailboxes;
     protected final MailEntities mailEntities;
-    protected final PaybackDepartment paybackDepartment;
     protected final DeliveryManager deliveryManager;
+    protected final PaybackDepartment paybackDepartment;
 
     protected @Nullable KnownPlayers knownPlayers;
     protected @Nullable BackgroundDelivery backgroundDelivery;
@@ -46,8 +46,8 @@ public class MailService {
         this.level = level;
         this.mailboxes = new Mailboxes(level);
         this.mailEntities = new MailEntities(this);
-        this.paybackDepartment = new PaybackDepartment(this);
         this.deliveryManager = new DeliveryManager(this);
+        this.paybackDepartment = new PaybackDepartment(this);
     }
 
     /**
@@ -90,6 +90,10 @@ public class MailService {
         return mailEntities;
     }
 
+    public DeliveryManager getDeliveryManager() {
+        return deliveryManager;
+    }
+
     public PaybackDepartment getPaybackDepartment() {
         return paybackDepartment;
     }
@@ -104,10 +108,6 @@ public class MailService {
         return backgroundDelivery == null
               ? backgroundDelivery = BackgroundDelivery.get(level, "envelope_background_delivery")
               : backgroundDelivery;
-    }
-
-    public DeliveryManager getDeliveryManager() {
-        return deliveryManager;
     }
 
     // -- Address
@@ -161,14 +161,14 @@ public class MailService {
         return getLevel().getGameTime();
     }
 
-    public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
+    public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity courier, Delivery delivery, DamageSource damageSource) {
         Address recipient = delivery.getSender();
 
         if (!(recipient instanceof BlockAddress) && !(recipient instanceof PlayerAddress)) {
             return Result.error("Cannot send death notice: recipient is not 'real' (player).");
         }
 
-        ItemStack letter = createCourierDeathNoticeLetter(entity, delivery, damageSource);
+        ItemStack letter = createCourierDeathNoticeLetter(courier, delivery, damageSource);
 
         return getDeliveryManager().startService(Delivery.draft()
               .deliver(letter)
@@ -176,21 +176,21 @@ public class MailService {
               .to(recipient));
     }
 
-    public ItemStack createCourierDeathNoticeLetter(LivingEntity entity, Delivery delivery, DamageSource damageSource) {
+    public ItemStack createCourierDeathNoticeLetter(LivingEntity courier, Delivery delivery, DamageSource damageSource) {
         Component text = Component.empty()
               .append(Component.translatable("letter.envelope.courier_death_notice.title").withStyle(ChatFormatting.ITALIC))
-              .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + entity.getRandom().nextInt(5),
-                    damageSource.getLocalizedDeathMessage(entity)))
+              .append(Component.translatable("letter.envelope.courier_death_notice.inform_" + courier.getRandom().nextInt(5),
+                    damageSource.getLocalizedDeathMessage(courier)))
               .append(Component.translatable("letter.envelope.courier_death_notice.delivery." + delivery.getPhase().getSerializedName(),
                     delivery.getRecipient().format().withIcon().withIconColor(0xFFB5633F).withColor(0xFFB5633F).toComponent()))
               .append(!delivery.getMail().isEmpty()
-                    ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + entity.getRandom().nextInt(6),
+                    ? Component.translatable("letter.envelope.courier_death_notice.mail_lost_" + courier.getRandom().nextInt(6),
                     delivery.getMail().getHoverName().copy()
                           .withStyle(Style.EMPTY.withUnderlined(true)
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(delivery.getMail())))))
                     : CommonComponents.EMPTY)
-              .append(Component.translatable("letter.envelope.courier_death_notice.condolence_" + entity.getRandom().nextInt(5),
-                    entity.getName()))
+              .append(Component.translatable("letter.envelope.courier_death_notice.condolence_" + courier.getRandom().nextInt(5),
+                    courier.getName()))
               .append(Component.translatable("letter.envelope.courier_death_notice.signature"));
 
         return Mail.createLetter(text)

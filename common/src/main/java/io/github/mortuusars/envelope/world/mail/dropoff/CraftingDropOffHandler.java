@@ -38,8 +38,7 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
         }
 
         if (context.isReturned()) {
-            //TODO: Lost mail
-            LOGGER.info("Mail Entity Crafting Handler received returned mail [{}] in '{}'. Voiding.", mail, context.getDelivery());
+            LOGGER.info("Crafting '{}' received returned mail. Delivery: '{}'. Voiding", address, context.getDelivery());
             return MailDropOffResult.CONSUME;
         }
 
@@ -101,12 +100,13 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
 
         do {
             ItemStack result = recipe.assemble(input, level.registryAccess());
-            result.onCraftedBySystem(level);
-            experience += recipe.getExperience();
-
             if (!outputContainer.addItem(result).isEmpty()) {
                 break;
             }
+
+            result = recipe.assembleFinal(input, level);
+            result.onCraftedBySystem(level);
+            experience += recipe.getExperience();
 
             input = PackageRecipeInput.of(recipe.consumeOnce(input));
 

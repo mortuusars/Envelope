@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class BlockLootTableProvider extends BlockLootSubProvider {
-    public BlockLootTableProvider(HolderLookup.Provider registries) {
+public class BlockLootProvider extends BlockLootSubProvider {
+    public BlockLootProvider(HolderLookup.Provider registries) {
         super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags(), registries);
     }
 

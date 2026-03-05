@@ -17,8 +17,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
-public class EntityLootTableProvider extends EntityLootSubProvider {
-    public EntityLootTableProvider(HolderLookup.Provider registries) {
+public class EntityLootProvider extends EntityLootSubProvider {
+    public EntityLootProvider(HolderLookup.Provider registries) {
         super(FeatureFlags.REGISTRY.allFlags(), registries);
     }
 

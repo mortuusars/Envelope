@@ -1,0 +1,20 @@
+{
+  "type": "envelope:mail_crafting",
+  "entity": "envelope:mail_service",
+  "experience": 1.5,
+  "ingredients": [
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "components": {
+      "minecraft:container_loot": {
+        "loot_table": "envelope:lost_mail"
+      },
+      "minecraft:custom_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+    },
+    "count": 1,
+    "id": "envelope:package"
+  }
+}

@@ -5,6 +5,8 @@
   "block.envelope.package": "Package",
   "block.envelope.sealed_package": "Sealed Package",
 
+  "item.envelope.lost_mail": "Lost Mail",
+
   "item.envelope.oak_pigeonhole": "Oak Pigeonhole",
 
   "item.envelope.letter_and_quill": "Letter and Quill",

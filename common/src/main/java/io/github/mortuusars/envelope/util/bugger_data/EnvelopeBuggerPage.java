@@ -26,7 +26,7 @@ public class EnvelopeBuggerPage implements BuggerPage {
                   List<String> lines = new ArrayList<>(List.of(
                         "Mailboxes: " + tag.getInt("mailboxes"),
                         "",
-                        "Mail Awaiting Payback: " + tag.getInt("payback_pending_mail"),
+                        "Mail Awaiting Payback: " + tag.getInt("payback_pending_mail_count"),
                         "",
                         "Couriers:",
                         "  Real: " + realPigeons,
@@ -34,8 +34,6 @@ public class EnvelopeBuggerPage implements BuggerPage {
                         "  Finished: " + backgroundFinishedPigeons,
                         ""
                   ));
-
-
 
                   ListTag deliveries = tag.getList("deliveries", Tag.TAG_STRING);
                   if (!deliveries.isEmpty()) {

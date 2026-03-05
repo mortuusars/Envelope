@@ -1,15 +1,20 @@
 package io.github.mortuusars.envelope.world.mail.delivery.background;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -22,6 +27,7 @@ public class BackgroundDelivery extends SavedData {
                 .optionalFieldOf("finished_couriers", Collections.emptyList())
                 .forGetter(BackgroundDelivery::getFinishedCouriers)
     ).apply(instance, BackgroundDelivery::new));
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     protected final List<BackgroundCourier> couriers;
     protected final List<BackgroundCourier> pendingCouriers = new ArrayList<>();
@@ -67,19 +73,28 @@ public class BackgroundDelivery extends SavedData {
     }
 
     public void tick(ServerLevel level) {
-        couriers.removeIf(courier -> {
+        for (int i = 0; i < couriers.size(); i++) {
+            BackgroundCourier courier = couriers.get(i);
             courier.tick(level);
 
-            boolean ended = courier.getDelivery().isEnded();
+            Delivery delivery = courier.getDelivery();
+            boolean ended = delivery.isEnded();
 
-            if (ended && courier.getOrigin().isRegular()) {
-                FinishedBackgroundCourier finishedCourier = new FinishedBackgroundCourier(
-                      courier.getEntityData(), courier.getOrigin().getPos(), courier.getDelivery().getMail());
-                addFinishedCourier(finishedCourier);
+            //TODO: let courier itself decide what to do next
+            if (ended)
+                if (courier.getOrigin().isRegular()) {
+                    FinishedBackgroundCourier finishedCourier = new FinishedBackgroundCourier(
+                          courier.getEntityData(), courier.getOrigin().getPos(), delivery.getMail());
+                    addFinishedCourier(finishedCourier);
+                } else if (!delivery.getMail().isEmpty()) {
+                    //TODO: handle undelivered service mail
+                }
+
+            if (ended) {
+                couriers.remove(i);
+                i--;
             }
-
-            return ended;
-        });
+        }
         processPendingCouriers();
     }
 

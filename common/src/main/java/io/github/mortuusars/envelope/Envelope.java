@@ -15,7 +15,6 @@ import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
-import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -57,6 +56,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -417,6 +417,22 @@ public class Envelope {
     }
 
     public static class LootTables {
+        public static final ResourceKey<LootTable> LOST_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail"));
+        public static final ResourceKey<LootTable> LOST_MAIL_JUNK =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_junk"));
+        public static final ResourceKey<LootTable> LOST_MAIL_PLANTS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_plants"));
+        public static final ResourceKey<LootTable> LOST_MAIL_BLOCKS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_blocks"));
+        public static final ResourceKey<LootTable> LOST_MAIL_METALS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_metals"));
+        public static final ResourceKey<LootTable> LOST_MAIL_TOOLS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_tools"));
+        public static final ResourceKey<LootTable> LOST_MAIL_WEAPONS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_weapons"));
+        public static final ResourceKey<LootTable> LOST_MAIL_VALUABLES =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_valuables"));
     }
 
     public static class Tags {
@@ -442,7 +458,8 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("packages"));
             public static final TagKey<Item> MAILABLE =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("mailable"));
-
+            public static final TagKey<Item> LOST_MAIL_EXCLUDED =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("lost_mail_excluded"));
             public static final TagKey<Item> CANNOT_BE_PACKAGED =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cannot_be_packaged"));
             public static final TagKey<Item> CANNOT_BE_USED_AS_PAYBACK =

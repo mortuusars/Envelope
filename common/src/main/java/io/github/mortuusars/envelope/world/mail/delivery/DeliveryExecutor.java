@@ -40,7 +40,7 @@ public interface DeliveryExecutor {
                 endDelivery(level, delivery);
                 if (Bugger.isEnabled()) {
                     String type = getOrigin().isService() ? "Service delivery" : "Delivery";
-                    Envelope.LOGGER.info("{} '{} > {}' is finished.", type, delivery.getSender(), delivery.getRecipient());
+                    LOGGER.info("{} '{} > {}' is finished.", type, delivery.getSender(), delivery.getRecipient());
                 }
             } else {
                 if (!handlePhaseTransition(level, delivery)) {
@@ -126,17 +126,17 @@ public interface DeliveryExecutor {
     // --
 
     default boolean dispatchDelivery(ServerLevel level, Delivery delivery) {
-        MailService mailService = MailService.of(level);
+        MailService service = MailService.of(level);
 
         Mail.setSender(delivery.getMail(), delivery.getSender());
 
-        if (!mailService.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
+        if (!service.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
             Mail.returned(delivery.getMail(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
             delivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return true;
         }
 
-        if (mailService.getPaybackDepartment().tryHandleDelivery(delivery)) {
+        if (service.getPaybackDepartment().tryHandleDelivery(delivery)) {
             return true;
         }
 
@@ -145,12 +145,14 @@ public interface DeliveryExecutor {
     }
 
     default boolean dispatchReturn(ServerLevel level, Delivery delivery) {
-        if (MailService.of(level).getPaybackDepartment().tryHandleReturn(delivery)) {
-            return true;
-        }
+        MailService service = MailService.of(level);
 
         if (!Mail.isReturned(delivery.getMail()) && Mail.getSender(delivery.getMail()).isEmpty()) {
             Mail.setSender(delivery.getMail(), delivery.getRecipient());
+        }
+
+        if (service.getPaybackDepartment().tryHandleReturn(delivery)) {
+            return true;
         }
 
         if (getOrigin().isService() && shouldTerminateServiceDeliveryEarly(level, delivery)) {
@@ -159,7 +161,10 @@ public interface DeliveryExecutor {
             return true;
         }
 
-        delivery.updateRoute(level);
+        if (service.getDeliveryManager().canDeliverTo(delivery.getSender())) {
+            delivery.updateRoute(level);
+        }
+
         return false;
     }
 

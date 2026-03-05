@@ -29,8 +29,7 @@ public class EntityDropOffHandler implements MailDropOffHandler {
         }
 
         if (context.isReturned()) {
-            //TODO: Lost mail
-            LOGGER.info("Mail Entity received returned mail [{}] in '{}'. Voiding.", mail, context.getDelivery());
+            LOGGER.info("'{}' received returned mail. Delivery: '{}'. Voiding.", address, context.getDelivery());
             return MailDropOffResult.CONSUME;
         }
 

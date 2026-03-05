@@ -37,7 +37,7 @@ public class MailServiceBuggerData extends NbtData {
         List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getCouriers();
 
         tag.putInt("mailboxes", mailService.getMailboxes().getAllAddresses().size());
-        tag.putInt("payback_pending_mail", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
+        tag.putInt("payback_pending_mail_count", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
 
         tag.putInt("delivering_pigeons", pigeons.size());
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());

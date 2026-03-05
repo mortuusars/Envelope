@@ -4,14 +4,17 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipeBuilder;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +24,7 @@ import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -143,7 +147,16 @@ public class RecipesDatagen extends RecipeProvider {
               .requires(new StackIngredient(Items.PHANTOM_MEMBRANE), 1)
               .requires(new StackIngredient(Items.IRON_NUGGET))
               .forResult(Items.NAME_TAG)
+              .experience(1.5f)
               .save(output);
+
+        MailRecipeBuilder.crafting(mailService)
+              .requires(new StackIngredient(Items.DIAMOND))
+              .forResult(Mail.createPackage(Envelope.LootTables.LOST_MAIL)
+                    .set(DataComponents.CUSTOM_NAME, Component.translatable("item.envelope.lost_mail"))
+                    .get())
+              .experience(1.5f)
+              .save(output, "lost_mail");
     }
 
     protected void sealStamp(RecipeOutput output, EntityAddress address, StackIngredient ingredient, ResourceKey<SealImpression> impression) {

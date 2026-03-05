@@ -1,7 +1,8 @@
 package io.github.mortuusars.envelope.neoforge.datagen.server;
 
-import io.github.mortuusars.envelope.neoforge.datagen.server.loot.BlockLootTableProvider;
-import io.github.mortuusars.envelope.neoforge.datagen.server.loot.EntityLootTableProvider;
+import io.github.mortuusars.envelope.neoforge.datagen.server.loot.BlockLootProvider;
+import io.github.mortuusars.envelope.neoforge.datagen.server.loot.ChestLootProvider;
+import io.github.mortuusars.envelope.neoforge.datagen.server.loot.EntityLootProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
@@ -24,8 +25,9 @@ public class LootTablesDatagen extends LootTableProvider {
                 output,
                 Collections.emptySet(),
                 List.of(
-                        new LootTableProvider.SubProviderEntry(BlockLootTableProvider::new, LootContextParamSets.BLOCK),
-                        new LootTableProvider.SubProviderEntry(EntityLootTableProvider::new, LootContextParamSets.ENTITY)
+                        new LootTableProvider.SubProviderEntry(BlockLootProvider::new, LootContextParamSets.BLOCK),
+                        new LootTableProvider.SubProviderEntry(EntityLootProvider::new, LootContextParamSets.ENTITY),
+                        new LootTableProvider.SubProviderEntry(ChestLootProvider::new, LootContextParamSets.CHEST)
                 ),
                 registries
         );
