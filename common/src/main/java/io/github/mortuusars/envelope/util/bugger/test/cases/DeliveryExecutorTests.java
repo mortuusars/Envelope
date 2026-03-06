@@ -18,10 +18,10 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 
-public class DeliveryHandlerTests extends BuggerTests {
+public class DeliveryExecutorTests extends BuggerTests {
     private final MinecraftServer server;
 
-    public DeliveryHandlerTests(MinecraftServer server) {
+    public DeliveryExecutorTests(MinecraftServer server) {
         this.server = server;
         add(new Test("TickDelivery_CallsCallbacksProperly", this::testCallbacks));
     }

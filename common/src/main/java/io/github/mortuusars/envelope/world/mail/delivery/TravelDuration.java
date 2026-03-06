@@ -8,19 +8,20 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
 
 public record TravelDuration(int ticks) {
-    public TravelDuration {
-        Preconditions.checkArgument(ticks > 0, "Duration must be larger than 0.");
-    }
-
-    public static final Codec<TravelDuration> CODEC = Codec.intRange(1, Integer.MAX_VALUE)
-          .xmap(TravelDuration::new, TravelDuration::ticks);
+    public static final Codec<TravelDuration> CODEC =
+          ExtraCodecs.POSITIVE_INT.xmap(TravelDuration::new, TravelDuration::ticks);
 
     public static final StreamCodec<ByteBuf, TravelDuration> STREAM_CODEC =
           ByteBufCodecs.INT.map(TravelDuration::new, TravelDuration::ticks);
 
     public static final TravelDuration DEFAULT = new TravelDuration(600); // 30 sec
+
+    public TravelDuration {
+        Preconditions.checkArgument(ticks > 0, "Duration must be larger than 0.");
+    }
 
     public int seconds() {
         return ticks / SharedConstants.TICKS_PER_SECOND;

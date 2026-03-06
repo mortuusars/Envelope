@@ -43,7 +43,7 @@ public class BackgroundCourier implements Courier, DeliveryExecutor {
 
     @Override
     public Optional<Delivery> getCurrentDelivery() {
-        return Optional.ofNullable(delivery);
+        return Optional.of(delivery);
     }
 
     @Override

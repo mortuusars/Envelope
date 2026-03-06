@@ -3,28 +3,19 @@ package io.github.mortuusars.envelope.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
-import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryHandlerTests;
+import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryExecutorTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
-import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.LetterContent;
-import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
-import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -55,7 +46,7 @@ public class EnvelopeDebugCommand {
     private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
         TestResults testResults = new BuggerTests()
               .add(new StackIngredientTests(context.getSource().getServer()))
-              .add(new DeliveryHandlerTests(context.getSource().getServer()))
+              .add(new DeliveryExecutorTests(context.getSource().getServer()))
               .add(new MailCraftingRecipeTests(context.getSource().getServer()))
               .add(new MailCraftingTests(context.getSource().getServer()))
               .run(count -> context.getSource().sendSuccess(() ->

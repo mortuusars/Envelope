@@ -2,10 +2,8 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
-import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
@@ -71,8 +69,8 @@ public interface DeliveryExecutor {
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
-            case STARTED, FINISHED -> 8;
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 5 * Ticks.SECOND;
+            case STARTED, FINISHED -> 5;
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 100;
             case TRAVELING_FROM_SENDER_TO_HUB, TRAVELING_FROM_HUB_TO_SENDER -> delivery.getRoute().getSenderToHubDuration().ticks();
             case TRAVELING_FROM_HUB_TO_RECIPIENT, TRAVELING_FROM_RECIPIENT_TO_HUB ->
                   delivery.getRoute().getRecipientToHubDuration().ticks();

@@ -28,14 +28,31 @@ public class BlockDropOffHandler implements MailDropOffHandler {
             return MailDropOffResult.PASS;
         }
 
+//        boolean inserted = getInboxByAddress(context.getService(), address)
+//              .map(inbox -> {
+//                  if (inbox.isInboxFull()) return false;
+//
+//                  ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
+//                  Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address));
+//                  Mail.setId(deliveredMail, Id.create(context.getService().getLevel()));
+//
+//                  if (inbox.addMail(deliveredMail)) {
+//                      inbox.onMailInserted(deliveredMail);
+//                      return true;
+//                  }
+//
+//                  return false;
+//              })
+//              .orElse(false);
+
         return getInboxByAddress(context.getService(), address)
               .map(inbox -> {
                   if (inbox.isInboxFull()) {
                       if (context.getDelivery().getPhase().isReturning()) {
-                          LOGGER.info("Cannot deliver mail to mailbox '{}': inbox is full.", address);
+                          LOGGER.debug("Cannot deliver mail to mailbox '{}': inbox is full.", address);
                           return MailDropOffResult.PASS;
                       } else {
-                          LOGGER.info("Cannot deliver mail to mailbox '{}': inbox is full. Returning to sender.", address);
+                          LOGGER.debug("Cannot deliver mail to mailbox '{}': inbox is full. Returning to sender.", address);
                           return MailDropOffResult.returned(mail, DeliveryRecord.Message.RECIPIENT_INBOX_IS_FULL);
                       }
                   }
@@ -49,20 +66,20 @@ public class BlockDropOffHandler implements MailDropOffHandler {
                       return MailDropOffResult.CONSUME;
                   } else {
                       if (context.getDelivery().getPhase().isReturning()) {
-                          LOGGER.info("Cannot deliver mail to mailbox '{}': mail cannot be inserted.", address);
+                          LOGGER.debug("Cannot deliver mail to mailbox '{}': mail cannot be inserted.", address);
                           return MailDropOffResult.PASS;
                       } else {
-                          LOGGER.info("Cannot deliver mail to mailbox '{}': mail cannot be inserted. Returning to sender.", address);
+                          LOGGER.debug("Cannot deliver mail to mailbox '{}': mail cannot be inserted. Returning to sender.", address);
                           return MailDropOffResult.returned(mail, DeliveryRecord.Message.UNABLE_TO_REACH);
                       }
                   }
               })
               .orElseGet(() -> {
                   if (context.getDelivery().getPhase().isReturning()) {
-                      LOGGER.info("Cannot deliver mail to mailbox '{}': address not found.", address);
+                      LOGGER.debug("Cannot deliver mail to mailbox '{}': address not found.", address);
                       return MailDropOffResult.PASS;
                   } else {
-                      LOGGER.info("Cannot deliver mail to mailbox '{}': address not found. Returning to sender.", address);
+                      LOGGER.debug("Cannot deliver mail to mailbox '{}': address not found. Returning to sender.", address);
                       return MailDropOffResult.returned(mail, DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
                   }
               });
