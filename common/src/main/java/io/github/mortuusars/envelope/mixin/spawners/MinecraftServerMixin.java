@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.mixin.spawners;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import io.github.mortuusars.envelope.world.entity.spawner.PigeonSpawner;
+import io.github.mortuusars.envelope.world.entity.spawner.PigeonInStructureSpawner;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.level.CustomSpawner;
@@ -23,7 +23,7 @@ public class MinecraftServerMixin {
     @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Registry;get(Lnet/minecraft/resources/ResourceKey;)Ljava/lang/Object;"))
     private void addToSpawnersList(ChunkProgressListener listener, CallbackInfo ci, @Local LocalRef<List<CustomSpawner>> spawners) {
         List<CustomSpawner> modifiedSpawnersList = new ArrayList<>(spawners.get());
-        modifiedSpawnersList.add(new PigeonSpawner());
+        modifiedSpawnersList.add(new PigeonInStructureSpawner());
         spawners.set(modifiedSpawnersList);
     }
 }

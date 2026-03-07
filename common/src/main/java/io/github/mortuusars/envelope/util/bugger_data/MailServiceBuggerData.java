@@ -34,9 +34,10 @@ public class MailServiceBuggerData extends NbtData {
 
     private void writeDebugInfo(MailService mailService, CompoundTag tag) {
         List<? extends Pigeon> pigeons = mailService.getLevel().getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
-        List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getCouriers();
+        List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getActiveCouriers();
 
         tag.putInt("mailboxes", mailService.getMailboxes().getAllAddresses().size());
+        tag.putInt("dropped_mail_count", mailService.getBackgroundDelivery().getDroppedMail().size());
         tag.putInt("payback_pending_mail_count", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
 
         tag.putInt("delivering_pigeons", pigeons.size());

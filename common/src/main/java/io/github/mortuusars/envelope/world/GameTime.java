@@ -11,6 +11,10 @@ import java.util.List;
 public interface GameTime {
     long get();
 
+    default int getAsInt() {
+        return (int) get();
+    }
+
     static GameTime of(Level level) {
         return level::getGameTime;
     }

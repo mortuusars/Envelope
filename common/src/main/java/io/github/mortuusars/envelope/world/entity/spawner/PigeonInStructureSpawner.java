@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PigeonSpawner implements CustomSpawner {
+public class PigeonInStructureSpawner implements CustomSpawner {
     protected static final int SPAWN_ATTEMPT_DELAY = 1000;
     protected int nextAttemptDelay;
 

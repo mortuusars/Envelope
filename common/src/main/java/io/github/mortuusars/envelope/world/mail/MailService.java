@@ -69,7 +69,7 @@ public class MailService {
     }
 
     public static boolean operatesIn(ResourceKey<Level> dimension) {
-        return dimension == Level.OVERWORLD;
+        return dimension.equals(Level.OVERWORLD);
     }
 
     public static boolean operatesIn(Level level) {

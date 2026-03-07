@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.entity;
+package io.github.mortuusars.envelope.world.entity.spawning;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
@@ -53,6 +53,10 @@ public record SpawnableEntityData(CustomData data) {
 
     @SuppressWarnings("deprecation")
     public @Nullable Entity createEntity(ServerLevel level) {
-        return EntityType.loadEntityRecursive(data.getUnsafe(), level, Function.identity());
+        @Nullable Entity entity = EntityType.loadEntityRecursive(data.getUnsafe(), level, Function.identity());
+        if (entity == null) {
+            LOGGER.error("Failed to create spawnable entity. Tag: {}", data.getUnsafe());
+        }
+        return entity;
     }
 }

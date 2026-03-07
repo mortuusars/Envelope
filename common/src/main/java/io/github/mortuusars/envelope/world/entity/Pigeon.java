@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
+import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
@@ -55,7 +56,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, FlyingAnimal, TransitionableCourier {
+public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, FlyingAnimal, PhysicalCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -660,13 +661,13 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         return switch (phase) {
             // Longer approach/depart phases to allow for pathfinding to finish
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 30 * Ticks.SECOND;
-            default -> TransitionableCourier.super.getPhaseDuration(level, delivery, phase);
+            default -> PhysicalCourier.super.getPhaseDuration(level, delivery, phase);
         };
     }
 
     @Override
     public void phaseStarted(ServerLevel level, Delivery delivery) {
-        TransitionableCourier.super.phaseStarted(level, delivery);
+        PhysicalCourier.super.phaseStarted(level, delivery);
         if (delivery.getPhase().isTraveling()) {
             transitionToBackground(level);
         }
@@ -689,7 +690,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
             return true;
         }
 
-        return TransitionableCourier.super.handlePhaseTransition(level, delivery);
+        return PhysicalCourier.super.handlePhaseTransition(level, delivery);
     }
 
     @Override

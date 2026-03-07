@@ -51,6 +51,7 @@ Misc
 - Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.
 - Small change to how `envelope:payback_subject` component is defined.
 - Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
+- Fixed couriers spawned after delivery is finished (when ended in unloaded chunk) not being tired.
 
 ## 0.6.0-Snapshot 1
 #### Added Mailing recipes

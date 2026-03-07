@@ -5,9 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.entity.spawning.SpawnableItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -22,32 +20,41 @@ public class BackgroundDelivery extends SavedData {
     public static final Codec<BackgroundDelivery> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           Codec.list(BackgroundCourier.CODEC)
                 .optionalFieldOf("couriers", Collections.emptyList())
-                .forGetter(BackgroundDelivery::getCouriers),
+                .forGetter(BackgroundDelivery::getActiveCouriers),
           Codec.list(FinishedBackgroundCourier.CODEC)
                 .optionalFieldOf("finished_couriers", Collections.emptyList())
-                .forGetter(BackgroundDelivery::getFinishedCouriers)
+                .forGetter(BackgroundDelivery::getFinishedCouriers),
+          Codec.list(SpawnableItem.CODEC)
+                .optionalFieldOf("dropped_items", Collections.emptyList())
+                .forGetter(BackgroundDelivery::getDroppedMail)
     ).apply(instance, BackgroundDelivery::new));
     public static final Logger LOGGER = LogUtils.getLogger();
 
     protected final List<BackgroundCourier> couriers;
     protected final List<BackgroundCourier> pendingCouriers = new ArrayList<>();
     protected final List<FinishedBackgroundCourier> finishedCouriers;
+    protected final List<SpawnableItem> droppedItems;
 
-    public BackgroundDelivery(List<BackgroundCourier> couriers, List<FinishedBackgroundCourier> finishedCouriers) {
+    public BackgroundDelivery(List<BackgroundCourier> couriers, List<FinishedBackgroundCourier> finishedCouriers, List<SpawnableItem> droppedItems) {
         this.couriers = new ArrayList<>(couriers);
         this.finishedCouriers = new ArrayList<>(finishedCouriers);
+        this.droppedItems = new ArrayList<>(droppedItems);
     }
 
     public BackgroundDelivery() {
-        this(Collections.emptyList(), Collections.emptyList());
+        this(Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
     }
 
-    public List<BackgroundCourier> getCouriers() {
+    public List<BackgroundCourier> getActiveCouriers() {
         return couriers;
     }
 
     public List<FinishedBackgroundCourier> getFinishedCouriers() {
         return finishedCouriers;
+    }
+
+    public List<SpawnableItem> getDroppedMail() {
+        return droppedItems;
     }
 
     public void addCourier(BackgroundCourier courier) {
@@ -72,29 +79,28 @@ public class BackgroundDelivery extends SavedData {
         }
     }
 
-    public void tick(ServerLevel level) {
-        for (int i = 0; i < couriers.size(); i++) {
-            BackgroundCourier courier = couriers.get(i);
-            courier.tick(level);
+    public void addDroppedMail(SpawnableItem item) {
+        droppedItems.add(item);
+        setDirty();
+    }
 
-            Delivery delivery = courier.getDelivery();
-            boolean ended = delivery.isEnded();
-
-            //TODO: let courier itself decide what to do next
-            if (ended)
-                if (courier.getOrigin().isRegular()) {
-                    FinishedBackgroundCourier finishedCourier = new FinishedBackgroundCourier(
-                          courier.getEntityData(), courier.getOrigin().getPos(), delivery.getMail());
-                    addFinishedCourier(finishedCourier);
-                } else if (!delivery.getMail().isEmpty()) {
-                    //TODO: handle undelivered service mail
-                }
-
-            if (ended) {
-                couriers.remove(i);
-                i--;
-            }
+    public void removeDroppedMail(SpawnableItem item) {
+        if (droppedItems.remove(item)) {
+            setDirty();
         }
+    }
+
+    // --
+
+    public void tick(ServerLevel level) {
+        couriers.removeIf(courier -> {
+            if (courier.isRemoved()) {
+                setDirty();
+                return true;
+            }
+            courier.tick(level);
+            return false;
+        });
         processPendingCouriers();
     }
 

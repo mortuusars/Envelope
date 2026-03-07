@@ -19,20 +19,18 @@ public class EnvelopeBuggerPage implements BuggerPage {
     public List<String> getLeftLines() {
         return Bugger.MAIL_SERVICE.get()
               .map(tag -> {
-                  int realPigeons = tag.getInt("delivering_pigeons");
-                  int backgroundPigeons = tag.getInt("background_delivering_pigeons");
-                  int backgroundFinishedPigeons = tag.getInt("background_finished_pigeons");
 
                   List<String> lines = new ArrayList<>(List.of(
                         "Mailboxes: " + tag.getInt("mailboxes"),
                         "",
-                        "Mail Awaiting Payback: " + tag.getInt("payback_pending_mail_count"),
+                        "Mail:",
+                        "  Dropped: " + tag.getInt("dropped_mail_count"),
+                        "  Awaiting Payback: " + tag.getInt("payback_pending_mail_count"),
                         "",
                         "Couriers:",
-                        "  Real: " + realPigeons,
-                        "  Background: " + backgroundPigeons,
-                        "  Finished: " + backgroundFinishedPigeons,
-                        ""
+                        "  Real: " + tag.getInt("delivering_pigeons"),
+                        "  Background: " + tag.getInt("background_delivering_pigeons"),
+                        "  Finished: " + tag.getInt("background_finished_pigeons")
                   ));
 
                   ListTag deliveries = tag.getList("deliveries", Tag.TAG_STRING);
