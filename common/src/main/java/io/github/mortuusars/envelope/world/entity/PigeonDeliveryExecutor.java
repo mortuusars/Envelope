@@ -50,14 +50,14 @@ public class PigeonDeliveryExecutor implements DeliveryExecutor {
         if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
             Mail.writeToLog(delivery.getMail(),
                   DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
-            delivery.setPhaseAndResetProgress(DeliveryPhase.APPROACHING_SENDER);
+            delivery.beginPhase(DeliveryPhase.APPROACHING_SENDER);
             return true;
         }
 
         if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
             Mail.writeToLog(delivery.getMail(),
                   DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
-            delivery.setPhaseAndResetProgress(DeliveryPhase.DEPARTING_RECIPIENT);
+            delivery.beginPhase(DeliveryPhase.DEPARTING_RECIPIENT);
             return true;
         }
 

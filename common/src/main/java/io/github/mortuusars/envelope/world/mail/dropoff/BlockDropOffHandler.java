@@ -28,23 +28,6 @@ public class BlockDropOffHandler implements MailDropOffHandler {
             return MailDropOffResult.PASS;
         }
 
-//        boolean inserted = getInboxByAddress(context.getService(), address)
-//              .map(inbox -> {
-//                  if (inbox.isInboxFull()) return false;
-//
-//                  ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
-//                  Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address));
-//                  Mail.setId(deliveredMail, Id.create(context.getService().getLevel()));
-//
-//                  if (inbox.addMail(deliveredMail)) {
-//                      inbox.onMailInserted(deliveredMail);
-//                      return true;
-//                  }
-//
-//                  return false;
-//              })
-//              .orElse(false);
-
         return getInboxByAddress(context.getService(), address)
               .map(inbox -> {
                   if (inbox.isInboxFull()) {

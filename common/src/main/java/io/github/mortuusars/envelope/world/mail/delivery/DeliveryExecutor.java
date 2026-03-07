@@ -42,7 +42,7 @@ public interface DeliveryExecutor {
                 }
             } else {
                 if (!handlePhaseTransition(level, delivery)) {
-                    delivery.setPhaseAndResetProgress(delivery.getPhase().next());
+                    delivery.beginPhase(delivery.getPhase().next());
                 }
             }
         }
@@ -80,13 +80,9 @@ public interface DeliveryExecutor {
     }
 
     default void phaseStarted(ServerLevel level, Delivery delivery) {
-        if (delivery.getPhase() == DeliveryPhase.STARTED) {
-            Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()));
-        }
     }
 
     default void phaseTicked(ServerLevel level, Delivery delivery) {
-
     }
 
     default void phaseCompleted(ServerLevel level, Delivery delivery) {
@@ -97,6 +93,9 @@ public interface DeliveryExecutor {
         final MailService service = MailService.of(level);
 
         switch (delivery.getPhase()) {
+            case STARTED -> {
+                Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()));
+            }
             case HANDLING_DELIVERY -> {
                 MailDropOffContext context = new MailDropOffContext(service, delivery.getRecipient(), delivery);
                 MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
@@ -130,7 +129,7 @@ public interface DeliveryExecutor {
 
         if (!service.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
             Mail.returned(delivery.getMail(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND);
-            delivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+            delivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return true;
         }
 
@@ -155,7 +154,7 @@ public interface DeliveryExecutor {
 
         if (getOrigin().isService() && shouldTerminateServiceDeliveryEarly(level, delivery)) {
             LOGGER.debug("Terminating service delivery [{}] early.", delivery.getId());
-            delivery.setPhaseAndResetProgress(DeliveryPhase.FINISHED);
+            delivery.beginPhase(DeliveryPhase.FINISHED);
             return true;
         }
 

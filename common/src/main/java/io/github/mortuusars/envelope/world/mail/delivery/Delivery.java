@@ -99,7 +99,7 @@ public class Delivery {
         setPhaseProgress(progress);
     }
 
-    public void setPhaseAndResetProgress(DeliveryPhase phase) {
+    public void beginPhase(DeliveryPhase phase) {
         setPhase(phase, 0);
     }
 

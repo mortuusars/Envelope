@@ -81,7 +81,7 @@ public class DeliveryExecutorTests extends BuggerTests {
         @Override
         public boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
             // Skip any logic and just transition linearly
-            delivery.setPhaseAndResetProgress(delivery.getPhase().next());
+            delivery.beginPhase(delivery.getPhase().next());
             return true;
         }
 

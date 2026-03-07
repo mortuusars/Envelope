@@ -143,7 +143,7 @@ public class PaybackDepartment {
             if (subject == null) {
                 LOGGER.info("Returning Payback Packing Box does not have a subject linked. Packing Box will be voided.");
                 delivery.setMail(ItemStack.EMPTY);
-                delivery.setPhaseAndResetProgress(DeliveryPhase.FINISHED);
+                delivery.beginPhase(DeliveryPhase.FINISHED);
                 return true;
             }
 
@@ -153,7 +153,7 @@ public class PaybackDepartment {
                             "which is not found in storage. Packing Box will be voided.",
                       subject.mail().getHoverName().getString(), subject.id());
                 delivery.setMail(ItemStack.EMPTY);
-                delivery.setPhaseAndResetProgress(DeliveryPhase.FINISHED);
+                delivery.beginPhase(DeliveryPhase.FINISHED);
                 return true;
             }
 
@@ -164,7 +164,7 @@ public class PaybackDepartment {
             }
 
             delivery.setMail(ItemStack.EMPTY);
-            delivery.setPhaseAndResetProgress(DeliveryPhase.FINISHED);
+            delivery.beginPhase(DeliveryPhase.FINISHED);
             return true;
         }
 
@@ -192,7 +192,7 @@ public class PaybackDepartment {
                   DeliveryRecord.sentFrom(getAddress()));
         }
 
-        subjectDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+        subjectDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
     }
 
     protected boolean sendPaybackPackingBoxToBuyer(Delivery subjectDelivery, PaybackSubject paybackSubject) {
@@ -222,7 +222,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(getAddress()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+            paybackDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -231,7 +231,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(getAddress()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+            paybackDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -239,7 +239,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.PAYBACK_SUBJECT_NOT_FOUND),
                   DeliveryRecord.sentFrom(getAddress()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+            paybackDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -248,7 +248,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(getAddress()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+            paybackDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -256,7 +256,7 @@ public class PaybackDepartment {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID),
                   DeliveryRecord.sentFrom(getAddress()));
-            paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+            paybackDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
             return;
         }
 
@@ -272,7 +272,7 @@ public class PaybackDepartment {
               .writeToLog(DeliveryRecord.sentFrom(getAddress()))
               .get();
         paybackDelivery.setMail(subject);
-        paybackDelivery.setPhaseAndResetProgress(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
+        paybackDelivery.beginPhase(DeliveryPhase.TRAVELING_FROM_HUB_TO_SENDER);
     }
 
     protected boolean sendPaymentPackageToSeller(Delivery paybackDelivery, PackageContents packageContents, ItemStack paybackPackage) {
