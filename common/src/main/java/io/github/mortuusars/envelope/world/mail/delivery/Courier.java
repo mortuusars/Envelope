@@ -6,8 +6,8 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
-import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
+import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.dropoff.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
@@ -16,6 +16,13 @@ import java.util.Optional;
 
 public interface Courier {
     Logger LOGGER = LogUtils.getLogger();
+
+    MailDropOffHandler DROP_OFF_HANDLER = MailDropOffHandler.chain(
+          new BaseDropOffHandler(),
+          new BlockDropOffHandler(),
+          new PlayerDropOffHandler(),
+          new EntityDropOffHandler()
+    );
 
     Optional<Delivery> getCurrentDelivery();
     CourierOrigin getOrigin();
@@ -97,30 +104,10 @@ public interface Courier {
             return;
         }
 
-        final MailService service = MailService.of(level);
-
         switch (delivery.getPhase()) {
-            case STARTED -> {
-                Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()));
-            }
-            case HANDLING_DELIVERY -> {
-                MailDropOffContext context = new MailDropOffContext(service, delivery.getRecipient(), delivery);
-                MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
-                if (result.isHandled()) {
-                    ItemStack mail = result.getMail();
-                    if (result.isReply()) {
-                        Mail.writeToLog(mail, DeliveryRecord.sentFrom(delivery.getRecipient()));
-                    }
-                    delivery.setMail(mail);
-                }
-            }
-            case HANDLING_RETURN -> {
-                MailDropOffContext context = new MailDropOffContext(service, delivery.getSender(), delivery);
-                MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
-                if (result.isHandled()) {
-                    delivery.setMail(result.getMail());
-                }
-            }
+            case STARTED -> Mail.writeToLog(delivery.getMail(), DeliveryRecord.sentFrom(delivery.getSender()));
+            case HANDLING_DELIVERY -> handleMailDropOff(level, delivery, delivery.getRecipient());
+            case HANDLING_RETURN -> handleMailDropOff(level, delivery, delivery.getSender());
         }
     }
 
@@ -170,6 +157,23 @@ public interface Courier {
         }
 
         return false;
+    }
+
+    default void handleMailDropOff(ServerLevel level, Delivery delivery, Address recipient) {
+        MailDropOffContext context = new MailDropOffContext(MailService.of(level), recipient, delivery);
+        MailDropOffResult result = DROP_OFF_HANDLER.handle(context);
+
+        if (result.isHandled()) {
+            ItemStack mail = result.getMail();
+            if (result.isReply()) {
+                if (delivery.getPhase().isReturning()) {
+                    LOGGER.error("Received reply in the returning phase. This must be an error. Delivery: {}", delivery);
+                } else {
+                    Mail.writeToLog(mail, DeliveryRecord.sentFrom(delivery.getRecipient()));
+                }
+            }
+            delivery.setMail(mail);
+        }
     }
 
     /**

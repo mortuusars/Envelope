@@ -29,12 +29,6 @@ public class DeliveryManager {
           "error.envelope.delivery.unknown_address");
 
     private final MailService mailService;
-    private final MailDropOffHandler dropOffHandler = MailDropOffHandler.chain(
-          new BaseDropOffHandler(),
-          new BlockDropOffHandler(),
-          new PlayerDropOffHandler(),
-          new EntityDropOffHandler()
-    );
 
     public DeliveryManager(MailService mailService) {
         this.mailService = mailService;
@@ -87,9 +81,5 @@ public class DeliveryManager {
             case EntityAddress entity -> true;
             default -> false;
         };
-    }
-
-    public MailDropOffResult handleMailDropOff(MailDropOffContext context) {
-        return dropOffHandler.handle(context);
     }
 }

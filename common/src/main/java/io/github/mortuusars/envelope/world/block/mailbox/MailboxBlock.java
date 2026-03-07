@@ -3,11 +3,11 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
-import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
+import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.network.Packets;
 import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
-import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
@@ -16,9 +16,6 @@ import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
-import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
-import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,6 +36,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,8 +49,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public class MailboxBlock extends BaseEntityBlock {
     public static final MapCodec<MailboxBlock> CODEC = simpleCodec(MailboxBlock::new);
@@ -161,20 +157,19 @@ public class MailboxBlock extends BaseEntityBlock {
 
         if (player.isCreative()
               && stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof BlockAddress recipientAddress
+              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof BlockAddress address
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
-              && blockEntity.getAddress().equals(recipientAddress)) {
-            if (level instanceof ServerLevel serverLevel) {
-                MailService service = MailService.of(serverLevel);
-                Delivery delivery = new Delivery(Id.create(serverLevel), Optional.of(player.getUUID()), new PlayerAddress(player),
-                      recipientAddress, stack.split(1), DeliveryRoute.EMPTY, DeliveryPhase.HANDLING_DELIVERY, 0, false);
-                MailDropOffContext context = new MailDropOffContext(service, recipientAddress, delivery);
-                MailDropOffResult result = service.getDeliveryManager().handleMailDropOff(context);
-                ItemStack resultMail = result.getMail().copy();
-                if (player.getItemInHand(hand).isEmpty()) {
-                    player.setItemInHand(hand, resultMail);
-                } else if (!player.addItem(resultMail)) {
-                    player.drop(resultMail, false);
+              && blockEntity.getAddress().equals(address)) {
+            if (level instanceof ServerLevel) {
+                ItemStack mail = Mail.of(stack.copyWithCount(1))
+                      .writeToLog(DeliveryRecord.sentFrom(new PlayerAddress(player)))
+                      .writeToLog(DeliveryRecord.arrivedTo(address))
+                      .sender(new PlayerAddress(player))
+                      .id(Id.create(level))
+                      .get();
+                if (blockEntity.addMail(mail)) {
+                    player.getItemInHand(hand).shrink(1);
+                    blockEntity.onMailInserted(mail);
                 }
             }
             return ItemInteractionResult.SUCCESS;
@@ -187,8 +182,10 @@ public class MailboxBlock extends BaseEntityBlock {
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
                         pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
-                    pigeon.setOrigin(CourierOrigin.service());
-                    if (!player.isCreative()) {
+                    if (player.isCreative()) {
+                        pigeon.setOrigin(CourierOrigin.service());
+                    } else {
+                        pigeon.setOrigin(CourierOrigin.regular(pos));
                         stack.shrink(1);
                     }
                 } else {
@@ -306,13 +303,13 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new MailboxBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends net.minecraft.world.level.block.entity.BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
               ? null
               : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.MAILBOX.get(),
