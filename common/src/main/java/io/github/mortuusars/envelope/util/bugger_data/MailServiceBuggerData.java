@@ -54,7 +54,7 @@ public class MailServiceBuggerData extends NbtData {
 
     private @NotNull String formDeliveryString(MailService mailService, Courier courier) {
         Delivery delivery = courier.getCurrentDelivery().orElseThrow();
-        int phaseDuration = courier.getDeliveryExecutor().getPhaseDuration(mailService.getLevel(), delivery, delivery.getPhase());
+        int phaseDuration = courier.getPhaseDuration(mailService.getLevel(), delivery, delivery.getPhase());
 
         return ChatFormatting.AQUA + delivery.getSender().format().withIcon().toString() + ChatFormatting.RESET +
               " " + EnvelopeSymbols.SMALL_FILLED_ARROW_RIGHT + " " +

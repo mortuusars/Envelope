@@ -3,11 +3,7 @@ package io.github.mortuusars.envelope.util.bugger.test.cases;
 import com.mojang.serialization.DataResult;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.Test;
-import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
-import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import io.github.mortuusars.envelope.world.mail.delivery.DeliveryExecutor;
-import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
-import io.github.mortuusars.envelope.world.mail.delivery.DeliveryRoute;
+import io.github.mortuusars.envelope.world.mail.delivery.*;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
 import net.minecraft.Util;
@@ -18,16 +14,15 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 
-public class DeliveryExecutorTests extends BuggerTests {
+public class CourierDeliveryTests extends BuggerTests {
     private final MinecraftServer server;
 
-    public DeliveryExecutorTests(MinecraftServer server) {
+    public CourierDeliveryTests(MinecraftServer server) {
         this.server = server;
         add(new Test("TickDelivery_CallsCallbacksProperly", this::testCallbacks));
     }
 
     private DataResult<Boolean> testCallbacks() {
-        TestDeliveryExecutor handler = new TestDeliveryExecutor();
         Delivery delivery = new Delivery(
               Id.createUnsafe(0),
               Optional.empty(),
@@ -39,38 +34,49 @@ public class DeliveryExecutorTests extends BuggerTests {
               0,
               false
         );
+        TestCourier courier = new TestCourier(delivery);
 
         while (!delivery.isEnded()) {
-            handler.tickDelivery(server.overworld(), delivery);
+            courier.tickDelivery(server.overworld(), delivery);
         }
 
-        for (Map.Entry<DeliveryPhase, BitSet> check : handler.checks.entrySet()) {
+        for (Map.Entry<DeliveryPhase, BitSet> check : courier.checks.entrySet()) {
             BitSet set = check.getValue();
             if (!set.get(0)) return DataResult.error(() -> check.getKey() + " - not called phaseStarted");
             if (!set.get(1)) return DataResult.error(() -> check.getKey() + " - not called phaseTicked");
             if (!set.get(2)) return DataResult.error(() -> check.getKey() + " - not called phaseCompleted");
         }
 
-        if (!handler.endedCorrectly) {
+        if (!courier.endedCorrectly) {
             return DataResult.error(() -> "endDelivery was not called properly.");
         }
 
         return DataResult.success(true);
     }
 
-    private static class TestDeliveryExecutor implements DeliveryExecutor {
+    private static class TestCourier implements Courier {
         public final Map<DeliveryPhase, BitSet> checks = Util.make(new HashMap<>(), map -> {
             for (DeliveryPhase phase : DeliveryPhase.values()) {
                 map.put(phase, new BitSet());
             }
         });
         public boolean endedCorrectly;
+        public Delivery delivery;
+
+        public TestCourier(Delivery delivery) {
+            this.delivery = delivery;
+        }
 
         @Override
         public void endDelivery(ServerLevel level, Delivery delivery) {
             if (delivery.getPhase() == DeliveryPhase.FINISHED) {
                 endedCorrectly = true;
             }
+        }
+
+        @Override
+        public Optional<Delivery> getCurrentDelivery() {
+            return Optional.of(delivery);
         }
 
         @Override
@@ -87,7 +93,7 @@ public class DeliveryExecutorTests extends BuggerTests {
 
         @Override
         public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
-            return DeliveryExecutor.super.getPhaseDuration(level, delivery, phase) - 1;
+            return Courier.super.getPhaseDuration(level, delivery, phase) - 1;
         }
 
         @Override

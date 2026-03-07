@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
-import io.github.mortuusars.envelope.util.bugger.test.cases.DeliveryExecutorTests;
+import io.github.mortuusars.envelope.util.bugger.test.cases.CourierDeliveryTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
@@ -46,7 +46,7 @@ public class EnvelopeDebugCommand {
     private static int runBuggerTests(CommandContext<CommandSourceStack> context) {
         TestResults testResults = new BuggerTests()
               .add(new StackIngredientTests(context.getSource().getServer()))
-              .add(new DeliveryExecutorTests(context.getSource().getServer()))
+              .add(new CourierDeliveryTests(context.getSource().getServer()))
               .add(new MailCraftingRecipeTests(context.getSource().getServer()))
               .add(new MailCraftingTests(context.getSource().getServer()))
               .run(count -> context.getSource().sendSuccess(() ->

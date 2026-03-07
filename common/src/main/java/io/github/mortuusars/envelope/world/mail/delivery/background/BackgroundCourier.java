@@ -5,13 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.world.mail.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import io.github.mortuusars.envelope.world.mail.delivery.DeliveryExecutor;
 import io.github.mortuusars.envelope.world.entity.SpawnableEntityData;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.Optional;
 
-public class BackgroundCourier implements Courier, DeliveryExecutor {
+public class BackgroundCourier implements Courier {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
           SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::getEntityData),
           CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::getOrigin),
@@ -44,11 +43,6 @@ public class BackgroundCourier implements Courier, DeliveryExecutor {
     @Override
     public Optional<Delivery> getCurrentDelivery() {
         return Optional.of(delivery);
-    }
-
-    @Override
-    public DeliveryExecutor getDeliveryExecutor() {
-        return this;
     }
 
     // --

@@ -3,12 +3,14 @@ package io.github.mortuusars.envelope.world.entity;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
+import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.delivery.*;
@@ -110,7 +112,6 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     protected PigeonholeHandler pigeonholeHandler;
     protected MailboxHandler mailboxHandler;
-    protected PigeonDeliveryExecutor deliveryHandler;
 
     protected @Nullable Delivery delivery;
     protected @Nullable CourierOrigin origin;
@@ -121,7 +122,6 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         pigeonholeHandler = new PigeonholeHandler();
         pigeonholeHandler.setRandomWantCooldownUpToDefault(level.getRandom());
         mailboxHandler = new MailboxHandler();
-        deliveryHandler = new PigeonDeliveryExecutor(this);
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
         setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
     }
@@ -600,11 +600,6 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     // -- Courier
 
-    @Override
-    public DeliveryExecutor getDeliveryExecutor() {
-        return deliveryHandler;
-    }
-
     public boolean canStartDelivery() {
         return !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
     }
@@ -658,6 +653,71 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     @Override
     public SpawnableEntityData toSpawnableData() {
         return SpawnableEntityData.of(this, IGNORED_TAGS);
+    }
+
+    @Override
+    public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
+        return switch (phase) {
+            // Longer approach/depart phases to allow for pathfinding to finish
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 30 * Ticks.SECOND;
+            default -> TransitionableCourier.super.getPhaseDuration(level, delivery, phase);
+        };
+    }
+
+    @Override
+    public void phaseStarted(ServerLevel level, Delivery delivery) {
+        TransitionableCourier.super.phaseStarted(level, delivery);
+        if (delivery.getPhase().isTraveling()) {
+            transitionToBackground(level);
+        }
+        onDeliveryChanged();
+    }
+
+    @Override
+    public boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
+        if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
+            Mail.writeToLog(delivery.getMail(),
+                  DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
+            delivery.beginPhase(DeliveryPhase.APPROACHING_SENDER);
+            return true;
+        }
+
+        if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
+            Mail.writeToLog(delivery.getMail(),
+                  DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
+            delivery.beginPhase(DeliveryPhase.DEPARTING_RECIPIENT);
+            return true;
+        }
+
+        return TransitionableCourier.super.handlePhaseTransition(level, delivery);
+    }
+
+    @Override
+    public void endDelivery(ServerLevel level, Delivery delivery) {
+        if (!delivery.getMail().isEmpty()) {
+            spawnAtLocation(delivery.getMail().copy());
+            Pigeon.LOGGER.info("{} has dropped undelivered mail on the ground.", getName().getString());
+            delivery.setMail(ItemStack.EMPTY);
+        }
+
+        setDelivery(null);
+
+        if (getOrigin().isService()) {
+            onVanished(level);
+            discard();
+        } else {
+            setOrigin(null);
+            getPigeonholeHandler().setTargetPos(getPigeonholeHandler().getLastReleasePos());
+            // Prevent Pigeon entering Pigeonhole immediately:
+            getPigeonholeHandler().setWantCooldown(20);
+            setTiredTicks(Config.Server.PIGEON_TIRED_AFTER_DELIVERY_TICKS.get());
+        }
+    }
+
+    protected boolean hasReachedSegmentEndPos(Delivery delivery) {
+        return delivery.getRoute().getSegment(delivery.getPhase()).endPos()
+              .map(this::hasReachedTarget)
+              .orElse(true);
     }
 
     // -- Save / Load
