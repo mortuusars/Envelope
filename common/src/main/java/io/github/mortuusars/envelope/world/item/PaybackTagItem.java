@@ -37,25 +37,33 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
         if (action != ClickAction.SECONDARY) return false;
         if (!slot.allowModification(player)) return false;
-        if (!slot.getItem().is(Envelope.Tags.Items.MAILABLE)) return false;
+        ItemStack target = slot.getItem();
+        if (!target.is(Envelope.Tags.Items.MAILABLE)) return false;
 
         @Nullable PaybackRequest request = stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
-        @Nullable PaybackRequest currentRequest = slot.getItem().get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+        @Nullable PaybackRequest currentRequest = target.get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
 
         if (request != null) {
+            if (stack.getCount() < target.getCount()) {
+                player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 1, 1);
+                return true;
+            }
+
             if (request.equals(currentRequest)) {
                 return true; // do nothing
             }
-            slot.getItem().set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
+            target.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
         } else {
             if (currentRequest == null) {
                 return true; // do nothing
             }
-            slot.getItem().remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+            target.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
         }
 
         slot.setChanged();
-        stack.shrink(1);
+        if (request != null) {
+            stack.shrink(target.getCount());
+        }
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
         return true;
     }

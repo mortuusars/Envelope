@@ -46,6 +46,8 @@ Mail Entities
   - Querying their uses (R-Click or [U]) will show available recipes associated with that address.
 
 Misc
+- Added **Address Tag** and **Payback Tag** application recipes.
+- Applying **Address Tag** and **Payback Tag** in GUI now consumes 1 tag per mail, instead of 1 per stack.  
 - Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
 - **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
 - Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.

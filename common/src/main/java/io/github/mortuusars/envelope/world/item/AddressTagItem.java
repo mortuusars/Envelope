@@ -63,6 +63,11 @@ public class AddressTagItem extends Item implements ApplicatorItem {
             return true; // Do nothing
         }
 
+        if (address != null && stack.getCount() < target.getCount()) {
+            player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 1, 1);
+            return true;
+        }
+
         ItemStack result = target.copy();
         Mail.setRecipient(result, address);
         Mail.removePreviousDeliveryData(result);
@@ -75,7 +80,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
         slot.setByPlayer(result);
 
         if (address != null) {
-            stack.shrink(1);
+            stack.shrink(target.getCount());
         }
 
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);

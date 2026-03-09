@@ -3,7 +3,10 @@ package io.github.mortuusars.envelope.neoforge.datagen.server;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipeBuilder;
+import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
@@ -19,6 +22,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.ShulkerBoxColoring;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
@@ -90,6 +94,10 @@ public class RecipesDatagen extends RecipeProvider {
               .pattern(" I ")
               .unlockedBy("has_mailable", has(Envelope.Tags.Items.MAILABLE))
               .save(output);
+
+        SpecialRecipeBuilder.special(LetterCloningRecipe::new).save(output, Envelope.resource("letter_cloning"));
+        SpecialRecipeBuilder.special(AddressTagApplicationRecipe::new).save(output, Envelope.resource("address_tag_application"));
+        SpecialRecipeBuilder.special(PaybackTagApplicationRecipe::new).save(output, Envelope.resource("payback_tag_application"));
     }
 
     protected void pigeonhole(RecipeOutput output, ItemLike result, ItemLike planks) {

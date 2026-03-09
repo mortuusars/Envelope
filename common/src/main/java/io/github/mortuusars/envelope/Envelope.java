@@ -12,9 +12,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
-import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.MailCraftingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -357,8 +355,17 @@ public class Envelope {
         public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> MAIL_CRAFTING =
-              Register.recipeSerializer("mail_crafting", MailCraftingRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<?>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer("address_tag_application",
+              () -> new SimpleCraftingRecipeSerializer<>(
+                    AddressTagApplicationRecipe::new));
+
+        public static final Supplier<RecipeSerializer<?>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer("payback_tag_application",
+              () -> new SimpleCraftingRecipeSerializer<>(
+                    PaybackTagApplicationRecipe::new));
+
+        public static final Supplier<RecipeSerializer<?>> MAIL_CRAFTING = Register.recipeSerializer("mail_crafting",
+              MailCraftingRecipe.Serializer::new);
+
 
         static void init() {
         }
