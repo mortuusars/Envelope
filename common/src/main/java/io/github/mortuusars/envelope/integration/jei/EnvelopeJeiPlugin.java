@@ -23,10 +23,7 @@ import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRe
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.ingredients.IIngredientType;
-import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 import mezz.jei.api.registration.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -61,7 +58,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
         if (Config.Client.JEI_ENTITY_ADDRESS_INGREDIENT.get()) {
             List<EntityAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
                   .stream()
-                  .map(recipe -> recipe.value().getEntityAddress())
+                  .map(recipe -> recipe.value().getAddress())
                   .distinct()
                   .filter(address -> !address.getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
                   .toList();
@@ -85,7 +82,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .getRecipeManager()
               .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
               .stream()
-              .filter(recipe -> !recipe.value().getEntityAddress().getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
+              .filter(recipe -> !recipe.value().getAddress().getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
               .toList();
 
         registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, deliveryRecipes);

@@ -80,7 +80,7 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
 
     public List<RecipeHolder<MailRecipe>> getAllRecipes(ServerLevel level, EntityAddress address) {
         return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get()).stream()
-              .filter(recipeHolder -> recipeHolder.value().getEntityAddress().equals(address))
+              .filter(recipeHolder -> recipeHolder.value().getAddress().equals(address))
               .collect(Collectors.toList());
     }
 
@@ -104,7 +104,6 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
                 break;
             }
 
-            result = recipe.assembleFinal(input, level);
             result.onCraftedBySystem(level);
             experience += recipe.getExperience();
 

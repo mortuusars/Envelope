@@ -35,7 +35,7 @@ public class MailCraftingRecipe implements MailRecipe {
     }
 
     @Override
-    public EntityAddress getEntityAddress() {
+    public EntityAddress getAddress() {
         return address;
     }
 
@@ -139,7 +139,7 @@ public class MailCraftingRecipe implements MailRecipe {
               RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
                     .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
                     .fieldOf("entity")
-                    .forGetter(MailCraftingRecipe::getEntityAddress),
+                    .forGetter(MailCraftingRecipe::getAddress),
               StackIngredient.CODEC.listOf(1, 6)
                     .fieldOf("ingredients")
                     .forGetter(MailCraftingRecipe::getRequestedIngredients),
@@ -152,7 +152,7 @@ public class MailCraftingRecipe implements MailRecipe {
         ).apply(i, MailCraftingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MailCraftingRecipe> STREAM_CODEC = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, MailCraftingRecipe::getEntityAddress,
+              EntityAddress.STREAM_CODEC, MailCraftingRecipe::getAddress,
               StackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list(6)), MailCraftingRecipe::getRequestedIngredients,
               ItemStack.STREAM_CODEC, MailCraftingRecipe::getResult,
               ByteBufCodecs.FLOAT, MailCraftingRecipe::getExperience,

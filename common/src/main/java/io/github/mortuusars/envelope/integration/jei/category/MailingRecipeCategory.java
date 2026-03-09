@@ -39,9 +39,9 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               .addItemLike(Envelope.Items.PACKAGE.get());
 
         builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
-              .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getEntityAddress());
+              .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getAddress());
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-              .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getEntityAddress());
+              .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getAddress());
 
         for (int row = 0; row < 2; row++) {
             for (int column = 0; column < 3; column++) {
@@ -77,7 +77,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
-        Component component = recipeHolder.value().getEntityAddress()
+        Component component = recipeHolder.value().getAddress()
               .format()
               .withIcon()
               .toComponent();
