@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item.crafting;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.PaybackTagItem;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -65,9 +66,7 @@ public class PaybackTagApplicationRecipe extends CustomRecipe {
             return ItemStack.EMPTY;
         }
 
-        ItemStack result = target.copyWithCount(1);
-        result.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, tag.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS));
-        return result;
+        return Mail.setPaybackRequest(target.copyWithCount(1), tag.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS));
     }
 
     @Override

@@ -7,17 +7,26 @@ import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
+import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
+import io.github.mortuusars.envelope.integration.jei.extensions.LetterCloningRecipeExtension;
+import io.github.mortuusars.envelope.integration.jei.extensions.PaybackTagApplicationRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.ingredient.EntityAddressIngredientHelper;
 import io.github.mortuusars.envelope.integration.jei.ingredient.EntityAddressIngredientRenderer;
 import io.github.mortuusars.envelope.integration.jei.util.InHandRecipeTransferInfo;
 import io.github.mortuusars.envelope.integration.jei.util.PaybackTagGhostIngredientHandler;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.ingredients.IIngredientType;
+import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 import mezz.jei.api.registration.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -80,6 +89,13 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .toList();
 
         registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, deliveryRecipes);
+    }
+
+    @Override
+    public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
+        registration.getCraftingCategory().addExtension(LetterCloningRecipe.class, new LetterCloningRecipeExtension());
+        registration.getCraftingCategory().addExtension(AddressTagApplicationRecipe.class, new AddressTagApplicationRecipeExtension());
+        registration.getCraftingCategory().addExtension(PaybackTagApplicationRecipe.class, new PaybackTagApplicationRecipeExtension());
     }
 
     @Override

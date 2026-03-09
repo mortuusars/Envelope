@@ -2,13 +2,10 @@ package io.github.mortuusars.envelope.world.item.mail;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.PackageItem;
-import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.component.LetterContent;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -65,8 +62,9 @@ public final class Mail {
         return getRecipientOrElse(stack, Address.UNKNOWN);
     }
 
-    public static void setRecipient(@NotNull ItemStack stack, @Nullable Address recipient) {
+    public static ItemStack setRecipient(@NotNull ItemStack stack, @Nullable Address recipient) {
         stack.set(Envelope.DataComponents.MAIL_RECIPIENT, recipient);
+        return stack;
     }
 
     // -- Id
@@ -85,6 +83,13 @@ public final class Mail {
 
     public static ItemStack setId(ItemStack stack, Id id) {
         stack.set(Envelope.DataComponents.MAIL_ID, id);
+        return stack;
+    }
+
+    // -- Payback
+
+    public static ItemStack setPaybackRequest(@NotNull ItemStack stack, @Nullable PaybackRequest request) {
+        stack.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
         return stack;
     }
 
