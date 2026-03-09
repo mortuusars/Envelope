@@ -18,7 +18,7 @@ Package
 - Fixed overlays not rendering over package slots.
 - Fixed being able to insert items into opened package, if items were the same.
 
-Crafting
+Mail Crafting
 - Added `experience` field to mail crafting recipes. Applied to resulting package and awarded when player opens it.
   - Works the same as in smelting recipes.
 - Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
@@ -52,6 +52,7 @@ Misc
 - Small change to how `envelope:payback_subject` component is defined.
 - Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
 - Fixed couriers spawned after delivery is finished (when ended in unloaded chunk) not being tired.
+- [JEI] Clicking on an arrow in Mailbox menu will show all mail recipes. 
 
 ## 0.6.0-Snapshot 1
 #### Added Mailing recipes
