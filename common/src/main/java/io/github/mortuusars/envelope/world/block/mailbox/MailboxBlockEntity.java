@@ -51,6 +51,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public static final int SLOT_FOOD = 0;
     public static final int SLOT_MAIL = 1;
     public static final int INBOX_SLOT = 2;
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private NonNullList<ItemStack> items = NonNullList.withSize(REGULAR_SLOTS, ItemStack.EMPTY);
@@ -240,24 +241,21 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
         ItemStack mail = Mail.removePreviousDeliveryData(mailStack.copyWithCount(1));
 
-        return MailService.of(level).getDeliveryManager()
+        MailService.of(level).getDeliveryManager()
               .start(pigeon, Delivery.draft()
                     .deliver(mail)
                     .from(getAddress())
                     .to(Mail.getRecipientOrUnknown(mail))
-                    .owner(getOwner()))
-              .getValue()
-              .map(delivery -> {
-                  removeItem(SLOT_MAIL, 1);
-                  removeItem(SLOT_FOOD, 1);
+                    .owner(getOwner()));
 
-                  Vec3 pos = pigeon.position();
-                  level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
-                  level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
+        removeItem(SLOT_MAIL, 1);
+        removeItem(SLOT_FOOD, 1);
 
-                  return true;
-              })
-              .orElse(false);
+        Vec3 pos = pigeon.position();
+        level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
+        level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
+
+        return true;
     }
 
     // -- Inbox

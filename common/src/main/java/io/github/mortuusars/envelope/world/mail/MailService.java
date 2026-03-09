@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope.world.mail;
 import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.util.result.Result;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.DeliveryManager;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -161,16 +161,16 @@ public class MailService {
         return getLevel().getGameTime();
     }
 
-    public Result<DeliveryManager.StartedDelivery> sendCourierDeathNotice(LivingEntity courier, Delivery delivery, DamageSource damageSource) {
+    public void sendCourierDeathNotice(LivingEntity courier, Delivery delivery, DamageSource damageSource) {
         Address recipient = delivery.getSender();
 
         if (!(recipient instanceof BlockAddress) && !(recipient instanceof PlayerAddress)) {
-            return Result.error("Cannot send death notice: recipient is not 'real' (player).");
+            return;
         }
 
         ItemStack letter = createCourierDeathNoticeLetter(courier, delivery, damageSource);
 
-        return getDeliveryManager().startService(Delivery.draft()
+        getDeliveryManager().startService(Delivery.draft()
               .deliver(letter)
               .from(getAddress())
               .to(recipient));
@@ -206,26 +206,5 @@ public class MailService {
 
     public static void init() {
         Platform.registerEntityDropOffHandlers();
-
-        /* test
-        EntityMailDropOffHandlerRegistry.register(MailEntities.TRADE_OFFICE, context -> {
-            ResourceLocation dataId = Envelope.resource("test_mail_dropoff_handler");
-            CompoundTag data = context.getPersistentData(dataId);
-
-            long elapsedSinceLastReceive = GameTime.of(context.getLevel()).elapsedSince(data.getLong("last_receive")).get();
-            if (elapsedSinceLastReceive < 600) {
-                return MailDropOffResult.returned(context.getMail(), Component.literal("Is On Cooldown"));
-            }
-
-            data.putLong("last_receive", context.getLevel().getGameTime());
-            data.putInt("count", data.getInt("count") + 1);
-            context.setPersistentData(dataId, data);
-
-            return MailDropOffResult.reply(Mail.createPackage(BuiltInLootTables.SIMPLE_DUNGEON)
-                  .writeToLog(DeliveryRecord.sentFrom(context.getTarget()))
-                  .set(DataComponents.LORE, new ItemLore(List.of(Component.literal("I stole if from the dungeon"))))
-                  .get());
-        });
-        */
     }
 }

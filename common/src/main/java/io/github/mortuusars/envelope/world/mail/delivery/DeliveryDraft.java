@@ -85,7 +85,6 @@ public class DeliveryDraft {
 
     // --
 
-
     @Override
     public String toString() {
         return "DeliveryDraft{" +

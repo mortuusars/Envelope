@@ -59,6 +59,11 @@ public class EnvelopeCommand {
 
         Address recipient = Mail.getRecipientOrUnknown(mail);
 
+        if (mail.isEmpty()) {
+            context.getSource().sendFailure(Component.literal("Cannot send: mail is empty."));
+            return 0;
+        }
+
         if (recipient.equals(Address.UNKNOWN)) {
             context.getSource().sendFailure(Component.literal("Cannot send: recipient is not defined."));
             return 0;
@@ -68,15 +73,10 @@ public class EnvelopeCommand {
               .startService(Delivery.draft()
                     .deliver(mail)
                     .from(sender)
-                    .to(recipient))
-              .ifPresentOrElse(
-                    delivery -> {
-                        Component message = Component.literal("Mail sent to ")
-                              .append(delivery.delivery().getRecipient().format().asRecipient().toComponent());
-                        context.getSource().sendSuccess(() -> message, true);
-                    },
-                    error -> context.getSource().sendFailure(Component.literal("Cannot send: ").append(error.getTranslation()))
-              );
+                    .to(recipient));
+
+        Component message = Component.literal("Mail sent to ").append(recipient.format().asRecipient().toComponent());
+        context.getSource().sendSuccess(() -> message, true);
 
         return 0;
     }
