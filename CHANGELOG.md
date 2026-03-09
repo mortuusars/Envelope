@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## 0.6.0-Snapshot 2
 Payback Tag
 - Added drag and drop from JEI support.
 - Added payback request duration selector.
