@@ -162,10 +162,6 @@
   "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
   "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
 
-  "error.envelope.delivery.same_addresses": "Recipient address cannot be the same as sender address.",
-  "error.envelope.delivery.unknown_address": "Cannot deliver to unknown address.",
-  "error.envelope.delivery.no_mail": "No mail to deliver.",
-
   "letter.envelope.courier_death_notice.name": "Courier Death Notice",
   "letter.envelope.courier_death_notice.title": "     Courier Death Notice\n\n",
 

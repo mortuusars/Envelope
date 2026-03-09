@@ -40,6 +40,8 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
 
         builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
               .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getEntityAddress());
+        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
+              .addIngredient(EnvelopeJeiPlugin.ENTITY_ADDRESS_INGREDIENT, recipe.getEntityAddress());
 
         for (int row = 0; row < 2; row++) {
             for (int column = 0; column < 3; column++) {
