@@ -4,23 +4,19 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.item.crafting.CraftingResult;
-import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.PackageRecipeInput;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailCrafting;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CraftingDropOffHandler implements MailDropOffHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -48,94 +44,52 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
             return MailDropOffResult.CONSUME;
         }
 
-        PackageContents packageContents = PackageContents.from(mail);
+        PackageContents packageContents = PackageContents.of(mail);
         if (packageContents.isEmpty()) {
             return MailDropOffResult.PASS;
         }
 
-        PackageRecipeInput input = PackageRecipeInput.of(packageContents);
-
-        @Nullable MailRecipe recipe = findMatchingRecipe(context.getLevel(), address, input);
+        @Nullable MailingRecipe recipe = MailCrafting.findMatchingRecipe(address, packageContents, context.getLevel())
+              .map(RecipeHolder::value)
+              .orElse(null);
         if (recipe == null) {
             return MailDropOffResult.PASS;
         }
 
-        CraftingResult result = craft(context.getLevel(), recipe, input);
+        MailCrafting.Result result = MailCrafting.craft(context.getLevel(), recipe, packageContents, sender);
 
-        if (result.output().isEmpty()) {
-            LOGGER.warn("No results from the mail crafting.");
-            return MailDropOffResult.returned(mail, DeliveryRecord.Message.CRAFTING_UNABLE_TO_PROCESS);
+        List<ItemStack> results;
+
+        if (recipe.onlyOneCraftPerDelivery() && result.output().size() == 1 && result.output().getFirst().is(Envelope.Tags.Items.MAILABLE)) {
+            results = result.output();
+        } else {
+            results = Mail.createPackages(result.output(), pkg -> pkg.recipient(sender));
+
+            // It's not ideal that all experience is on one package.
+            // But implementing it per package would be more complicated, and usually there's only one anyway.
+            results.stream().findFirst()
+                  .ifPresent(pkg -> pkg.set(Envelope.DataComponents.PACKAGE_EXPERIENCE, result.experience()));
         }
 
-        List<ItemStack> packages = Mail.createPackages(result.output(),
-              pkg -> pkg.recipient(sender));
-
-        // It's not ideal that all experience is on one package.
-        // But implementing it per package would be more complicated, and usually there's only one anyway.
-        packages.stream().findFirst().ifPresent(pkg ->
-              pkg.set(Envelope.DataComponents.PACKAGE_EXPERIENCE, MailRecipe.calculateExperiencePoints(result.experience())));
-
-        return sendResults(context.getService(), address, mail, result.remainingInput(), packages, sender);
+        return sendResults(context.getService(), address, mail, result.remainder(), results, sender);
     }
 
-    public List<RecipeHolder<MailRecipe>> getAllRecipes(ServerLevel level, EntityAddress address) {
-        return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get()).stream()
-              .filter(recipeHolder -> recipeHolder.value().getAddress().equals(address))
-              .collect(Collectors.toList());
-    }
-
-    public @Nullable MailRecipe findMatchingRecipe(ServerLevel level, EntityAddress address, PackageRecipeInput input) {
-        for (RecipeHolder<MailRecipe> recipeHolder : getAllRecipes(level, address)) {
-            MailRecipe recipe = recipeHolder.value();
-            if (recipe.matches(input, level)) {
-                return recipe;
-            }
-        }
-        return null;
-    }
-
-    public CraftingResult craft(ServerLevel level, MailRecipe recipe, PackageRecipeInput input) {
-        SimpleContainer outputContainer = new SimpleContainer(PackageContents.SLOTS);
-        float experience = 0;
-
-        do {
-            ItemStack result = recipe.assemble(input, level.registryAccess());
-            if (!outputContainer.addItem(result).isEmpty()) {
-                break;
-            }
-
-            result.onCraftedBySystem(level);
-            experience += recipe.getExperience();
-
-            input = PackageRecipeInput.of(recipe.consumeOnce(input));
-
-            if (!PackageContents.canHold(result)) {
-                // If package cannot hold a result, then it's likely another package.
-                // Stop the crafting to return only one package.
-                break;
-            }
-        }
-        while (recipe.matches(input, level));
-
-        return new CraftingResult(input, outputContainer.removeAllItems(), experience);
-    }
-
-    protected MailDropOffResult sendResults(MailService service, EntityAddress address, ItemStack mail, PackageRecipeInput remainingInput, List<ItemStack> packages, Address destination) {
+    protected MailDropOffResult sendResults(MailService service, EntityAddress address, ItemStack mail,
+                                            PackageContents remainingInput, List<ItemStack> results, Address destination) {
         boolean hasRemainder = false;
 
         if (!remainingInput.isEmpty()) {
             ItemStack remainderPackage = mail.copy();
-            PackageContents remainderContents = new PackageContents(remainingInput.getItems().toList());
-            remainderPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, remainderContents);
-            packages.addFirst(remainderPackage);
+            remainderPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, remainingInput);
+            results.addFirst(remainderPackage);
             hasRemainder = true;
         }
 
-        if (packages.isEmpty()) {
-            return MailDropOffResult.PASS;
+        if (results.isEmpty()) {
+            return MailDropOffResult.CONSUME;
         }
 
-        packages.stream()
+        results.stream()
               .skip(1)
               .forEach(pkg -> {
                   service.getDeliveryManager()
@@ -146,9 +100,9 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
               });
 
         if (hasRemainder) {
-            return MailDropOffResult.returned(packages.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
+            return MailDropOffResult.returned(results.getFirst(), DeliveryRecord.Message.CRAFTING_UNPROCESSED_ITEMS);
         } else {
-            return MailDropOffResult.reply(Mail.of(packages.getFirst()).get());
+            return MailDropOffResult.reply(Mail.of(results.getFirst()).get());
         }
     }
 }

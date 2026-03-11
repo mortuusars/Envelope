@@ -18,7 +18,7 @@
       "item": "minecraft:leather"
     },
     {
-      "item": "#c:ingots/iron"
+      "tag": "c:ingots/iron"
     }
   ],
   "result": {

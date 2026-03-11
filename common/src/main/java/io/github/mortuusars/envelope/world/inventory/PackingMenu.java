@@ -101,7 +101,7 @@ public class PackingMenu extends AbstractInHandContainerMenu {
 
     protected @NotNull ItemStack createPackingResult() {
         ItemStack result = new ItemStack(Envelope.Items.PACKAGE.get());
-        result.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.createFrom(getContainer()));
+        result.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(getContainer()));
         return result;
     }
 

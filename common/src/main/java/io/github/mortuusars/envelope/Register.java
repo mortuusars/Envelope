@@ -111,7 +111,7 @@ public class Register {
     }
 
     @ExpectPlatform
-    public static Supplier<RecipeSerializer<?>> recipeSerializer(String name, Supplier<RecipeSerializer<?>> supplier) {
+    public static <T extends Recipe<?>> Supplier<RecipeSerializer<T>> recipeSerializer(String id, Supplier<RecipeSerializer<T>> supplier) {
         throw new AssertionError();
     }
 

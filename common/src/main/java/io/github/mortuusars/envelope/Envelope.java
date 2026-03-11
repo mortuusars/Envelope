@@ -13,6 +13,10 @@ import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.*;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.serializer.MailRecipeSerializer;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
@@ -339,7 +343,7 @@ public class Envelope {
     }
 
     public static class RecipeTypes {
-        public static final Supplier<RecipeType<MailRecipe>> MAILING = Register.recipeType("mailing",
+        public static final Supplier<RecipeType<MailingRecipe>> MAILING = Register.recipeType("mailing",
               () -> new RecipeType<>() {
                   @Override
                   public String toString() {
@@ -352,20 +356,21 @@ public class Envelope {
     }
 
     public static class RecipeSerializers {
-        public static final Supplier<RecipeSerializer<?>> LETTER_CLONING = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<LetterCloningRecipe>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer("address_tag_application",
+        public static final Supplier<RecipeSerializer<AddressTagApplicationRecipe>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer("address_tag_application",
               () -> new SimpleCraftingRecipeSerializer<>(
                     AddressTagApplicationRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer("payback_tag_application",
+        public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer("payback_tag_application",
               () -> new SimpleCraftingRecipeSerializer<>(
                     PaybackTagApplicationRecipe::new));
 
-        public static final Supplier<RecipeSerializer<?>> MAIL_CRAFTING = Register.recipeSerializer("mail_crafting",
-              MailCraftingRecipe.Serializer::new);
-
+        public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer("mail_crafting",
+              () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
+        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_BROADCASTING = Register.recipeSerializer("mail_broadcasting",
+              () -> new MailRecipeSerializer<>(MailLetterBroadcastingRecipe::new));
 
         static void init() {
         }
@@ -465,8 +470,6 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("packages"));
             public static final TagKey<Item> MAILABLE =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("mailable"));
-            public static final TagKey<Item> LOST_MAIL_EXCLUDED =
-                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("lost_mail_excluded"));
             public static final TagKey<Item> CANNOT_BE_PACKAGED =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("cannot_be_packaged"));
             public static final TagKey<Item> CANNOT_BE_USED_AS_PAYBACK =

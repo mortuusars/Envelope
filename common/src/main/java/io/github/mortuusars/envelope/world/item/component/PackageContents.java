@@ -21,10 +21,10 @@ public final class PackageContents implements RecipeInput, TooltipComponent {
     public static final int SLOTS = 6;
 
     public static final Codec<PackageContents> CODEC = ItemStack.OPTIONAL_CODEC.listOf(0, SLOTS)
-            .xmap(PackageContents::new, PackageContents::getItemsForSerialization);
+            .xmap(PackageContents::new, PackageContents::getItemsTrimmed);
     public static final StreamCodec<RegistryFriendlyByteBuf, PackageContents> STREAM_CODEC = ItemStack.OPTIONAL_STREAM_CODEC
             .apply(ByteBufCodecs.list(SLOTS))
-            .map(PackageContents::new, PackageContents::getItemsForReading);
+            .map(PackageContents::new, PackageContents::getItemsTrimmed);
 
     public static final PackageContents EMPTY = new PackageContents(Collections.emptyList());
 
@@ -37,36 +37,40 @@ public final class PackageContents implements RecipeInput, TooltipComponent {
         }
     }
 
-    public static PackageContents createFrom(Container container) {
-        List<ItemStack> items = new ArrayList<>();
+    public PackageContents(Container container) {
+        this.items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
         for (int i = 0; i < Math.min(container.getContainerSize(), SLOTS); i++) {
-            items.add(container.getItem(i));
+            this.items.set(i, container.getItem(i));
         }
-        return new PackageContents(items);
     }
 
-    public static PackageContents from(ItemStack stack) {
+    public static PackageContents of(ItemStack stack) {
         return stack.getOrDefault(Envelope.DataComponents.PACKAGE_CONTENTS, EMPTY);
     }
 
     // --
 
     public boolean isEmpty() {
-        return this == EMPTY || getItemsForReading().isEmpty() || getItemsForReading().stream().allMatch(ItemStack::isEmpty);
+        return this == EMPTY || getItems().isEmpty() || getItems().stream().allMatch(ItemStack::isEmpty);
     }
 
     public int size() {
         return items.size();
     }
 
-    public List<ItemStack> getItemsForReading() {
+    /**
+     * Items should not be modified. Use {@link PackageContents#copyItems()} if modification is needed.
+     */
+    public List<ItemStack> getItems() {
         return items;
     }
 
     /**
-     * Removes trailing empty items.
+     * Items without trailing empty stacks.
+     * <br>
+     * Items should not be modified. Use {@link PackageContents#copyItems()} if modification is needed.
      */
-    private List<ItemStack> getItemsForSerialization() {
+    public List<ItemStack> getItemsTrimmed() {
         List<ItemStack> list = new ArrayList<>(items);
         for (int i = list.size() - 1; i >= 0; i--) {
             if (!list.get(i).isEmpty()) {
@@ -77,10 +81,23 @@ public final class PackageContents implements RecipeInput, TooltipComponent {
         return list;
     }
 
+    /**
+     * Item should not be modified. Copy the stack if modification is needed.
+     */
     public @NotNull ItemStack getItem(int index) {
         return index < size() ? items.get(index) : ItemStack.EMPTY;
     }
 
+    /**
+     * Returned item can be modified safely.
+     */
+    public @NotNull ItemStack copyItem(int index) {
+        return getItem(index).copy();
+    }
+
+    /**
+     * Returned items can be modified safely.
+     */
     public List<ItemStack> copyItems() {
         return Lists.transform(this.items, ItemStack::copy);
     }

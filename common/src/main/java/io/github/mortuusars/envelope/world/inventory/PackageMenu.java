@@ -27,7 +27,7 @@ public class PackageMenu extends AbstractInHandContainerMenu {
     protected PackageMenu(@Nullable MenuType<?> menuType, int containerId, Inventory inventory,
                           InteractionHand hand) {
         super(menuType, containerId, inventory, hand);
-        this.initialContents = PackageContents.from(getItemInHand());
+        this.initialContents = PackageContents.of(getItemInHand());
     }
 
     public PackageMenu(int containerId, Inventory inventory, InteractionHand hand) {
@@ -43,14 +43,14 @@ public class PackageMenu extends AbstractInHandContainerMenu {
     }
 
     public boolean isDestroyedOnClose() {
-        return getContainer().isEmpty() || !getInitialContents().equals(PackageContents.createFrom(getContainer()));
+        return getContainer().isEmpty() || !getInitialContents().equals(new PackageContents(getContainer()));
     }
 
     // --
 
     @Override
     protected Container createContainer() {
-        List<ItemStack> items = new ArrayList<>(PackageContents.from(getItemInHand()).copyItems());
+        List<ItemStack> items = new ArrayList<>(PackageContents.of(getItemInHand()).copyItems());
         while (items.size() < PackageContents.SLOTS) {
             items.add(ItemStack.EMPTY);
         }

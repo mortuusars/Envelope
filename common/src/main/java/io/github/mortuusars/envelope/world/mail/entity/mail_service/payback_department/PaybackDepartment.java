@@ -229,7 +229,7 @@ public class PaybackDepartment {
             return;
         }
 
-        PackageContents packageContents = PackageContents.from(paybackPackage);
+        PackageContents packageContents = PackageContents.of(paybackPackage);
         if (!paybackSubject.getRequest().matches(packageContents)) {
             Mail.writeToLog(paybackPackage,
                   DeliveryRecord.returned(DeliveryRecord.Message.PAYBACK_IS_NOT_VALID),

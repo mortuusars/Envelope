@@ -141,7 +141,7 @@ public class PackageItem extends BlockItem implements Sealable {
             }
 
             stack.remove(DataComponents.CONTAINER_LOOT);
-            stack.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.createFrom(container));
+            stack.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(container));
         }
     }
 

@@ -6,7 +6,7 @@
       "item": "envelope:address_tag"
     },
     {
-      "item": "#c:dyes/red"
+      "tag": "c:dyes/red"
     }
   ],
   "result": {

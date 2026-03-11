@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item.mail;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.inventory.ContainerUtils;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
@@ -11,6 +12,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public final class Mail {
     private Mail() {
@@ -181,6 +185,11 @@ public final class Mail {
               .set(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text));
     }
 
+    public static MailBuilder<?> createLetter(LetterContent content) {
+        return new MailBuilder<>(Envelope.Items.LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, content);
+    }
+
     public static MailBuilder<?> createPackage(PackageContents contents) {
         return new MailBuilder<>(Envelope.Items.PACKAGE.get())
               .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
@@ -194,12 +203,14 @@ public final class Mail {
     /**
      * Splits items into packages, however many are required to fit all items.
      *
-     * @param builder callback for each package builder, allows setting necessary data for all created packages.
+     * @param builder callback for each package builder, allows setting necessary data for each created package.
      */
     public static List<ItemStack> createPackages(List<ItemStack> items, Consumer<MailBuilder<?>> builder) {
-        items = new ArrayList<>(items); // Ensure mutability
-        List<ItemStack> packages = new ArrayList<>();
+        items = new ArrayList<>(items.stream().filter(stack -> !stack.isEmpty()).toList()); // Non-empty and ensure mutability
+        if (items.isEmpty()) return List.of();
 
+        // Separate items that are already a package:
+        List<ItemStack> packages = new ArrayList<>();
         items.removeIf(stack -> {
             if (stack.getItem() instanceof PackageItem) {
                 packages.add(Mail.of(stack).apply(builder).get());
@@ -208,12 +219,51 @@ public final class Mail {
             return false;
         });
 
-        for (int i = 0; i < items.size(); i += PackageContents.SLOTS) {
-            PackageContents contents = new PackageContents(items.subList(i, Math.min(i + PackageContents.SLOTS, items.size())));
-            packages.add(Mail.createPackage(contents).apply(builder).get());
-        }
+        List<ItemStack> packedPackages = ContainerUtils.split(ContainerUtils.compact(items), PackageContents.SLOTS)
+              .stream()
+              .map(PackageContents::new)
+              .map(contents -> Mail.createPackage(contents).apply(builder).get())
+              .toList();
 
-        return packages;
+        return Stream.concat(packages.stream(), packedPackages.stream()).toList();
+
+//        Container container = ContainerUtils.compact(items);
+//
+//        for (int i = 0; i < container.getContainerSize(); i += PackageContents.SLOTS) {
+//            List<ItemStack> contents = new ArrayList<>();
+//            for (int slot = 0; slot < PackageContents.SLOTS; slot++) {
+//                int index = i + slot;
+//                contents.add()
+//
+//            }
+//
+//            ItemStack stack = container.getItem(i);
+//
+//
+//        }
+//
+//
+//        SimpleContainer container = new SimpleContainer(PackageContents.SLOTS);
+//
+//        while (!items.isEmpty()) {
+//            SimpleContainer finalContainer = container;
+//
+//            items.removeIf(stack -> {
+//                if (stack.getItem() instanceof PackageItem) {
+//                    packages.add(Mail.of(stack).apply(builder).get());
+//                    return true;
+//                }
+//                return finalContainer.addItem(stack).isEmpty();
+//            });
+//
+//            if (!container.isEmpty()) {
+//                ItemStack pkg = Mail.createPackage(new PackageContents(container)).apply(builder).get();
+//                packages.add(pkg);
+//                container = new SimpleContainer(PackageContents.SLOTS);
+//            }
+//        }
+
+//        return packages;
     }
 
     public static MailBuilder<?> createPaybackBox(PaybackSubject subject) {

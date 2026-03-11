@@ -7,7 +7,7 @@
       "item": "envelope:seal_stamp"
     },
     {
-      "item": "#minecraft:pickaxes"
+      "tag": "minecraft:pickaxes"
     }
   ],
   "result": {

@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.item.LetterItem;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -72,9 +73,9 @@ public class LetterCloningRecipe extends CustomRecipe {
         }
 
 		if (!sourceStack.isEmpty() && copies > 0) {
-			ItemStack result = sourceStack.copyWithCount(copies);
-			result.remove(Envelope.DataComponents.LETTER_TATTERED);
-			return Mail.removeAllDeliveryData(result);
+			return Mail.createLetter(sourceStack.get(Envelope.DataComponents.LETTER_CONTENT))
+				.set(DataComponents.CUSTOM_NAME, sourceStack.get(DataComponents.CUSTOM_NAME))
+				.get();
 		}
 
         return ItemStack.EMPTY;

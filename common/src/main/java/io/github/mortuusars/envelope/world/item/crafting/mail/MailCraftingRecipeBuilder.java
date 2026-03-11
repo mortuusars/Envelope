@@ -1,17 +1,15 @@
-package io.github.mortuusars.envelope.world.item.crafting;
+package io.github.mortuusars.envelope.world.item.crafting.mail;
 
-import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MailCraftingRecipeBuilder extends MailRecipeBuilder {
-    private final List<StackIngredient> ingredients = new ArrayList<>();
+    private final NonNullList<Ingredient> ingredients = NonNullList.create();
     private ItemStack result = ItemStack.EMPTY;
     private float experience;
 
@@ -39,12 +37,12 @@ public class MailCraftingRecipeBuilder extends MailRecipeBuilder {
         return this;
     }
 
-    public MailCraftingRecipeBuilder requires(StackIngredient ingredient) {
+    public MailCraftingRecipeBuilder requires(Ingredient ingredient) {
         ingredients.add(ingredient);
         return this;
     }
 
-    public MailCraftingRecipeBuilder requires(StackIngredient ingredient, int quantity) {
+    public MailCraftingRecipeBuilder requires(Ingredient ingredient, int quantity) {
         for (int i = 0; i < quantity; i++) {
             ingredients.add(ingredient);
         }

@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
 import io.github.mortuusars.envelope.world.item.Unsealable;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.placement.HorizontalAlignment;
@@ -19,7 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
-public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailRecipe>> {
+public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailingRecipe>> {
     private final IDrawable background;
 
     public MailingRecipeCategory(IJeiHelpers helper) {
@@ -31,8 +31,8 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
-        MailRecipe recipe = recipeHolder.value();
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailingRecipe> recipeHolder, IFocusGroup focuses) {
+        MailingRecipe recipe = recipeHolder.value();
 
         builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
               .addItemLike(Envelope.Items.PAPER_BOX.get())
@@ -50,10 +50,10 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
                 int xPos = 18;
                 int yPos = 24;
 
-                if (index >= recipe.getIngredientsCount()) continue;
+                if (index >= recipe.getIngredients().size()) continue;
 
                 builder.addInputSlot(xPos + column * 18, yPos + row * 18)
-                      .addItemStacks(recipe.getIngredientStacks(index));
+                      .addIngredients(recipe.getIngredients().get(index));
             }
         }
 
@@ -62,11 +62,11 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
 
         ItemStack resultItem = recipe.getResultItem(Minecrft.registryAccess());
         if (!(resultItem.getItem() instanceof Unsealable)) { // If not sealed
-            PackageContents resultContents = PackageContents.from(resultItem);
+            PackageContents resultContents = PackageContents.of(resultItem);
             if (!resultContents.isEmpty()) {
                 // Makes contents "known" to jei usages lookup:
                 builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-                      .addItemStacks(resultContents.getItemsForReading());
+                      .addItemStacks(resultContents.getItems());
             }
         }
 
@@ -74,7 +74,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailingRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
         Component component = recipeHolder.value().getAddress()

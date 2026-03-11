@@ -7,7 +7,7 @@
       "item": "envelope:seal_stamp"
     },
     {
-      "item": "#minecraft:hoes"
+      "tag": "minecraft:hoes"
     }
   ],
   "result": {

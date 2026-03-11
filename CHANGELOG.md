@@ -1,5 +1,10 @@
 # Changelog
 
+## UNRELEASED
+- Mailing recipes can no longer work with ingredients that have counts. It now works like regular crafting.
+- Added **Letter + Diamond -> Broadcast Report** recipe.
+  - Sends copies of the letter to all existing player-default mailboxes.
+
 ## 0.6.0-Snapshot 2
 Payback Tag
 - Added drag and drop from JEI support.

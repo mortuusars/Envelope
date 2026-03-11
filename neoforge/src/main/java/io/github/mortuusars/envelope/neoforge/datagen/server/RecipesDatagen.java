@@ -1,18 +1,17 @@
 package io.github.mortuusars.envelope.neoforge.datagen.server;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.inventory.StackIngredient;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
-import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.MailRecipeBuilder;
-import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.*;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeBuilder;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
@@ -22,13 +21,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.ShulkerBoxColoring;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -116,50 +114,62 @@ public class RecipesDatagen extends RecipeProvider {
         EntityAddress mailService = address(MailEntities.MAIL_SERVICE);
 
         MailRecipeBuilder.crafting(mailService)
-              .requires(new StackIngredient(Envelope.Items.ADDRESS_TAG.get()))
-              .requires(new StackIngredient(Tags.Items.DYES_RED))
+              .requires(Ingredient.of(Envelope.Items.ADDRESS_TAG.get()))
+              .requires(Ingredient.of(Tags.Items.DYES_RED))
               .forResult(Envelope.Items.PAYBACK_TAG.get())
               .save(output);
 
-        sealStamp(output, mailService, new StackIngredient(Items.GOLDEN_APPLE), SealImpression.APPLE);
-        sealStamp(output, mailService, new StackIngredient(ItemTags.SWORDS), SealImpression.SWORD);
-        sealStamp(output, mailService, new StackIngredient(ItemTags.PICKAXES), SealImpression.PICKAXE);
-        sealStamp(output, mailService, new StackIngredient(ItemTags.SHOVELS), SealImpression.SHOVEL);
-        sealStamp(output, mailService, new StackIngredient(ItemTags.AXES), SealImpression.AXE);
-        sealStamp(output, mailService, new StackIngredient(ItemTags.HOES), SealImpression.HOE);
-        sealStamp(output, mailService, new StackIngredient(Items.BOOK), SealImpression.BOOK);
-        sealStamp(output, mailService, new StackIngredient(Items.SKELETON_SKULL), SealImpression.SKELETON);
+        output.accept(
+              Envelope.resource(MailRecipeBuilder.getDefaultPath(mailService, "letter_broadcasting")),
+              new MailLetterBroadcastingRecipe(
+                    mailService,
+                    NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Tags.Items.LETTERS), Ingredient.of(Items.DIAMOND)),
+                    Mail.of(new ItemStack(Envelope.Items.LETTER.get()))
+                          .set(DataComponents.CUSTOM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
+                          .get(),
+                    0f
+              ),
+              null);
+
+        sealStamp(output, mailService, Ingredient.of(Items.GOLDEN_APPLE), SealImpression.APPLE);
+        sealStamp(output, mailService, Ingredient.of(ItemTags.SWORDS), SealImpression.SWORD);
+        sealStamp(output, mailService, Ingredient.of(ItemTags.PICKAXES), SealImpression.PICKAXE);
+        sealStamp(output, mailService, Ingredient.of(ItemTags.SHOVELS), SealImpression.SHOVEL);
+        sealStamp(output, mailService, Ingredient.of(ItemTags.AXES), SealImpression.AXE);
+        sealStamp(output, mailService, Ingredient.of(ItemTags.HOES), SealImpression.HOE);
+        sealStamp(output, mailService, Ingredient.of(Items.BOOK), SealImpression.BOOK);
+        sealStamp(output, mailService, Ingredient.of(Items.SKELETON_SKULL), SealImpression.SKELETON);
 
         // --
 
         EntityAddress automatedSupplyService = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(new StackIngredient(Items.ROTTEN_FLESH), 6)
+              .requires(Ingredient.of(Items.ROTTEN_FLESH), 6)
               .forResult(Items.LEATHER, 1)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(new StackIngredient(Items.LEATHER), 5)
-              .requires(new StackIngredient(Tags.Items.INGOTS_IRON))
+              .requires(Ingredient.of(Items.LEATHER), 5)
+              .requires(Ingredient.of(Tags.Items.INGOTS_IRON))
               .forResult(Items.SADDLE)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(new StackIngredient(Items.BONE_MEAL), 5)
-              .requires(new StackIngredient(Items.DIORITE), 1)
+              .requires(Ingredient.of(Items.BONE_MEAL), 5)
+              .requires(Ingredient.of(Items.DIORITE), 1)
               .forResult(Items.CALCITE)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(new StackIngredient(Items.PHANTOM_MEMBRANE), 1)
-              .requires(new StackIngredient(Items.IRON_NUGGET))
+              .requires(Ingredient.of(Items.PHANTOM_MEMBRANE), 1)
+              .requires(Ingredient.of(Items.IRON_NUGGET))
               .forResult(Items.NAME_TAG)
               .experience(1.5f)
               .save(output);
 
         MailRecipeBuilder.crafting(mailService)
-              .requires(new StackIngredient(Items.DIAMOND))
+              .requires(Ingredient.of(Items.DIAMOND))
               .forResult(Mail.createPackage(Envelope.LootTables.LOST_MAIL)
                     .set(DataComponents.CUSTOM_NAME, Component.translatable("item.envelope.lost_mail"))
                     .get())
@@ -167,9 +177,9 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output, "lost_mail");
     }
 
-    protected void sealStamp(RecipeOutput output, EntityAddress address, StackIngredient ingredient, ResourceKey<SealImpression> impression) {
+    protected void sealStamp(RecipeOutput output, EntityAddress address, Ingredient ingredient, ResourceKey<SealImpression> impression) {
         MailRecipeBuilder.crafting(address)
-              .requires(new StackIngredient(Envelope.Items.SEAL_STAMP.get()))
+              .requires(Ingredient.of(Envelope.Items.SEAL_STAMP.get()))
               .requires(ingredient)
               .forResult(Util.make(() -> {
                   ItemStack stamp = new ItemStack(Envelope.Items.SEAL_STAMP.get());

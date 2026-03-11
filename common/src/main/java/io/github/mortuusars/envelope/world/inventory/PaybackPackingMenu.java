@@ -71,7 +71,7 @@ public class PaybackPackingMenu extends PackingMenu {
     @Override
     protected @NotNull ItemStack createPackingResult() {
         ItemStack result = getItemInHand().transmuteCopy(Envelope.Items.PAYBACK_PACKAGE.get());
-        result.set(Envelope.DataComponents.PACKAGE_CONTENTS, PackageContents.createFrom(getContainer()));
+        result.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(getContainer()));
         Mail.removePreviousDeliveryData(result);
         Mail.setRecipient(result, getPaybackSubject().returnAddress());
         return result;

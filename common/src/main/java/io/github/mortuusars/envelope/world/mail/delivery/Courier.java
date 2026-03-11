@@ -119,7 +119,9 @@ public interface Courier {
     default boolean dispatchDelivery(ServerLevel level, Delivery delivery) {
         MailService service = MailService.of(level);
 
-        Mail.setSender(delivery.getMail(), delivery.getSender());
+        if (Mail.getSender(delivery.getMail()).isEmpty()) {
+            Mail.setSender(delivery.getMail(), delivery.getSender());
+        }
 
         if (!service.getDeliveryManager().canDeliverTo(delivery.getRecipient())) {
             Mail.returned(delivery.getMail(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND);

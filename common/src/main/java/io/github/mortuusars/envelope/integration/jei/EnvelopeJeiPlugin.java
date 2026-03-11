@@ -18,7 +18,7 @@ import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.MailRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import mezz.jei.api.IModPlugin;
@@ -78,14 +78,14 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        List<RecipeHolder<MailRecipe>> deliveryRecipes = Minecrft.level()
+        List<RecipeHolder<MailingRecipe>> mailingRecipes = Minecrft.level()
               .getRecipeManager()
               .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
               .stream()
               .filter(recipe -> !recipe.value().getAddress().getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
               .toList();
 
-        registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, deliveryRecipes);
+        registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, mailingRecipes);
     }
 
     @Override
