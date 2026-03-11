@@ -12,7 +12,7 @@
       "minecraft:container_loot": {
         "loot_table": "envelope:lost_mail"
       },
-      "minecraft:custom_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+      "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
     },
     "count": 1,
     "id": "envelope:package"

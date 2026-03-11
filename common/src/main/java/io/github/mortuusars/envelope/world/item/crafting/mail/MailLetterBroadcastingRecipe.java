@@ -67,7 +67,7 @@ public class MailLetterBroadcastingRecipe extends MailCraftingRecipe {
             MailService service = MailService.of(level);
 
             ItemStack broadcastedLetter = Mail.createLetter(content)
-                  .set(DataComponents.CUSTOM_NAME, inputLetter.get(DataComponents.CUSTOM_NAME))
+                  .set(DataComponents.ITEM_NAME, inputLetter.get(DataComponents.ITEM_NAME))
                   .sender(sender)
                   .get();
 
@@ -94,7 +94,7 @@ public class MailLetterBroadcastingRecipe extends MailCraftingRecipe {
                   .append(getAddress().getComponent());
 
             return Mail.createLetter(reportText)
-                  .set(DataComponents.CUSTOM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
+                  .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
                   .sender(getAddress())
                   .get();
         }

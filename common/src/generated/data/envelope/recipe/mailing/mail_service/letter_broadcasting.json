@@ -11,7 +11,7 @@
   ],
   "result": {
     "components": {
-      "minecraft:custom_name": "{\"translate\":\"letter.envelope.broadcast_report.name\"}"
+      "minecraft:item_name": "{\"translate\":\"letter.envelope.broadcast_report.name\"}"
     },
     "count": 1,
     "id": "envelope:letter"

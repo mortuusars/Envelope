@@ -3,22 +3,22 @@
   "entity": "envelope:automated_supply_service",
   "ingredients": [
     {
-      "item": "minecraft:bone_meal"
-    },
-    {
-      "item": "minecraft:bone_meal"
-    },
-    {
-      "item": "minecraft:bone_meal"
-    },
-    {
-      "item": "minecraft:bone_meal"
-    },
-    {
-      "item": "minecraft:bone_meal"
-    },
-    {
       "item": "minecraft:diorite"
+    },
+    {
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "item": "minecraft:bone_meal"
     }
   ],
   "result": {

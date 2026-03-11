@@ -3,22 +3,22 @@
   "entity": "envelope:automated_supply_service",
   "ingredients": [
     {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
-      "item": "minecraft:leather"
-    },
-    {
       "tag": "c:ingots/iron"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:leather"
     }
   ],
   "result": {

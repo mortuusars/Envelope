@@ -119,13 +119,21 @@ public class RecipesDatagen extends RecipeProvider {
               .forResult(Envelope.Items.PAYBACK_TAG.get())
               .save(output);
 
+        MailRecipeBuilder.crafting(mailService)
+              .requires(Ingredient.of(Items.DIAMOND))
+              .forResult(Mail.createPackage(Envelope.LootTables.LOST_MAIL)
+                    .set(DataComponents.ITEM_NAME, Component.translatable("item.envelope.lost_mail"))
+                    .get())
+              .experience(1.5f)
+              .save(output, "lost_mail");
+
         output.accept(
               Envelope.resource(MailRecipeBuilder.getDefaultPath(mailService, "letter_broadcasting")),
               new MailLetterBroadcastingRecipe(
                     mailService,
                     NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Tags.Items.LETTERS), Ingredient.of(Items.DIAMOND)),
                     Mail.of(new ItemStack(Envelope.Items.LETTER.get()))
-                          .set(DataComponents.CUSTOM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
+                          .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
                           .get(),
                     0f
               ),
@@ -150,31 +158,44 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(Ingredient.of(Items.LEATHER), 5)
               .requires(Ingredient.of(Tags.Items.INGOTS_IRON))
+              .requires(Ingredient.of(Items.LEATHER), 5)
               .forResult(Items.SADDLE)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(Ingredient.of(Items.BONE_MEAL), 5)
               .requires(Ingredient.of(Items.DIORITE), 1)
+              .requires(Ingredient.of(Items.BONE_MEAL), 5)
               .forResult(Items.CALCITE)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
-              .requires(Ingredient.of(Items.PHANTOM_MEMBRANE), 1)
               .requires(Ingredient.of(Items.IRON_NUGGET))
+              .requires(Ingredient.of(Items.PHANTOM_MEMBRANE))
               .forResult(Items.NAME_TAG)
-              .experience(1.5f)
               .save(output);
 
-        MailRecipeBuilder.crafting(mailService)
-              .requires(Ingredient.of(Items.DIAMOND))
-              .forResult(Mail.createPackage(Envelope.LootTables.LOST_MAIL)
-                    .set(DataComponents.CUSTOM_NAME, Component.translatable("item.envelope.lost_mail"))
-                    .get())
-              .experience(1.5f)
-              .save(output, "lost_mail");
+        MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(Ingredient.of(Items.INK_SAC))
+              .requires(Ingredient.of(Items.GLOWSTONE_DUST), 5)
+              .forResult(Items.GLOW_INK_SAC)
+              .save(output);
+
+        MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(Ingredient.of(Items.PAPER))
+              .requires(Ingredient.of(Items.FEATHER))
+              .requires(Ingredient.of(Items.BLACK_DYE))
+              .requires(Ingredient.of(Items.SLIME_BALL))
+              .forResult(Envelope.Items.LETTER_AND_QUILL.get())
+              .save(output);
+
+        MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(Ingredient.of(Items.BOOK))
+              .requires(Ingredient.of(Items.FEATHER))
+              .requires(Ingredient.of(Items.BLACK_DYE))
+              .requires(Ingredient.of(Items.SLIME_BALL))
+              .forResult(Items.WRITABLE_BOOK)
+              .save(output);
     }
 
     protected void sealStamp(RecipeOutput output, EntityAddress address, Ingredient ingredient, ResourceKey<SealImpression> impression) {

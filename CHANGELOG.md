@@ -1,9 +1,12 @@
 # Changelog
 
 ## UNRELEASED
-- Mailing recipes can no longer work with ingredients that have counts. It now works like regular crafting.
+Mailing
 - Added **Letter + Diamond -> Broadcast Report** recipe.
   - Sends copies of the letter to all existing player-default mailboxes.
+- Added **5x Glowstone Dust + Ink Sac -> Glow Inc Sac** recipe.
+- Added **Book and Quill** and **Letter and Quill** recipes using **Black Dye + Slimeball** instead of **Ink Sac**.
+- Mailing recipes can no longer work with ingredients that have counts. It now works like regular crafting.
 
 ## 0.6.0-Snapshot 2
 Payback Tag

@@ -1,13 +1,12 @@
 {
   "type": "envelope:mail_crafting",
   "entity": "envelope:automated_supply_service",
-  "experience": 1.5,
   "ingredients": [
     {
-      "item": "minecraft:phantom_membrane"
+      "item": "minecraft:iron_nugget"
     },
     {
-      "item": "minecraft:iron_nugget"
+      "item": "minecraft:phantom_membrane"
     }
   ],
   "result": {

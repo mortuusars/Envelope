@@ -198,7 +198,7 @@
 
   "letter.envelope.broadcast_report.name": "Broadcast Report",
   "letter.envelope.broadcast_report.title": "       Broadcast Report\n\n",
-  "letter.envelope.broadcast_report.message": "The message was distributed successfully.\nTotal number of recipients included in the broadcast: %s",
+  "letter.envelope.broadcast_report.message": "The message was distributed successfully.\n\nTotal number of recipients included in the broadcast: %s",
   "letter.envelope.broadcast_report.error": "No message suitable for broadcast was provided. Action was not taken.",
 
   "envelope.configuration.pigeon": "Pigeon",

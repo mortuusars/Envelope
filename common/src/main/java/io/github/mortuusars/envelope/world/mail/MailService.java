@@ -195,7 +195,7 @@ public class MailService {
               .append(Component.translatable("letter.envelope.mail_service.signature"));
 
         return Mail.createLetter(text)
-              .set(DataComponents.CUSTOM_NAME, Component.translatable("letter.envelope.courier_death_notice.name"))
+              .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.courier_death_notice.name"))
               .get();
     }
 
