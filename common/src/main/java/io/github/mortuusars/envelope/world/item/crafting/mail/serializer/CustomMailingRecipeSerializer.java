@@ -1,0 +1,46 @@
+package io.github.mortuusars.envelope.world.item.crafting.mail.serializer;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.crafting.mail.CustomMailingRecipe;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryFixedCodec;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import org.jetbrains.annotations.NotNull;
+
+public class CustomMailingRecipeSerializer<T extends CustomMailingRecipe> implements RecipeSerializer<T> {
+    private final MapCodec<T> codec;
+    private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
+
+    public CustomMailingRecipeSerializer(Constructor<T> constructor) {
+        this.codec = RecordCodecBuilder.mapCodec(i -> i.group(
+              RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
+                    .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
+                    .fieldOf("entity")
+                    .forGetter(CustomMailingRecipe::getAddress)
+        ).apply(i, constructor::create));
+
+        this.streamCodec = StreamCodec.composite(
+              EntityAddress.STREAM_CODEC, CustomMailingRecipe::getAddress,
+              constructor::create
+        );
+    }
+
+    @Override
+    public @NotNull MapCodec<T> codec() {
+        return codec;
+    }
+
+    @Override
+    public @NotNull StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
+        return streamCodec;
+    }
+
+    @FunctionalInterface
+    public interface Constructor<T extends CustomMailingRecipe> {
+        T create(EntityAddress address);
+    }
+}

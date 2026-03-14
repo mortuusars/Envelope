@@ -359,18 +359,16 @@ public class Envelope {
         public static final Supplier<RecipeSerializer<LetterCloningRecipe>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
 
-        public static final Supplier<RecipeSerializer<AddressTagApplicationRecipe>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer("address_tag_application",
-              () -> new SimpleCraftingRecipeSerializer<>(
-                    AddressTagApplicationRecipe::new));
+        public static final Supplier<RecipeSerializer<AddressTagApplicationRecipe>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer(
+              "address_tag_application", () -> new SimpleCraftingRecipeSerializer<>(AddressTagApplicationRecipe::new));
 
-        public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer("payback_tag_application",
-              () -> new SimpleCraftingRecipeSerializer<>(
-                    PaybackTagApplicationRecipe::new));
+        public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer(
+              "payback_tag_application", () -> new SimpleCraftingRecipeSerializer<>(PaybackTagApplicationRecipe::new));
 
-        public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer("mail_crafting",
-              () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
-        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_BROADCASTING = Register.recipeSerializer("mail_broadcasting",
-              () -> new MailRecipeSerializer<>(MailLetterBroadcastingRecipe::new));
+        public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer(
+              "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
+        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_BROADCASTING = Register.recipeSerializer(
+              "mail_broadcasting", () -> new MailRecipeSerializer<>(MailLetterBroadcastingRecipe::new));
 
         static void init() {
         }
