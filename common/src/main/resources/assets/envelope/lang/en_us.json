@@ -197,9 +197,11 @@
   "letter.envelope.mail_service.signature": "Mail Service",
 
   "letter.envelope.broadcast_report.name": "Broadcast Report",
-  "letter.envelope.broadcast_report.title": "       Broadcast Report\n\n",
-  "letter.envelope.broadcast_report.message": "The message was distributed successfully.\n\nTotal number of recipients included in the broadcast: %s",
-  "letter.envelope.broadcast_report.error": "No message suitable for broadcast was provided. Action was not taken.",
+  "letter.envelope.broadcast_report.title": "       Broadcast Report",
+  "letter.envelope.broadcast_report.total": "Total number of recipients included in the broadcast: %s",
+  "letter.envelope.broadcast_report.success": "The message was distributed successfully.",
+  "letter.envelope.broadcast_report.error_no_message": "No message suitable for broadcast was provided. Action was not taken.",
+  "letter.envelope.broadcast_report.error_no_recipients": "No recipients suitable for broadcast are available. Action was not taken.",
 
   "envelope.configuration.pigeon": "Pigeon",
   "envelope.configuration.delivery": "Delivery",

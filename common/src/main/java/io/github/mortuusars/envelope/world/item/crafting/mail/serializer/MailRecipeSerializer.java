@@ -1,13 +1,13 @@
 package io.github.mortuusars.envelope.world.item.crafting.mail.serializer;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -30,22 +30,8 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
                     .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
                     .fieldOf("entity")
                     .forGetter(MailCraftingRecipe::getAddress),
-              Ingredient.CODEC_NONEMPTY
-                    .listOf()
+              EnvelopeCodecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
                     .fieldOf("ingredients")
-                    .flatXmap(
-                          list -> {
-                              Ingredient[] ingredients = list.stream().filter(ingredient -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
-                              if (ingredients.length == 0) {
-                                  return DataResult.error(() -> "No ingredients for mail crafting recipe");
-                              } else {
-                                  return ingredients.length > PackageContents.SLOTS
-                                        ? DataResult.error(() -> "Too many ingredients for mail crafting recipe")
-                                        : DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
-                              }
-                          },
-                          DataResult::success
-                    )
                     .forGetter(MailCraftingRecipe::getIngredients),
               ItemStack.STRICT_CODEC
                     .fieldOf("result")
@@ -79,7 +65,7 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
     }
 
     @FunctionalInterface
-    public interface Constructor<T extends MailingRecipe> {
+    public interface Constructor<T extends MailRecipe> {
         T create(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result, float experience);
     }
 }

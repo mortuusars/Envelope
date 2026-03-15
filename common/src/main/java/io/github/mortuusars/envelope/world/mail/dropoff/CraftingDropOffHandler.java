@@ -2,10 +2,12 @@ package io.github.mortuusars.envelope.world.mail.dropoff;
 
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.item.crafting.mail.MailCrafting;
-import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.Mailing;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeInput;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -49,29 +51,37 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
             return MailDropOffResult.PASS;
         }
 
-        @Nullable MailingRecipe recipe = MailCrafting.findMatchingRecipe(address, packageContents, context.getLevel())
+        MailRecipeInput input = new MailRecipeInput(context.getService(), sender, packageContents);
+
+        @Nullable MailRecipe recipe = Mailing.findMatchingRecipe(address, input, context.getLevel())
               .map(RecipeHolder::value)
               .orElse(null);
         if (recipe == null) {
             return MailDropOffResult.PASS;
         }
 
-        MailCrafting.Result result = MailCrafting.craft(context.getLevel(), recipe, packageContents, sender);
+        Mailing.Result result = Mailing.craft(recipe, input);
 
         List<ItemStack> results;
 
-        if (recipe.onlyOneCraftPerDelivery() && result.output().size() == 1 && result.output().getFirst().is(Envelope.Tags.Items.MAILABLE)) {
+        if (result.output().size() == 1
+              && result.output().getFirst().getCount() == 1
+              && result.output().getFirst().is(Envelope.Tags.Items.MAILABLE)) {
             results = result.output();
         } else {
             results = Mail.createPackages(result.output(), pkg -> pkg.recipient(sender));
-
-            // It's not ideal that all experience is on one package.
-            // But implementing it per package would be more complicated, and usually there's only one anyway.
-            results.stream().findFirst()
-                  .ifPresent(pkg -> pkg.set(Envelope.DataComponents.PACKAGE_EXPERIENCE, result.experience()));
         }
 
-        return sendResults(context.getService(), address, mail, result.remainder(), results, sender);
+        if (result.experience() > 0) {
+            // It's not ideal that all experience is on one package.
+            // But implementing it per package would be more complicated, and usually there's only one anyway.
+            results.stream()
+                  .filter(stack -> stack.getItem() instanceof PackageItem)
+                  .findFirst()
+                  .ifPresent(stack -> stack.set(Envelope.DataComponents.PACKAGE_EXPERIENCE, result.experience()));
+        }
+
+        return sendResults(context.getService(), address, mail, result.input().toPackageContents(), results, sender);
     }
 
     protected MailDropOffResult sendResults(MailService service, EntityAddress address, ItemStack mail,

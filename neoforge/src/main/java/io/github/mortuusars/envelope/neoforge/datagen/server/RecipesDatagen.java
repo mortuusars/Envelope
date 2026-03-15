@@ -131,11 +131,7 @@ public class RecipesDatagen extends RecipeProvider {
               Envelope.resource(MailRecipeBuilder.getDefaultPath(mailService, "letter_broadcasting")),
               new MailLetterBroadcastingRecipe(
                     mailService,
-                    NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Tags.Items.LETTERS), Ingredient.of(Items.DIAMOND)),
-                    Mail.of(new ItemStack(Envelope.Items.LETTER.get()))
-                          .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
-                          .get(),
-                    0f
+                    NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Tags.Items.LETTERS), Ingredient.of(Items.DIAMOND))
               ),
               null);
 

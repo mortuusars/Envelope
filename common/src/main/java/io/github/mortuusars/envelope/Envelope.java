@@ -15,7 +15,7 @@ import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
-import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.serializer.MailRecipeSerializer;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.util.DeferredSoundType;
@@ -343,7 +343,7 @@ public class Envelope {
     }
 
     public static class RecipeTypes {
-        public static final Supplier<RecipeType<MailingRecipe>> MAILING = Register.recipeType("mailing",
+        public static final Supplier<RecipeType<MailRecipe>> MAILING = Register.recipeType("mailing",
               () -> new RecipeType<>() {
                   @Override
                   public String toString() {
@@ -358,17 +358,15 @@ public class Envelope {
     public static class RecipeSerializers {
         public static final Supplier<RecipeSerializer<LetterCloningRecipe>> LETTER_CLONING = Register.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
-
         public static final Supplier<RecipeSerializer<AddressTagApplicationRecipe>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer(
-              "address_tag_application", () -> new SimpleCraftingRecipeSerializer<>(AddressTagApplicationRecipe::new));
-
+              "crafting_special_address_tag_application", () -> new SimpleCraftingRecipeSerializer<>(AddressTagApplicationRecipe::new));
         public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer(
-              "payback_tag_application", () -> new SimpleCraftingRecipeSerializer<>(PaybackTagApplicationRecipe::new));
+              "crafting_special_payback_tag_application", () -> new SimpleCraftingRecipeSerializer<>(PaybackTagApplicationRecipe::new));
 
         public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer(
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
-        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_BROADCASTING = Register.recipeSerializer(
-              "mail_broadcasting", () -> new MailRecipeSerializer<>(MailLetterBroadcastingRecipe::new));
+        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_LETTER_BROADCASTING = Register.recipeSerializer(
+              "mail_letter_broadcasting", MailLetterBroadcastingRecipe.Serializer::new);
 
         static void init() {
         }

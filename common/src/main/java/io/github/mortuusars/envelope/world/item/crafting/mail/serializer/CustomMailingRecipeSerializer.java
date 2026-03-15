@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item.crafting.mail.serializer;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.crafting.mail.CustomMailingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.CustomMailRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -11,7 +11,7 @@ import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.NotNull;
 
-public class CustomMailingRecipeSerializer<T extends CustomMailingRecipe> implements RecipeSerializer<T> {
+public class CustomMailingRecipeSerializer<T extends CustomMailRecipe> implements RecipeSerializer<T> {
     private final MapCodec<T> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
@@ -20,11 +20,11 @@ public class CustomMailingRecipeSerializer<T extends CustomMailingRecipe> implem
               RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
                     .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
                     .fieldOf("entity")
-                    .forGetter(CustomMailingRecipe::getAddress)
+                    .forGetter(CustomMailRecipe::getAddress)
         ).apply(i, constructor::create));
 
         this.streamCodec = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, CustomMailingRecipe::getAddress,
+              EntityAddress.STREAM_CODEC, CustomMailRecipe::getAddress,
               constructor::create
         );
     }
@@ -40,7 +40,7 @@ public class CustomMailingRecipeSerializer<T extends CustomMailingRecipe> implem
     }
 
     @FunctionalInterface
-    public interface Constructor<T extends CustomMailingRecipe> {
+    public interface Constructor<T extends CustomMailRecipe> {
         T create(EntityAddress address);
     }
 }

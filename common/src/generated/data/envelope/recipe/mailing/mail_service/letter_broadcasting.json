@@ -1,5 +1,5 @@
 {
-  "type": "envelope:mail_broadcasting",
+  "type": "envelope:mail_letter_broadcasting",
   "entity": "envelope:mail_service",
   "ingredients": [
     {
@@ -8,12 +8,5 @@
     {
       "item": "minecraft:diamond"
     }
-  ],
-  "result": {
-    "components": {
-      "minecraft:item_name": "{\"translate\":\"letter.envelope.broadcast_report.name\"}"
-    },
-    "count": 1,
-    "id": "envelope:letter"
-  }
+  ]
 }

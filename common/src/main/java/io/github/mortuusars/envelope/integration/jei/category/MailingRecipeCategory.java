@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
 import io.github.mortuusars.envelope.world.item.Unsealable;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.crafting.mail.MailingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.placement.HorizontalAlignment;
@@ -19,7 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
-public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailingRecipe>> {
+public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailRecipe>> {
     private final IDrawable background;
 
     public MailingRecipeCategory(IJeiHelpers helper) {
@@ -31,8 +31,8 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailingRecipe> recipeHolder, IFocusGroup focuses) {
-        MailingRecipe recipe = recipeHolder.value();
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
+        MailRecipe recipe = recipeHolder.value();
 
         builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
               .addItemLike(Envelope.Items.PAPER_BOX.get())
@@ -74,7 +74,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailingRecipe> recipeHolder, IFocusGroup focuses) {
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         builder.addDrawable(background, 0, 0);
 
         Component component = recipeHolder.value().getAddress()
