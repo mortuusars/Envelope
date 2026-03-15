@@ -115,7 +115,7 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
                   .get();
         } else {
             ItemStack broadcastedLetter = Mail.createLetter(content)
-                  .set(DataComponents.ITEM_NAME, inputLetter.get(DataComponents.ITEM_NAME))
+                  .set(DataComponents.CUSTOM_NAME, inputLetter.get(DataComponents.CUSTOM_NAME))
                   .sender(input.sender())
                   .get();
 
