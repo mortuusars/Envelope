@@ -2,10 +2,14 @@
 
 ## UNRELEASED
 Mailing
-- Added **Letter + Diamond -> Broadcast Report** recipe.
-  - Sends copies of the letter to all existing player-default mailboxes.
-- Added **5x Glowstone Dust + Ink Sac -> Glow Inc Sac** recipe.
-- Added **Book and Quill** and **Letter and Quill** recipes using **Black Dye + Slimeball** instead of **Ink Sac**.
+- Added recipes:
+  - **Letter + Diamond -> Broadcast Report**.
+    - Sends copies of the letter to all existing player-default mailboxes.
+  - **Andesite + 5x Flint -> 2x Tuff**.
+  - **Granite + 5x Clay Ball -> 2x Dripstone**.
+  - **Ink Sac + 5x Glowstone Dust -> Glow Inc Sac**.
+  - **Book and Quill** and **Letter and Quill** recipes using **Black Dye + Slimeball** instead of **Ink Sac**.
+- **Calcite** recipe now gives 2 instead of 1.
 - Mailing recipes can no longer work with ingredients that have counts. It now works like regular crafting.
 
 ## 0.6.0-Snapshot 2

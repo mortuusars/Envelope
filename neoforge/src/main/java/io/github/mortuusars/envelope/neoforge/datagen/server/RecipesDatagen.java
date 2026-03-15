@@ -160,9 +160,21 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(Ingredient.of(Items.ANDESITE), 1)
+              .requires(Ingredient.of(Items.FLINT), 5)
+              .forResult(Items.TUFF, 2)
+              .save(output);
+
+        MailRecipeBuilder.crafting(automatedSupplyService)
+              .requires(Ingredient.of(Items.GRANITE), 1)
+              .requires(Ingredient.of(Items.CLAY_BALL), 5)
+              .forResult(Items.DRIPSTONE_BLOCK, 2)
+              .save(output);
+
+        MailRecipeBuilder.crafting(automatedSupplyService)
               .requires(Ingredient.of(Items.DIORITE), 1)
               .requires(Ingredient.of(Items.BONE_MEAL), 5)
-              .forResult(Items.CALCITE)
+              .forResult(Items.CALCITE, 2)
               .save(output);
 
         MailRecipeBuilder.crafting(automatedSupplyService)
