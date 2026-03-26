@@ -600,7 +600,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     // -- Courier
 
     public boolean canStartDelivery() {
-        return !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
+        return !isLeashed() && !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
     }
 
     public Courier startDelivery(Delivery delivery) {
@@ -675,15 +675,13 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     @Override
     public boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
         if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            Mail.writeToLog(delivery.getMail(),
-                  DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
+            Mail.returned(delivery.getMail(), DeliveryRecord.Message.UNABLE_TO_REACH);
             delivery.beginPhase(DeliveryPhase.APPROACHING_SENDER);
             return true;
         }
 
         if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
-            Mail.writeToLog(delivery.getMail(),
-                  DeliveryRecord.returned(DeliveryRecord.Message.UNABLE_TO_REACH));
+            Mail.returned(delivery.getMail(), DeliveryRecord.Message.UNABLE_TO_REACH);
             delivery.beginPhase(DeliveryPhase.DEPARTING_RECIPIENT);
             return true;
         }

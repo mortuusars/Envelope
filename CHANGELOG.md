@@ -80,6 +80,7 @@ Misc:
 - Small change to how `envelope:payback_subject` component is defined.
 - Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
 - Fixed couriers spawned after delivery is finished (when ended in unloaded chunk) not being tired.
+- Fixed leashed pigeons being able to enter a Pigeonhole
 
 ## 0.5.2 - 2026-02-06
 #### Reworked Packages:

@@ -162,6 +162,10 @@ public interface Courier {
     }
 
     default void handleMailDropOff(ServerLevel level, Delivery delivery, Address recipient) {
+        if (Mail.getSender(delivery.getMail()).isEmpty()) {
+            Mail.setSender(delivery.getMail(), delivery.getSender());
+        }
+
         MailDropOffContext context = new MailDropOffContext(MailService.of(level), recipient, delivery);
         MailDropOffResult result = DROP_OFF_HANDLER.handle(context);
 

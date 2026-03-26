@@ -16,7 +16,7 @@ public class PigeonEnterPigeonholeGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (pigeon.isDelivering()) {
+        if (pigeon.isDelivering() || pigeon.isLeashed()) {
             return false;
         }
 
