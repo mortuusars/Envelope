@@ -203,6 +203,9 @@ public class Envelope {
 
         public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
 
+        public static final Supplier<MailboxBlockItem> MAILBOX = Register.item("mailbox",
+              () -> new MailboxBlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
+
         public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = Register.item("letter_and_quill",
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
@@ -231,9 +234,6 @@ public class Envelope {
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
-
-        public static final Supplier<MailboxBlockItem> MAILBOX = Register.item("mailbox",
-              () -> new MailboxBlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
 
         private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
             Supplier<BlockItem> item = Register.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));

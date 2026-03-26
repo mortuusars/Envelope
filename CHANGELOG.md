@@ -1,28 +1,28 @@
 # Changelog
 
-## UNRELEASED
-Mailing
-- Added recipes:
-  - **Letter + Diamond -> Broadcast Report**.
-    - Sends copies of the letter to all existing player-default mailboxes.
-  - **Andesite + 5x Flint -> 2x Tuff**.
-  - **Granite + 5x Clay Ball -> 2x Dripstone**.
-  - **Ink Sac + 5x Glowstone Dust -> Glow Inc Sac**.
-  - **Book and Quill** and **Letter and Quill** recipes using **Black Dye + Slimeball** instead of **Ink Sac**.
-- **Calcite** recipe now gives 2 instead of 1.
-- Mailing recipes can no longer work with ingredients that have counts. It now works like regular crafting.
+## 0.6
+#### Mail Recipes
+Added a new way to craft items (and more) by sending a Package with ingredients to a mail entity
+- Works similarly to a shapeless crafting.
+- Results are returned using the same courier, or with service courier, if some of the ingredients were unprocessed.
+- Data-driven. Shown in JEI.
+  - Clicking on an arrow in Mailbox menu, or on a box in Paper Box menu will show available recipes.
+- Can give experience Applied to resulting package and awarded when player opens it.
 
-## 0.6.0-Snapshot 2
-Payback Tag
-- Added drag and drop from JEI support.
-- Added payback request duration selector.
-  - Controls how much time buyer will have to pay for the mail.
-  - Item texture changes slightly based on duration defined.
-- Using the tag while holding [**Sneak**] will clear the data from it.
-- Menu UI/UX improvements.
-- Removed crafting table recipes.
-- Changed `envelope:payback_tag_contents` item component: its structure is now the same as `envelope:mail_payback_request`.
-- `delivery.payback_timeout_minutes` config option was replaced by three `payback.request_duration_<duration>` options.
+Included recipes:
+- Payback Tag 
+  - no longer craftable in Crafting Table
+- Seal Stamps with custom impressions
+- Rotten Flesh -> Leather
+- Saddle
+- Name Tag
+- Tuff, Dripstone, Calcite
+- Glow Ink Sac
+- Book and Quill and Letter and Quill 
+- Lost Mail
+  - Has random loot inside
+- Letter Broadcast
+  - Sends copies of the letter to all existing player-default mailboxes.
 
 Package
 - Added `envelope:package_experience` item component. Awarded when package is opened.
@@ -30,60 +30,17 @@ Package
 - Fixed overlays not rendering over package slots.
 - Fixed being able to insert items into opened package, if items were the same.
 
-Mail Crafting
-- Added `experience` field to mail crafting recipes. Applied to resulting package and awarded when player opens it.
-  - Works the same as in smelting recipes.
-- Seal Stamp recipes @[Mail Service] now give 1.5 experience per craft. 
-- Added **Phantom Membrane + Iron Nugget -> Name Tag** recipe.
-- Added **Diorite + 3x Bone Meal -> Calcite** recipe.
-- Added **Diamond -> Lost Mail** recipe. 
-- Small changes to existing recipes.
+Payback Tag
+- Added drag and drop from JEI support.
+- Added payback request duration selector.
+  - Controls how much time buyer will have to pay for the mail.
+  - Item texture changes slightly based on duration defined.
+- Using the tag while holding [**Sneak**] will clear the data from it.
+- Menu UI/UX improvements.
+- Changed `envelope:payback_tag_contents` item component: its structure is now the same as `envelope:mail_payback_request`.
+- `delivery.payback_timeout_minutes` config option was replaced by three `payback.request_duration_<duration>` options.
 
-Delivery
-- Added support for Entity address "drop-off" handlers. 
-  - They can be defined in code (for addons) or through KubeJS.
-  - _Drop-off handler is responsible for actually deciding what happens with delivered mail (consume/return/reply)._ 
-
-KubeJS
-- Added `EnvelopeEvents.registerEntityDropOffHandlers` event.
-- Added `EnvelopeEvents.handleMailDropOff` event.
-  - Called before most of the regular logic is processed.  
-  - Can be used to modify drop-off of any address type.
-- No documentation yet.
-
-Mail Entities
-- Added `envelope:hidden` mail entity tag. Allows hiding mail entity from address suggestions and its recipes from JEI.
-- Changed/renamed address **Trade Office** to **Automated Supply Service**.
-- Mail entities that have recipes now show up in JEI as an ingredient. 
-  - Querying their uses (R-Click or [U]) will show available recipes associated with that address.
-
-Misc
-- Added **Address Tag** and **Payback Tag** application recipes.
-- Applying **Address Tag** and **Payback Tag** in GUI now consumes 1 tag per mail, instead of 1 per stack.  
-- Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
-- **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
-- Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.
-- Small change to how `envelope:payback_subject` component is defined.
-- Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
-- Fixed couriers spawned after delivery is finished (when ended in unloaded chunk) not being tired.
-- [JEI] Clicking on an arrow in Mailbox menu will show all mail recipes. 
-
-## 0.6.0-Snapshot 1
-#### Added Mailing recipes
-Send a Package with ingredients to a mail entity - receive crafted result back.
-  - Similar to shapeless recipe, but can accept ingredients larger than single item
-  - Can do multiple crafts at a time, if more ingredients are provided. As long as they are in same stacks.
-  - Results are returned using the same courier, or with service courier, if some of the ingredients were unprocessed 
-  - Recipes are data-driven, of course
-  - JEI shows available recipes
-
-Included recipes:
-  - Payback Tag (no longer craftable in Crafting Table)
-  - Seal Stamps of several custom impressions
-  - Rotten Flesh -> Leather
-  - Saddle
-
-#### Address
+Address
 - Player address type definition has been changed. Field `id` is now `name`: `{ type:"player", name:"mortuusars" }`
 - Entity addresses are now data-driven
   - Address component now references registered entity by its key: `{ type:"entity", entity:"envelope:mail_service" }`
@@ -91,12 +48,38 @@ Included recipes:
   - Can be used as a virtual address for display purposes (commands, scripts, etc.). Cannot receive mail.
 - Unknown address is now a separate type: `{ type:"unknown" }`
 
+Mail Entities
+- Definition is data-driven.
+- For use in recipes or custom handlers.
+- `#envelope:hidden` mail entity tag can be used to hide the entity from address suggestions and its recipes from JEI.
+- Mail entities that have recipes now show up in JEI as an ingredient.
+  - Querying their uses (R-Click or [U]) will show available recipes associated with that address.
+
+Delivery
+- Added support for Entity address "drop-off" handlers.
+  - They can be defined in code (for addons) or through KubeJS.
+  - _Drop-off handler is responsible for actually deciding what happens with delivered mail (consume/return/reply)._
+
+KubeJS
+- Added `EnvelopeEvents.registerEntityDropOffHandlers` event.
+- Added `EnvelopeEvents.handleMailDropOff` event.
+  - Called before most of the regular logic is processed.
+  - Can be used to modify drop-off of any address type.
+- No documentation yet.
+
 Misc:
+- Added **Address Tag** and **Payback Tag** application recipes.
+- Applying **Address Tag** and **Payback Tag** in GUI now consumes 1 tag per mail, instead of 1 per stack.
+- **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
 - Updated some address type icons (little flags)
 - Moved seal textures from `textures/gui/seal` to `textures/seal` folder.
 - Moved letters and numbers seal impressions into their respective subfolders. Example: `envelope:c` -> `envelope:letter/c`
-  - Sealed Letters and Packages will lose their sealer data when updating to this version.
 - Fixed total delivery distance calculation in debug-mode overlay.
+- Rewrote some parts of Delivery Log, mostly internal work, but there are some minor user-facing changes as well.
+- Small updates of **Address Tag**, **Payback Box** and **Payback Package** menu textures.
+- Small change to how `envelope:payback_subject` component is defined.
+- Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
+- Fixed couriers spawned after delivery is finished (when ended in unloaded chunk) not being tired.
 
 ## 0.5.2 - 2026-02-06
 #### Reworked Packages:
