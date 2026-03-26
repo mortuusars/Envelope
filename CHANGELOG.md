@@ -2,12 +2,12 @@
 
 ## 0.6
 #### Mail Recipes
-Added a new way to craft items (and more) by sending a Package with ingredients to a mail entity
+Added a new way to craft items by sending a Package with ingredients to a mail entity.
 - Works similarly to a shapeless crafting.
 - Results are returned using the same courier, or with service courier, if some of the ingredients were unprocessed.
-- Data-driven. Shown in JEI.
-  - Clicking on an arrow in Mailbox menu, or on a box in Paper Box menu will show available recipes.
-- Can give experience Applied to resulting package and awarded when player opens it.
+- Data-driven. 
+- Can give experience. Applied to the resulting package.
+- [JEI] Clicking on an arrow in Mailbox menu, or on a box in Paper Box menu, or looking up usages for mailbox and package will show available recipes.
 
 Included recipes:
 - Payback Tag 
@@ -21,7 +21,7 @@ Included recipes:
 - Book and Quill and Letter and Quill 
 - Lost Mail
   - Has random loot inside
-- Letter Broadcast
+- Letter Broadcasting
   - Sends copies of the letter to all existing player-default mailboxes.
 
 Package
@@ -32,7 +32,7 @@ Package
 
 Payback Tag
 - Added drag and drop from JEI support.
-- Added payback request duration selector.
+- Added request duration selector.
   - Controls how much time buyer will have to pay for the mail.
   - Item texture changes slightly based on duration defined.
 - Using the tag while holding [**Sneak**] will clear the data from it.
