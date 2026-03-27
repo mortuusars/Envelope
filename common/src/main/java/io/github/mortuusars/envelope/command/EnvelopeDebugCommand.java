@@ -10,6 +10,9 @@ import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTe
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.entity.EquineAssuranceBureau;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -75,6 +78,9 @@ public class EnvelopeDebugCommand {
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
+
+        EquineAssuranceBureau.sendNotice(MailService.of(player.serverLevel()),
+              EntityAddress.getOrThrow(player.registryAccess(), MailEntities.EQUINE_ASSURANCE_BUREAU));
 
 //        ItemStack item = new ItemStack(Envelope.Items.LETTER.get());
 //        item.set(Envelope.DataComponents.LETTER_CONTENT,

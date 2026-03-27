@@ -151,6 +151,7 @@ public class MailService {
     public void tick() {
         getBackgroundDelivery().tick(level);
         getPaybackDepartment().tick();
+        getMailEntities().tick();
 
         if (level.getGameTime() % 20 == 0) Bugger.MAIL_SERVICE.collectAndSendData(this);
     }
@@ -201,6 +202,14 @@ public class MailService {
 
     public EntityAddress getAddress() {
         return EntityAddress.getOrThrow(getLevel().registryAccess(), MailEntities.MAIL_SERVICE);
+    }
+
+    /**
+     * Common storage for mail related data that needs to persist.<br>
+     * Can be used by mail entities, custom handlers, etc.
+     */
+    public CustomMailSavedData getPersistentData() {
+        return CustomMailSavedData.get(getLevel());
     }
 
     // --

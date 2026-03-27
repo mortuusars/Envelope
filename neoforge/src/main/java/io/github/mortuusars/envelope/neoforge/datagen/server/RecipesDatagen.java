@@ -111,15 +111,21 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void buildMailRecipes(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
-        EntityAddress mailService = address(MailEntities.MAIL_SERVICE);
+        mailService(output, registries);
+        automatedSupplyService(output, registries);
+        equineAssuranceBureau(output, registries);
+    }
 
-        MailRecipeBuilder.crafting(mailService)
+    private void mailService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
+        EntityAddress address = address(MailEntities.MAIL_SERVICE);
+
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Envelope.Items.ADDRESS_TAG.get()))
               .requires(Ingredient.of(Tags.Items.DYES_RED))
               .forResult(Envelope.Items.PAYBACK_TAG.get())
               .save(output);
 
-        MailRecipeBuilder.crafting(mailService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.DIAMOND))
               .forResult(Mail.createPackage(Envelope.LootTables.LOST_MAIL)
                     .set(DataComponents.ITEM_NAME, Component.translatable("item.envelope.lost_mail"))
@@ -128,68 +134,68 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output, "lost_mail");
 
         output.accept(
-              Envelope.resource(MailRecipeBuilder.getDefaultPath(mailService, "letter_broadcasting")),
+              Envelope.resource(MailRecipeBuilder.getDefaultPath(address, "letter_broadcasting")),
               new MailLetterBroadcastingRecipe(
-                    mailService,
+                    address,
                     NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Tags.Items.LETTERS), Ingredient.of(Items.DIAMOND))
               ),
               null);
 
-        sealStamp(output, mailService, Ingredient.of(Items.GOLDEN_APPLE), SealImpression.APPLE);
-        sealStamp(output, mailService, Ingredient.of(ItemTags.SWORDS), SealImpression.SWORD);
-        sealStamp(output, mailService, Ingredient.of(ItemTags.PICKAXES), SealImpression.PICKAXE);
-        sealStamp(output, mailService, Ingredient.of(ItemTags.SHOVELS), SealImpression.SHOVEL);
-        sealStamp(output, mailService, Ingredient.of(ItemTags.AXES), SealImpression.AXE);
-        sealStamp(output, mailService, Ingredient.of(ItemTags.HOES), SealImpression.HOE);
-        sealStamp(output, mailService, Ingredient.of(Items.BOOK), SealImpression.BOOK);
-        sealStamp(output, mailService, Ingredient.of(Items.SKELETON_SKULL), SealImpression.SKELETON);
+        sealStamp(output, address, Ingredient.of(Items.GOLDEN_APPLE), SealImpression.APPLE);
+        sealStamp(output, address, Ingredient.of(ItemTags.SWORDS), SealImpression.SWORD);
+        sealStamp(output, address, Ingredient.of(ItemTags.PICKAXES), SealImpression.PICKAXE);
+        sealStamp(output, address, Ingredient.of(ItemTags.SHOVELS), SealImpression.SHOVEL);
+        sealStamp(output, address, Ingredient.of(ItemTags.AXES), SealImpression.AXE);
+        sealStamp(output, address, Ingredient.of(ItemTags.HOES), SealImpression.HOE);
+        sealStamp(output, address, Ingredient.of(Items.BOOK), SealImpression.BOOK);
+        sealStamp(output, address, Ingredient.of(Items.SKELETON_SKULL), SealImpression.SKELETON);
+    }
 
-        // --
+    private void automatedSupplyService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
+        EntityAddress address = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
 
-        EntityAddress automatedSupplyService = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
-
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.ROTTEN_FLESH), 6)
               .forResult(Items.LEATHER, 1)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Tags.Items.INGOTS_IRON))
               .requires(Ingredient.of(Items.LEATHER), 5)
               .forResult(Items.SADDLE)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.ANDESITE), 1)
               .requires(Ingredient.of(Items.FLINT), 5)
               .forResult(Items.TUFF, 2)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.GRANITE), 1)
               .requires(Ingredient.of(Items.CLAY_BALL), 5)
               .forResult(Items.DRIPSTONE_BLOCK, 2)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.DIORITE), 1)
               .requires(Ingredient.of(Items.BONE_MEAL), 5)
               .forResult(Items.CALCITE, 2)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.IRON_NUGGET))
               .requires(Ingredient.of(Items.PHANTOM_MEMBRANE))
               .forResult(Items.NAME_TAG)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.INK_SAC))
               .requires(Ingredient.of(Items.GLOWSTONE_DUST), 5)
               .forResult(Items.GLOW_INK_SAC)
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.PAPER))
               .requires(Ingredient.of(Items.BLACK_DYE))
               .requires(Ingredient.of(Items.SLIME_BALL))
@@ -197,12 +203,20 @@ public class RecipesDatagen extends RecipeProvider {
               .forResult(Envelope.Items.LETTER_AND_QUILL.get())
               .save(output);
 
-        MailRecipeBuilder.crafting(automatedSupplyService)
+        MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.BOOK))
               .requires(Ingredient.of(Items.BLACK_DYE))
               .requires(Ingredient.of(Items.SLIME_BALL))
               .requires(Ingredient.of(Items.FEATHER))
               .forResult(Items.WRITABLE_BOOK)
+              .save(output);
+    }
+
+    private void equineAssuranceBureau(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
+        EntityAddress address = address(MailEntities.EQUINE_ASSURANCE_BUREAU);
+        MailRecipeBuilder.crafting(address)
+              .requires(Ingredient.of(Items.GOLD_BLOCK))
+              .forResult(Items.GOLDEN_HORSE_ARMOR)
               .save(output);
     }
 

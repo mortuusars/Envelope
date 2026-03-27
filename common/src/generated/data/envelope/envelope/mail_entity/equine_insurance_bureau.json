@@ -1,0 +1,9 @@
+{
+  "location": {
+    "type": "relative",
+    "distance": 2000
+  },
+  "name": {
+    "translate": "address.envelope.equine_assurance_bureau"
+  }
+}

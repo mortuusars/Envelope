@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class MailEntities {
     public static final ResourceKey<MailEntity> MAIL_SERVICE = createKey(Envelope.resource("mail_service"));
     public static final ResourceKey<MailEntity> AUTOMATED_SUPPLY_SERVICE = createKey(Envelope.resource("automated_supply_service"));
+    public static final ResourceKey<MailEntity> EQUINE_ASSURANCE_BUREAU = createKey(Envelope.resource("equine_insurance_bureau"));
 
     private final MailService service;
 
@@ -36,6 +37,11 @@ public class MailEntities {
               .collect(Collectors.toSet());
     }
 
+    public void tick() {
+        EntityAddress.get(getMailService().getLevel().registryAccess(), EQUINE_ASSURANCE_BUREAU)
+              .ifPresent(address -> EquineAssuranceBureau.tick(getMailService(), address));
+    }
+
     // --
 
     public static ResourceKey<MailEntity> createKey(ResourceLocation location) {
@@ -46,9 +52,13 @@ public class MailEntities {
         context.register(MAIL_SERVICE, new MailEntity(
               Component.translatable("address.envelope.mail_service"),
               EnvelopeSymbols.ADDRESS_MAIL_SERVICE,
-              new AddressLocation.Relative(1000)));
+              new AddressLocation.Relative(1000))); //TODO: use 0? mail hub
         context.register(AUTOMATED_SUPPLY_SERVICE, new MailEntity(
               Component.translatable("address.envelope.automated_supply_service"),
+              EnvelopeSymbols.ADDRESS_ENTITY,
+              new AddressLocation.Relative(2000)));
+        context.register(EQUINE_ASSURANCE_BUREAU, new MailEntity(
+              Component.translatable("address.envelope.equine_assurance_bureau"),
               EnvelopeSymbols.ADDRESS_ENTITY,
               new AddressLocation.Relative(2000)));
     }

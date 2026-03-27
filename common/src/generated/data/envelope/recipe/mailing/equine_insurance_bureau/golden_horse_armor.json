@@ -1,0 +1,13 @@
+{
+  "type": "envelope:mail_crafting",
+  "entity": "envelope:equine_insurance_bureau",
+  "ingredients": [
+    {
+      "item": "minecraft:gold_block"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:golden_horse_armor"
+  }
+}

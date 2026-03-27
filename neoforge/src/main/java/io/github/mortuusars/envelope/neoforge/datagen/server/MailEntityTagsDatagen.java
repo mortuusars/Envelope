@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.neoforge.datagen.server;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
 import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -18,5 +19,7 @@ public class MailEntityTagsDatagen extends TagsProvider<MailEntity> {
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
+        tag(Envelope.Tags.MailEntities.HIDDEN)
+              .add(MailEntities.EQUINE_ASSURANCE_BUREAU);
     }
 }

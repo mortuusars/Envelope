@@ -47,6 +47,13 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_MEDIUM;
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_LONG;
 
+        // Entity
+        // Equine Assurance Bureau
+        public static final ModConfigSpec.BooleanValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
+        public static final ModConfigSpec.DoubleValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES;
+        public static final ModConfigSpec.DoubleValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES;
+        public static final ModConfigSpec.DoubleValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK;
+
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
 
@@ -166,6 +173,28 @@ public abstract class Config {
                 PAYBACK_REQUEST_DURATION_LONG = builder
                       .comment("'Long' payback request duration (in minutes).")
                       .defineInRange("request_duration_long", 4320, 1, Integer.MAX_VALUE);
+                builder.pop();
+            }
+
+            {
+                builder.push("mail_entity");
+                {
+                    builder.push("equine_assurance_bureau");
+                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder
+                          .comment("A notice letter would be sent out to all players occasionally.", "Default: true")
+                          .define("notice_sending_enabled", true);
+                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES = builder
+                          .comment("Minimum time (in minutes) from the previous send after which another notice could be sent.")
+                          .defineInRange("notice_sending_base_interval_minutes", 120, 0, 9999.0);
+                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES = builder
+                          .comment("Additional time (in minutes) per the in-game day. More days played = less notices.")
+                          .defineInRange("notice_sending_additional_interval_per_day_minutes", 1, 0, 9999.0);
+                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK = builder
+                          .comment("Chance of notice letter being sent per tick, assuming that enough time has passed from previous send.", "Default: 0.0002 (about 4 minutes on average)")
+                                .defineInRange("notice_sending_chance_per_tick", 0.0002, 0.0, 1.0);
+
+                    builder.pop();
+                }
                 builder.pop();
             }
 

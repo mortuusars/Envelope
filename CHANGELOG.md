@@ -54,6 +54,7 @@ Mail Entities
 - `#envelope:hidden` mail entity tag can be used to hide the entity from address suggestions and its recipes from JEI.
 - Mail entities that have recipes now show up in JEI as an ingredient.
   - Querying their uses (R-Click or [U]) will show available recipes associated with that address.
+- Added **Equine Assurance Bureau** sending "spam" letters.
 
 Delivery
 - Added support for Entity address "drop-off" handlers.

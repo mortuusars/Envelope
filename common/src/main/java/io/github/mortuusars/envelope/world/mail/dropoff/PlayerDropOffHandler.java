@@ -17,7 +17,7 @@ public class PlayerDropOffHandler implements MailDropOffHandler {
         }
 
         return context.getService().getKnownPlayers().getDefaultAddressOf(address)
-              .map(blockAddress -> blockHandler.handle(context))
+              .map(blockAddress -> blockHandler.handle(new MailDropOffContext(context.getService(), blockAddress, context.getDelivery())))
               .orElseGet(() -> MailDropOffResult.returned(context.getMail(), DeliveryRecord.Message.RECIPIENT_NOT_FOUND));
     }
 }

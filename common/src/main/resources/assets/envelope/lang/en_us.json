@@ -145,6 +145,7 @@
 
   "address.envelope.mail_service": "Mail Service",
   "address.envelope.automated_supply_service": "Automated Supply Service",
+  "address.envelope.equine_assurance_bureau": "Equine Assurance Bureau",
   "address.envelope.unknown": "Unknown",
 
   "address_type.envelope.block": "Block",
@@ -203,6 +204,9 @@
   "letter.envelope.broadcast_report.error_no_message": "No message suitable for broadcast was provided. Action was not taken.",
   "letter.envelope.broadcast_report.error_no_recipients": "No recipients suitable for broadcast are available. Action was not taken.",
 
+  "letter.envelope.equine_assurance_notice.name": "Equine Assurance Notice",
+  "letter.envelope.equine_assurance_notice.body": "We've been trying to reach you about your horse's extended warranty.\n\nLack of assurance can lead to unexpected incidents including total loss of your vehicle.\n\nTo receive the full assurance package, send us: %s.\n\nAct promptly to secure your vehicle's future!",
+
   "envelope.configuration.pigeon": "Pigeon",
   "envelope.configuration.delivery": "Delivery",
   "envelope.configuration.hunted_by_fox": "Hunted by Fox",
@@ -240,6 +244,12 @@
   "envelope.configuration.request_duration_medium": "Request Duration - Medium",
   "envelope.configuration.request_duration_short": "Request Duration - Short",
   "envelope.configuration.request_duration_long": "Request Duration - Long",
+  "envelope.configuration.notice_sending_additional_interval_per_day_minutes": "Notice: Additional Interval per Day",
+  "envelope.configuration.notice_sending_chance_per_tick": "Notice: Chance per Tick",
+  "envelope.configuration.mail_entity": "Mail Entity",
+  "envelope.configuration.notice_sending_enabled": "Notice: Enabled",
+  "envelope.configuration.notice_sending_base_interval_minutes": "Notice: Base Sending Interval",
+  "envelope.configuration.equine_assurance_bureau": "Equine Assurance Bureau",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
