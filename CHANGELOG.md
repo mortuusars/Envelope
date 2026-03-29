@@ -3,11 +3,12 @@
 ## 0.6
 #### Mail Recipes
 Added a new way to craft items by sending a Package with ingredients to a mail entity.
-- Works similarly to a shapeless crafting.
-- Results are returned using the same courier, or with service courier, if some of the ingredients were unprocessed.
+- Works similarly to the shapeless crafting.
+- Results are returned using the same courier, or with a service courier, if some of the ingredients were unprocessed.
 - Data-driven. 
 - Can give experience. Applied to the resulting package.
-- [JEI] Clicking on an arrow in Mailbox menu, or on a box in Paper Box menu, or looking up usages for mailbox and package will show available recipes.
+- Shown in **JEI**
+  - Clicking on an arrow in the Mailbox menu, or on a box in the Paper Box menu will show available recipes.
 
 Included recipes:
 - Payback Tag 
