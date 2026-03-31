@@ -1,6 +1,6 @@
 {
   "type": "envelope:mail_crafting",
-  "entity": "envelope:automated_supply_service",
+  "address": "envelope:automated_supply_service",
   "ingredients": [
     {
       "item": "minecraft:granite"

@@ -124,8 +124,8 @@ public class AddressTagScreen extends Screen {
         return new AllAddresses(
               knownAddresses.blocks(),
               knownAddresses.players(),
-              knownAddresses.entities().stream()
-                    .filter(address -> !address.getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
+              knownAddresses.services().stream()
+                    .filter(address -> !address.getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN))
                     .collect(Collectors.toSet()));
     }
 

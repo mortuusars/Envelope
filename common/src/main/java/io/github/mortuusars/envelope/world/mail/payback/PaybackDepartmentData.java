@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department;
+package io.github.mortuusars.envelope.world.mail.payback;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;

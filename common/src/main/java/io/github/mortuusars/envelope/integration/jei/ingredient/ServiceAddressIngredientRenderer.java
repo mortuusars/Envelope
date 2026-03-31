@@ -5,7 +5,7 @@ import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,9 +15,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class EntityAddressIngredientRenderer implements IIngredientRenderer<EntityAddress> {
+public class ServiceAddressIngredientRenderer implements IIngredientRenderer<ServiceAddress> {
     @Override
-    public void render(GuiGraphics guiGraphics, EntityAddress ingredient) {
+    public void render(GuiGraphics guiGraphics, ServiceAddress ingredient) {
         String address = ingredient.getString();
         String string = AddressFormatter.getIcon(ingredient)
               + EnvelopeSymbols.SMALL_SPACE
@@ -28,9 +28,9 @@ public class EntityAddressIngredientRenderer implements IIngredientRenderer<Enti
     }
 
     @Override
-    public @NotNull List<Component> getTooltip(EntityAddress ingredient, TooltipFlag tooltipFlag) {
+    public @NotNull List<Component> getTooltip(ServiceAddress ingredient, TooltipFlag tooltipFlag) {
         if (tooltipFlag.isAdvanced()) {
-            int travelDuration = ingredient.getEntity().location().getTravelDurationTo(Minecrft.player().blockPosition()).ticks();
+            int travelDuration = ingredient.getDefinition().location().getTravelDurationTo(Minecrft.player().blockPosition()).ticks();
             return List.of(
                   ingredient.format().withIcon().toComponent(),
                   Component.literal("⌚" + EnvelopeSymbols.SMALL_SPACE)

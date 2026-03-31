@@ -32,8 +32,8 @@ public class AddressSuggestions implements SuggestionProvider<CommandSourceStack
         return new AddressSuggestions(Address.Type.PLAYER);
     }
 
-    public static AddressSuggestions entity() {
-        return new AddressSuggestions(Address.Type.ENTITY);
+    public static AddressSuggestions service() {
+        return new AddressSuggestions(Address.Type.SERVICE);
     }
 
     @Override

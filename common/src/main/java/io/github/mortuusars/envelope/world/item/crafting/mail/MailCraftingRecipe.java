@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item.crafting.mail;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -10,12 +10,12 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.NotNull;
 
 public class MailCraftingRecipe implements MailRecipe {
-    private final EntityAddress address;
+    private final ServiceAddress address;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
     private final float experience;
 
-    public MailCraftingRecipe(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result, float experience) {
+    public MailCraftingRecipe(ServiceAddress address, NonNullList<Ingredient> ingredients, ItemStack result, float experience) {
         this.address = address;
         this.ingredients = ingredients;
         this.result = result;
@@ -23,7 +23,7 @@ public class MailCraftingRecipe implements MailRecipe {
     }
 
     @Override
-    public EntityAddress getAddress() {
+    public ServiceAddress getAddress() {
         return address;
     }
 

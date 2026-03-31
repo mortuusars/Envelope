@@ -11,7 +11,7 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -20,12 +20,12 @@ import org.slf4j.Logger;
 
 import java.util.List;
 
-public class CraftingDropOffHandler implements MailDropOffHandler {
+public class ServiceCraftingDropOffHandler implements MailDropOffHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
     public MailDropOffResult handle(MailDropOffContext context) {
-        if (!(context.getTarget() instanceof EntityAddress address)) {
+        if (!(context.getTarget() instanceof ServiceAddress address)) {
             return MailDropOffResult.PASS;
         }
 
@@ -42,7 +42,7 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
 
         Address sender = context.getDelivery().getSender();
         if (sender.equals(address)) {
-            LOGGER.info("Mail Entity Crafting Handler cannot handle mail when sender is it's own address '{}'. Voiding.", context.getDelivery());
+            LOGGER.info("Service Crafting Handler cannot handle mail when sender is it's own address '{}'. Voiding.", context.getDelivery());
             return MailDropOffResult.CONSUME;
         }
 
@@ -84,7 +84,7 @@ public class CraftingDropOffHandler implements MailDropOffHandler {
         return sendResults(context.getService(), address, mail, result.input().toPackageContents(), results, sender);
     }
 
-    protected MailDropOffResult sendResults(MailService service, EntityAddress address, ItemStack mail,
+    protected MailDropOffResult sendResults(MailService service, ServiceAddress address, ItemStack mail,
                                             PackageContents remainingInput, List<ItemStack> results, Address destination) {
         boolean hasRemainder = false;
 

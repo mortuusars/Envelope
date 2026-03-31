@@ -34,6 +34,6 @@ public class DataGeneration {
         DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
         generator.addProvider(event.includeServer(), datapackRegistries);
         generator.addProvider(event.includeServer(), new SealImpressionTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
-        generator.addProvider(event.includeServer(), new MailEntityTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
+        generator.addProvider(event.includeServer(), new ServiceAddressTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
     }
 }

@@ -1,6 +1,6 @@
 {
   "type": "envelope:mail_letter_broadcasting",
-  "entity": "envelope:mail_service",
+  "address": "envelope:mail_service",
   "ingredients": [
     {
       "tag": "envelope:letters"

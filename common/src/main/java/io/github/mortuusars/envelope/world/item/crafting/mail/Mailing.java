@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item.crafting.mail;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
@@ -22,13 +22,13 @@ public class Mailing {
         return level.getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get());
     }
 
-    public static Stream<RecipeHolder<MailRecipe>> getAllRecipesOf(EntityAddress address, ServerLevel level) {
+    public static Stream<RecipeHolder<MailRecipe>> getAllRecipesOf(ServiceAddress address, ServerLevel level) {
         return getAllRecipes(level)
               .stream()
               .filter(recipeHolder -> recipeHolder.value().getAddress().equals(address));
     }
 
-    public static Optional<RecipeHolder<MailRecipe>> findMatchingRecipe(EntityAddress address, MailRecipeInput input, ServerLevel level) {
+    public static Optional<RecipeHolder<MailRecipe>> findMatchingRecipe(ServiceAddress address, MailRecipeInput input, ServerLevel level) {
         return getAllRecipesOf(address, level)
               .filter(recipeHolder -> recipeHolder.value().matches(input, level))
               .findFirst();

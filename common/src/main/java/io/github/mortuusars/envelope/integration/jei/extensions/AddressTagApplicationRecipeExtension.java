@@ -4,13 +4,12 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +25,7 @@ public class AddressTagApplicationRecipeExtension implements ICraftingCategoryEx
               .orElse(List.of());
 
         ItemStack tag = new ItemStack(Envelope.Items.ADDRESS_TAG.get());
-        tag.set(Envelope.DataComponents.ADDRESS, EntityAddress.getOrThrow(Minecrft.registryAccess(), MailEntities.MAIL_SERVICE));
+        tag.set(Envelope.DataComponents.ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE));
         List<ItemStack> tagItems = List.of(tag);
 
         List<ItemStack> resultItems = mailableItems.stream()

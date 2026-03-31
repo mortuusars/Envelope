@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item.crafting.mail;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -9,13 +9,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
 public abstract class MailRecipeBuilder {
-    private final EntityAddress address;
+    private final ServiceAddress address;
 
-    public MailRecipeBuilder(EntityAddress address) {
+    public MailRecipeBuilder(ServiceAddress address) {
         this.address = address;
     }
 
-    public EntityAddress getAddress() {
+    public ServiceAddress getAddress() {
         return address;
     }
 
@@ -33,7 +33,7 @@ public abstract class MailRecipeBuilder {
 
     // --
 
-    public static MailCraftingRecipeBuilder crafting(EntityAddress address) {
+    public static MailCraftingRecipeBuilder crafting(ServiceAddress address) {
         return new MailCraftingRecipeBuilder(address);
     }
 
@@ -41,8 +41,8 @@ public abstract class MailRecipeBuilder {
         return BuiltInRegistries.ITEM.getKey(itemLike.asItem()).getPath();
     }
 
-    public static String getDefaultPath(EntityAddress address, String name) {
-        String addressStr = address.getEntityHolder().unwrapKey()
+    public static String getDefaultPath(ServiceAddress address, String name) {
+        String addressStr = address.getDefinitionHolder().unwrapKey()
               .map(key -> key.location().getPath())
               .orElseThrow();
         return "mailing/" + addressStr + "/" + name;

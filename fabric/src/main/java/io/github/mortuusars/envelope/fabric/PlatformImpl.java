@@ -79,7 +79,7 @@ public class PlatformImpl {
         return FabricLoader.getInstance().getConfigDir();
     }
 
-    public static void registerEntityDropOffHandlers() {
+    public static void registerServiceDropOffHandlers() {
 
     }
 

@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.crafting.mail.CustomMailRecipe;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFixedCodec;
@@ -17,14 +17,14 @@ public class CustomMailingRecipeSerializer<T extends CustomMailRecipe> implement
 
     public CustomMailingRecipeSerializer(Constructor<T> constructor) {
         this.codec = RecordCodecBuilder.mapCodec(i -> i.group(
-              RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
-                    .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
-                    .fieldOf("entity")
+              RegistryFixedCodec.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION)
+                    .xmap(ServiceAddress::new, ServiceAddress::getDefinitionHolder)
+                    .fieldOf("address")
                     .forGetter(CustomMailRecipe::getAddress)
         ).apply(i, constructor::create));
 
         this.streamCodec = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, CustomMailRecipe::getAddress,
+              ServiceAddress.STREAM_CODEC, CustomMailRecipe::getAddress,
               constructor::create
         );
     }
@@ -41,6 +41,6 @@ public class CustomMailingRecipeSerializer<T extends CustomMailRecipe> implement
 
     @FunctionalInterface
     public interface Constructor<T extends CustomMailRecipe> {
-        T create(EntityAddress address);
+        T create(ServiceAddress address);
     }
 }

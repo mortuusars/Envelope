@@ -60,7 +60,7 @@ public class Platform {
     }
 
     @ExpectPlatform
-    public static void registerEntityDropOffHandlers() {
+    public static void registerServiceDropOffHandlers() {
         throw new AssertionError();
     }
 

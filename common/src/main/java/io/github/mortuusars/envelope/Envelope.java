@@ -24,7 +24,7 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -502,9 +502,9 @@ public class Envelope {
                   TagKey.create(Registries.SEAL_IMPRESSION, resource("tools"));
         }
 
-        public static class MailEntities {
-            public static final TagKey<MailEntity> HIDDEN =
-                  TagKey.create(Registries.MAIL_ENTITY, resource("hidden"));
+        public static class ServiceAddresses {
+            public static final TagKey<ServiceAddressDefinition> HIDDEN =
+                  TagKey.create(Registries.SERVICE_ADDRESS_DEFINITION, resource("hidden"));
         }
     }
 
@@ -517,8 +517,8 @@ public class Envelope {
     }
 
     public static class Registries {
-        public static final ResourceKey<Registry<MailEntity>> MAIL_ENTITY =
-              ResourceKey.createRegistryKey(resource("mail_entity"));
+        public static final ResourceKey<Registry<ServiceAddressDefinition>> SERVICE_ADDRESS_DEFINITION =
+              ResourceKey.createRegistryKey(resource("service_address"));
 
         public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIAL =
               ResourceKey.createRegistryKey(resource("seal_material"));

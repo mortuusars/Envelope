@@ -47,12 +47,12 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_MEDIUM;
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_LONG;
 
-        // Entity
+        // Service Addresses
         // Equine Assurance Bureau
-        public static final ModConfigSpec.BooleanValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
-        public static final ModConfigSpec.DoubleValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES;
-        public static final ModConfigSpec.DoubleValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES;
-        public static final ModConfigSpec.DoubleValue ENTITY_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK;
+        public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
+        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES;
+        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES;
+        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK;
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -177,19 +177,19 @@ public abstract class Config {
             }
 
             {
-                builder.push("mail_entity");
+                builder.push("service_addresses");
                 {
                     builder.push("equine_assurance_bureau");
-                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder
+                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder
                           .comment("A notice letter would be sent out to all players occasionally.", "Default: true")
                           .define("notice_sending_enabled", true);
-                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES = builder
+                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES = builder
                           .comment("Minimum time (in minutes) from the previous send after which another notice could be sent.")
                           .defineInRange("notice_sending_base_interval_minutes", 120, 0, 9999.0);
-                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES = builder
+                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES = builder
                           .comment("Additional time (in minutes) per the in-game day. More days played = less notices.")
                           .defineInRange("notice_sending_additional_interval_per_day_minutes", 1, 0, 9999.0);
-                    ENTITY_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK = builder
+                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK = builder
                           .comment("Chance of notice letter being sent per tick, assuming that enough time has passed from previous send.", "Default: 0.0002 (about 4 minutes on average)")
                                 .defineInRange("notice_sending_chance_per_tick", 0.0002, 0.0, 1.0);
 
@@ -224,7 +224,7 @@ public abstract class Config {
         public static final ModConfigSpec SPEC;
 
         // JEI
-        public static final ModConfigSpec.BooleanValue JEI_ENTITY_ADDRESS_INGREDIENT;
+        public static final ModConfigSpec.BooleanValue JEI_SERVICE_ADDRESS_INGREDIENT;
 
         static {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -233,11 +233,11 @@ public abstract class Config {
                 builder.push("integration");
                 {
                     builder.push("jei");
-                    JEI_ENTITY_ADDRESS_INGREDIENT = builder
-                          .comment("Entity Addresses that have recipes associated with them will be shown in JEI as ingredients.",
+                    JEI_SERVICE_ADDRESS_INGREDIENT = builder
+                          .comment("Service Addresses that have recipes associated with them will be shown in JEI as ingredients.",
                                 "Changing the value requires relogging into the world or /reload to take effect.",
                                 " Default: true.")
-                          .define("entity_address_ingredient", true);
+                          .define("service_address_ingredient", true);
                     builder.pop();
                 }
                 builder.pop();

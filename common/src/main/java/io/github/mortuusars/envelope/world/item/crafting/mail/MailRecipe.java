@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.item.crafting.mail;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public interface MailRecipe extends Recipe<MailRecipeInput> {
-    EntityAddress getAddress();
+    ServiceAddress getAddress();
 
     @Override
     default @NotNull RecipeType<?> getType() {

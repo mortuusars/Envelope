@@ -10,8 +10,8 @@ import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCateg
 import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.extensions.LetterCloningRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.extensions.PaybackTagApplicationRecipeExtension;
-import io.github.mortuusars.envelope.integration.jei.ingredient.EntityAddressIngredientHelper;
-import io.github.mortuusars.envelope.integration.jei.ingredient.EntityAddressIngredientRenderer;
+import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientHelper;
+import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientRenderer;
 import io.github.mortuusars.envelope.integration.jei.util.InHandRecipeTransferInfo;
 import io.github.mortuusars.envelope.integration.jei.util.PaybackTagGhostIngredientHandler;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
@@ -20,7 +20,7 @@ import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRe
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.PaybackTagApplicationRecipe;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -36,10 +36,10 @@ import java.util.List;
 public class EnvelopeJeiPlugin implements IModPlugin {
     private static final ResourceLocation ID = Envelope.resource("jei_plugin");
 
-    public static final IIngredientType<EntityAddress> ENTITY_ADDRESS_INGREDIENT = new IIngredientType<>() {
+    public static final IIngredientType<ServiceAddress> SERVICE_ADDRESS_INGREDIENT = new IIngredientType<>() {
         @Override
-        public @NotNull Class<? extends EntityAddress> getIngredientClass() {
-            return EntityAddress.class;
+        public @NotNull Class<? extends ServiceAddress> getIngredientClass() {
+            return ServiceAddress.class;
         }
     };
 
@@ -55,19 +55,19 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
-        if (Config.Client.JEI_ENTITY_ADDRESS_INGREDIENT.get()) {
-            List<EntityAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
+        if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
+            List<ServiceAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
                   .stream()
                   .map(recipe -> recipe.value().getAddress())
                   .distinct()
-                  .filter(address -> !address.getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN))
+                  .filter(address -> !address.getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN))
                   .toList();
 
-            registration.register(ENTITY_ADDRESS_INGREDIENT,
+            registration.register(SERVICE_ADDRESS_INGREDIENT,
                   addressesWithRecipes,
-                  new EntityAddressIngredientHelper(),
-                  new EntityAddressIngredientRenderer(),
-                  EntityAddress.CODEC.codec());
+                  new ServiceAddressIngredientHelper(),
+                  new ServiceAddressIngredientRenderer(),
+                  ServiceAddress.CODEC.codec());
         }
     }
 
@@ -83,7 +83,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
               .stream()
               .filter(recipe ->
-                    !recipe.value().getAddress().getEntityHolder().is(Envelope.Tags.MailEntities.HIDDEN)
+                    !recipe.value().getAddress().getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN)
                           && !recipe.value().getIngredients().isEmpty())
               .toList();
 

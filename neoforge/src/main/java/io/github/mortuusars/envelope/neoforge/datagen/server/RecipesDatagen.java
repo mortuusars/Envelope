@@ -6,9 +6,9 @@ import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeBuilder;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -117,7 +117,7 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void mailService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
-        EntityAddress address = address(MailEntities.MAIL_SERVICE);
+        ServiceAddress address = address(ServiceAddresses.MAIL_SERVICE);
 
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Envelope.Items.ADDRESS_TAG.get()))
@@ -152,7 +152,7 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void automatedSupplyService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
-        EntityAddress address = address(MailEntities.AUTOMATED_SUPPLY_SERVICE);
+        ServiceAddress address = address(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE);
 
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.ROTTEN_FLESH), 6)
@@ -213,14 +213,14 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void equineAssuranceBureau(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
-        EntityAddress address = address(MailEntities.EQUINE_ASSURANCE_BUREAU);
+        ServiceAddress address = address(ServiceAddresses.EQUINE_ASSURANCE_BUREAU);
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.GOLD_BLOCK))
               .forResult(Items.GOLDEN_HORSE_ARMOR)
               .save(output);
     }
 
-    protected void sealStamp(RecipeOutput output, EntityAddress address, Ingredient ingredient, ResourceKey<SealImpression> impression) {
+    protected void sealStamp(RecipeOutput output, ServiceAddress address, Ingredient ingredient, ResourceKey<SealImpression> impression) {
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Envelope.Items.SEAL_STAMP.get()))
               .requires(ingredient)
@@ -235,8 +235,8 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output, "seal_stamp_" + impression.location().getPath());
     }
 
-    protected EntityAddress address(ResourceKey<MailEntity> key) {
-        return new EntityAddress(Objects.requireNonNull(registries).lookupOrThrow(Envelope.Registries.MAIL_ENTITY)
+    protected ServiceAddress address(ResourceKey<ServiceAddressDefinition> key) {
+        return new ServiceAddress(Objects.requireNonNull(registries).lookupOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION)
               .get(key)
               .orElseThrow());
     }

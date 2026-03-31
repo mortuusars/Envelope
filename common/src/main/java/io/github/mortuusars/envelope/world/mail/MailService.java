@@ -11,8 +11,8 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
-import io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department.PaybackDepartment;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
+import io.github.mortuusars.envelope.world.mail.payback.PaybackDepartment;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import io.github.mortuusars.envelope.world.KnownPlayers;
 import net.minecraft.ChatFormatting;
@@ -34,7 +34,7 @@ public class MailService {
     protected final ServerLevel level;
 
     protected final Mailboxes mailboxes;
-    protected final MailEntities mailEntities;
+    protected final ServiceAddresses serviceAddresses;
     protected final DeliveryManager deliveryManager;
     protected final PaybackDepartment paybackDepartment;
 
@@ -45,7 +45,7 @@ public class MailService {
         Preconditions.checkArgument(operatesIn(level), "MailService cannot exist in the '" + level.dimension().location() + "' dimension.");
         this.level = level;
         this.mailboxes = new Mailboxes(level);
-        this.mailEntities = new MailEntities(this);
+        this.serviceAddresses = new ServiceAddresses(this);
         this.deliveryManager = new DeliveryManager(this);
         this.paybackDepartment = new PaybackDepartment(this);
     }
@@ -86,8 +86,8 @@ public class MailService {
         return mailboxes;
     }
 
-    public MailEntities getMailEntities() {
-        return mailEntities;
+    public ServiceAddresses getServiceAddresses() {
+        return serviceAddresses;
     }
 
     public DeliveryManager getDeliveryManager() {
@@ -116,7 +116,7 @@ public class MailService {
         return new AllAddresses(
               getMailboxes().getAllAddresses(),
               getKnownPlayers().getDefaultAddresses().keySet(),
-              getMailEntities().getAllAddresses()
+              getServiceAddresses().getAllAddresses()
         );
     }
 
@@ -127,7 +127,7 @@ public class MailService {
         return switch (type) {
             case BLOCK -> AllAddresses.blocks(getMailboxes().getAllAddresses());
             case PLAYER -> AllAddresses.players(getKnownPlayers().getDefaultAddresses().keySet());
-            case ENTITY -> AllAddresses.entities(getMailEntities().getAllAddresses());
+            case SERVICE -> AllAddresses.services(getServiceAddresses().getAllAddresses());
             case CUSTOM, UNKNOWN -> AllAddresses.EMPTY;
         };
     }
@@ -141,7 +141,7 @@ public class MailService {
             case BlockAddress block -> getMailboxes().getPositionOf(block).map(AddressLocation::exact).orElse(AddressLocation.DEFAULT);
             case PlayerAddress player ->
                   getKnownPlayers().getDefaultAddressOf(player).map(this::getLocationOf).orElse(AddressLocation.DEFAULT);
-            case EntityAddress entity -> entity.getEntity().location();
+            case ServiceAddress service -> service.getDefinition().location();
             default -> AddressLocation.DEFAULT;
         };
     }
@@ -151,7 +151,7 @@ public class MailService {
     public void tick() {
         getBackgroundDelivery().tick(level);
         getPaybackDepartment().tick();
-        getMailEntities().tick();
+        getServiceAddresses().tick();
 
         if (level.getGameTime() % 20 == 0) Bugger.MAIL_SERVICE.collectAndSendData(this);
     }
@@ -200,8 +200,8 @@ public class MailService {
               .get();
     }
 
-    public EntityAddress getAddress() {
-        return EntityAddress.getOrThrow(getLevel().registryAccess(), MailEntities.MAIL_SERVICE);
+    public ServiceAddress getAddress() {
+        return ServiceAddress.getOrThrow(getLevel().registryAccess(), ServiceAddresses.MAIL_SERVICE);
     }
 
     /**
@@ -215,6 +215,6 @@ public class MailService {
     // --
 
     public static void init() {
-        Platform.registerEntityDropOffHandlers();
+        Platform.registerServiceDropOffHandlers();
     }
 }

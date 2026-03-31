@@ -35,7 +35,7 @@ public class AddressArgument implements ArgumentType<Address> {
     }
 
     public static AddressArgument entity() {
-        return new AddressArgument(Address.Type.ENTITY);
+        return new AddressArgument(Address.Type.SERVICE);
     }
 
     public static BlockAddress getBlock(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {

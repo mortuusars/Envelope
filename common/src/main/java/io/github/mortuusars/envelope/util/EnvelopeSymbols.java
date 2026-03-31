@@ -12,7 +12,7 @@ public class EnvelopeSymbols {
     public static final String ADDRESS_GENERIC = "\uEE00";
     public static final String ADDRESS_BLOCK = "\uEE01";
     public static final String ADDRESS_PLAYER = "\uEE02";
-    public static final String ADDRESS_ENTITY = "\uEE03";
+    public static final String ADDRESS_SERVICE = "\uEE03";
     public static final String ADDRESS_CUSTOM = "\uEE04";
     public static final String ADDRESS_MAIL_SERVICE = "\uEE05";
     public static final String ADDRESS_UNKNOWN = "\uEE06";

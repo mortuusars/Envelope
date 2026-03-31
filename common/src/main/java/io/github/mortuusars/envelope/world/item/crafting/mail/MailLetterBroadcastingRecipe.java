@@ -10,7 +10,7 @@ import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import net.minecraft.ChatFormatting;
@@ -21,7 +21,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -36,7 +35,7 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
           .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
           .get();
 
-    public MailLetterBroadcastingRecipe(EntityAddress address, NonNullList<Ingredient> ingredients) {
+    public MailLetterBroadcastingRecipe(ServiceAddress address, NonNullList<Ingredient> ingredients) {
         super(address);
         this.ingredients = ingredients;
     }
@@ -151,9 +150,8 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
 
     public static class Serializer implements RecipeSerializer<MailLetterBroadcastingRecipe> {
         public static final MapCodec<MailLetterBroadcastingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-              RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
-                    .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
-                    .fieldOf("entity")
+              ServiceAddress.DEFINITION_CODEC
+                    .fieldOf("address")
                     .forGetter(MailLetterBroadcastingRecipe::getAddress),
               EnvelopeCodecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
                     .fieldOf("ingredients")
@@ -161,7 +159,7 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
         ).apply(i, MailLetterBroadcastingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MailLetterBroadcastingRecipe> STREAM_CODEC = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, MailLetterBroadcastingRecipe::getAddress,
+              ServiceAddress.STREAM_CODEC, MailLetterBroadcastingRecipe::getAddress,
               Ingredient.CONTENTS_STREAM_CODEC
                     .apply(ByteBufCodecs.list(PackageContents.SLOTS))
                     .map(list ->

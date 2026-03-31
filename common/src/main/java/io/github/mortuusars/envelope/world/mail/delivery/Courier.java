@@ -21,7 +21,7 @@ public interface Courier {
           new BaseDropOffHandler(),
           new BlockDropOffHandler(),
           new PlayerDropOffHandler(),
-          new EntityDropOffHandler(),
+          new ServiceDropOffHandler(),
           context -> MailDropOffResult.returned(context.getMail())
     );
 

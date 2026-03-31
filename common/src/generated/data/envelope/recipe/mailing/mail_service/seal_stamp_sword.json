@@ -1,6 +1,6 @@
 {
   "type": "envelope:mail_crafting",
-  "entity": "envelope:mail_service",
+  "address": "envelope:mail_service",
   "experience": 1.5,
   "ingredients": [
     {

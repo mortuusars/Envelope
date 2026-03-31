@@ -48,9 +48,9 @@ public class PlatformImpl {
         return FMLPaths.CONFIGDIR.get();
     }
 
-    public static void registerEntityDropOffHandlers() {
+    public static void registerServiceDropOffHandlers() {
         if (isModLoaded("kubejs")) {
-            EnvelopeJSEvents.registerCustomEntityDropOffHandlers();
+            EnvelopeJSEvents.registerServiceDropOffHandlers();
         }
     }
 

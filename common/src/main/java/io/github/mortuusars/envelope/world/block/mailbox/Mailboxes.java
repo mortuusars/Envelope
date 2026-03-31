@@ -51,9 +51,9 @@ public class Mailboxes {
     public @NotNull BlockAddress correctOrRegisterIfNeeded(BlockAddress suggestedAddress, BlockPos pos) {
         @Nullable RegisteredMailbox registeredAtPos = getAtPosition(pos);
         if (registeredAtPos != null) {
-            // inUseAsPlayerOrEntity check is to handle the case when new player joins,
-            // or new mail entity is added with the same address id
-            if (registeredAtPos.getAddress().equals(suggestedAddress) && !inUseAsPlayerOrEntity(registeredAtPos.getAddress())) {
+            // inUseAsPlayerOrService check is to handle the case when new player joins,
+            // or new service address is added with the same address
+            if (registeredAtPos.getAddress().equals(suggestedAddress) && !inUseAsPlayerOrService(registeredAtPos.getAddress())) {
                 return suggestedAddress;
             }
 
@@ -148,10 +148,10 @@ public class Mailboxes {
 
     // --
 
-    private boolean inUseAsPlayerOrEntity(BlockAddress address) {
+    private boolean inUseAsPlayerOrService(BlockAddress address) {
         AllAddresses knownAddresses = MailService.of(level).getKnownAddresses();
         return knownAddresses.isKnownOfType(address, Address.Type.PLAYER)
-              || knownAddresses.isKnownOfType(address, Address.Type.ENTITY);
+              || knownAddresses.isKnownOfType(address, Address.Type.SERVICE);
     }
 
     private BlockAddress uniquifyIfKnown(BlockAddress address) {

@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.address;
 
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -14,7 +14,7 @@ public class AllAddresses {
     public static final StreamCodec<RegistryFriendlyByteBuf, AllAddresses> STREAM_CODEC = StreamCodec.composite(
           BlockAddress.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::blocks,
           PlayerAddress.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::players,
-          EntityAddress.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::entities,
+          ServiceAddress.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)), AllAddresses::services,
           AllAddresses::new
     );
 
@@ -22,12 +22,12 @@ public class AllAddresses {
 
     private final Set<BlockAddress> blocks;
     private final Set<PlayerAddress> players;
-    private final Set<EntityAddress> entities;
+    private final Set<ServiceAddress> services;
 
-    public AllAddresses(Set<BlockAddress> blocks, Set<PlayerAddress> players, Set<EntityAddress> entities) {
+    public AllAddresses(Set<BlockAddress> blocks, Set<PlayerAddress> players, Set<ServiceAddress> services) {
         this.blocks = blocks;
         this.players = players;
-        this.entities = entities;
+        this.services = services;
     }
 
     public static AllAddresses blocks(Set<BlockAddress> addresses) {
@@ -38,14 +38,14 @@ public class AllAddresses {
         return new AllAddresses(Collections.emptySet(), addresses, Collections.emptySet());
     }
 
-    public static AllAddresses entities(Set<EntityAddress> addresses) {
+    public static AllAddresses services(Set<ServiceAddress> addresses) {
         return new AllAddresses(Collections.emptySet(), Collections.emptySet(), addresses);
     }
 
     // --
 
     public Stream<Address> stream() {
-        return Stream.of(blocks, players, entities).flatMap(Set::stream);
+        return Stream.of(blocks, players, services).flatMap(Set::stream);
     }
 
     public Set<BlockAddress> blocks() {
@@ -56,8 +56,8 @@ public class AllAddresses {
         return players;
     }
 
-    public Set<EntityAddress> entities() {
-        return entities;
+    public Set<ServiceAddress> services() {
+        return services;
     }
 
     // --
@@ -94,12 +94,12 @@ public class AllAddresses {
         var that = (AllAddresses) obj;
         return Objects.equals(this.blocks, that.blocks) &&
               Objects.equals(this.players, that.players) &&
-              Objects.equals(this.entities, that.entities);
+              Objects.equals(this.services, that.services);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(blocks, players, entities);
+        return Objects.hash(blocks, players, services);
     }
 
     @Override
@@ -107,6 +107,6 @@ public class AllAddresses {
         return "AllAddresses[" +
               "blocks=" + blocks + ", " +
               "players=" + players + ", " +
-              "entities=" + entities + ']';
+              "entities=" + services + ']';
     }
 }

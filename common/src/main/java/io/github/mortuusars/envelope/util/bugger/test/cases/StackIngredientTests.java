@@ -108,8 +108,8 @@ public class StackIngredientTests extends BuggerTests {
                 "components": {
                   "envelope:letter_tattered": {},
                   "envelope:mail_sender": {
-                      "type": "entity",
-                      "entity": "envelope:mail_service"
+                      "type": "service",
+                      "definition": "envelope:mail_service"
                   },
                   "envelope:mail_recipient": {
                       "type": "block",
@@ -136,8 +136,8 @@ public class StackIngredientTests extends BuggerTests {
                 "components": {
                   "envelope:letter_tattered": {},
                   "envelope:mail_sender": {
-                      "type": "entity",
-                      "entity": "envelope:mail_service"
+                      "type": "service",
+                      "definition": "envelope:mail_service"
                   },
                   "envelope:mail_recipient": {
                       "type": "block",

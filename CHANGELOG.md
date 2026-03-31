@@ -2,7 +2,7 @@
 
 ## 0.6
 #### Mail Recipes
-Added a new way to craft items by sending a Package with ingredients to a mail entity.
+Added a new way to craft items by sending a Package with ingredients to the service address.
 - Works similarly to the shapeless crafting.
 - Results are returned using the same courier, or with a service courier, if some of the ingredients were unprocessed.
 - Data-driven. 
@@ -43,17 +43,17 @@ Payback Tag
 
 Address
 - Player address type definition has been changed. Field `id` is now `name`: `{ type:"player", name:"mortuusars" }`
-- Entity addresses are now data-driven
-  - Address component now references registered entity by its key: `{ type:"entity", entity:"envelope:mail_service" }`
+- Service addresses are now data-driven
+  - Address component now references registered definition by its key: `{ type:"service", definition:"envelope:mail_service" }`
 - Added "custom" address type: `{ type:"custom", name:{translate:"display.name"} }`
-  - Can be used as a virtual address for display purposes (commands, scripts, etc.). Cannot receive mail.
+  - Can be used for display purposes (commands, scripts, etc.). Cannot receive mail.
 - Unknown address is now a separate type: `{ type:"unknown" }`
 
-Mail Entities
+Service Addresses
 - Definition is data-driven.
 - For use in recipes or custom handlers.
-- `#envelope:hidden` mail entity tag can be used to hide the entity from address suggestions and its recipes from JEI.
-- Mail entities that have recipes now show up in JEI as an ingredient.
+- `#envelope:hidden` service address tag can be used to hide the address from suggestions and its recipes from JEI.
+- Addresses that have recipes will show up in JEI as an ingredient.
   - Querying their uses (R-Click or [U]) will show available recipes associated with that address.
 - Added **Equine Assurance Bureau** sending "spam" letters.
 
@@ -63,7 +63,7 @@ Delivery
   - _Drop-off handler is responsible for actually deciding what happens with delivered mail (consume/return/reply)._
 
 KubeJS
-- Added `EnvelopeEvents.registerEntityDropOffHandlers` event.
+- Added `EnvelopeEvents.registerServiceDropOffHandlers` event.
 - Added `EnvelopeEvents.handleMailDropOff` event.
   - Called before most of the regular logic is processed.
   - Can be used to modify drop-off of any address type.

@@ -11,7 +11,7 @@ import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntity;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -39,7 +39,7 @@ public class EnvelopeFabric implements ModInitializer {
 
         CommonEvents.commonSetup();
 
-        DynamicRegistries.registerSynced(Envelope.Registries.MAIL_ENTITY, MailEntity.DIRECT_CODEC, MailEntity.DIRECT_CODEC);
+        DynamicRegistries.registerSynced(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, ServiceAddressDefinition.DIRECT_CODEC, ServiceAddressDefinition.DIRECT_CODEC);
         DynamicRegistries.registerSynced(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
         DynamicRegistries.registerSynced(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
 

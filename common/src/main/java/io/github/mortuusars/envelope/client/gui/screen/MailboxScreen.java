@@ -45,7 +45,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     public static final WidgetSprites ICON_ADDRESS_GENERIC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_generic"));
     public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_block"));
     public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
-    public static final WidgetSprites ICON_ADDRESS_ENTITY_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_entity"));
+    public static final WidgetSprites ICON_ADDRESS_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_service"));
     public static final WidgetSprites ICON_ADDRESS_CUSTOM_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_custom"));
     public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mail_service"));
     public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unknown"));
@@ -492,9 +492,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         return switch (sender.getType()) {
             case BLOCK -> ICON_ADDRESS_BLOCK_SPRITES;
             case PLAYER -> ICON_ADDRESS_PLAYER_SPRITES;
-            case ENTITY -> sender.isMailService()
+            case SERVICE -> sender.isMailService()
                   ? ICON_ADDRESS_MAIL_SERVICE_SPRITES
-                  : ICON_ADDRESS_ENTITY_SPRITES;
+                  : ICON_ADDRESS_SERVICE_SPRITES;
             case CUSTOM -> ICON_ADDRESS_CUSTOM_SPRITES;
             case UNKNOWN -> ICON_ADDRESS_UNKNOWN_SPRITES;
             default -> ICON_ADDRESS_GENERIC_SPRITES;
@@ -507,9 +507,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         return switch (sender.getType()) {
             case BLOCK -> Component.translatable("address_type.envelope.block");
             case PLAYER -> Component.translatable("address_type.envelope.player");
-            case ENTITY -> sender.isMailService()
-                  ? Component.translatable("address.envelope.mail_service")
-                  : Component.translatable("address_type.envelope.entity");
+            case SERVICE -> Component.translatable("address_type.envelope.service");
             case CUSTOM -> Component.translatable("address_type.envelope.custom");
             case UNKNOWN -> Component.translatable("address_type.envelope.unknown");
         };

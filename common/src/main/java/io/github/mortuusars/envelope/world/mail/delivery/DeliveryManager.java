@@ -54,6 +54,6 @@ public class DeliveryManager {
 
     public boolean canDeliverTo(Address address) {
         address = address.resolve(getMailService());
-        return address instanceof BlockAddress || address instanceof EntityAddress;
+        return address instanceof BlockAddress || address instanceof ServiceAddress;
     }
 }

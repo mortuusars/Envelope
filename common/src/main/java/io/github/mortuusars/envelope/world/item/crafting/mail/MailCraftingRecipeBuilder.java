@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world.item.crafting.mail;
 
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +13,7 @@ public class MailCraftingRecipeBuilder extends MailRecipeBuilder {
     private ItemStack result = ItemStack.EMPTY;
     private float experience;
 
-    public MailCraftingRecipeBuilder(EntityAddress address) {
+    public MailCraftingRecipeBuilder(ServiceAddress address) {
         super(address);
     }
 

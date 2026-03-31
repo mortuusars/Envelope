@@ -1,24 +1,24 @@
 package io.github.mortuusars.envelope.world.mail.dropoff;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.api.EntityMailDropOffHandlerRegistry;
+import io.github.mortuusars.envelope.api.ServiceDropOffHandlerRegistry;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
-public class EntityDropOffHandler implements MailDropOffHandler {
+public class ServiceDropOffHandler implements MailDropOffHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final CraftingDropOffHandler craftingHandler = new CraftingDropOffHandler();
+    private final ServiceCraftingDropOffHandler craftingHandler = new ServiceCraftingDropOffHandler();
 
-    public CraftingDropOffHandler getCraftingHandler() {
+    public ServiceCraftingDropOffHandler getCraftingHandler() {
         return craftingHandler;
     }
 
     @Override
     public MailDropOffResult handle(MailDropOffContext context) {
-        if (!(context.getTarget() instanceof EntityAddress address)) {
+        if (!(context.getTarget() instanceof ServiceAddress address)) {
             return MailDropOffResult.PASS;
         }
 
@@ -38,14 +38,14 @@ public class EntityDropOffHandler implements MailDropOffHandler {
             return craftingResult;
         }
 
-        for (MailDropOffHandler handler : EntityMailDropOffHandlerRegistry.getHandlers(address)) {
+        for (MailDropOffHandler handler : ServiceDropOffHandlerRegistry.getHandlers(address)) {
             try {
                 MailDropOffResult result = handler.handle(context);
                 if (result.isHandled()) {
                     return result;
                 }
             } catch (Exception e) {
-                LOGGER.error("Entity Mail Handler '{}' for address '{}' failed to handle delivery '{}':",
+                LOGGER.error("Service Drop Off Handler '{}' for address '{}' has failed to handle delivery '{}':",
                       handler.toString(), address, context.getDelivery(), e);
             }
         }

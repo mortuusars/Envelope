@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.serialization.*;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
-import io.github.mortuusars.envelope.world.mail.entity.MailEntities;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -36,7 +36,7 @@ public interface Address {
     }
 
     default boolean isMailService() {
-        return this instanceof EntityAddress entityAddress && entityAddress.getEntityHolder().is(MailEntities.MAIL_SERVICE);
+        return this instanceof ServiceAddress serviceAddress && serviceAddress.getDefinitionHolder().is(ServiceAddresses.MAIL_SERVICE);
     }
 
     default boolean isUnknown() {
@@ -66,7 +66,7 @@ public interface Address {
     enum Type implements StringRepresentable {
         BLOCK("block", BlockAddress.CODEC, BlockAddress.STREAM_CODEC),
         PLAYER("player", PlayerAddress.CODEC, PlayerAddress.STREAM_CODEC),
-        ENTITY("entity", EntityAddress.CODEC, EntityAddress.STREAM_CODEC),
+        SERVICE("service", ServiceAddress.CODEC, ServiceAddress.STREAM_CODEC),
         CUSTOM("custom", CustomAddress.CODEC, CustomAddress.STREAM_CODEC),
         UNKNOWN("unknown", MapCodec.unit(UnknownAddress.INSTANCE), StreamCodec.unit(UnknownAddress.INSTANCE));
 

@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.mail.entity;
+package io.github.mortuusars.envelope.world.mail.service;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
@@ -9,7 +9,7 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.Mailing;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import net.minecraft.ChatFormatting;
@@ -28,35 +28,35 @@ import java.util.Optional;
 public class EquineAssuranceBureau {
     private static final ResourceLocation RECIPE_ID = Envelope.resource("mailing/equine_insurance_bureau/golden_horse_armor");
 
-    public static void tick(MailService service, EntityAddress address) {
-        if (!Config.Server.ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ENABLED.get()) {
+    public static void tick(MailService service, ServiceAddress address) {
+        if (!Config.Server.SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED.get()) {
             return;
         }
 
         long currentTime = service.getGameTime();
-        CompoundTag data = service.getPersistentData().get(MailEntities.EQUINE_ASSURANCE_BUREAU.location());
+        CompoundTag data = service.getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location());
         long lastSendTime = data.getLong("last_send_time");
 
         long days = service.getLevel().getDayTime() / 24000L;
-        long interval = Ticks.fromMinutes(Config.Server.ENTITY_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES.get())
-              + days * Ticks.fromMinutes(Config.Server.ENTITY_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES.get());
+        long interval = Ticks.fromMinutes(Config.Server.SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES.get())
+              + days * Ticks.fromMinutes(Config.Server.SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES.get());
 
         if (currentTime - lastSendTime < interval) {
             return;
         }
 
-        double chance = Config.Server.ENTITY_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK.get();
+        double chance = Config.Server.SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK.get();
         if (service.getLevel().getRandom().nextDouble() >= chance) {
             return;
         }
 
         if (sendNotice(service, address) > 0) {
             data.putLong("last_send_time", service.getGameTime());
-            service.getPersistentData().set(MailEntities.EQUINE_ASSURANCE_BUREAU.location(), data);
+            service.getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location(), data);
         }
     }
 
-    public static int sendNotice(MailService service, EntityAddress address) {
+    public static int sendNotice(MailService service, ServiceAddress address) {
         Map<PlayerAddress, BlockAddress> defaultAddresses = service.getKnownPlayers().getDefaultAddresses();
         if (defaultAddresses.isEmpty()) {
             return 0;

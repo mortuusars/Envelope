@@ -1,9 +1,10 @@
-package io.github.mortuusars.envelope.world.mail.entity.mail_service.payback_department;
+package io.github.mortuusars.envelope.world.mail.payback;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
 import io.github.mortuusars.envelope.world.item.PaybackPackageItem;
@@ -11,7 +12,6 @@ import io.github.mortuusars.envelope.world.item.PaybackBoxItem;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class PaybackDepartment {
         return mailService;
     }
 
-    public EntityAddress getAddress() {
+    public ServiceAddress getAddress() {
         return getMailService().getAddress();
     }
 

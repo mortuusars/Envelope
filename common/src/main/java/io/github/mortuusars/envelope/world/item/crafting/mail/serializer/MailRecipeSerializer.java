@@ -8,12 +8,11 @@ import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
-import io.github.mortuusars.envelope.world.mail.address.type.EntityAddress;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +25,8 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
 
     public MailRecipeSerializer(Constructor<T> constructor) {
         this.codec = RecordCodecBuilder.mapCodec(i -> i.group(
-              RegistryFixedCodec.create(Envelope.Registries.MAIL_ENTITY)
-                    .xmap(EntityAddress::new, EntityAddress::getEntityHolder)
-                    .fieldOf("entity")
+              ServiceAddress.DEFINITION_CODEC
+                    .fieldOf("address")
                     .forGetter(MailCraftingRecipe::getAddress),
               EnvelopeCodecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
                     .fieldOf("ingredients")
@@ -42,7 +40,7 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
         ).apply(i, constructor::create));
 
         this.streamCodec = StreamCodec.composite(
-              EntityAddress.STREAM_CODEC, MailCraftingRecipe::getAddress,
+              ServiceAddress.STREAM_CODEC, MailCraftingRecipe::getAddress,
               Ingredient.CONTENTS_STREAM_CODEC
                     .apply(ByteBufCodecs.list(PackageContents.SLOTS))
                     .map(list ->
@@ -66,6 +64,6 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
 
     @FunctionalInterface
     public interface Constructor<T extends MailRecipe> {
-        T create(EntityAddress address, NonNullList<Ingredient> ingredients, ItemStack result, float experience);
+        T create(ServiceAddress address, NonNullList<Ingredient> ingredients, ItemStack result, float experience);
     }
 }
