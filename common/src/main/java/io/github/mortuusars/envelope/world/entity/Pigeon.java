@@ -449,7 +449,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         return hasReachedTarget(pos, 2);
     }
 
-    protected boolean hasReachedTarget(BlockPos pos, int distance) {
+    protected boolean hasReachedTarget(BlockPos pos, double distance) {
         if (closerThan(pos, distance)) {
             return true;
         } else {
@@ -458,7 +458,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         }
     }
 
-    public boolean closerThan(BlockPos pos, int distance) {
+    public boolean closerThan(BlockPos pos, double distance) {
         return pos.closerThan(blockPosition(), distance);
     }
 
@@ -722,8 +722,8 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, tag).getOrThrow());
-        tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, tag).getOrThrow());
+        tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
+        tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
         tag.putInt("Variant", getVariant().getId());
         if (isSitting()) tag.putBoolean("Sitting", true);
         if (tiredTicks > 0) tag.putInt("TiredTicks", tiredTicks);
