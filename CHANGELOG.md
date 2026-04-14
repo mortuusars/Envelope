@@ -12,7 +12,7 @@ Added a new way to craft items by sending a Package with ingredients to the serv
 
 Included recipes:
 - Payback Tag 
-  - no longer craftable in Crafting Table
+  - no longer craftable in the Crafting Table
 - Seal Stamps with custom impressions
 - Rotten Flesh -> Leather
 - Saddle
@@ -58,18 +58,19 @@ Service Addresses
 - Added **Equine Assurance Bureau** sending "spam" letters.
 
 Delivery
-- Added support for Entity address "drop-off" handlers.
+- Added support for Service address "drop-off" handlers.
   - They can be defined in code (for addons) or through KubeJS.
   - _Drop-off handler is responsible for actually deciding what happens with delivered mail (consume/return/reply)._
 
 KubeJS
-- Added `EnvelopeEvents.registerServiceDropOffHandlers` event.
+- Added `EnvelopeEvents.registerServiceDropOffHandlers` event.  
 - Added `EnvelopeEvents.handleMailDropOff` event.
   - Called before most of the regular logic is processed.
   - Can be used to modify drop-off of any address type.
 - No documentation yet.
 
 Misc:
+- Slightly improved Pigeon pathfinding around blocks, should get stuck a bit less now .
 - Added **Address Tag** and **Payback Tag** application recipes.
 - Applying **Address Tag** and **Payback Tag** in GUI now consumes 1 tag per mail, instead of 1 per stack.
 - **Payback Box** and **Payback Package** now show full time remaining when [**Shift**] is held.
@@ -82,7 +83,8 @@ Misc:
 - Small change to how `envelope:payback_subject` component is defined.
 - Renamed `mail_service_payback_department.dat` to `envelope_mail_service_payback_department.dat` in _level/data_.
 - Fixed couriers spawned after delivery is finished (when ended in unloaded chunk) not being tired.
-- Fixed leashed pigeons being able to enter a Pigeonhole
+- Fixed leashed pigeons being able to enter a Pigeonhole.
+- Fixed error in Pigeon saved NBT data.
 
 ## 0.5.2 - 2026-02-06
 #### Reworked Packages:

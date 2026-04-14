@@ -464,7 +464,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     public boolean pathfindDirectlyTowards(BlockPos pos) {
         getNavigation().setMaxVisitedNodesMultiplier(10.0F);
-        getNavigation().moveTo(pos.getX(), pos.getY(), pos.getZ(), 2, 1);
+        getNavigation().moveTo(pos.getX(), pos.getY(), pos.getZ(), 1, 1);
         return getNavigation().getPath() != null && getNavigation().getPath().canReach();
     }
 
