@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
@@ -119,8 +120,9 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
 
             int count = 0;
 
-            for (BlockAddress recipient : defaultAddresses.values()) {
-                if (recipient.equals(input.sender())) {
+            for (Address recipient : defaultAddresses.keySet()) {
+                Address resolvedRecipient = recipient.resolve(service);
+                if (resolvedRecipient.isUnknown() || resolvedRecipient.equals(input.sender())) {
                     continue;
                 }
 
