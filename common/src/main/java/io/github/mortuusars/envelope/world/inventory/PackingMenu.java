@@ -1,12 +1,13 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class PackingMenu extends AbstractInHandContainerMenu {
     public static final int PACK_BUTTON_ID = 0;
 
+    private @Nullable Address presetAddress;
     protected boolean packed = false;
 
     protected PackingMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -32,10 +34,6 @@ public class PackingMenu extends AbstractInHandContainerMenu {
 
     public static PackingMenu fromNetwork(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         return new PackingMenu(id, inventory, buffer.readEnum(InteractionHand.class));
-    }
-
-    public boolean isPacked() {
-        return packed;
     }
 
     @Override
@@ -68,27 +66,46 @@ public class PackingMenu extends AbstractInHandContainerMenu {
         };
     }
 
-    @Override
-    public boolean clickMenuButton(Player player, int buttonId) {
-        if (buttonId == PACK_BUTTON_ID) {
-            if (canPack()) {
-                packed = pack();
-            }
-            return true;
-        }
+    // --
 
-        return false;
+    public @Nullable Address getPresetAddress() {
+        return presetAddress;
+    }
+
+    public void presetAddress(@Nullable Address address) {
+        presetAddress = address;
+    }
+
+    public ItemStack getAddressTag() {
+        return PlayerInventoryUtil.findFirstMatching(getPlayer(),
+              stack -> stack.getItem() instanceof AddressTagItem);
+    }
+
+    // --
+
+    public boolean isPacked() {
+        return packed;
     }
 
     public boolean canPack() {
         return !getContainer().isEmpty();
     }
 
-    protected boolean pack() {
+    protected void pack() {
         Player player = getPlayer();
+
+        ItemStack addressTag = getAddressTag();
+
+        if (addressTag.isEmpty()) {
+            presetAddress = null;
+        } else if (presetAddress != null) {
+            addressTag.shrink(1);
+        }
+
         ItemStack result = createPackingResult();
 
         getItemInHand().shrink(1);
+
         if (!player.addItem(result)) {
             player.drop(result, false);
         }
@@ -96,13 +113,28 @@ public class PackingMenu extends AbstractInHandContainerMenu {
         player.level().playSound(null, player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS,
               1f, player.level().getRandom().nextFloat() * 0.3f + 0.85f);
         player.swing(getHand());
-        return true;
+        packed = true;
     }
 
     protected @NotNull ItemStack createPackingResult() {
         ItemStack result = new ItemStack(Envelope.Items.PACKAGE.get());
         result.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(getContainer()));
+        result.set(Envelope.DataComponents.MAIL_RECIPIENT, presetAddress);
         return result;
+    }
+
+    // --
+
+    @Override
+    public boolean clickMenuButton(Player player, int buttonId) {
+        if (buttonId == PACK_BUTTON_ID) {
+            if (canPack()) {
+                pack();
+            }
+            return true;
+        }
+
+        return false;
     }
 
     @Override

@@ -38,7 +38,10 @@
   "envelope.letter_and_quill.fold_button": "Fold",
   "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
 
-  "gui.envelope.package.pack": "Pack",
+  "gui.envelope.packing.pack": "Pack",
+  "gui.envelope.packing.preset_address": "Address",
+  "gui.envelope.packing.preset_address.will_apply": "Packing will apply an Address Tag",
+  "gui.envelope.packing.preset_address.no_address_tag": "No Address Tag available",
 
   "gui.envelope.address_tag.title": "Address",
 

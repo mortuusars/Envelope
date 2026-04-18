@@ -4,6 +4,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.function.Predicate;
+
 public class PlayerInventoryUtil {
     public static boolean canAddWholeStack(Player player, ItemStack stack) {
         Inventory inventory = player.getInventory();
@@ -58,5 +60,21 @@ public class PlayerInventoryUtil {
         }
 
         return false; // Cannot fit whole stack
+    }
+
+    public static ItemStack findFirstMatching(Player player, Predicate<ItemStack> predicate) {
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (predicate.test(stack)) {
+                return stack;
+            }
+        }
+
+        for (ItemStack stack : player.getInventory().items) {
+            if (predicate.test(stack)) {
+                return stack;
+            }
+        }
+
+        return ItemStack.EMPTY;
     }
 }

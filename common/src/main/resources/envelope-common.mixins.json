@@ -19,6 +19,7 @@
     "event.ServerLevelMixin",
     "fox_tatter.FoxMixin",
     "injected.ServerLevelMixin",
+    "jei.BasicRecipeTransferHandlerMixin",
     "jei.JeiKeyConflictContextMixin",
     "predators.CatMixin",
     "predators.FoxMixin",
