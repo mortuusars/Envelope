@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6
+## 0.6 - 2026-04-16
 #### Mail Recipes
 Added a new way to craft items by sending a Package with ingredients to the service address.
 - Works similarly to the shapeless crafting.
