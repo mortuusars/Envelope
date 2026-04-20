@@ -1,7 +1,12 @@
 # Changelog
 
 ## UNRELEASED
-- When moving mail recipe ingredients into a Package with JEI - address of the recipe will be remembered and applied when items are packed, consuming an Address Tag.
+- Added 'hanging' property to Mailbox block. When placed on the side of a block, the model will have slightly different style.
+- Adjusted Mailbox collision shape to better reflect the model.
+  - Fixes some cases of wrong culling. 
+
+
+- When moving mail recipe ingredients into a Package with JEI - address of the recipe will be remembered and applied when items are packed, consuming an Address Tag.    
 
 ## 0.6.2 - 2026-06-11
 - Potentially fixed an issue with C2ME.

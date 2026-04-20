@@ -46,6 +46,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,14 +55,39 @@ public class MailboxBlock extends BaseEntityBlock {
     public static final MapCodec<MailboxBlock> CODEC = simpleCodec(MailboxBlock::new);
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty HANGING = BlockStateProperties.HANGING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 
-    public static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 14, 15);
+    public static final VoxelShape SHAPE_Z = Shapes.or(
+          Block.box(3, 2, 3, 13, 11.5, 13),
+          Block.box(6, 11.5, 3, 10, 12, 13),
+          Block.box(2, 0, 2, 14, 2, 14));
+    public static final VoxelShape SHAPE_X = Shapes.or(
+          Block.box(3, 2, 3, 13, 11.5, 13),
+          Block.box(3, 11.5, 6, 13, 12, 10),
+          Block.box(2, 0, 2, 14, 2, 14));
+    public static final VoxelShape SHAPE_HANGING_NORTH = Shapes.or(
+          Block.box(2, 0, 7, 14, 2, 16),
+          Block.box(3, 2, 8, 13, 11.5, 16),
+          Block.box(6, 11.5, 8, 10, 12, 16));
+    public static final VoxelShape SHAPE_HANGING_EAST = Shapes.or(
+          Block.box(0, 0, 2, 9, 2, 14),
+          Block.box(0, 2, 3, 8, 11.5, 13),
+          Block.box(0, 11.5, 6, 8, 12, 10));
+    public static final VoxelShape SHAPE_HANGING_SOUTH = Shapes.or(
+          Block.box(2, 0, 0, 14, 2, 9),
+          Block.box(3, 2, 0, 13, 11.5, 8),
+          Block.box(6, 11.5, 0, 10, 12, 8));
+    public static final VoxelShape SHAPE_HANGING_WEST = Shapes.or(
+          Block.box(7, 0, 2, 16, 2, 14),
+          Block.box(8, 2, 3, 16, 11.5, 13),
+          Block.box(8, 11.5, 6, 16, 12, 10));
 
     public MailboxBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
               .setValue(FACING, Direction.NORTH)
+              .setValue(HANGING, false)
               .setValue(OPEN, false));
     }
 
@@ -77,17 +103,33 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        if (state.hasProperty(HANGING) && state.getValue(HANGING)) {
+            return switch (state.getValue(FACING)) {
+                case SOUTH -> SHAPE_HANGING_SOUTH;
+                case WEST -> SHAPE_HANGING_WEST;
+                case EAST -> SHAPE_HANGING_EAST;
+                default -> SHAPE_HANGING_NORTH;
+            };
+        }
+
+        return state.getValue(FACING).getAxis() == Direction.Axis.Z ? SHAPE_Z : SHAPE_X;
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, OPEN);
+        builder.add(FACING, HANGING, OPEN);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        BlockPos attachPos = context.getClickedPos().relative(context.getClickedFace().getOpposite());
+        boolean hanging = !context.replacingClickedOnBlock()
+              && context.getClickedFace().getAxis().isHorizontal()
+              && context.getLevel().getBlockState(attachPos).isFaceSturdy(context.getLevel(), attachPos, context.getClickedFace());
+
+        return this.defaultBlockState()
+              .setValue(FACING, hanging ? context.getClickedFace() : context.getHorizontalDirection().getOpposite())
+              .setValue(HANGING, hanging);
     }
 
     @Override
@@ -180,7 +222,7 @@ public class MailboxBlock extends BaseEntityBlock {
                 if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                       && blockEntity.isAvailableForPickup()
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
-                        pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
+                      pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
                     if (player.isCreative()) {
                         pigeon.setOrigin(CourierOrigin.service());

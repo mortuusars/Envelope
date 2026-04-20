@@ -1,33 +1,64 @@
 {
   "variants": {
-    "facing=east,open=false": {
+    "facing=east,hanging=false,open=false": {
       "model": "envelope:block/mailbox",
       "y": 90
     },
-    "facing=north,open=false": {
+    "facing=north,hanging=false,open=false": {
       "model": "envelope:block/mailbox"
     },
-    "facing=south,open=false": {
+    "facing=south,hanging=false,open=false": {
       "model": "envelope:block/mailbox",
       "y": 180
     },
-    "facing=west,open=false": {
+    "facing=west,hanging=false,open=false": {
       "model": "envelope:block/mailbox",
       "y": 270
     },
-    "facing=east,open=true": {
+    "facing=east,hanging=false,open=true": {
       "model": "envelope:block/mailbox_open",
       "y": 90
     },
-    "facing=north,open=true": {
+    "facing=north,hanging=false,open=true": {
       "model": "envelope:block/mailbox_open"
     },
-    "facing=south,open=true": {
+    "facing=south,hanging=false,open=true": {
       "model": "envelope:block/mailbox_open",
       "y": 180
     },
-    "facing=west,open=true": {
+    "facing=west,hanging=false,open=true": {
       "model": "envelope:block/mailbox_open",
+      "y": 270
+    },
+
+    "facing=east,hanging=true,open=false": {
+      "model": "envelope:block/mailbox_hanging",
+      "y": 90
+    },
+    "facing=north,hanging=true,open=false": {
+      "model": "envelope:block/mailbox_hanging"
+    },
+    "facing=south,hanging=true,open=false": {
+      "model": "envelope:block/mailbox_hanging",
+      "y": 180
+    },
+    "facing=west,hanging=true,open=false": {
+      "model": "envelope:block/mailbox_hanging",
+      "y": 270
+    },
+    "facing=east,hanging=true,open=true": {
+      "model": "envelope:block/mailbox_hanging_open",
+      "y": 90
+    },
+    "facing=north,hanging=true,open=true": {
+      "model": "envelope:block/mailbox_hanging_open"
+    },
+    "facing=south,hanging=true,open=true": {
+      "model": "envelope:block/mailbox_hanging_open",
+      "y": 180
+    },
+    "facing=west,hanging=true,open=true": {
+      "model": "envelope:block/mailbox_hanging_open",
       "y": 270
     }
   }
