@@ -15,6 +15,7 @@ import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequestCancelingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.serializer.MailRecipeSerializer;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -367,6 +368,8 @@ public class Envelope {
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
         public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_LETTER_BROADCASTING = Register.recipeSerializer(
               "mail_letter_broadcasting", MailLetterBroadcastingRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<MailPaybackRequestCancelingRecipe>> MAIL_PAYBACK_REQUEST_CANCELING = Register.recipeSerializer(
+              "mail_payback_request_canceling", MailPaybackRequestCancelingRecipe.Serializer::new);
 
         static void init() {
         }

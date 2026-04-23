@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -84,19 +84,19 @@ public final class ServiceAddress implements Address {
 
     // --
 
-    public static ServiceAddress getOrThrow(RegistryAccess access, ResourceKey<ServiceAddressDefinition> key) {
-        return new ServiceAddress(getHolderOrThrow(access, key));
+    public static ServiceAddress getOrThrow(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
+        return new ServiceAddress(getHolderOrThrow(registries, key));
     }
 
-    public static Optional<ServiceAddress> get(RegistryAccess access, ResourceKey<ServiceAddressDefinition> key) {
-        return getHolder(access, key).map(ServiceAddress::new);
+    public static Optional<ServiceAddress> get(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
+        return getHolder(registries, key).map(ServiceAddress::new);
     }
 
-    public static Holder.Reference<ServiceAddressDefinition> getHolderOrThrow(RegistryAccess access, ResourceKey<ServiceAddressDefinition> key) {
-        return access.registryOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION).getHolderOrThrow(key);
+    public static Holder.Reference<ServiceAddressDefinition> getHolderOrThrow(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
+        return registries.lookupOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION).getOrThrow(key);
     }
 
-    public static Optional<Holder.Reference<ServiceAddressDefinition>> getHolder(RegistryAccess access, ResourceKey<ServiceAddressDefinition> key) {
-        return access.registryOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION).getHolder(key);
+    public static Optional<Holder.Reference<ServiceAddressDefinition>> getHolder(HolderLookup.Provider registries, ResourceKey<ServiceAddressDefinition> key) {
+        return registries.lookupOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION).get(key);
     }
 }

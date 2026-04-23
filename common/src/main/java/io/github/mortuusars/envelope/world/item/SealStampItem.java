@@ -68,7 +68,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
             ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.RED_WAX);
             ResourceKey<SealMaterial> newMaterial = currentMaterial == SealMaterial.RED_WAX ? SealMaterial.GOLD : SealMaterial.RED_WAX;
 
-            Holder<SealMaterial> material = SealMaterial.getHolder(player.registryAccess(), newMaterial);
+            Holder<SealMaterial> material = SealMaterial.getOrThrow(player.registryAccess(), newMaterial);
 
             target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(), existingSeal.signature()));
             slot.set(target);
@@ -91,7 +91,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     public Seal createSeal(ItemStack stack, Player player) {
         return new Seal(
-              SealMaterial.getHolder(player.registryAccess(), SealMaterial.RED_WAX),
+              SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX),
               getImpressionOrDefault(stack, player.registryAccess(), player),
               player.getName());
     }
@@ -102,7 +102,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     public Holder<SealImpression> getImpressionOrDefault(ItemStack stack, RegistryAccess registryAccess, @Nullable Player player) {
         return getImpression(stack).orElseGet(() ->
-              SealImpression.getHolder(registryAccess, SealImpression.firstCharOrDefault(player)));
+              SealImpression.getOrThrow(registryAccess, SealImpression.firstCharOrDefault(player)));
     }
 
     protected boolean canApplyGold(ItemStack stack, Player player) {

@@ -102,6 +102,7 @@
   "gui.envelope.delivery_log.message.payback.subject_not_found": "Payback Subject Not Found",
   "gui.envelope.delivery_log.message.payback.is_not_valid": "Payback Is Not Valid",
   "gui.envelope.delivery_log.message.payback.expired": "Payback Request Expired",
+  "gui.envelope.delivery_log.message.payback.canceled": "Payback Request Canceled",
 
   "gui.envelope.delivery_log.message.crafting.unable_to_process": "Unable To Process",
   "gui.envelope.delivery_log.message.crafting.unprocessed_items": "Unprocessed Items",
@@ -193,7 +194,6 @@
   "letter.envelope.courier_death_notice.condolence_2": "\n\nPlease accept our condolences for the loss of %s. Their memory will live on.",
   "letter.envelope.courier_death_notice.condolence_3": "\n\nMay the memories of %s help you find comfort.",
   "letter.envelope.courier_death_notice.condolence_4": "\n\n%s will always be in our hearts.",
-  "letter.envelope.mail_service.signature": "Mail Service",
 
   "letter.envelope.broadcast_report.name": "Broadcast Report",
   "letter.envelope.broadcast_report.title": "       Broadcast Report",
@@ -204,6 +204,14 @@
 
   "letter.envelope.equine_assurance_notice.name": "Equine Assurance Notice",
   "letter.envelope.equine_assurance_notice.body": "We've been trying to reach you about your horse's extended warranty.\n\nLack of assurance can lead to unexpected incidents including total loss of your vehicle.\n\nTo receive the full assurance package, send us: %s.\n\nAct promptly to secure your vehicle's future!",
+
+  "letter.envelope.payback_request_cancel_report.name": "Payback Request Cancel Report",
+  "letter.envelope.payback_request_cancel_report.title": "       Payback Request \n        Cancel Report",
+  "letter.envelope.payback_request_cancel_report.error_no_requests": "Canceling unsuccessful.\nNo mail awaiting payback from this address is in storage.",
+
+  "letter.envelope.mail_service.signature": "Mail Service",
+
+  "package.envelope.canceled_payback_request.name": "Canceled Payback Request",
 
   "envelope.configuration.pigeon": "Pigeon",
   "envelope.configuration.delivery": "Delivery",

@@ -193,7 +193,7 @@ public class MailService {
               .append(Component.translatable("letter.envelope.courier_death_notice.condolence_" + courier.getRandom().nextInt(5),
                     courier.getName()))
               .append("\n\n")
-              .append(Component.translatable("letter.envelope.mail_service.signature"));
+              .append(getAddress().getComponent());
 
         return Mail.createLetter(text)
               .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.courier_death_notice.name"))

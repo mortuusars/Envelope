@@ -27,7 +27,7 @@ public class SealDieTooltipComponent implements ClientTooltipComponent {
         return impressionHolder
               .orElseGet(() -> {
                   ResourceKey<SealImpression> key = SealImpression.firstCharOrDefault(Minecrft.player());
-                  return SealImpression.getHolder(Minecrft.registryAccess(), key);
+                  return SealImpression.getOrThrow(Minecrft.registryAccess(), key);
               })
               .value();
     }

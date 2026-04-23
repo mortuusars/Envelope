@@ -127,6 +127,7 @@ public interface DeliveryRecord {
         Component PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.payback.subject_not_found").withColor(Colors.TOOLTIP_RED);
         Component PAYBACK_IS_NOT_VALID = Component.translatable("gui.envelope.delivery_log.message.payback.is_not_valid").withColor(Colors.TOOLTIP_RED);
         Component PAYBACK_EXPIRED = Component.translatable("gui.envelope.delivery_log.message.payback.expired").withColor(Colors.TOOLTIP_RED);
+        Component PAYBACK_CANCELED = Component.translatable("gui.envelope.delivery_log.message.payback.canceled").withColor(Colors.TOOLTIP_RED);
 
         Component CRAFTING_UNPROCESSED_ITEMS = Component.translatable("gui.envelope.delivery_log.message.crafting.unprocessed_items").withColor(Colors.TOOLTIP_RED);
         Component CRAFTING_UNABLE_TO_PROCESS = Component.translatable("gui.envelope.delivery_log.message.crafting.unable_to_process").withColor(Colors.TOOLTIP_RED);

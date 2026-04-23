@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequestCancelingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeBuilder;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
@@ -138,6 +139,14 @@ public class RecipesDatagen extends RecipeProvider {
               new MailLetterBroadcastingRecipe(
                     address,
                     NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Tags.Items.LETTERS), Ingredient.of(Items.DIAMOND))
+              ),
+              null);
+
+        output.accept(
+              Envelope.resource(MailRecipeBuilder.getDefaultPath(address, "payback_request_canceling")),
+              new MailPaybackRequestCancelingRecipe(
+                    address,
+                    NonNullList.of(Ingredient.EMPTY, Ingredient.of(Envelope.Items.PAYBACK_TAG.get()))
               ),
               null);
 

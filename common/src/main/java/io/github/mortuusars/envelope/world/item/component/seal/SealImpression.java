@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 public final class SealImpression {
@@ -112,8 +113,12 @@ public final class SealImpression {
 
     // --
 
-    public static Holder<SealImpression> getHolder(RegistryAccess access, ResourceKey<SealImpression> key) {
-        return access.registryOrThrow(Envelope.Registries.SEAL_IMPRESSION).getHolderOrThrow(key);
+    public static Optional<Holder.Reference<SealImpression>> get(HolderLookup.Provider registries, ResourceKey<SealImpression> key) {
+        return registries.lookupOrThrow(Envelope.Registries.SEAL_IMPRESSION).get(key);
+    }
+
+    public static Holder<SealImpression> getOrThrow(HolderLookup.Provider registries, ResourceKey<SealImpression> key) {
+        return registries.lookupOrThrow(Envelope.Registries.SEAL_IMPRESSION).getOrThrow(key);
     }
 
     // --
