@@ -46,12 +46,14 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -104,7 +106,17 @@ public class Envelope {
     public static class Blocks {
         public static final Map<ResourceLocation, Supplier<PigeonholeBlock>> PIGEONHOLES = new HashMap<>();
 
-        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak", MapColor.WOOD);
+        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak", net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = pigeonhole("spruce", net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> BIRCH_PIGEONHOLE = pigeonhole("birch", net.minecraft.world.level.block.Blocks.BIRCH_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> JUNGLE_PIGEONHOLE = pigeonhole("jungle", net.minecraft.world.level.block.Blocks.JUNGLE_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> ACACIA_PIGEONHOLE = pigeonhole("acacia", net.minecraft.world.level.block.Blocks.ACACIA_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> DARK_OAK_PIGEONHOLE = pigeonhole("dark_oak", net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> MANGROVE_PIGEONHOLE = pigeonhole("mangrove", net.minecraft.world.level.block.Blocks.MANGROVE_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> CHERRY_PIGEONHOLE = pigeonhole("cherry", net.minecraft.world.level.block.Blocks.CHERRY_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> BAMBOO_PIGEONHOLE = pigeonhole("bamboo", net.minecraft.world.level.block.Blocks.BAMBOO_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> CRIMSON_PIGEONHOLE = pigeonhole("crimson", net.minecraft.world.level.block.Blocks.CRIMSON_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> WARPED_PIGEONHOLE = pigeonhole("warped", net.minecraft.world.level.block.Blocks.WARPED_PLANKS.defaultMapColor());
 
         public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
               () -> new MailboxBlock(BlockBehaviour.Properties.of()
@@ -203,6 +215,16 @@ public class Envelope {
         public static final List<Supplier<BlockItem>> PIGEONHOLES = new ArrayList<>();
 
         public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
+        public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = pigeonhole("spruce", Blocks.SPRUCE_PIGEONHOLE);
+        public static final Supplier<BlockItem> BIRCH_PIGEONHOLE = pigeonhole("birch", Blocks.BIRCH_PIGEONHOLE);
+        public static final Supplier<BlockItem> JUNGLE_PIGEONHOLE = pigeonhole("jungle", Blocks.JUNGLE_PIGEONHOLE);
+        public static final Supplier<BlockItem> ACACIA_PIGEONHOLE = pigeonhole("acacia", Blocks.ACACIA_PIGEONHOLE);
+        public static final Supplier<BlockItem> DARK_OAK_PIGEONHOLE = pigeonhole("dark_oak", Blocks.DARK_OAK_PIGEONHOLE);
+        public static final Supplier<BlockItem> MANGROVE_PIGEONHOLE = pigeonhole("mangrove", Blocks.MANGROVE_PIGEONHOLE);
+        public static final Supplier<BlockItem> CHERRY_PIGEONHOLE = pigeonhole("cherry", Blocks.CHERRY_PIGEONHOLE);
+        public static final Supplier<BlockItem> BAMBOO_PIGEONHOLE = pigeonhole("bamboo", Blocks.BAMBOO_PIGEONHOLE);
+        public static final Supplier<BlockItem> CRIMSON_PIGEONHOLE = pigeonhole("crimson", Blocks.CRIMSON_PIGEONHOLE);
+        public static final Supplier<BlockItem> WARPED_PIGEONHOLE = pigeonhole("warped", Blocks.WARPED_PIGEONHOLE);
 
         public static final Supplier<MailboxBlockItem> MAILBOX = Register.item("mailbox",
               () -> new MailboxBlockItem(Blocks.MAILBOX.get(), new Item.Properties()));

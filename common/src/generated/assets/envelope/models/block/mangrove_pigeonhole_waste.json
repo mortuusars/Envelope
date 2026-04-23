@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "bottom": "envelope:block/mangrove_pigeonhole_end",
+    "front": "envelope:block/mangrove_pigeonhole_front_waste",
+    "side": "envelope:block/mangrove_pigeonhole_side",
+    "top": "envelope:block/mangrove_pigeonhole_end"
+  }
+}

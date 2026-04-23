@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+Pigeonhole
+- Added variants for all wood types.
+
+Mailbox
 - Added 'hanging' property to Mailbox block. When placed on the side of a block, the model will have slightly different style.
 - Adjusted Mailbox collision shape to better reflect the model.
   - Fixes some cases of wrong culling. 

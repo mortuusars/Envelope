@@ -52,6 +52,16 @@ public class RecipesDatagen extends RecipeProvider {
 
     private void buildCraftingRecipes(@NotNull RecipeOutput output) {
         pigeonhole(output, Envelope.Items.OAK_PIGEONHOLE.get(), Items.OAK_PLANKS);
+        pigeonhole(output, Envelope.Items.SPRUCE_PIGEONHOLE.get(), Items.SPRUCE_PLANKS);
+        pigeonhole(output, Envelope.Items.BIRCH_PIGEONHOLE.get(), Items.BIRCH_PLANKS);
+        pigeonhole(output, Envelope.Items.JUNGLE_PIGEONHOLE.get(), Items.JUNGLE_PLANKS);
+        pigeonhole(output, Envelope.Items.ACACIA_PIGEONHOLE.get(), Items.ACACIA_PLANKS);
+        pigeonhole(output, Envelope.Items.DARK_OAK_PIGEONHOLE.get(), Items.DARK_OAK_PLANKS);
+        pigeonhole(output, Envelope.Items.MANGROVE_PIGEONHOLE.get(), Items.MANGROVE_PLANKS);
+        pigeonhole(output, Envelope.Items.CHERRY_PIGEONHOLE.get(), Items.CHERRY_PLANKS);
+        pigeonhole(output, Envelope.Items.BAMBOO_PIGEONHOLE.get(), Items.BAMBOO_PLANKS);
+        pigeonhole(output, Envelope.Items.CRIMSON_PIGEONHOLE.get(), Items.CRIMSON_PLANKS);
+        pigeonhole(output, Envelope.Items.WARPED_PIGEONHOLE.get(), Items.WARPED_PLANKS);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Envelope.Items.MAILBOX.get(), 1)
               .define('P', ItemTags.PLANKS)

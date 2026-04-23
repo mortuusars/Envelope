@@ -1,13 +1,32 @@
 {
   "block.envelope.oak_pigeonhole": "Oak Pigeonhole",
+  "block.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
+  "block.envelope.birch_pigeonhole": "Birch Pigeonhole",
+  "block.envelope.jungle_pigeonhole": "Jungle Pigeonhole",
+  "block.envelope.acacia_pigeonhole": "Acacia Pigeonhole",
+  "block.envelope.dark_oak_pigeonhole": "Dark Oak Pigeonhole",
+  "block.envelope.mangrove_pigeonhole": "Mangrove Pigeonhole",
+  "block.envelope.cherry_pigeonhole": "Cherry Pigeonhole",
+  "block.envelope.bamboo_pigeonhole": "Bamboo Pigeonhole",
+  "block.envelope.crimson_pigeonhole": "Crimson Pigeonhole",
+  "block.envelope.warped_pigeonhole": "Warped Pigeonhole",
+
   "block.envelope.mailbox": "Mailbox",
   "block.envelope.paper_box": "Paper Box",
   "block.envelope.package": "Package",
   "block.envelope.sealed_package": "Sealed Package",
 
-  "item.envelope.lost_mail": "Lost Mail",
-
   "item.envelope.oak_pigeonhole": "Oak Pigeonhole",
+  "item.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
+  "item.envelope.birch_pigeonhole": "Birch Pigeonhole",
+  "item.envelope.jungle_pigeonhole": "Jungle Pigeonhole",
+  "item.envelope.acacia_pigeonhole": "Acacia Pigeonhole",
+  "item.envelope.dark_oak_pigeonhole": "Dark Oak Pigeonhole",
+  "item.envelope.mangrove_pigeonhole": "Mangrove Pigeonhole",
+  "item.envelope.cherry_pigeonhole": "Cherry Pigeonhole",
+  "item.envelope.bamboo_pigeonhole": "Bamboo Pigeonhole",
+  "item.envelope.crimson_pigeonhole": "Crimson Pigeonhole",
+  "item.envelope.warped_pigeonhole": "Warped Pigeonhole",
 
   "item.envelope.letter_and_quill": "Letter and Quill",
   "item.envelope.letter": "Letter",
@@ -28,6 +47,8 @@
   "item.envelope.mailbox": "Mailbox",
 
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
+
+  "item.envelope.lost_mail": "Lost Mail",
 
   "container.envelope.mailbox": "Mailbox",
   "container.envelope.payback_tag": "Payback",
