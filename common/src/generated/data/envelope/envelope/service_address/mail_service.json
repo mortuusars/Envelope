@@ -2,7 +2,7 @@
   "icon": "",
   "location": {
     "type": "relative",
-    "distance": 1000
+    "distance": 0
   },
   "name": {
     "translate": "address.envelope.mail_service"

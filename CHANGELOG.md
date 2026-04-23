@@ -5,9 +5,11 @@
 - Adjusted Mailbox collision shape to better reflect the model.
   - Fixes some cases of wrong culling. 
 
-
+Services
 - Added Payback Request Canceling recipe to Mail Service. 
-
+- Reduced virtual distance to service addresses: 
+  - Mail Service (1000 -> 0)
+  - Automated Supply Service (2000 -> 1000)
 
 - When moving mail recipe ingredients into a Package with JEI - address of the recipe will be remembered and applied when items are packed, consuming an Address Tag.    
 - Packages from Create can be delivered now.
