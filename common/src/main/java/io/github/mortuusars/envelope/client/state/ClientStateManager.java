@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ClientStateManager {
+    /*
     //TODO: Rework for individual states. Use gameDir instead of configDir.
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -47,5 +48,5 @@ public class ClientStateManager {
             load();
         }
         return data;
-    }
+    }*/
 }
