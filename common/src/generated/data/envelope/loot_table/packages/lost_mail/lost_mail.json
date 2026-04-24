@@ -6,38 +6,38 @@
       "entries": [
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_junk",
+          "value": "envelope:packages/lost_mail/lost_mail_junk",
           "weight": 3
         },
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_plants",
+          "value": "envelope:packages/lost_mail/lost_mail_plants",
           "weight": 2
         },
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_blocks",
+          "value": "envelope:packages/lost_mail/lost_mail_blocks",
           "weight": 2
         },
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_metals"
+          "value": "envelope:packages/lost_mail/lost_mail_metals"
         },
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_tools"
+          "value": "envelope:packages/lost_mail/lost_mail_tools"
         },
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_weapons"
+          "value": "envelope:packages/lost_mail/lost_mail_weapons"
         },
         {
           "type": "minecraft:loot_table",
-          "value": "envelope:lost_mail_valuables"
+          "value": "envelope:packages/lost_mail/lost_mail_valuables"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "envelope:lost_mail"
+  "random_sequence": "envelope:packages/lost_mail/lost_mail"
 }

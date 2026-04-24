@@ -15,14 +15,14 @@
         "volume": 0.3
       }
     ],
-    "subtitle": "subtitle.envelope.paper.crackle"
+    "subtitle": "subtitles.envelope.paper.crackle"
   },
   "item.paper.tear": {
     "sounds": [
       "envelope:item/paper_tear1",
       "envelope:item/paper_tear2"
     ],
-    "subtitle": "subtitle.envelope.paper.tear"
+    "subtitle": "subtitles.envelope.paper.tear"
   },
   "block.paper.break": {
     "sounds": [
@@ -244,5 +244,141 @@
       "mob/parrot/step4",
       "mob/parrot/step5"
     ]
+  },
+  "block.pigeonhole.enter": {
+    "sounds": [
+      {
+        "name": "envelope:block/pigeonhole/enter",
+        "pitch": 0.9,
+        "attenuation_distance": 14
+      },
+      {
+        "name": "envelope:block/pigeonhole/enter",
+        "attenuation_distance": 14
+      }
+    ],
+    "subtitle": "subtitles.envelope.block.pigeonhole.enter"
+  },
+  "block.pigeonhole.exit": {
+    "sounds": [
+      {
+        "name": "envelope:block/pigeonhole/exit",
+        "pitch": 0.9,
+        "attenuation_distance": 14
+      },
+      {
+        "name": "envelope:block/pigeonhole/exit",
+        "attenuation_distance": 14
+      }
+    ],
+    "subtitle": "subtitles.envelope.block.pigeonhole.exit"
+  },
+  "block.pigeonhole.work": {
+    "sounds": [
+      {
+        "name": "envelope:block/pigeonhole/work1",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work2",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work3",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work4",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work5",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work6",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work7",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work8",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      }
+    ],
+    "subtitle": "subtitles.envelope.block.pigeonhole.work"
+  },
+  "block.pigeonhole.work_multiple": {
+    "sounds": [
+      {
+        "name": "envelope:block/pigeonhole/work1",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work2",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work3",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work4",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work5",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work6",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work7",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work8",
+        "volume": 0.6,
+        "attenuation_distance": 12
+      },
+      {
+        "name": "envelope:block/pigeonhole/work_multiple1",
+        "volume": 0.6,
+        "attenuation_distance": 12,
+        "weight": 3
+      },
+      {
+        "name": "envelope:block/pigeonhole/work_multiple2",
+        "volume": 0.6,
+        "attenuation_distance": 12,
+        "weight": 3
+      }
+    ],
+    "subtitle": "subtitles.envelope.block.pigeonhole.work"
+  },
+  "block.pigeonhole.scoop": {
+    "sounds": [
+      "envelope:block/pigeonhole/scoop"
+    ],
+    "subtitle": "subtitles.envelope.block.pigeonhole.scoop"
   }
 }

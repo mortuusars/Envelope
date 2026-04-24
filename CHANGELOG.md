@@ -3,6 +3,11 @@
 ## UNRELEASED
 Pigeonhole
 - Added variants for all wood types.
+- Added unique sounds for scooping waste and pigeon entering, leaving and "working".
+- Added 1% chance of receiving a Diamond when scooping waste.
+  - Grants hidden advancement.
+- Waste scooping now uses loot table for drops.
+- Improved pigeon behavior when the block is smoked.
 
 Mailbox
 - Added 'hanging' property to Mailbox block. When placed on the side of a block, the model will have slightly different style.
@@ -15,9 +20,12 @@ Services
   - Mail Service (1000 -> 0)
   - Automated Supply Service (2000 -> 1000)
 
+Misc
 - When moving mail recipe ingredients into a Package with JEI - address of the recipe will be remembered and applied when items are packed, consuming an Address Tag.    
 - Packages from Create can be delivered now.
   - Address Tag is still required, regardless of the address on the package. Address Tag can be applied automatically with crafters.
+- Moved Lost Mail loot tables to `packages/lost_mail/` subfolder.
+  - Open your existing Lost Mail packages before updating to this version.
 
 ## 0.6.2 - 2026-06-11
 - Potentially fixed an issue with C2ME.

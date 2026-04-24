@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.EnchantmentTags;
@@ -37,8 +37,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,18 +77,6 @@ public class PigeonholeBlock extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    public @NotNull BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
-    }
-
-    // --
-
-    @Override
     protected @NotNull RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
@@ -99,6 +89,31 @@ public class PigeonholeBlock extends BaseEntityBlock {
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return state.getValue(WASTE_LEVEL);
+    }
+
+    @Override
+    public @NotNull BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    public @NotNull BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new PigeonholeBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return level.isClientSide
+              ? null
+              : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(),
+              (lvl, blockPos, blockState, blockEntity) -> blockEntity.serverTick(((ServerLevel) lvl), blockPos, state));
     }
 
     @Override
@@ -141,12 +156,39 @@ public class PigeonholeBlock extends BaseEntityBlock {
     // --
 
     public void addWaste(Level level, BlockPos pos, BlockState state) {
-        if (!state.hasProperty(WASTE_LEVEL)) return;
-
         int waste = state.getValue(WASTE_LEVEL);
         if (waste < MAX_WASTE_LEVEL) {
             waste += 1;
             level.setBlockAndUpdate(pos, state.setValue(WASTE_LEVEL, waste));
+        }
+    }
+
+    public void clearWaste(Level level, BlockPos pos, BlockState state) {
+        level.setBlockAndUpdate(pos, state.setValue(WASTE_LEVEL, 0));
+    }
+
+    public boolean canScoopWaste(BlockState state) {
+        return state.getValue(WASTE_LEVEL) >= MAX_WASTE_LEVEL;
+    }
+
+    public void dropWasteItems(ServerLevel level, BlockPos pos, BlockState state, ItemStack tool, @Nullable Player player) {
+        LootParams lootParams = new LootParams.Builder(level)
+              .withParameter(LootContextParams.BLOCK_STATE, state)
+              .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+              .withParameter(LootContextParams.TOOL, tool)
+              .withOptionalParameter(LootContextParams.THIS_ENTITY, player)
+              .create(LootContextParamSets.BLOCK);
+
+        List<ItemStack> items = level.getServer().reloadableRegistries()
+              .getLootTable(Envelope.LootTables.PIGEONHOLE_WASTE)
+              .getRandomItems(lootParams);
+
+        for (ItemStack item : items) {
+            popResourceFromFace(level, pos, state.getValue(FACING), item);
+
+            if (item.is(Items.DIAMOND) && player instanceof ServerPlayer serverPlayer) {
+                Envelope.CriteriaTriggers.SCOOP_DIAMOND.get().trigger(serverPlayer);
+            }
         }
     }
 
@@ -171,35 +213,20 @@ public class PigeonholeBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        if (stack.is(Envelope.Tags.Items.WASTE_SCOOPABLE) && state.getValue(WASTE_LEVEL) >= MAX_WASTE_LEVEL) {
-            if (!level.isClientSide()) {
-                //TODO: Waste loot table
-                popResourceFromFace(level, pos, state.getValue(FACING), new ItemStack(Items.BONE_MEAL));
+        if (stack.is(Envelope.Tags.Items.WASTE_SCOOPABLE) && canScoopWaste(state)) {
+            if (level instanceof ServerLevel serverLevel) {
+                dropWasteItems(serverLevel, pos, state, player.getItemInHand(hand), player);
+                clearWaste(level, pos, state);
                 stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
-                level.setBlockAndUpdate(pos, state.setValue(WASTE_LEVEL, 0));
             }
 
-            level.playSound(player, pos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(player, pos, Envelope.SoundEvents.PIGEONHOLE_SCOOP.get(), SoundSource.BLOCKS,
+                  1.0F, level.random.nextFloat() * 0.1f + 0.95f);
 
             return ItemInteractionResult.SUCCESS;
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new PigeonholeBlockEntity(pos, state);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide
-              ? null
-              : createTickerHelper(blockEntityType, Envelope.BlockEntityTypes.PIGEONHOLE.get(),
-              (lvl, blockPos, blockState, blockEntity) -> blockEntity.serverTick(((ServerLevel) lvl), blockPos, state));
     }
 }

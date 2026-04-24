@@ -114,5 +114,5 @@
       }
     }
   ],
-  "random_sequence": "envelope:lost_mail_tools"
+  "random_sequence": "envelope:packages/lost_mail/lost_mail_tools"
 }

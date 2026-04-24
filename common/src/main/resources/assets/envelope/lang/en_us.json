@@ -174,8 +174,8 @@
   "address_type.envelope.custom": "Address",
   "address_type.envelope.unknown": "Unknown",
 
-  "subtitle.envelope.paper.crackle": "Paper crackles",
-  "subtitle.envelope.paper.tear": "Paper tears",
+  "subtitles.envelope.paper.crackle": "Paper crackles",
+  "subtitles.envelope.paper.tear": "Paper tears",
 
   "subtitles.envelope.entity.pigeon.ambient": "Pigeon coos",
   "subtitles.envelope.entity.pigeon.death": "Pigeon dies",
@@ -290,5 +290,13 @@
   "gui.envelope.payback_tag.duration_medium": "Duration: Medium",
   "gui.envelope.payback_tag.duration_long": "Duration: Long",
 
-  "gui.envelope.payback_tag.tooltip.scroll": "§8[§7Scroll§8] to change amount"
+  "gui.envelope.payback_tag.tooltip.scroll": "§8[§7Scroll§8] to change amount",
+
+  "advancement.envelope.dirt_to_diamonds.title": "Dirt to Diamonds",
+  "advancement.envelope.dirt_to_diamonds.description": "Find a Diamond in Pigeonhole waste",
+
+  "subtitles.envelope.block.pigeonhole.enter": "Pigeon enters hole",
+  "subtitles.envelope.block.pigeonhole.exit": "Pigeon leaves hole",
+  "subtitles.envelope.block.pigeonhole.work": "Pigeons work",
+  "subtitles.envelope.block.pigeonhole.scoop": "Shovel scoops"
 }

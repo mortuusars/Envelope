@@ -504,6 +504,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     public void releasedFromPigeonhole(BlockPos pos, BlockState state, Occupiable.ReleaseReason releaseReason) {
         getPigeonholeHandler().setTargetPos(pos);
         getPigeonholeHandler().setLastReleasePos(pos);
+        getPigeonholeHandler().setLastTickInside(level().getGameTime());
         getPigeonholeHandler().setDefaultWantCooldown();
 
         if (releaseReason == Occupiable.ReleaseReason.EMERGENCY) {

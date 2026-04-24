@@ -5,8 +5,9 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public interface PigeonOccupiable extends Occupiable {
     @Override
@@ -16,17 +17,19 @@ public interface PigeonOccupiable extends Occupiable {
 
     @Override
     default SoundEvent getOccupantEnterSound(Entity entity) {
-        return SoundEvents.BEEHIVE_ENTER;
+        return Envelope.SoundEvents.PIGEONHOLE_ENTER.get();
     }
 
     @Override
     default SoundEvent getOccupantExitSound(Entity entity) {
-        return SoundEvents.BEEHIVE_EXIT;
+        return Envelope.SoundEvents.PIGEONHOLE_EXIT.get();
     }
 
     @Override
     default SoundEvent getOccupantWorkSound() {
-        return Envelope.SoundEvents.PIGEON_AMBIENT.get();
+        return getOccupants().size() > 1
+              ? Envelope.SoundEvents.PIGEONHOLE_WORK_MULTIPLE.get()
+              : Envelope.SoundEvents.PIGEONHOLE_WORK.get();
     }
 
     @Override

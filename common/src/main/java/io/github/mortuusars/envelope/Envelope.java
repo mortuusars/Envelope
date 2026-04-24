@@ -26,6 +26,7 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import net.minecraft.advancements.critereon.PlayerTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -46,14 +47,12 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -414,6 +413,12 @@ public class Envelope {
         public static final Supplier<SoundEvent> PIGEON_HURT = register("entity", "pigeon.hurt");
         public static final Supplier<SoundEvent> PIGEON_STEP = register("entity", "pigeon.step");
 
+        public static final Supplier<SoundEvent> PIGEONHOLE_ENTER = register("block", "pigeonhole.enter");
+        public static final Supplier<SoundEvent> PIGEONHOLE_EXIT = register("block", "pigeonhole.exit");
+        public static final Supplier<SoundEvent> PIGEONHOLE_WORK = register("block", "pigeonhole.work");
+        public static final Supplier<SoundEvent> PIGEONHOLE_WORK_MULTIPLE = register("block", "pigeonhole.work_multiple");
+        public static final Supplier<SoundEvent> PIGEONHOLE_SCOOP = register("block", "pigeonhole.scoop");
+
         private static Supplier<SoundEvent> register(String category, String key) {
             Preconditions.checkState(category != null && !category.isEmpty(), "'category' should not be empty.");
             Preconditions.checkState(key != null && !key.isEmpty(), "'key' should not be empty.");
@@ -440,6 +445,8 @@ public class Envelope {
     }
 
     public static class CriteriaTriggers {
+        public static Supplier<PlayerTrigger> SCOOP_DIAMOND = Register.criterionTrigger("scoop_diamond", PlayerTrigger::new);
+
         public static void init() {
         }
     }
@@ -450,22 +457,25 @@ public class Envelope {
     }
 
     public static class LootTables {
+        public static final ResourceKey<LootTable> PIGEONHOLE_WASTE =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("gameplay/pigeonhole_waste"));
+
         public static final ResourceKey<LootTable> LOST_MAIL =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail"));
         public static final ResourceKey<LootTable> LOST_MAIL_JUNK =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_junk"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_junk"));
         public static final ResourceKey<LootTable> LOST_MAIL_PLANTS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_plants"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_plants"));
         public static final ResourceKey<LootTable> LOST_MAIL_BLOCKS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_blocks"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_blocks"));
         public static final ResourceKey<LootTable> LOST_MAIL_METALS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_metals"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_metals"));
         public static final ResourceKey<LootTable> LOST_MAIL_TOOLS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_tools"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_tools"));
         public static final ResourceKey<LootTable> LOST_MAIL_WEAPONS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_weapons"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_weapons"));
         public static final ResourceKey<LootTable> LOST_MAIL_VALUABLES =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_valuables"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_valuables"));
     }
 
     public static class Tags {

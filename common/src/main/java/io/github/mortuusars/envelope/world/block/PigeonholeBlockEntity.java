@@ -76,16 +76,15 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
 
     @Override
     public void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
-        if (reason == ReleaseReason.EMERGENCY) return;
+        if (entity instanceof Pigeon pigeon) {
+            pigeon.releasedFromPigeonhole(getBlockPos(), getBlockState(), reason);
+        }
 
-        if (getBlockState().getBlock() instanceof PigeonholeBlock block
+        if (reason != ReleaseReason.EMERGENCY
+              && getBlockState().getBlock() instanceof PigeonholeBlock block
               && level.random.nextDouble() < getWasteIncreaseChanceOnRelease(entity)) {
             block.addWaste(level, getBlockPos(), getBlockState());
             setChanged();
-        }
-
-        if (entity instanceof Pigeon pigeon) {
-            pigeon.releasedFromPigeonhole(getBlockPos(), getBlockState(), reason); // Calling before mail sending to set home pos etc
         }
     }
 

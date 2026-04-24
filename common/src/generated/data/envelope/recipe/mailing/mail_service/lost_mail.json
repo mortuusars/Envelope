@@ -10,7 +10,7 @@
   "result": {
     "components": {
       "minecraft:container_loot": {
-        "loot_table": "envelope:lost_mail"
+        "loot_table": "envelope:packages/lost_mail/lost_mail"
       },
       "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
     },

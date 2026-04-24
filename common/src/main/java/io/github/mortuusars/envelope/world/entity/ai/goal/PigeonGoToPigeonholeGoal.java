@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.core.BlockPos;
@@ -26,7 +25,7 @@ public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
         return super.canUse()
               && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon)
               && pigeon.level().getBlockState(pigeon.getPigeonholeHandler().getTargetPos()).is(Envelope.Tags.Blocks.PIGEONHOLES)
-              && !Position.isFireNearby(pigeon.level(), pigeon.getPigeonholeHandler().getTargetPos());
+              && PigeonholeHandler.isPigeonholeSafe(pigeon.level(), pigeon.getPigeonholeHandler().getTargetPos());
     }
 
     @Override
