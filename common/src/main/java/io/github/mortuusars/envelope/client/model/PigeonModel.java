@@ -57,8 +57,8 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
         PartDefinition head = part.addOrReplaceChild("head",
               CubeListBuilder.create()
                     .texOffs(0, 14)
-                    .addBox(-3.0F, -4.0F, -5.0F, 6.0F, 6.0F, 6.0F, CubeDeformation.NONE),
-              PartPose.offset(0.0F, 16.0F, -1.0F));
+                    .addBox(-3.0F, -6.0F, -3.0F, 6.0F, 6.0F, 6.0F, CubeDeformation.NONE),
+              PartPose.offset(0.0F, 18f, -3.0F));
 
         PartDefinition beak = head.addOrReplaceChild("beak",
               CubeListBuilder.create()
@@ -66,7 +66,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                     .addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.01F))
                     .texOffs(0, 16)
                     .addBox(0.0F, 0.0F, -2.0F, 0.0F, 1.0F, 1.0F, CubeDeformation.NONE),
-              PartPose.offset(0.0F, -1.0F, -5.0F));
+              PartPose.offset(0.0F, -3.0F, -3.0F));
 
         PartDefinition hat = head.addOrReplaceChild("hat",
               CubeListBuilder.create()
@@ -74,7 +74,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                     .addBox(-3.5F, -2.0F, -3.5F, 7.0F, 2.0F, 7.0F, CubeDeformation.NONE)
                     .texOffs(0, 55)
                     .addBox(-3.5F, 0.0F, -4.5F, 7.0F, 1.0F, 8.0F, CubeDeformation.NONE),
-              PartPose.offsetAndRotation(0.0F, -4.0F, -2.0F, -0.1745F, 0.0F, 0.0F));
+              PartPose.offsetAndRotation(0.0F, -5.75F, 0.0F, -0.1745F, 0.0F, 0.0F));
 
         PartDefinition body = part.addOrReplaceChild("body",
               CubeListBuilder.create()
