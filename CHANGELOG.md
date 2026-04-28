@@ -13,6 +13,7 @@ Pigeon
     - Pigeon will pathfind back to the home radius if it happens to be outside of it.
     - Pigeon will forget its home after 3 in-game days of not resting inside a Pigeonhole, and will be free to wander off anywhere.
     - Pigeon can still enter any Pigeonhole when it already has a home, which will make it its new home.
+- Minor adjustments to predator avoidance behavior. 
 - Tired pigeons fly slower now.
 - Fixed pigeons exiting (and re-entering immediately) the Pigeonhole when it's raining without thunderstorm.
 

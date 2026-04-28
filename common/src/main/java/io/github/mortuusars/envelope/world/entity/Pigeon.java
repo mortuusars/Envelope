@@ -117,6 +117,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     protected @Nullable Delivery delivery;
     protected @Nullable CourierOrigin origin;
+    private PigeonAvoidEntityGoal<Animal> avoidEntityGoal;
 
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
@@ -199,9 +200,8 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new PigeonDeliverMailGoal(this));
-        goalSelector.addGoal(1, new FloatGoal(this));
-        goalSelector.addGoal(1, new PigeonAvoidEntityGoal<>(this, Animal.class,
-              8, 1.5, 2, AVOID_SELECTOR));
+        goalSelector.addGoal(1, avoidEntityGoal = new PigeonAvoidEntityGoal<>(this, Animal.class,
+              5, 0.5, 0.6, AVOID_SELECTOR));
         goalSelector.addGoal(2, new PigeonPanicGoal(this, 3.5));
         goalSelector.addGoal(2, new PigeonEnterPigeonholeGoal(this));
         goalSelector.addGoal(3, new PigeonStartDeliveryFromMailboxGoal(this));
@@ -214,6 +214,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         goalSelector.addGoal(7, new PigeonSitGoal(this));
         goalSelector.addGoal(8, new PigeonGoToMailboxGoal(this));
         goalSelector.addGoal(9, wanderGoal = new PigeonWanderGoal(this, 0.5));
+        goalSelector.addGoal(10, new FloatGoal(this));
         goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 8.0F));
     }
 
@@ -436,7 +437,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     @Override
     protected float getFlyingSpeed() {
-        if (isPanicking()) return 0.035f;
+        if (isPanicking() || avoidEntityGoal.isAvoiding()) return 0.030f;
         if (isTired()) return 0.0175f;
         return 0.0275f;
     }
