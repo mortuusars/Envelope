@@ -260,6 +260,12 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         super.checkDespawn();
     }
 
+    @Override
+    public boolean isPersistenceRequired() {
+        // Not sure if this changes much, but just to make sure.
+        return super.isPersistenceRequired() || isDelivering() || getPigeonholeHandler().getHomePos() != null;
+    }
+
     protected void calculateFlapping() {
         this.oFlap = this.flap;
         this.oFlapSpeed = this.flapSpeed;

@@ -155,7 +155,7 @@ public class PigeonholeHandler {
     public List<BlockPos> findNearbyPigeonholesWithSpace(ServerLevel level, BlockPos pos) {
         PoiManager poiManager = level.getPoiManager();
         return poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 32, PoiManager.Occupancy.ANY)
+                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 48, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
               .filter(p -> level.getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole
                     && pigeonhole.hasSpaceForAnotherOccupant())
