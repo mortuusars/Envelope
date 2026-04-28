@@ -22,8 +22,9 @@ Pigeonhole
 - Added unique sounds for scooping waste and pigeon entering, leaving and "working".
 - Added 1% chance of receiving a Diamond when scooping waste.
   - Grants hidden advancement.
-- Waste scooping now uses loot table for drops.
 - Improved pigeon behavior when the block is smoked.
+- Waste scooping now uses loot table for drops.
+- Fixed waste generation of tired pigeons being less than intended.
 
 Mailbox
 - Added 'hanging' property to Mailbox block. When placed on the side of a block, the model will have slightly different style.

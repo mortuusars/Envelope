@@ -1,10 +1,12 @@
 package io.github.mortuusars.envelope.util.bugger_data;
 
 import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
+import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
@@ -18,15 +20,15 @@ public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataD
         if (pigeon.getCurrentDelivery().isPresent()) {
             Delivery delivery = pigeon.getCurrentDelivery().get();
             lines.add(Component.empty()
-                  .append(delivery.getSender().getString())
+                  .append(delivery.getSender().format().asSender().toComponent())
                   .append(" → ")
-                  .append(delivery.getRecipient().getString()));
-            lines.add(line(delivery.getPhase().toPrettyString()));
+                  .append(delivery.getRecipient().format().asRecipient().toComponent()));
+            lines.add(line(delivery.getPhase().toPrettyString()).withStyle(ChatFormatting.GRAY));
             return;
         }
 
         if (pigeon.isTired()) {
-            lines.add(line("Tired"));
+            lines.add(line("Tired [" + GameTime.format(pigeon.getTiredTicks(), true).getString() + "]"));
         }
 
         PigeonholeHandler pigeonholeHandler = pigeon.getPigeonholeHandler();

@@ -1,11 +1,12 @@
 package io.github.mortuusars.envelope.world.entity.ai;
 
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
-import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,30 +29,33 @@ import java.util.stream.Collectors;
 
 public class PigeonholeHandler {
     public static final int MAX_BLACKLISTED_TARGETS = 3;
-    public static final int DEFAULT_LOCATE_COOLDOWN = 200;
+    public static final int DEFAULT_LOCATE_COOLDOWN = 100;
+    public static final int FORGET_HOME_TIME = Ticks.IN_GAME_DAY * 3;
 
     public static final Codec<PigeonholeHandler> CODEC = RecordCodecBuilder.create(i -> i.group(
           BlockPos.CODEC.optionalFieldOf("target_pos").forGetter(o -> Optional.ofNullable(o.getTargetPos())),
           BlockPos.CODEC.optionalFieldOf("home_pos").forGetter(o -> Optional.ofNullable(o.getHomePos())),
-          Codec.LONG.optionalFieldOf("last_tick_inside", 0L).forGetter(PigeonholeHandler::getLastTickInside),
+          Codec.INT.optionalFieldOf("ticks_since_last_rest", 0).forGetter(PigeonholeHandler::getTicksSinceLastRest),
           Codec.INT.optionalFieldOf("locate_cooldown", 0).forGetter(PigeonholeHandler::getLocateCooldown),
           Codec.INT.optionalFieldOf("want_cooldown", 0).forGetter(PigeonholeHandler::getWantCooldown),
           Codec.INT.optionalFieldOf("enter_cooldown", 0).forGetter(PigeonholeHandler::getEnterCooldown)
     ).apply(i, PigeonholeHandler::new));
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     protected final List<BlockPos> blacklistedPositions = new ArrayList<>();
 
     protected @Nullable BlockPos targetPos;
     protected @Nullable BlockPos homePos;
-    protected long lastTickInside;
+    protected int ticksSinceLastRest;
     protected int locateCooldown;
     protected int wantCooldown;
     protected int enterCooldown;
 
-    public PigeonholeHandler(Optional<BlockPos> targetPos, Optional<BlockPos> homePos, long lastTickInside,
+    public PigeonholeHandler(Optional<BlockPos> targetPos, Optional<BlockPos> homePos, int ticksSinceLastRest,
                              int locateCooldown, int wantCooldown, int enterCooldown) {
         this.targetPos = targetPos.orElse(null);
         this.homePos = homePos.orElse(null);
+        this.ticksSinceLastRest = ticksSinceLastRest;
         this.locateCooldown = locateCooldown;
         this.wantCooldown = wantCooldown;
         this.enterCooldown = enterCooldown;
@@ -77,12 +82,12 @@ public class PigeonholeHandler {
         return this;
     }
 
-    public long getLastTickInside() {
-        return lastTickInside;
+    public int getTicksSinceLastRest() {
+        return ticksSinceLastRest;
     }
 
-    public PigeonholeHandler setLastTickInside(long lastTickInside) {
-        this.lastTickInside = lastTickInside;
+    public PigeonholeHandler setTicksSinceLastRest(int ticks) {
+        this.ticksSinceLastRest = ticks;
         return this;
     }
 
@@ -125,15 +130,13 @@ public class PigeonholeHandler {
     // --
 
     public void tick(Pigeon pigeon, Level level) {
-        if (wantCooldown > 0) {
-            wantCooldown--;
-        }
-        if (locateCooldown > 0) {
-            locateCooldown--;
-        }
+        ticksSinceLastRest++;
+        if (wantCooldown > 0) wantCooldown--;
+        if (locateCooldown > 0) locateCooldown--;
 
         if (level instanceof ServerLevel) {
-            if (getHomePos() != null && level.getGameTime() - lastTickInside > SharedConstants.TICKS_PER_GAME_DAY * 3) {
+            if (getHomePos() != null && getTicksSinceLastRest() > FORGET_HOME_TIME) {
+                LOGGER.debug("{} has forgotten their home position [{}].", pigeon, getHomePos().toShortString());
                 setHomePos(null);
             }
 
@@ -152,7 +155,7 @@ public class PigeonholeHandler {
     public List<BlockPos> findNearbyPigeonholesWithSpace(ServerLevel level, BlockPos pos) {
         PoiManager poiManager = level.getPoiManager();
         return poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 20, PoiManager.Occupancy.ANY)
+                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 32, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
               .filter(p -> level.getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole
                     && pigeonhole.hasSpaceForAnotherOccupant())
@@ -215,9 +218,9 @@ public class PigeonholeHandler {
     @Override
     public String toString() {
         return "PigeonholeHandler{" +
-              "currentPos=" + targetPos +
-              ", lastReleasePos=" + homePos +
-              ", lastTickInside=" + lastTickInside +
+              "targetPos=" + targetPos +
+              ", homePos=" + homePos +
+              ", ticksSinceLastRest=" + ticksSinceLastRest +
               ", locateCooldown=" + locateCooldown +
               ", wantCooldown=" + wantCooldown +
               ", enterCooldown=" + enterCooldown +

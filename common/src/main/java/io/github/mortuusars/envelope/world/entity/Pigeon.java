@@ -101,7 +101,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> DATA_TIRED = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> DATA_TIRED_TICKS = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
 
     public float flap;
     public float flapSpeed;
@@ -109,7 +109,6 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     public float oFlap;
     protected float flapping = 1.0F;
     protected float nextFlap = 1.0F;
-    protected int tiredTicks;
 
     protected PigeonholeHandler pigeonholeHandler;
     protected MailboxHandler mailboxHandler;
@@ -182,7 +181,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         builder.define(DATA_DELIVERING, false);
         builder.define(DATA_SERVICE, false);
         builder.define(DATA_HAS_MAIL, false);
-        builder.define(DATA_TIRED, false);
+        builder.define(DATA_TIRED_TICKS, 0);
     }
 
     // -- Variant
@@ -232,12 +231,11 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         super.aiStep();
         this.calculateFlapping();
 
-        if (tiredTicks > 0) {
-            setTiredTicks(tiredTicks - 1);
+        if (getTiredTicks() > 0) {
+            setTiredTicks(getTiredTicks() - 1);
 
-            if (tiredTicks > 0 && level() instanceof ServerLevel serverLevel && level().getRandom().nextInt(32) == 0) {
-                //TODO: use addParticle?
-                serverLevel.sendParticles(ParticleTypes.SMOKE, position().x, position().y, position().z, 1, 0.25, 0.25, 0.25, 0);
+            if (level().getRandom().nextInt(32) == 0) {
+                level().addParticle(ParticleTypes.SMOKE, position().x, position().y, position().z, 0, 0, 0);
             }
         }
 
@@ -362,23 +360,19 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     }
 
     public boolean isTired() {
-        if (!level().isClientSide) {
-            return tiredTicks > 0;
-        }
-        return entityData.get(DATA_TIRED);
+        return getTiredTicks() > 0;
     }
 
     public int getTiredTicks() {
-        return tiredTicks;
+        return entityData.get(DATA_TIRED_TICKS);
     }
 
     public void setTiredTicks(int ticks) {
-        if (ticks <= 0 && tiredTicks > 0 && level() instanceof ServerLevel level) {
+        if (ticks <= 0 && getTiredTicks() > 0 && level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, position().x, position().y, position().z, 7, 0.25, 0.25, 0.25, 0);
         }
 
-        tiredTicks = ticks;
-        entityData.set(DATA_TIRED, tiredTicks > 0);
+        entityData.set(DATA_TIRED_TICKS, ticks);
     }
 
     public boolean hasMailmanHat() {
@@ -523,7 +517,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
             }
         }
 
-        getPigeonholeHandler().setLastTickInside(level().getGameTime());
+        getPigeonholeHandler().setTicksSinceLastRest(0);
 
         // Immediately going for mailbox after release looks weird
         getMailboxHandler().setLocateCooldown(level().getRandom().nextInt(20, MailboxHandler.DEFAULT_LOCATE_COOLDOWN));
@@ -737,7 +731,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
         tag.putInt("Variant", getVariant().getId());
         if (isSitting()) tag.putBoolean("Sitting", true);
-        if (tiredTicks > 0) tag.putInt("TiredTicks", tiredTicks);
+        if (getTiredTicks() > 0) tag.putInt("TiredTicks", getTiredTicks());
 
         if (delivery != null) {
             Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
