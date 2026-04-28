@@ -222,7 +222,7 @@ public class PigeonholeBlock extends BaseEntityBlock {
             }
 
             level.playSound(player, pos, Envelope.SoundEvents.PIGEONHOLE_SCOOP.get(), SoundSource.BLOCKS,
-                  1.0F, level.random.nextFloat() * 0.1f + 0.95f);
+                  1.0F, level.random.nextFloat() * 0.2f + 0.95f);
 
             return ItemInteractionResult.SUCCESS;
         }
