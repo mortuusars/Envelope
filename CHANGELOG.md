@@ -15,6 +15,7 @@ Pigeon
     - Pigeon can still enter any Pigeonhole when it already has a home, which will make it its new home.
 - Minor adjustments to predator avoidance behavior. 
 - Tired pigeons fly slower now.
+- Fixed wings of pigeons sitting in boats or seats being in wrong position.
 - Fixed pigeons exiting (and re-entering immediately) the Pigeonhole when it's raining without thunderstorm.
 
 Pigeonhole

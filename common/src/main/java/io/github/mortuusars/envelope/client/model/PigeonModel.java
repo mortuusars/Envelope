@@ -138,8 +138,8 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 
         switch (getState(pigeon)) {
             case FLYING -> {
-                leftWing.zRot = -bob;
-                rightWing.zRot = bob;
+                leftWing.zRot = -(bob + 0.3f);
+                rightWing.zRot = bob + 0.3f;
 
                 leftLeg.xRot = 0.75f * limbSwingAmount;
                 leftLeg.yRot = -0.15f;
@@ -153,21 +153,21 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                     anim = 2 - anim;
                 }
                 anim = ((float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim));
-                body.xRot = anim * 0.1f;
-                head.xRot = -anim * 0.05f;
-                head.z -= 0.75F * (anim);
+                body.xRot = anim * 0.05f;
+                head.xRot = -anim * 0.025f;
+                head.z -= 0.5F * (anim);
 
-                leftWing.xRot += (anim * 0.2f);
-                leftWing.y -= 0.35F * (anim);
+                leftWing.xRot += (anim * 0.1f);
+                leftWing.y -= 0.3F * (anim);
                 leftWing.z -= 0.5F * (anim);
 
-                rightWing.xRot += (anim * 0.2f);
-                rightWing.y -= 0.35F * (anim);
+                rightWing.xRot += (anim * 0.1f);
+                rightWing.y -= 0.3F * (anim);
                 rightWing.z -= 0.5F * (anim);
 
-                tail.xRot += (limbSwingAmount * 0.75F) + (anim * 0.1f);
-                tail.y -= 0.35F * (anim);
-                tail.z -= 0.5F * (anim);
+                tail.xRot += (limbSwingAmount * 0.5F) + (anim * 0.1f);
+                tail.y -= 0.3F * (anim);
+                tail.z -= 0.4F * (anim);
             }
             case STANDING -> {
                 leftWing.zRot = -0.3927F;
