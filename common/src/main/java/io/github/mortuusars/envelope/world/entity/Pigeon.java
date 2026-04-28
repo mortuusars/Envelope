@@ -114,6 +114,8 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     protected PigeonholeHandler pigeonholeHandler;
     protected MailboxHandler mailboxHandler;
 
+    protected PigeonWanderGoal wanderGoal;
+
     protected @Nullable Delivery delivery;
     protected @Nullable CourierOrigin origin;
 
@@ -169,7 +171,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         return Mob.createMobAttributes()
               .add(Attributes.MAX_HEALTH, 8.0)
               .add(Attributes.FLYING_SPEED, 1F)
-              .add(Attributes.MOVEMENT_SPEED, 0.2F)
+              .add(Attributes.MOVEMENT_SPEED, 0.4F)
               .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
 
@@ -200,7 +202,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         goalSelector.addGoal(0, new PigeonDeliverMailGoal(this));
         goalSelector.addGoal(1, new FloatGoal(this));
         goalSelector.addGoal(1, new PigeonAvoidEntityGoal<>(this, Animal.class,
-              8, 1.5, 3.5, AVOID_SELECTOR));
+              8, 1.5, 2, AVOID_SELECTOR));
         goalSelector.addGoal(2, new PigeonPanicGoal(this, 3.5));
         goalSelector.addGoal(2, new PigeonEnterPigeonholeGoal(this));
         goalSelector.addGoal(3, new PigeonStartDeliveryFromMailboxGoal(this));
@@ -212,13 +214,13 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         goalSelector.addGoal(7, new PigeonLocateMailboxGoal(this));
         goalSelector.addGoal(7, new PigeonSitGoal(this));
         goalSelector.addGoal(8, new PigeonGoToMailboxGoal(this));
-        goalSelector.addGoal(9, new PigeonWanderGoal(this));
+        goalSelector.addGoal(9, wanderGoal = new PigeonWanderGoal(this, 0.5));
         goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 8.0F));
     }
 
     @Override
     protected @NotNull FlyingPathNavigation createNavigation(Level level) {
-        FlyingPathNavigation navigation = new FlyingPathNavigation(this, level);
+        FlyingPathNavigation navigation = new PigeonFlyingPathNavigation(this, level);
         navigation.setCanOpenDoors(false);
         navigation.setCanFloat(true);
         navigation.setCanPassDoors(true);
@@ -232,8 +234,10 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
         if (tiredTicks > 0) {
             setTiredTicks(tiredTicks - 1);
-            if (level() instanceof ServerLevel serverLevel && level().getRandom().nextFloat() < 0.1) {
-                serverLevel.sendParticles(ParticleTypes.SMOKE, position().x, position().y, position().z, 1, 0.2, 0.2, 0.2, 0);
+
+            if (tiredTicks > 0 && level() instanceof ServerLevel serverLevel && level().getRandom().nextInt(32) == 0) {
+                //TODO: use addParticle?
+                serverLevel.sendParticles(ParticleTypes.SMOKE, position().x, position().y, position().z, 1, 0.25, 0.25, 0.25, 0);
             }
         }
 
@@ -438,7 +442,9 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     @Override
     protected float getFlyingSpeed() {
-        return isPanicking() ? 0.035f : 0.0275f;
+        if (isPanicking()) return 0.035f;
+        if (isTired()) return 0.0175f;
+        return 0.0275f;
     }
 
     @Override
@@ -502,23 +508,29 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     }
 
     public void releasedFromPigeonhole(BlockPos pos, BlockState state, Occupiable.ReleaseReason releaseReason) {
-        getPigeonholeHandler().setTargetPos(pos);
-        getPigeonholeHandler().setLastReleasePos(pos);
-        getPigeonholeHandler().setLastTickInside(level().getGameTime());
-        getPigeonholeHandler().setDefaultWantCooldown();
-
         if (releaseReason == Occupiable.ReleaseReason.EMERGENCY) {
             getPigeonholeHandler().setEnterCooldown(200);
-        }
+        } else {
+            getPigeonholeHandler().setTargetPos(pos);
+            getPigeonholeHandler().setHomePos(pos);
+            getPigeonholeHandler().setDefaultWantCooldown();
 
-        getMailboxHandler().setLocateCooldown(level().getRandom().nextInt(20, MailboxHandler.DEFAULT_LOCATE_COOLDOWN));
-
-        if (isTired()) {
-            setTiredTicks(0);
-            if (level() instanceof ServerLevel level) {
-                level.sendParticles(ParticleTypes.HAPPY_VILLAGER, position().x, position().y, position().z, 5, 0.25, 0.25, 0.25, 0);
+            if (isTired()) {
+                setTiredTicks(0);
+                if (level() instanceof ServerLevel level) {
+                    level.sendParticles(ParticleTypes.HAPPY_VILLAGER, position().x, position().y, position().z, 5, 0.25, 0.25, 0.25, 0);
+                }
             }
         }
+
+        getPigeonholeHandler().setLastTickInside(level().getGameTime());
+
+        // Immediately going for mailbox after release looks weird
+        getMailboxHandler().setLocateCooldown(level().getRandom().nextInt(20, MailboxHandler.DEFAULT_LOCATE_COOLDOWN));
+
+        // Force wandering immediately, instead of standing (or falling) in front of the Pigeonhole
+        // - looks especially stupid if there's an emergency
+        wanderGoal.trigger();
     }
 
     // -- Mailbox
@@ -702,7 +714,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
             discard();
         } else {
             setOrigin(null);
-            getPigeonholeHandler().setTargetPos(getPigeonholeHandler().getLastReleasePos());
+            getPigeonholeHandler().setTargetPos(getPigeonholeHandler().getHomePos());
             // Prevent Pigeon entering Pigeonhole immediately:
             getPigeonholeHandler().setWantCooldown(20);
             setTiredTicks(Config.Server.PIGEON_TIRED_AFTER_DELIVERY_TICKS.get());

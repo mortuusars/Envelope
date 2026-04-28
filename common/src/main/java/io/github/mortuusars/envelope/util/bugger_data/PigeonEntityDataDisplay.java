@@ -44,5 +44,12 @@ public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataD
                 lines.add(line("Could enter after: " + pigeonholeHandler.getEnterCooldown() / 20));
             }
         }
+
+        if (pigeonholeHandler.getTargetPos() != null) {
+            lines.add(line("Target: [" + pigeonholeHandler.getTargetPos().toShortString() + "]"));
+        }
+        if (pigeonholeHandler.getHomePos() != null) {
+            lines.add(line("Home: [" + pigeonholeHandler.getHomePos().toShortString() + "]"));
+        }
     }
 }

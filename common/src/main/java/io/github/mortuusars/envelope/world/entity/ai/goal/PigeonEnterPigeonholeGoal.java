@@ -45,7 +45,7 @@ public class PigeonEnterPigeonholeGoal extends Goal {
 
     @Override
     public void start() {
-        pigeon.getPigeonholeHandler().getPigeonholeAtCurrentPos(pigeon.level())
+        pigeon.getPigeonholeHandler().getPigeonholeAtTargetPos(pigeon.level())
               .ifPresent(pigeonhole -> pigeonhole.addOccupant(pigeonhole.getBlockPos(), pigeonhole.getBlockState(), pigeon));
     }
 }

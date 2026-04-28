@@ -1,8 +1,24 @@
 # Changelog
 
 ## UNRELEASED
+
+Pigeon
+- Improved wandering:
+  - Pigeons now perch occasionally on leaves and wooden blocks, similar to parrots.
+  - Reduced wandering movement speed slightly.
+  - Other minor changes and fixes.
+- Improved and fixed pigeon's "home" mechanic:
+  - When a Pigeon exits Pigeonhole - it becomes its home position.
+    - Pigeon will not wander outside 24 block radius of it.
+    - Pigeon will pathfind back to the home radius if it happens to be outside of it.
+    - Pigeon will forget its home after 3 in-game days of not resting inside a Pigeonhole, and will be free to wander off anywhere.
+    - Pigeon can still enter any Pigeonhole when it already has a home, which will make it its new home.
+- Tired pigeons fly slower now.
+- Fixed pigeons exiting (and re-entering immediately) the Pigeonhole when it's raining without thunderstorm.
+
 Pigeonhole
 - Added variants for all wood types.
+  - Added `envelope:pigeonholes_that_burn` block tag that controls which pigeonholes can burn.
 - Added unique sounds for scooping waste and pigeon entering, leaving and "working".
 - Added 1% chance of receiving a Diamond when scooping waste.
   - Grants hidden advancement.

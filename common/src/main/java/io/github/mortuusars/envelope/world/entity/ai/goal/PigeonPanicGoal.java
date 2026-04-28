@@ -29,7 +29,7 @@ public class PigeonPanicGoal extends PanicGoal {
         if (!(mob.getLastDamageSource() instanceof DamageSource damageSource)) return false;
         if (!(damageSource.getDirectEntity() instanceof Entity entity)) return false;
 
-        @Nullable Vec3 pos = PigeonAvoidEntityGoal.getPosAway(mob, 6, 3, entity.position());
+        @Nullable Vec3 pos = PigeonAvoidEntityGoal.getPosAway(mob, 6, 6, entity.position());
 
         if (pos != null) {
             this.posX = pos.x;

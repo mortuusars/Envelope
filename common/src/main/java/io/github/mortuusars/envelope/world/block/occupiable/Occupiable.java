@@ -109,7 +109,7 @@ public interface Occupiable {
 
     default Optional<Entity> releaseOccupant(Level level, BlockPos pos, BlockState state, Occupant occupant, ReleaseReason reason) {
         if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
-        if ((level.isNight() || level.isThundering()) && reason != ReleaseReason.EMERGENCY) {
+        if ((level.isNight() || level.isRaining() || level.isThundering()) && reason != ReleaseReason.EMERGENCY) {
             return Optional.empty();
         }
 

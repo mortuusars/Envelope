@@ -482,8 +482,12 @@ public class Envelope {
         public static class Blocks {
             public static final TagKey<Block> PIGEONS_SPAWNABLE_ON =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeons_spawnable_on"));
+            public static final TagKey<Block> PIGEONS_PERCHABLE_ON =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeons_perchable_on"));
             public static final TagKey<Block> PIGEONHOLES =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes"));
+            public static final TagKey<Block> PIGEONHOLES_THAT_BURN =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes_that_burn"));
         }
 
         public static class Items {

@@ -3,28 +3,35 @@ package io.github.mortuusars.envelope.world.entity.ai;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PigeonholeHandler {
     public static final int MAX_BLACKLISTED_TARGETS = 3;
     public static final int DEFAULT_LOCATE_COOLDOWN = 200;
 
     public static final Codec<PigeonholeHandler> CODEC = RecordCodecBuilder.create(i -> i.group(
-          BlockPos.CODEC.optionalFieldOf("current_pos").forGetter(o -> Optional.ofNullable(o.getTargetPos())),
-          BlockPos.CODEC.optionalFieldOf("last_release_pos").forGetter(o -> Optional.ofNullable(o.getLastReleasePos())),
+          BlockPos.CODEC.optionalFieldOf("target_pos").forGetter(o -> Optional.ofNullable(o.getTargetPos())),
+          BlockPos.CODEC.optionalFieldOf("home_pos").forGetter(o -> Optional.ofNullable(o.getHomePos())),
           Codec.LONG.optionalFieldOf("last_tick_inside", 0L).forGetter(PigeonholeHandler::getLastTickInside),
           Codec.INT.optionalFieldOf("locate_cooldown", 0).forGetter(PigeonholeHandler::getLocateCooldown),
           Codec.INT.optionalFieldOf("want_cooldown", 0).forGetter(PigeonholeHandler::getWantCooldown),
@@ -34,16 +41,16 @@ public class PigeonholeHandler {
     protected final List<BlockPos> blacklistedPositions = new ArrayList<>();
 
     protected @Nullable BlockPos targetPos;
-    protected @Nullable BlockPos lastReleasePos;
+    protected @Nullable BlockPos homePos;
     protected long lastTickInside;
     protected int locateCooldown;
     protected int wantCooldown;
     protected int enterCooldown;
 
-    public PigeonholeHandler(Optional<BlockPos> targetPos, Optional<BlockPos> lastReleasePos, long lastTickInside,
+    public PigeonholeHandler(Optional<BlockPos> targetPos, Optional<BlockPos> homePos, long lastTickInside,
                              int locateCooldown, int wantCooldown, int enterCooldown) {
         this.targetPos = targetPos.orElse(null);
-        this.lastReleasePos = lastReleasePos.orElse(null);
+        this.homePos = homePos.orElse(null);
         this.locateCooldown = locateCooldown;
         this.wantCooldown = wantCooldown;
         this.enterCooldown = enterCooldown;
@@ -61,12 +68,12 @@ public class PigeonholeHandler {
         this.targetPos = targetPos;
     }
 
-    public @Nullable BlockPos getLastReleasePos() {
-        return lastReleasePos;
+    public @Nullable BlockPos getHomePos() {
+        return homePos;
     }
 
-    public PigeonholeHandler setLastReleasePos(@Nullable BlockPos lastReleasePos) {
-        this.lastReleasePos = lastReleasePos;
+    public PigeonholeHandler setHomePos(@Nullable BlockPos homePos) {
+        this.homePos = homePos;
         return this;
     }
 
@@ -125,17 +132,35 @@ public class PigeonholeHandler {
             locateCooldown--;
         }
 
-        if (level instanceof ServerLevel && pigeon.tickCount % 20 == 0) {
-            if (!isPigeonholeValid(level, pigeon.blockPosition())) {
-                setTargetPos(null);
+        if (level instanceof ServerLevel) {
+            if (getHomePos() != null && level.getGameTime() - lastTickInside > SharedConstants.TICKS_PER_GAME_DAY * 3) {
+                setHomePos(null);
             }
-            Bugger.PIGEON_PIGEONHOLE_HANDLER.send(pigeon.getId(), this);
+
+            if (pigeon.tickCount % 20 == 0) {
+                // This is important for the pigeon to forget its previous pigeonhole if far away or no longer existing
+                if (getTargetPos() != null && !pigeon.isDelivering() && !isPigeonholeValid(level, pigeon.blockPosition())) {
+                    setTargetPos(null);
+                }
+                Bugger.PIGEON_PIGEONHOLE_HANDLER.send(pigeon.getId(), this);
+            }
         }
     }
 
     // --
 
-    public Optional<PigeonholeBlockEntity> getPigeonholeAtCurrentPos(Level level) {
+    public List<BlockPos> findNearbyPigeonholesWithSpace(ServerLevel level, BlockPos pos) {
+        PoiManager poiManager = level.getPoiManager();
+        return poiManager.getInRange(holder ->
+                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 20, PoiManager.Occupancy.ANY)
+              .map(PoiRecord::getPos)
+              .filter(p -> level.getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole
+                    && pigeonhole.hasSpaceForAnotherOccupant())
+              .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
+              .collect(Collectors.toList());
+    }
+
+    public Optional<PigeonholeBlockEntity> getPigeonholeAtTargetPos(Level level) {
         @Nullable BlockPos pos = getTargetPos();
         if (pos != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PigeonholeBlockEntity be) {
             return Optional.of(be);
@@ -159,19 +184,19 @@ public class PigeonholeHandler {
     }
 
     public boolean isTargetBlacklisted(BlockPos pos) {
-        return this.blacklistedPositions.contains(pos);
+        return blacklistedPositions.contains(pos);
     }
 
     private void blacklistTarget(BlockPos pos) {
-        this.blacklistedPositions.add(pos);
+        blacklistedPositions.add(pos);
 
-        while (this.blacklistedPositions.size() > MAX_BLACKLISTED_TARGETS) {
-            this.blacklistedPositions.removeFirst();
+        while (blacklistedPositions.size() > MAX_BLACKLISTED_TARGETS) {
+            blacklistedPositions.removeFirst();
         }
     }
 
     public void clearBlacklist() {
-        this.blacklistedPositions.clear();
+        blacklistedPositions.clear();
     }
 
     public void dropAndBlacklistPigeonhole() {
@@ -191,7 +216,7 @@ public class PigeonholeHandler {
     public String toString() {
         return "PigeonholeHandler{" +
               "currentPos=" + targetPos +
-              ", lastReleasePos=" + lastReleasePos +
+              ", lastReleasePos=" + homePos +
               ", lastTickInside=" + lastTickInside +
               ", locateCooldown=" + locateCooldown +
               ", wantCooldown=" + wantCooldown +
