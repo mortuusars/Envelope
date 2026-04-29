@@ -136,6 +136,8 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
         head.xRot = headPitch * (float) (Math.PI / 180.0);
         head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
 
+        float partialTick = Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true);
+
         switch (getState(pigeon)) {
             case FLYING -> {
                 leftWing.zRot = -(bob + 0.3f);
@@ -147,7 +149,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                 rightLeg.yRot = 0.15f;
 
                 // Rock back and forth
-                float anim = ((pigeon.tickCount + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) % 60) / 60;
+                float anim = ((pigeon.tickCount + partialTick) % 60) / 60;
                 anim *= 2;
                 if (anim > 1) {
                     anim = 2 - anim;
@@ -186,6 +188,17 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 
                 tail.xRot = 0.75f;
             }
+        }
+
+        int eatingTicks = pigeon.getEatingTicks();
+        if (eatingTicks > 0) {
+            float anim = Mth.clamp((eatingTicks + partialTick) / 10f, 0.0f, 1.0f);
+            anim *= 2;
+            if (anim > 1) {
+                anim = 2 - anim;
+            }
+
+            head.xRot += anim;
         }
     }
 

@@ -3,6 +3,9 @@
 ## UNRELEASED
 
 Pigeon
+- Pigeons now look for and eat dropped seeds.
+- Nitwits now occasionally throw seeds for nearby pigeons.
+  - Pigeons know this and will sometimes follow a nitwit to get some food. 
 - Improved wandering:
   - Pigeons now perch occasionally on leaves and wooden blocks, similar to parrots.
   - Reduced wandering movement speed slightly.
@@ -15,7 +18,8 @@ Pigeon
     - Pigeon can still enter any Pigeonhole when it already has a home, which will make it its new home.
 - Minor adjustments to predator avoidance behavior. 
 - Tired pigeons fly slower now.
-- Fixed wings of pigeons sitting in boats or seats being in wrong position.
+- Increased Pigeonhole location distance.
+- Fixed wings of pigeons sitting in boats or seats having wrong position.
 - Fixed position of Create's Conductor and Logistics hat on a Pigeon.
 - Fixed pigeons exiting (and re-entering immediately) the Pigeonhole when it's raining without thunderstorm.
 

@@ -419,6 +419,8 @@ public class Envelope {
         public static final Supplier<SoundEvent> PIGEONHOLE_WORK_MULTIPLE = register("block", "pigeonhole.work_multiple");
         public static final Supplier<SoundEvent> PIGEONHOLE_SCOOP = register("block", "pigeonhole.scoop");
 
+        public static final Supplier<SoundEvent> VILLAGER_THROW_PIGEON_FOOD = register("entity", "villager.throw_pigeon_food");
+
         private static Supplier<SoundEvent> register(String category, String key) {
             Preconditions.checkState(category != null && !category.isEmpty(), "'category' should not be empty.");
             Preconditions.checkState(key != null && !key.isEmpty(), "'key' should not be empty.");
@@ -493,6 +495,13 @@ public class Envelope {
         public static class Items {
             public static final TagKey<Item> PIGEON_FOOD =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeon_food"));
+
+            public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_COMMON =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_common"));
+            public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_UNCOMMON =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_uncommon"));
+            public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_RARE =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_rare"));
 
             public static final TagKey<Item> PIGEONHOLES =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeonholes"));

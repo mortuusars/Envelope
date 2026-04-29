@@ -183,6 +183,8 @@
   "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
   "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
 
+  "subtitles.envelope.entity.villager.throw_pigeon_food": "Villager throws food",
+
   "letter.envelope.courier_death_notice.name": "Courier Death Notice",
   "letter.envelope.courier_death_notice.title": "     Courier Death Notice\n\n",
   "letter.envelope.courier_death_notice.inform_0": "  We regret to inform you, that %s",
@@ -234,6 +236,7 @@
 
   "package.envelope.canceled_payback_request.name": "Canceled Payback Request",
 
+  "envelope.configuration.misc": "Miscellaneous",
   "envelope.configuration.pigeon": "Pigeon",
   "envelope.configuration.delivery": "Delivery",
   "envelope.configuration.hunted_by_fox": "Hunted by Fox",
@@ -277,6 +280,9 @@
   "envelope.configuration.notice_sending_enabled": "Notice: Enabled",
   "envelope.configuration.notice_sending_base_interval_minutes": "Notice: Base Sending Interval",
   "envelope.configuration.equine_assurance_bureau": "Equine Assurance Bureau",
+  "envelope.configuration.villager_feeding_pigeons": "Villagers Feed Pigeons",
+  "envelope.configuration.villager_feeding_pigeons_only_nitwits": "Villagers Feed Pigeons: Only Nitwits",
+  "envelope.configuration.eats_seeds": "Eats Seeds",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

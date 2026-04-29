@@ -27,13 +27,20 @@ public class ItemTagsDatagen extends ItemTagsProvider {
         copy(Envelope.Tags.Blocks.PIGEONHOLES, Envelope.Tags.Items.PIGEONHOLES);
 
         tag(Envelope.Tags.Items.PIGEON_FOOD)
-              .add(Items.WHEAT_SEEDS)
+              .addOptionalTag(Tags.Items.SEEDS);
+
+        tag(Envelope.Tags.Items.VILLAGER_FEEDING_PIGEON_FOOD_COMMON)
+              .add(Items.WHEAT_SEEDS);
+        tag(Envelope.Tags.Items.VILLAGER_FEEDING_PIGEON_FOOD_UNCOMMON)
+              .add(Items.BEETROOT_SEEDS);
+        tag(Envelope.Tags.Items.VILLAGER_FEEDING_PIGEON_FOOD_RARE)
               .add(Items.MELON_SEEDS)
               .add(Items.PUMPKIN_SEEDS)
-              .add(Items.BEETROOT_SEEDS)
               .add(Items.TORCHFLOWER_SEEDS)
-              .add(Items.PITCHER_POD)
-              .addOptionalTag(Tags.Items.SEEDS);
+              .addOptional(ResourceLocation.parse("farmersdelight:cabbage_seeds"))
+              .addOptional(ResourceLocation.parse("farmersdelight:tomato_seeds"))
+              .addOptional(ResourceLocation.parse("farmersdelight:rice"))
+              .addOptional(ResourceLocation.parse("supplementaries:flax_seeds"));
 
         tag(Envelope.Tags.Items.WASTE_SCOOPABLE)
               .addTag(ItemTags.SHOVELS);

@@ -1,0 +1,23 @@
+{
+  "values": [
+    "minecraft:melon_seeds",
+    "minecraft:pumpkin_seeds",
+    "minecraft:torchflower_seeds",
+    {
+      "id": "farmersdelight:cabbage_seeds",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:tomato_seeds",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:rice",
+      "required": false
+    },
+    {
+      "id": "supplementaries:flax_seeds",
+      "required": false
+    }
+  ]
+}

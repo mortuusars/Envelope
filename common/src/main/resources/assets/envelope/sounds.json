@@ -380,5 +380,30 @@
       "envelope:block/pigeonhole/scoop"
     ],
     "subtitle": "subtitles.envelope.block.pigeonhole.scoop"
+  },
+  "entity.villager.throw_pigeon_food": {
+    "sounds": [
+      {
+        "name": "item/brush/brushing_generic1",
+        "pitch": 1.5,
+        "volume": 0.5
+      },
+      {
+        "name": "item/brush/brushing_generic2",
+        "pitch": 1.5,
+        "volume": 0.5
+      },
+      {
+        "name": "item/brush/brushing_generic3",
+        "pitch": 1.5,
+        "volume": 0.5
+      },
+      {
+        "name": "item/brush/brushing_generic4",
+        "pitch": 1.5,
+        "volume": 0.5
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.villager.throw_pigeon_food"
   }
 }

@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.util.bugger.test.cases.CourierDeliveryTests
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.service.EquineAssuranceBureau;
@@ -19,6 +20,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.npc.Villager;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -79,8 +81,13 @@ public class EnvelopeDebugCommand {
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-        EquineAssuranceBureau.sendNotice(MailService.of(player.serverLevel()),
-              ServiceAddress.getOrThrow(player.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU));
+//        player.level().getEntitiesOfClass(Pigeon.class, player.getBoundingBox().inflate(16))
+//              .forEach(p -> p.restrictTo(player.blockPosition(), 4));
+//        player.level().getEntitiesOfClass(Villager.class, player.getBoundingBox().inflate(16))
+//              .forEach(p -> p.restrictTo(player.blockPosition(), 4));
+
+        //        EquineAssuranceBureau.sendNotice(MailService.of(player.serverLevel()),
+//              ServiceAddress.getOrThrow(player.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU));
 
 //        ItemStack item = new ItemStack(Envelope.Items.LETTER.get());
 //        item.set(Envelope.DataComponents.LETTER_CONTENT,

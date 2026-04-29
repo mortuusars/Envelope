@@ -19,6 +19,7 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
         public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING;
+        public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
 
         // Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
@@ -53,6 +54,10 @@ public abstract class Config {
         public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES;
         public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES;
         public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK;
+
+        // Misc
+        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
+        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -93,6 +98,10 @@ public abstract class Config {
                 PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING = builder
                       .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
                       .defineInRange("damage_evasion_chance_while_delivering", 0.0, 0.0, 1.0);
+
+                PIGEON_EATS_SEEDS = builder
+                      .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
+                      .define("eats_seeds", true);
 
                 builder.pop();
             }
@@ -199,10 +208,21 @@ public abstract class Config {
             }
 
             {
+                builder.push("misc");
+                VILLAGER_FEEDING_PIGEONS = builder
+                      .comment("Villagers will feed nearby pigeons by throwing them seeds.",
+                            "Requires 'pigeon.eats_seeds' config option to be enabled.")
+                      .define("villager_feeding_pigeons", true);
+                VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY = builder
+                      .comment("Only Nitwits can feed pigeons.")
+                      .define("villager_feeding_pigeons_only_nitwits", true);
+                builder.pop();
+            }
+
+            {
                 builder.push("debug");
                 DEBUG = builder
-                      .comment("Enable debug features. Will affect performance negatively. Don't enable unless it's needed.",
-                            " Default: false.")
+                      .comment("Enable debug features. Will affect performance negatively. Don't enable unless it's needed.")
                       .define("debug_mode", false);
                 builder.pop();
             }

@@ -18,6 +18,7 @@ import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.delivery.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -40,6 +41,9 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.util.AirRandomPos;
 import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -97,11 +101,22 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         return false;
     };
 
+    public static final Predicate<ItemEntity> SEARCHED_FOOD_ITEMS_PREDICATE = item ->
+          item.isAlive() && !item.hasPickUpDelay() && item.getItem().is(Envelope.Tags.Items.PIGEON_FOOD);
+
+    public static final Predicate<Mob> FOLLOW_PREDICATE = mob -> Config.Server.PIGEON_EATS_SEEDS.get()
+          && Config.Server.VILLAGER_FEEDING_PIGEONS.get()
+          && mob instanceof Villager villager
+          && (!Config.Server.VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY.get()
+          || villager.getVillagerData().getProfession() == VillagerProfession.NITWIT)
+          && mob.getRandom().nextInt(60) == 0;
+
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_TIRED_TICKS = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_EATING_TICKS = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
 
     public float flap;
     public float flapSpeed;
@@ -126,6 +141,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         mailboxHandler = new MailboxHandler();
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
         setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
+        setCanPickUpLoot(true);
     }
 
     // -- Spawn
@@ -183,6 +199,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         builder.define(DATA_SERVICE, false);
         builder.define(DATA_HAS_MAIL, false);
         builder.define(DATA_TIRED_TICKS, 0);
+        builder.define(DATA_EATING_TICKS, 0);
     }
 
     // -- Variant
@@ -213,9 +230,12 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         goalSelector.addGoal(7, new PigeonLocateMailboxGoal(this));
         goalSelector.addGoal(7, new PigeonSitGoal(this));
         goalSelector.addGoal(8, new PigeonGoToMailboxGoal(this));
-        goalSelector.addGoal(9, wanderGoal = new PigeonWanderGoal(this, 0.5));
-        goalSelector.addGoal(10, new FloatGoal(this));
-        goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        goalSelector.addGoal(9, new PigeonSearchForFoodGoal(this));
+        goalSelector.addGoal(9, new FollowSpecificMobGoal(this, FOLLOW_PREDICATE, 0.5, 3, 8));
+        goalSelector.addGoal(10, wanderGoal = new PigeonWanderGoal(this, 0.5));
+        goalSelector.addGoal(11, new FloatGoal(this));
+        goalSelector.addGoal(12, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        goalSelector.addGoal(13, new LookAtPlayerGoal(this, Villager.class, 8.0F, 0.01F));
     }
 
     @Override
@@ -232,6 +252,9 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         super.aiStep();
         this.calculateFlapping();
 
+        getPigeonholeHandler().tick(this, level());
+        getMailboxHandler().tick(this, level());
+
         if (getTiredTicks() > 0) {
             setTiredTicks(getTiredTicks() - 1);
 
@@ -244,8 +267,25 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
             setSitting(false);
         }
 
-        getPigeonholeHandler().tick(this, level());
-        getMailboxHandler().tick(this, level());
+        ItemStack mainHandItem = getMainHandItem();
+        if (isFood(mainHandItem)) {
+            setEatingTicks(getEatingTicks() + 1);
+
+            if (getEatingTicks() == 5) {
+                if (level() instanceof ServerLevel serverLevel) {
+                    serverLevel.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, mainHandItem),
+                          position().x, position().y + 0.3, position().z, 5, 0.25, 0.25, 0.25, 0);
+                }
+                playSound(getEatingSound(mainHandItem), 0.5f, getRandom().nextFloat() * 0.2f + 0.9f);
+            }
+
+            if (getEatingTicks() >= 10) {
+                setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+                setEatingTicks(0);
+            }
+        } else if (getEatingTicks() > 10) {
+            setEatingTicks(0);
+        }
     }
 
     @Override
@@ -291,6 +331,44 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
             if (delivery.getPhase().isAscending()) return 0.5f;
         }
         return 0.75f;
+    }
+
+    @Override
+    public boolean wantsToPickUp(ItemStack stack) {
+        return Config.Server.PIGEON_EATS_SEEDS.get()
+              && onGround()
+              && getMainHandItem().isEmpty()
+              && isFood(stack)
+              && getEatingTicks() <= 0;
+    }
+
+    @Override
+    public boolean canTakeItem(ItemStack stack) {
+        return wantsToPickUp(stack);
+    }
+
+    @Override
+    public boolean canHoldItem(ItemStack stack) {
+        return wantsToPickUp(stack);
+    }
+
+    @Override
+    protected void pickUpItem(ItemEntity itemEntity) {
+        if (getRandom().nextInt(10) != 0) {
+            return;
+        }
+        ItemStack item = itemEntity.getItem();
+        if (itemEntity.onGround() && distanceTo(itemEntity) < 1 && canHoldItem(item)) {
+            if (item.getCount() > 1) {
+                spawnAtLocation(item.split(item.getCount() - 1));
+            }
+
+            onItemPickup(itemEntity);
+            setItemSlot(EquipmentSlot.MAINHAND, item.split(1));
+            take(itemEntity, item.getCount());
+            itemEntity.discard();
+            setEatingTicks(0);
+        }
     }
 
     @Override
@@ -376,10 +454,20 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     public void setTiredTicks(int ticks) {
         if (ticks <= 0 && getTiredTicks() > 0 && level() instanceof ServerLevel level) {
-            level.sendParticles(ParticleTypes.HAPPY_VILLAGER, position().x, position().y, position().z, 7, 0.25, 0.25, 0.25, 0);
+            level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
+                  position().x, position().y + getBoundingBox().getYsize() / 2f, position().z,
+                  7, 0.25, 0.25, 0.25, 0);
         }
 
         entityData.set(DATA_TIRED_TICKS, ticks);
+    }
+
+    public int getEatingTicks() {
+        return entityData.get(DATA_EATING_TICKS);
+    }
+
+    public void setEatingTicks(int ticks) {
+        entityData.set(DATA_EATING_TICKS, ticks);
     }
 
     public boolean hasMailmanHat() {
@@ -411,7 +499,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         if (isDeadOrDying()) return false;
 
         if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING.get()
-            && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
+              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
 
             if (level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.POOF, position().x, position().y, position().z, 3, 0.3, 0.3, 0.3, 0);
@@ -554,6 +642,11 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     }
 
     @Override
+    public @NotNull SoundEvent getEatingSound(ItemStack stack) {
+        return Envelope.SoundEvents.PIGEON_EAT.get();
+    }
+
+    @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
         return Envelope.SoundEvents.PIGEON_HURT.get();
     }
@@ -586,7 +679,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     }
 
     public static float getPitch(RandomSource random) {
-        return (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F;
+        return (random.nextFloat() - random.nextFloat()) * 0.1F + 1.0F;
     }
 
     @Override
@@ -739,6 +832,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         tag.putInt("Variant", getVariant().getId());
         if (isSitting()) tag.putBoolean("Sitting", true);
         if (getTiredTicks() > 0) tag.putInt("TiredTicks", getTiredTicks());
+        if (getEatingTicks() > 0) tag.putInt("EatingTicks", getEatingTicks());
 
         if (delivery != null) {
             Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
@@ -760,6 +854,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         setVariant(PigeonVariant.byId(tag.getInt("Variant")));
         setSitting(tag.getBoolean("Sitting"));
         setTiredTicks(tag.getInt("TiredTicks"));
+        setEatingTicks(tag.getInt("EatingTicks"));
 
         if (tag.contains("Delivery")) {
             setDelivery(Delivery.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.getCompound("Delivery"))

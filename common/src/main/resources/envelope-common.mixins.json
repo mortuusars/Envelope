@@ -29,7 +29,8 @@
     "shears_clearing.ShearsItemMixin",
     "spawners.MinecraftServerMixin",
     "spawners.ServerLevelMixin",
-    "tooltip.ItemStackMixin"
+    "tooltip.ItemStackMixin",
+    "villager_feeds_pigeon.VillagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
