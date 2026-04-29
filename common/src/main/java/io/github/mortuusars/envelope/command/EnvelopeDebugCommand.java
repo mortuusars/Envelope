@@ -9,18 +9,13 @@ import io.github.mortuusars.envelope.util.bugger.test.cases.CourierDeliveryTests
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
-import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
-import io.github.mortuusars.envelope.world.mail.service.EquineAssuranceBureau;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.npc.Villager;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {

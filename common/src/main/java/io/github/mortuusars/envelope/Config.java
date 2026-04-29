@@ -31,6 +31,7 @@ public abstract class Config {
 
         // Letter
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
+        public static final ModConfigSpec.BooleanValue FOX_LETTER_TATTERING;
 
         // Package
         public static final ModConfigSpec.BooleanValue PACKAGE_SNEAK_QUICK_UNPACK;
@@ -58,6 +59,7 @@ public abstract class Config {
         // Misc
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
+
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -135,6 +137,9 @@ public abstract class Config {
                       .comment("Letter screen pauses singleplayer game.",
                             " Default: false")
                       .define("pause", false);
+                FOX_LETTER_TATTERING = builder
+                      .comment("Letter will become tattered if a Fox picks it up.")
+                      .define("fox_tattering", true);
                 builder.pop();
             }
 

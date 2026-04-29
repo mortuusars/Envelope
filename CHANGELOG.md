@@ -50,6 +50,7 @@ Misc
   - Address Tag is still required, regardless of the address on the package. Address Tag can be applied automatically with crafters.
 - Moved Lost Mail loot tables to `packages/lost_mail/` subfolder.
   - Open your existing Lost Mail packages before updating to this version.
+- Added config option for fox letter tattering.
 
 ## 0.6.2 - 2026-06-11
 - Potentially fixed an issue with C2ME.
