@@ -22,9 +22,12 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -49,7 +52,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
@@ -60,7 +62,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, FlyingAnimal, PhysicalCourier {
+public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant>>, FlyingAnimal, PhysicalCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final List<String> IGNORED_TAGS = Arrays.asList(
@@ -111,7 +113,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
           || villager.getVillagerData().getProfession() == VillagerProfession.NITWIT)
           && mob.getRandom().nextInt(60) == 0;
 
-    private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Holder<PigeonVariant>> DATA_VARIANT = SynchedEntityData.defineId(Pigeon.class, Envelope.EntityDataSerializers.PIGEON_VARIANT.get());
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(Pigeon.class, EntityDataSerializers.BOOLEAN);
@@ -156,7 +158,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     public static Pigeon createService(ServerLevel level) {
         Pigeon pigeon = Objects.requireNonNull(Envelope.EntityTypes.PIGEON.get().create(level),
               "Failed to create an entity. This should not happen.");
-        pigeon.setVariant(PigeonVariant.getRandomService(level.getRandom()));
+        pigeon.setVariant(PigeonVariant.getRandomServiceVariant(level.registryAccess(), level.getRandom()));
         pigeon.setOrigin(CourierOrigin.service());
         return pigeon;
     }
@@ -171,15 +173,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         getPigeonholeHandler().setRandomWantCooldownUpToDefault(getRandom());
-
-        Holder<Biome> biome = level.getBiome(blockPosition());
-
-        if (biome.is(Envelope.Tags.Biomes.HAS_PASSENGER_PIGEONS)) {
-            setVariant(PigeonVariant.getRandomPassengerPriority(getRandom()));
-        } else {
-            setVariant(PigeonVariant.getRandomRegular(getRandom()));
-        }
-
+        setVariant(PigeonVariant.getRandomSpawnVariant(level.registryAccess(), getRandom(), level.getBiome(blockPosition())));
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
@@ -194,7 +188,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(DATA_VARIANT_ID, 0);
+        builder.define(DATA_VARIANT, PigeonVariant.withFallback(registryAccess(), Optional.empty()));
         builder.define(DATA_DELIVERING, false);
         builder.define(DATA_SERVICE, false);
         builder.define(DATA_HAS_MAIL, false);
@@ -204,12 +198,12 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     // -- Variant
 
-    public @NotNull PigeonVariant getVariant() {
-        return PigeonVariant.byId(this.entityData.get(DATA_VARIANT_ID));
+    public @NotNull Holder<PigeonVariant> getVariant() {
+        return entityData.get(DATA_VARIANT);
     }
 
-    public void setVariant(PigeonVariant variant) {
-        entityData.set(DATA_VARIANT_ID, variant.getId());
+    public void setVariant(Holder<PigeonVariant> variant) {
+        entityData.set(DATA_VARIANT, variant);
     }
 
     // -- AI
@@ -829,7 +823,9 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         super.addAdditionalSaveData(tag);
         tag.put("PigeonholeHandler", PigeonholeHandler.CODEC.encode(getPigeonholeHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
         tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-        tag.putInt("Variant", getVariant().getId());
+        getVariant()
+              .unwrapKey()
+              .ifPresent(key -> tag.putString("Variant", key.location().toString()));
         if (isSitting()) tag.putBoolean("Sitting", true);
         if (getTiredTicks() > 0) tag.putInt("TiredTicks", getTiredTicks());
         if (getEatingTicks() > 0) tag.putInt("EatingTicks", getEatingTicks());
@@ -851,7 +847,17 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         super.readAdditionalSaveData(tag);
         setPigeonholeHandler(PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler")).getOrThrow());
         setMailboxHandler(MailboxHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("MailboxHandler")).getOrThrow());
-        setVariant(PigeonVariant.byId(tag.getInt("Variant")));
+
+        String variant = tag.contains("Variant", Tag.TAG_INT)
+              ? PigeonVariant.fromLegacyId(tag.getInt("Variant"))
+              : tag.getString("Variant");
+
+        Optional.ofNullable(ResourceLocation.tryParse(variant))
+              .map(key -> ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, key))
+              .flatMap(key -> registryAccess().registryOrThrow(Envelope.Registries.PIGEON_VARIANT)
+                    .getHolder(key))
+              .ifPresent(this::setVariant);
+
         setSitting(tag.getBoolean("Sitting"));
         setTiredTicks(tag.getInt("TiredTicks"));
         setEatingTicks(tag.getInt("EatingTicks"));

@@ -1,0 +1,8 @@
+ww{
+  "biomes": [],
+  "texture": "envelope:textures/entity/pigeon/pigeon_white.png",
+  "weights": {
+    "common": 1,
+    "service": 2
+  }
+}

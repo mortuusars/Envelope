@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 public class PigeonBackpackLayer extends RenderLayer<Pigeon, PigeonModel> {
     public static final ModelLayerLocation PIGEON_BACKPACK = new ModelLayerLocation(Envelope.resource("pigeon_backpack"), "main");
 
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/pigeon_backpack.png");
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/misc/pigeon_backpack.png");
 
     protected final PigeonModel model;
 

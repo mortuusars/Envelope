@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
@@ -34,6 +35,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -44,6 +46,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.animal.WolfVariant;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -79,6 +82,7 @@ public class Envelope {
         BlockEntityTypes.init();
         PoiTypes.init();
         EntityTypes.init();
+        EntityDataSerializers.init();
         Items.init();
         DataComponents.init();
         Stats.init();
@@ -343,6 +347,14 @@ public class Envelope {
         }
     }
 
+    public static class EntityDataSerializers {
+        public static final Supplier<EntityDataSerializer<Holder<PigeonVariant>>> PIGEON_VARIANT =
+              Register.entityDataSerializer("pigeon_variant", EntityDataSerializer.forValueType(PigeonVariant.STREAM_CODEC));
+
+        static void init() {
+        }
+    }
+
     public static class MenuTypes {
         public static final Supplier<MenuType<MailboxMenu>> MAILBOX =
               Register.menuType("mailbox", MailboxMenu::fromNetwork);
@@ -534,8 +546,8 @@ public class Envelope {
             public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
                   TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_pigeon_spawns"));
 
-            public static final TagKey<Biome> HAS_PASSENGER_PIGEONS =
-                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("has_passenger_pigeons"));
+            public static final TagKey<Biome> SPAWNS_PASSENGER_PIGEONS =
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("spawns_passenger_pigeons"));
         }
 
         public static class Structures {
@@ -565,6 +577,9 @@ public class Envelope {
     }
 
     public static class Registries {
+        public static final ResourceKey<Registry<PigeonVariant>> PIGEON_VARIANT =
+              ResourceKey.createRegistryKey(resource("pigeon_variant"));
+
         public static final ResourceKey<Registry<ServiceAddressDefinition>> SERVICE_ADDRESS_DEFINITION =
               ResourceKey.createRegistryKey(resource("service_address"));
 

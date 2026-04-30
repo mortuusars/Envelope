@@ -86,7 +86,7 @@ public class Register {
     }
 
     @ExpectPlatform
-    public static void entityDataSerializer(String id, EntityDataSerializer<?> serializer) {
+    public static <T> Supplier<EntityDataSerializer<T>> entityDataSerializer(String id, EntityDataSerializer<T> serializer) {
         throw new AssertionError();
     }
 

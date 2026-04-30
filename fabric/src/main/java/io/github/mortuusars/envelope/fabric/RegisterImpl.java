@@ -92,8 +92,9 @@ public class RegisterImpl {
         return () -> type;
     }
 
-    public static void entityDataSerializer(String id, EntityDataSerializer<?> serializer) {
+    public static <T> Supplier<EntityDataSerializer<T>> entityDataSerializer(String id, EntityDataSerializer<T> serializer) {
         EntityDataSerializers.registerSerializer(serializer);
+        return () -> serializer;
     }
 
     public static <T extends SoundEvent> Supplier<T> soundEvent(String id, Supplier<T> supplier) {

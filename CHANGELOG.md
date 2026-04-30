@@ -16,9 +16,12 @@ Pigeon
     - Pigeon will pathfind back to the home radius if it happens to be outside of it.
     - Pigeon will forget its home after 3 in-game days of not resting inside a Pigeonhole, and will be free to wander off anywhere.
     - Pigeon can still enter any Pigeonhole when it already has a home, which will make it its new home.
+- Pigeon Variants are now data-driven - you can create and spawn in world a custom variant using datapack + resourcepack. 
 - Minor adjustments to predator avoidance behavior. 
 - Tired pigeons fly slower now.
 - Increased Pigeonhole location distance.
+- Renamed tag `has_passenger_pigeons` to `spawns_passenger_pigeons`.
+- Moved pigeon hat and backpack textures into `misc` subfolder.
 - Fixed wings of pigeons sitting in boats or seats having wrong position.
 - Fixed position of Create's Conductor and Logistics hat on a Pigeon.
 - Fixed pigeons exiting (and re-entering immediately) the Pigeonhole when it's raining without thunderstorm.

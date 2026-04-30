@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 public class PigeonHatLayer extends RenderLayer<Pigeon, PigeonModel> {
     public static final ModelLayerLocation PIGEON_HAT = new ModelLayerLocation(Envelope.resource("pigeon_hat"), "main");
 
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/pigeon_hat.png");
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/misc/pigeon_hat.png");
 
     protected final PigeonModel model;
 
