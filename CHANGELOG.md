@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 
+- Added Oak Dovecote.
+
 Pigeon
 - Pigeons now look for and eat dropped seeds.
 - Nitwits now occasionally throw seeds for nearby pigeons.
