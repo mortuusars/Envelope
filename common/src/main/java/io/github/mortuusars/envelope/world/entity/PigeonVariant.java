@@ -38,8 +38,8 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
 
     public static final Codec<PigeonVariant> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
           ResourceLocation.CODEC.fieldOf("texture").forGetter(PigeonVariant::texture),
-          RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").orElse(HolderSet.empty()).forGetter(PigeonVariant::biomes),
-          SpawningWeights.CODEC.optionalFieldOf("weights", SpawningWeights.DEFAULT).forGetter(PigeonVariant::weights)
+          RegistryCodecs.homogeneousList(Registries.BIOME).optionalFieldOf("spawn_biomes", HolderSet.empty()).forGetter(PigeonVariant::biomes),
+          SpawningWeights.CODEC.optionalFieldOf("spawn_weights", SpawningWeights.DEFAULT).forGetter(PigeonVariant::weights)
     ).apply(i, PigeonVariant::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PigeonVariant> DIRECT_STREAM_CODEC = StreamCodec.composite(

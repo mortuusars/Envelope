@@ -1,8 +1,7 @@
 {
-  "biomes": [],
-  "texture": "envelope:textures/entity/pigeon/pigeon_brown.png",
-  "weights": {
+  "spawn_weights": {
     "common": 5,
     "service": 6
-  }
+  },
+  "texture": "envelope:textures/entity/pigeon/pigeon_brown.png"
 }

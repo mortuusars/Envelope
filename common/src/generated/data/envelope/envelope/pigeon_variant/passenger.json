@@ -1,7 +1,7 @@
 {
-  "biomes": "#envelope:spawns_passenger_pigeons",
-  "texture": "envelope:textures/entity/pigeon/pigeon_passenger.png",
-  "weights": {
+  "spawn_biomes": "#envelope:spawns_passenger_pigeons",
+  "spawn_weights": {
     "service": 1
-  }
+  },
+  "texture": "envelope:textures/entity/pigeon/pigeon_passenger.png"
 }
