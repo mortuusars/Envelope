@@ -9,6 +9,10 @@
     {
       "structure": "envelope:dovecote_oak",
       "weight": 1
+    },
+    {
+      "structure": "envelope:dovecote_spruce",
+      "weight": 1
     }
   ]
 }

@@ -1,0 +1,39 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "envelope:dovecote/spruce_short",
+        "processors": {
+          "processors": [
+            {
+              "integrity": 0.95,
+              "processor_type": "minecraft:block_rot",
+              "rottable_blocks": "#envelope:dovecote_spruce_replaceable"
+            }
+          ]
+        },
+        "projection": "rigid"
+      },
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "envelope:dovecote/spruce_tall",
+        "processors": {
+          "processors": [
+            {
+              "integrity": 0.95,
+              "processor_type": "minecraft:block_rot",
+              "rottable_blocks": "#envelope:dovecote_spruce_replaceable"
+            }
+          ]
+        },
+        "projection": "rigid"
+      },
+      "weight": 3
+    }
+  ],
+  "fallback": "minecraft:empty"
+}
