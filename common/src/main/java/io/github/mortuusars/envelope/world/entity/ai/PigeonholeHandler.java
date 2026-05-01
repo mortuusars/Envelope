@@ -35,7 +35,7 @@ public class PigeonholeHandler {
     public static final Codec<PigeonholeHandler> CODEC = RecordCodecBuilder.create(i -> i.group(
           BlockPos.CODEC.optionalFieldOf("target_pos").forGetter(o -> Optional.ofNullable(o.getTargetPos())),
           BlockPos.CODEC.optionalFieldOf("home_pos").forGetter(o -> Optional.ofNullable(o.getHomePos())),
-          Codec.INT.optionalFieldOf("ticks_since_last_rest", 0).forGetter(PigeonholeHandler::getTicksSinceLastRest),
+          Codec.INT.optionalFieldOf("ticks_since_last_rest", -1).forGetter(PigeonholeHandler::getTicksSinceLastRest),
           Codec.INT.optionalFieldOf("locate_cooldown", 0).forGetter(PigeonholeHandler::getLocateCooldown),
           Codec.INT.optionalFieldOf("want_cooldown", 0).forGetter(PigeonholeHandler::getWantCooldown),
           Codec.INT.optionalFieldOf("enter_cooldown", 0).forGetter(PigeonholeHandler::getEnterCooldown)
@@ -62,7 +62,7 @@ public class PigeonholeHandler {
     }
 
     public PigeonholeHandler() {
-        this(Optional.empty(), Optional.empty(), 0, 0, 0, 0);
+        this(Optional.empty(), Optional.empty(), -1, 0, 0, 0);
     }
 
     public @Nullable BlockPos getTargetPos() {
@@ -130,7 +130,7 @@ public class PigeonholeHandler {
     // --
 
     public void tick(Pigeon pigeon, Level level) {
-        ticksSinceLastRest++;
+        if (ticksSinceLastRest >= 0) ticksSinceLastRest++;
         if (wantCooldown > 0) wantCooldown--;
         if (locateCooldown > 0) locateCooldown--;
 

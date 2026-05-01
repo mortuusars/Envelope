@@ -845,8 +845,13 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        setPigeonholeHandler(PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler")).getOrThrow());
-        setMailboxHandler(MailboxHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("MailboxHandler")).getOrThrow());
+
+        PigeonholeHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("PigeonholeHandler"))
+              .resultOrPartial(e -> LOGGER.error("Cannot parse PigeonholeHandler from tag '{}': {}", tag.getCompound("PigeonholeHandler"), e))
+              .ifPresent(this::setPigeonholeHandler);
+        MailboxHandler.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("MailboxHandler"))
+              .resultOrPartial(e -> LOGGER.error("Cannot parse MailboxHandler from tag '{}': {}", tag.getCompound("MailboxHandler"), e))
+              .ifPresent(this::setMailboxHandler);
 
         String variant = tag.contains("Variant", Tag.TAG_INT)
               ? PigeonVariant.fromLegacyId(tag.getInt("Variant"))
