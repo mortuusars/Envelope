@@ -7,11 +7,11 @@
   },
   "structures": [
     {
-      "structure": "envelope:dovecote_oak",
+      "structure": "envelope:dovecote_plains",
       "weight": 1
     },
     {
-      "structure": "envelope:dovecote_spruce",
+      "structure": "envelope:dovecote_taiga",
       "weight": 1
     }
   ]

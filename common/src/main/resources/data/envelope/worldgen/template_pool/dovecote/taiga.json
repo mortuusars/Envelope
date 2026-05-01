@@ -3,13 +3,13 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
-        "location": "envelope:dovecote/spruce_short",
+        "location": "envelope:dovecote/taiga_short",
         "processors": {
           "processors": [
             {
               "integrity": 0.95,
               "processor_type": "minecraft:block_rot",
-              "rottable_blocks": "#envelope:dovecote_spruce_replaceable"
+              "rottable_blocks": "#envelope:dovecote_taiga_replaceable"
             }
           ]
         },
@@ -20,13 +20,13 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
-        "location": "envelope:dovecote/spruce_tall",
+        "location": "envelope:dovecote/taiga_tall",
         "processors": {
           "processors": [
             {
               "integrity": 0.95,
               "processor_type": "minecraft:block_rot",
-              "rottable_blocks": "#envelope:dovecote_spruce_replaceable"
+              "rottable_blocks": "#envelope:dovecote_taiga_replaceable"
             }
           ]
         },

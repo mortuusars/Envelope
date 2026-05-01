@@ -1,9 +1,9 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#envelope:has_structure/dovecote_oak",
+  "biomes": "#envelope:has_structure/dovecote_taiga",
   "step": "surface_structures",
   "spawn_overrides": {},
-  "start_pool": "envelope:dovecote/oak",
+  "start_pool": "envelope:dovecote/taiga",
   "size": 2,
   "start_height": {
     "absolute": 0

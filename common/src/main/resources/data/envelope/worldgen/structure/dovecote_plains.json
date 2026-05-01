@@ -1,9 +1,9 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#envelope:has_structure/dovecote_spruce",
+  "biomes": "#envelope:has_structure/dovecote_plains",
   "step": "surface_structures",
   "spawn_overrides": {},
-  "start_pool": "envelope:dovecote/spruce",
+  "start_pool": "envelope:dovecote/plains",
   "size": 2,
   "start_height": {
     "absolute": 0
