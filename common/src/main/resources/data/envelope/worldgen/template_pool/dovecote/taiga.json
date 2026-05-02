@@ -10,6 +10,24 @@
               "integrity": 0.95,
               "processor_type": "minecraft:block_rot",
               "rottable_blocks": "#envelope:dovecote_taiga_replaceable"
+            },
+            {
+              "processor_type": "minecraft:rule",
+              "rules": [
+                {
+                  "input_predicate": {
+                    "block": "minecraft:cobblestone",
+                    "predicate_type": "minecraft:random_block_match",
+                    "probability": 0.4
+                  },
+                  "location_predicate": {
+                    "predicate_type": "minecraft:always_true"
+                  },
+                  "output_state": {
+                    "Name": "minecraft:mossy_cobblestone"
+                  }
+                }
+              ]
             }
           ]
         },
@@ -27,6 +45,24 @@
               "integrity": 0.95,
               "processor_type": "minecraft:block_rot",
               "rottable_blocks": "#envelope:dovecote_taiga_replaceable"
+            },
+            {
+              "processor_type": "minecraft:rule",
+              "rules": [
+                {
+                  "input_predicate": {
+                    "block": "minecraft:cobblestone",
+                    "predicate_type": "minecraft:random_block_match",
+                    "probability": 0.4
+                  },
+                  "location_predicate": {
+                    "predicate_type": "minecraft:always_true"
+                  },
+                  "output_state": {
+                    "Name": "minecraft:mossy_cobblestone"
+                  }
+                }
+              ]
             }
           ]
         },

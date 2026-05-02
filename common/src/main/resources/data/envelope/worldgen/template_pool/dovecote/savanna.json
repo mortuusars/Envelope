@@ -1,0 +1,39 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "envelope:dovecote/savanna_terracotta",
+        "processors": {
+          "processors": [
+            {
+              "integrity": 0.95,
+              "processor_type": "minecraft:block_rot",
+              "rottable_blocks": "#envelope:dovecote_savanna_replaceable"
+            }
+          ]
+        },
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "envelope:dovecote/savanna_wood",
+        "processors": {
+          "processors": [
+            {
+              "integrity": 0.95,
+              "processor_type": "minecraft:block_rot",
+              "rottable_blocks": "#envelope:dovecote_savanna_replaceable"
+            }
+          ]
+        },
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}
