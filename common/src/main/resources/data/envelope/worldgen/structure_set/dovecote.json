@@ -17,6 +17,10 @@
     {
       "structure": "envelope:dovecote_savanna",
       "weight": 1
+    },
+    {
+      "structure": "envelope:dovecote_desert",
+      "weight": 1
     }
   ]
 }

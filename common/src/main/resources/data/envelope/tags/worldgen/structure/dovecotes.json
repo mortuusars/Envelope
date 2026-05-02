@@ -2,6 +2,7 @@
   "values": [
     "envelope:dovecote_plains",
     "envelope:dovecote_taiga",
-    "envelope:dovecote_savanna"
+    "envelope:dovecote_savanna",
+    "envelope:dovecote_desert"
   ]
 }
