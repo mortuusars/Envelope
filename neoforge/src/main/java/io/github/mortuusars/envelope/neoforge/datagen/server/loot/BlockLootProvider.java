@@ -19,9 +19,12 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BlockLootProvider extends BlockLootSubProvider {
     public BlockLootProvider(HolderLookup.Provider registries) {
@@ -53,10 +56,11 @@ public class BlockLootProvider extends BlockLootSubProvider {
         return LootTable.lootTable().withPool(LootPool.lootPool()
               .setRolls(ConstantValue.exactly(1.0F))
               .add(applyExplosionDecay(paperBoxBlock, LootItem.lootTableItem(paperBoxBlock)
-                          .apply(List.of(2, 3, 4), count -> SetItemCountFunction.setCount(ConstantValue.exactly(count))
-                                .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(paperBoxBlock)
-                                      .setProperties(StatePropertiesPredicate.Builder.properties()
-                                            .hasProperty(PaperBoxBlock.BOXES, count)))
+                          .apply(IntStream.range(1, PaperBoxBlock.MAX_BOXES + 1).boxed().toList(),
+                                count -> SetItemCountFunction.setCount(ConstantValue.exactly(count))
+                                      .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(paperBoxBlock)
+                                            .setProperties(StatePropertiesPredicate.Builder.properties()
+                                                  .hasProperty(PaperBoxBlock.BOXES, count)))
                           )
                     )
               )

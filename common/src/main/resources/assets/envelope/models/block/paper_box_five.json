@@ -1,0 +1,9 @@
+{
+	"parent": "minecraft:block/cube_bottom_top",
+	"textures": {
+		"side": "envelope:block/paper_box_full_side",
+		"top": "envelope:block/paper_box_full_top",
+		"bottom": "envelope:block/paper_box_full_bottom",
+		"particle": "envelope:block/paper_box_full_side"
+	}
+}

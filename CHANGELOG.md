@@ -2,7 +2,9 @@
 
 ## UNRELEASED
 
-- Added Oak Dovecote.
+- Added Plains, Taiga, Savanna and Desert Dovecotes.
+- Added ability to add a 5th box to Paper Box block, which will make it a full block.
+- Falling onto a Paper Box block will absorb the fall damage and break the block, dropping the boxes.  
 
 Pigeon
 - Pigeons now look for and eat dropped seeds.

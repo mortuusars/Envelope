@@ -14,6 +14,20 @@
                   "block": "envelope:paper_box",
                   "condition": "minecraft:block_state_property",
                   "properties": {
+                    "boxes": "1"
+                  }
+                }
+              ],
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": false,
+              "conditions": [
+                {
+                  "block": "envelope:paper_box",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
                     "boxes": "2"
                   }
                 }
@@ -47,6 +61,20 @@
                 }
               ],
               "count": 4.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "add": false,
+              "conditions": [
+                {
+                  "block": "envelope:paper_box",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "boxes": "5"
+                  }
+                }
+              ],
+              "count": 5.0,
               "function": "minecraft:set_count"
             },
             {

@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.VoxelShapeUtils;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -11,13 +10,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -32,8 +36,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PaperBoxBlock extends Block {
+    public static final int MAX_BOXES = 5;
+
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
-    public static final IntegerProperty BOXES = IntegerProperty.create("boxes", 1, 4);
+    public static final IntegerProperty BOXES = IntegerProperty.create("boxes", 1, MAX_BOXES);
 
     private static final VoxelShape[] SHAPES = new VoxelShape[8];
 
@@ -53,8 +59,8 @@ public class PaperBoxBlock extends Block {
     public PaperBoxBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(getStateDefinition().any()
-                .setValue(AXIS, Direction.Axis.X)
-                .setValue(BOXES, 1));
+              .setValue(AXIS, Direction.Axis.X)
+              .setValue(BOXES, 1));
     }
 
     @Override
@@ -64,7 +70,10 @@ public class PaperBoxBlock extends Block {
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
-        return SHAPES[state.getValue(BOXES) - 1 + (state.getValue(AXIS) == Direction.Axis.Z ? 4 : 0)];
+        int boxes = state.getValue(BOXES);
+        return boxes >= MAX_BOXES
+              ? Shapes.block()
+              : SHAPES[boxes - 1 + (state.getValue(AXIS) == Direction.Axis.Z ? 4 : 0)];
     }
 
     @Nullable
@@ -81,42 +90,24 @@ public class PaperBoxBlock extends Block {
     @Override
     public boolean canBeReplaced(@NotNull BlockState state, BlockPlaceContext context) {
         return !context.isSecondaryUseActive()
-            && context.getItemInHand().getItem() == this.asItem()
-            && state.getValue(BOXES) < 4 || super.canBeReplaced(state, context);
+              && context.getItemInHand().getItem() == this.asItem()
+              && state.getValue(BOXES) < MAX_BOXES || super.canBeReplaced(state, context);
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!player.isSecondaryUseActive()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        }
-
-        int boxes = state.getValue(BOXES) - 1;
-
-        if (level instanceof ServerLevel serverLevel) {
-            if (boxes <= 0) {
-                level.removeBlock(pos, false);
-            } else {
-                level.setBlock(pos, state.setValue(BOXES, boxes), Block.UPDATE_ALL);
-            }
-
-            if (!player.isCreative()) {
-                player.addItem(new ItemStack(this.asItem()));
-            }
-
-            serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
-                  pos.getX() + 0.5f, pos.getY() + 0.3f, pos.getZ() + 0.5f, 3, 0.2, 0.2, 0.2, 0);
-        }
-
-        level.playSound(player, pos, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.BLOCKS,
-            0.9f, level.getRandom().nextFloat() * 0.1f + 0.85f + (boxes * 0.2f));
-
-        return ItemInteractionResult.SUCCESS;
+    protected @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        return !state.canSurvive(level, pos)
+              ? Blocks.AIR.defaultBlockState()
+              : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
     @Override
-    public boolean canSurvive(@NotNull BlockState state, @NotNull LevelReader level, BlockPos pos) {
-        return Block.canSupportCenter(level, pos.below(), Direction.UP);
+    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        if (state.getValue(BOXES) == MAX_BOXES) return true;
+        BlockPos blockPos = pos.below();
+        BlockState stateBelow = level.getBlockState(blockPos);
+        return !stateBelow.getCollisionShape(level, blockPos).getFaceShape(Direction.UP).isEmpty()
+              || stateBelow.isFaceSturdy(level, blockPos, Direction.UP);
     }
 
     @Override
@@ -133,5 +124,77 @@ public class PaperBoxBlock extends Block {
                 return state;
             }
         }
+    }
+
+    // --
+
+    @Override
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        float fallDistanceToBreak = getFallDistanceToBreak(state, pos, entity);
+        if (fallDistanceToBreak > 0 && fallDistance > fallDistanceToBreak) {
+            if (!level.isClientSide()) {
+                boolean drop = !(entity instanceof Player player) || !player.isCreative();
+                level.destroyBlock(pos, drop);
+                //TODO: advancement
+            }
+        } else {
+            super.fallOn(level, state, pos, entity, fallDistance);
+        }
+    }
+
+    public float getFallDistanceToBreak(BlockState state, BlockPos pos, Entity entity) {
+        return entity instanceof LivingEntity living
+              ? (float) living.getAttributeValue(Attributes.SAFE_FALL_DISTANCE)
+              : 0f;
+    }
+
+    @Override
+    public void updateEntityAfterFallOn(BlockGetter level, Entity entity) {
+        if (entity.fallDistance <= 0) {
+            super.updateEntityAfterFallOn(level, entity);
+        } else {
+            entity.setDeltaMovement(entity.getDeltaMovement().multiply(1.0, 0.75f, 1.0));
+        }
+    }
+
+    public float reduceFallDistance(BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        int boxes = state.getValue(BOXES);
+        if (boxes == MAX_BOXES) return 0;
+        return fallDistance * (0.5f - (0.05f * boxes));
+    }
+
+    // --
+
+    @Override
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!player.isSecondaryUseActive()) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
+        int newBoxes = state.getValue(BOXES) - 1;
+
+        if (level instanceof ServerLevel serverLevel) {
+            if (newBoxes <= 0) {
+                level.removeBlock(pos, false);
+            } else {
+                level.setBlock(pos, state.setValue(BOXES, newBoxes), Block.UPDATE_ALL);
+
+                if (!canSurvive(level.getBlockState(pos), level, pos)) {
+                    level.destroyBlock(pos, true);
+                }
+            }
+
+            if (!player.isCreative()) {
+                player.addItem(new ItemStack(this.asItem()));
+            }
+
+            serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
+                  pos.getX() + 0.5f, pos.getY() + 0.3f, pos.getZ() + 0.5f, 3, 0.2, 0.2, 0.2, 0);
+        }
+
+        level.playSound(player, pos, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.BLOCKS,
+              0.9f, level.getRandom().nextFloat() * 0.1f + 0.85f + (newBoxes * 0.2f));
+
+        return ItemInteractionResult.SUCCESS;
     }
 }

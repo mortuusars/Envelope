@@ -42,7 +42,7 @@ public class ModelsDatagen extends BlockStateProvider {
         horizontalBlock(Envelope.Blocks.SEALED_PACKAGE.get(), models().getExistingFile(modLoc("block/sealed_package")));
 
         getVariantBuilder(Envelope.Blocks.PAPER_BOX.get()).forAllStates(state -> {
-            String[] boxes = {"one", "two", "three", "four"};
+            String[] boxes = {"one", "two", "three", "four", "five"};
             ModelFile.ExistingModelFile model = models().getExistingFile(
                   modLoc("block/paper_box_" + boxes[state.getValue(PaperBoxBlock.BOXES) - 1]));
             return ConfiguredModel.builder()

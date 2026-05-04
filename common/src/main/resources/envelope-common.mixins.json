@@ -21,6 +21,7 @@
     "injected.ServerLevelMixin",
     "jei.BasicRecipeTransferHandlerMixin",
     "jei.JeiKeyConflictContextMixin",
+    "paper_box_fall.EntityMixin",
     "predators.CatMixin",
     "predators.FoxMixin",
     "predators.OcelotMixin",
