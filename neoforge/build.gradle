@@ -45,6 +45,8 @@ dependencies {
 
     modRuntimeOnly("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}" )
 
+    modLocalRuntime("maven.modrinth:c2me-neoforge:0.3.0+alpha.0.91+1.21.1")
+
     // Create
     modRuntimeOnly("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
     modRuntimeOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
