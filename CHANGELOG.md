@@ -59,6 +59,7 @@ Misc
 - Moved Lost Mail loot tables to `packages/lost_mail/` subfolder.
   - Open your existing Lost Mail packages before updating to this version.
 - Added config option for fox letter tattering.
+- Fixed a crash occurring when a service address returned unprocessed items in a craft (sending back remaining items). 
 
 ## 0.6.2 - 2026-06-11
 - Potentially fixed an issue with C2ME.
