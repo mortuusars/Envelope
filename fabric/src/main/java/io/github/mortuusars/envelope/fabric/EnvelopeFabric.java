@@ -91,10 +91,11 @@ public class EnvelopeFabric implements ModInitializer {
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING, Pigeon::checkSpawnRules);
 
-        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PAPER_BOX.get(), 15, 50);
-        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 15, 50);
+        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PAPER_BOX.get(), 50, 15);
+        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 50, 15);
+        FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.LETTER.get(), 200, 10);
         Envelope.Blocks.PIGEONHOLES.forEach((id, block) -> {
-            FlammableBlockRegistry.getDefaultInstance().add(block.get(), 5, 20);
+            FlammableBlockRegistry.getDefaultInstance().add(block.get(), 20, 15);
         });
 
         FabricC2SPackets.register();

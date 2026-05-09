@@ -1,6 +1,5 @@
 package io.github.mortuusars.envelope.world.block;
 
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import net.minecraft.core.BlockPos;

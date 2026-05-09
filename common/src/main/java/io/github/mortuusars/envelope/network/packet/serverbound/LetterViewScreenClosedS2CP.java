@@ -30,6 +30,10 @@ public record LetterViewScreenClosedS2CP(int slot) implements Packet {
 
     @Override
     public boolean handle(PacketFlow direction, Player player) {
+        if (slot == -1) {
+            return true;
+        }
+
         ItemStack stack = player.getInventory().getItem(slot);
 
         if (stack.getItem() instanceof LetterItem) {
@@ -42,7 +46,7 @@ public record LetterViewScreenClosedS2CP(int slot) implements Packet {
                 stack.set(Envelope.DataComponents.LETTER_CONTENT, content);
             }
 
-            player.getCooldowns().addCooldown(stack.getItem(), 3);
+            player.getCooldowns().addCooldown(stack.getItem(), 5);
 
             return true;
         } else {

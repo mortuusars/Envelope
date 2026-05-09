@@ -19,6 +19,6 @@ public class PigeonholeBlockMixin implements IBlockExtension {
 
     @Override
     public int getFireSpreadSpeed(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull Direction direction) {
-        return state.is(Envelope.Tags.Blocks.PIGEONHOLES_THAT_BURN) ? 5 : 0;
+        return state.is(Envelope.Tags.Blocks.PIGEONHOLES_THAT_BURN) ? 15 : 0;
     }
 }

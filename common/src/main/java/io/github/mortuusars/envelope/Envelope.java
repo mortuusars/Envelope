@@ -154,6 +154,15 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
 
+        public static final Supplier<LetterBlock> LETTER = Register.block("letter",
+              () -> new LetterBlock(BlockBehaviour.Properties.of()
+                    .pushReaction(PushReaction.DESTROY)
+                    .sound(SoundTypes.PAPER)
+                    .ignitedByLava()
+                    .instabreak()
+                    .noCollission()
+                    .noOcclusion()));
+
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
@@ -180,6 +189,10 @@ public class Envelope {
         public static final Supplier<BlockEntityType<PackageBlockEntity>> PACKAGE =
               Register.blockEntityType("package", () -> Register.newBlockEntityType(
                     PackageBlockEntity::new, Blocks.PACKAGE.get(), Blocks.SEALED_PACKAGE.get()));
+
+        public static final Supplier<BlockEntityType<LetterBlockEntity>> LETTER =
+              Register.blockEntityType("letter", () -> Register.newBlockEntityType(
+                    LetterBlockEntity::new, Blocks.LETTER.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
             return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
@@ -235,7 +248,7 @@ public class Envelope {
         public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = Register.item("letter_and_quill",
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
-              () -> new LetterItem(new Item.Properties()));
+              () -> new LetterItem(Blocks.LETTER.get(), new Item.Properties()));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
               () -> new SealedLetterItem(new Item.Properties()));
 

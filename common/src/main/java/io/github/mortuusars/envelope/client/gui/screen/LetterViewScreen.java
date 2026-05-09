@@ -32,7 +32,7 @@ public class LetterViewScreen extends Screen {
     public static final ResourceLocation TATTERED_OVERLAY = Envelope.resource("textures/gui/letter_tattered_overlay.png");
 
     protected final ItemAndStack<LetterItem> letter;
-    protected final InteractionHand hand;
+    protected final @Nullable InteractionHand hand;
     protected final boolean isTattered;
 
     protected int imageWidth, imageHeight, leftPos, topPos;
@@ -42,7 +42,7 @@ public class LetterViewScreen extends Screen {
 
     protected List<FormattedCharSequence> lines;
 
-    public LetterViewScreen(ItemStack letter, InteractionHand hand) {
+    public LetterViewScreen(ItemStack letter, @Nullable InteractionHand hand) {
         super(Component.empty());
         this.letter = new ItemAndStack<>(letter);
         this.hand = hand;
@@ -128,8 +128,8 @@ public class LetterViewScreen extends Screen {
             return null;
         }
 
-        int x = (int)mouseX - (leftPos + 17);
-        int y = (int)mouseY - (topPos + 21);
+        int x = (int) mouseX - (leftPos + 17);
+        int y = (int) mouseY - (topPos + 21);
 
         int linesCount = Math.min(lines.size(), maxTextLines);
         if (y < font.lineHeight * linesCount + linesCount) {
@@ -148,8 +148,10 @@ public class LetterViewScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new LetterViewScreenClosedS2CP(slot));
+        if (hand != null) {
+            int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
+            Packets.sendToServer(new LetterViewScreenClosedS2CP(slot));
+        }
     }
 
     // -- Input

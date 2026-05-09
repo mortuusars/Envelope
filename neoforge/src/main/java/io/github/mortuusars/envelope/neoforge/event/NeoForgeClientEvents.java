@@ -8,6 +8,8 @@ import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.world.item.Sealable;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -18,9 +20,13 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 @EventBusSubscriber(modid = Envelope.ID, value = Dist.CLIENT)
 public class NeoForgeClientEvents {
+    @SuppressWarnings("deprecation")
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(EnvelopeClient::init);
+        event.enqueueWork(() -> {
+            EnvelopeClient.init();
+            ItemBlockRenderTypes.setRenderLayer(Envelope.Blocks.LETTER.get(), RenderType.cutout());
+        });
     }
 
     @SubscribeEvent

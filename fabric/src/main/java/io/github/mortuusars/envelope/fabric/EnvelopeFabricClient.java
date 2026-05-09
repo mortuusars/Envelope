@@ -11,10 +11,12 @@ import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPacketHandler;
 import io.github.mortuusars.envelope.world.item.Sealable;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 
 public class EnvelopeFabricClient implements ClientModInitializer {
@@ -28,6 +30,8 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PigeonRenderer.PIGEON_LAYER, PigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(PigeonBackpackLayer.PIGEON_BACKPACK, PigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(PigeonHatLayer.PIGEON_HAT, PigeonModel::createLayerDefinition);
+
+        BlockRenderLayerMap.INSTANCE.putBlock(Envelope.Blocks.LETTER.get(), RenderType.cutout());
 
         ColorProviderRegistry.ITEM.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
         ColorProviderRegistry.ITEM.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
