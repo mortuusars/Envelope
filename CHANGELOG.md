@@ -58,6 +58,7 @@ Misc
   - Address Tag is still required, regardless of the address on the package. Address Tag can be applied automatically with crafters.
 - Moved Lost Mail loot tables to `packages/lost_mail/` subfolder.
   - Open your existing Lost Mail packages before updating to this version.
+- Added Paper Box recipe using Cardboard from Create.
 - Added config option for fox letter tattering.
 - Fixed a crash occurring when a service address returned unprocessed items in a craft (sending back remaining items). 
 
