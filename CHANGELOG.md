@@ -1,8 +1,10 @@
 # Changelog
 
-## UNRELEASED
+## 0.7.0 Snapshot 1
 
-- Added Plains, Taiga, Savanna and Desert Dovecotes.
+- Added structures: 
+  - Collapsed Mail Hub.
+  - Plains, Taiga, Savanna and Desert Dovecotes.
 - Added ability to place a Letter on the wall (by holding sneak).
 - Added ability to add a 5th box to Paper Box block, which will make it a full block.
 - Falling onto a Paper Box block will absorb the fall damage and break the block, dropping the boxes.  
