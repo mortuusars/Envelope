@@ -503,6 +503,23 @@ public class Envelope {
               ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_weapons"));
         public static final ResourceKey<LootTable> LOST_MAIL_VALUABLES =
               ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_valuables"));
+
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage_mail"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE_MATERIALS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage_materials"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE_STAMPS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage_stamps"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_MANUFACTORY =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/manufactory"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_DISPATCHERY =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/dispatchery"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_CONSTRUCTION =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/construction"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_DOCK_NOTE =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("letters/collapsed_mail_hub/dock_note"));
     }
 
     public static class Tags {
