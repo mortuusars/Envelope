@@ -174,6 +174,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         getPigeonholeHandler().setRandomWantCooldownUpToDefault(getRandom());
         setVariant(PigeonVariant.getRandomSpawnVariant(level.registryAccess(), getRandom(), level.getBiome(blockPosition())));
+        getPigeonholeHandler().setRandomWantCooldownUpToDefault(getRandom());
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
