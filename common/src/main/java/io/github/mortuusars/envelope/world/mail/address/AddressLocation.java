@@ -48,6 +48,14 @@ public interface AddressLocation {
               .map(pos -> Position.aboveGround(level, pos, 5));
     }
 
+    default int getDistanceTo(Level level, BlockPos pos) {
+        return getDistanceTo(pos);
+    }
+
+    default int getDistanceTo(Level level, Optional<BlockPos> pos) {
+        return pos.map(p -> getDistanceTo(level, p)).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
+    }
+
     // --
 
     static AddressLocation exact(BlockPos pos) {
@@ -72,6 +80,11 @@ public interface AddressLocation {
         @Override
         public int getDistanceTo(BlockPos pos) {
             return Position.getDistanceBetween(this.pos, pos);
+        }
+
+        @Override
+        public int getDistanceTo(Level level, BlockPos pos) {
+            return Position.getDistanceBetween(level, this.pos, pos);
         }
     }
 

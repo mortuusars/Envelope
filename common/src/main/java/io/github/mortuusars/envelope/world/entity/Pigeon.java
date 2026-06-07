@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
+import io.github.mortuusars.envelope.world.entity.ai.PigeonNavigation;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
@@ -46,7 +47,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -445,31 +445,27 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         return new Vec3(0.0, getEyeHeight() * 0.65F, getBbWidth() * 0.4F);
     }
 
-    public boolean hasReachedTarget(BlockPos pos) {
-        return hasReachedTarget(pos, 2);
+    public boolean hasReachedTarget(BlockPos localPos) {
+        return PigeonNavigation.hasReachedTarget(this, localPos, PigeonNavigation.DEFAULT_REACH_DISTANCE);
     }
 
-    protected boolean hasReachedTarget(BlockPos pos, double distance) {
-        if (closerThan(pos, distance)) {
-            return true;
-        } else {
-            Path path = getNavigation().getPath();
-            return path != null && path.getTarget().equals(pos) && path.canReach() && path.isDone();
-        }
+    protected boolean hasReachedTarget(BlockPos localPos, double distance) {
+        return PigeonNavigation.hasReachedTarget(this, localPos, distance);
     }
 
-    public boolean closerThan(BlockPos pos, double distance) {
-        return pos.closerThan(blockPosition(), distance);
+    public boolean closerThan(BlockPos localPos, double distance) {
+        return PigeonNavigation.isWithinReach(this, localPos, distance);
     }
 
-    public boolean pathfindDirectlyTowards(BlockPos pos) {
+    public boolean pathfindDirectlyTowards(BlockPos localPos) {
+        BlockPos navigationPos = PigeonNavigation.getNavigationPos(this, localPos);
         getNavigation().setMaxVisitedNodesMultiplier(10.0F);
-        getNavigation().moveTo(pos.getX(), pos.getY(), pos.getZ(), 1, 1);
+        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 2, 1);
         return getNavigation().getPath() != null && getNavigation().getPath().canReach();
     }
 
-    public void pathfindRandomlyTowards(BlockPos pos) {
-        Vec3 vec3 = Vec3.atBottomCenterOf(pos);
+    public void pathfindRandomlyTowards(BlockPos localPos) {
+        Vec3 vec3 = Position.getGlobalCenter(level(), localPos).subtract(0, 0.5, 0);
         int i = 0;
         BlockPos blockPos = this.blockPosition();
         int j = (int) vec3.y - blockPos.getY();
@@ -481,7 +477,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
         int k = 6;
         int l = 8;
-        int m = blockPos.distManhattan(pos);
+        int m = blockPos.distManhattan(Position.getNavigationPos(level(), localPos));
         if (m < 15) {
             k = m / 2;
             l = m / 2;
@@ -713,7 +709,8 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     protected boolean hasReachedSegmentEndPos(Delivery delivery) {
         return delivery.getRoute().getSegment(delivery.getPhase()).endPos()
-              .map(this::hasReachedTarget)
+              .map(endPos -> hasReachedTarget(
+                    PigeonNavigation.getSegmentApproachTarget(level(), endPos, delivery.getPhase())))
               .orElse(true);
     }
 

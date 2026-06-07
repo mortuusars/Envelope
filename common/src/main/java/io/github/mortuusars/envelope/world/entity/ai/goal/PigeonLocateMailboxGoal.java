@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.integration.sable.ContraptionTargets;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
@@ -10,9 +11,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PigeonLocateMailboxGoal extends Goal {
     protected final Pigeon pigeon;
@@ -59,14 +58,22 @@ public class PigeonLocateMailboxGoal extends Goal {
     }
 
     private List<BlockPos> findNearbyAvailableMailboxes() {
-        BlockPos pos = pigeon.blockPosition();
-        PoiManager poiManager = ((ServerLevel) pigeon.level()).getPoiManager();
-        return poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.MAILBOX), pos, 20, PoiManager.Occupancy.ANY)
+        ServerLevel level = (ServerLevel) pigeon.level();
+        int radius = 20;
+        PoiManager poiManager = level.getPoiManager();
+        List<BlockPos> poiResults = poiManager.getInRange(holder ->
+                    holder.is(Envelope.PoiTypes.MAILBOX), pigeon.blockPosition(), radius, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
-              .filter(p -> pigeon.level().getBlockEntity(p) instanceof MailboxBlockEntity mailbox
+              .filter(p -> level.getBlockEntity(p) instanceof MailboxBlockEntity mailbox
                     && mailbox.isAvailableForPickup())
-              .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
-              .collect(Collectors.toList());
+              .toList();
+
+        return ContraptionTargets.locateNearby(
+              level,
+              pigeon.position(),
+              radius,
+              poiResults,
+              () -> ContraptionTargets.findNearbyMailboxes(
+                    level, pigeon.position(), radius, MailboxBlockEntity::isAvailableForPickup));
     }
 }

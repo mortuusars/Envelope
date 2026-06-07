@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,9 +82,9 @@ public class DeliveryRoute {
               recipientLocation,
               senderPos,
               senderLocation.ascendTowards(level, hubPos),
-              senderLocation.getTravelDurationTo(hubPos),
+              TravelDuration.basedOnDistance(senderLocation.getDistanceTo(level, hubPos)),
               hubPos,
-              recipientLocation.getTravelDurationTo(hubPos),
+              TravelDuration.basedOnDistance(recipientLocation.getDistanceTo(level, hubPos)),
               recipientLocation.ascendTowards(level, hubPos),
               recipientPos);
     }
@@ -134,8 +135,9 @@ public class DeliveryRoute {
         return new TravelDuration(getSenderToHubDuration().ticks() + getRecipientToHubDuration().ticks());
     }
 
-    public int getDistance() {
-        return senderLocation.getDistanceTo(hubPos) + recipientLocation.getDistanceTo(hubPos);
+    public int getDistance(Level level) {
+        return senderLocation.getDistanceTo(level, hubPos)
+              + recipientLocation.getDistanceTo(level, hubPos);
     }
 
     // --
@@ -170,9 +172,9 @@ public class DeliveryRoute {
     public record Segment(Optional<BlockPos> startPos, Optional<BlockPos> endPos) {
         public static final Segment EMPTY = new Segment(Optional.empty(), Optional.empty());
 
-        public Optional<BlockPos> getCurrentLocation(float progress) {
+        public Optional<BlockPos> getCurrentLocation(Level level, float progress) {
             if (startPos().isPresent() && endPos().isPresent()) {
-                Vec3 pos = Position.lerp(startPos().get(), endPos().get(), Mth.clamp(progress, 0, 1));
+                Vec3 pos = Position.lerp(level, startPos().get(), endPos().get(), Mth.clamp(progress, 0, 1));
                 return Optional.of(BlockPos.containing(pos));
             }
             return Optional.empty();

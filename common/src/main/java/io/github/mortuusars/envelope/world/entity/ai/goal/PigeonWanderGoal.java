@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -44,7 +45,7 @@ public class PigeonWanderGoal extends Goal {
         @Nullable BlockPos pigeonholePos = pigeon.getPigeonholeHandler().getTargetPos();
         if (pigeon.getPigeonholeHandler().isPigeonholeValid(pigeon.level(), pigeon.blockPosition())
               && pigeonholePos != null && !pigeon.closerThan(pigeonholePos, WANDER_THRESHOLD)) {
-            Vec3 pigeonholeCenter = Vec3.atCenterOf(pigeonholePos);
+            Vec3 pigeonholeCenter = Position.getGlobalCenter(pigeon.level(), pigeonholePos);
             pos = pigeonholeCenter.subtract(pigeon.position()).normalize();
         } else {
             pos = pigeon.getViewVector(0.0F);

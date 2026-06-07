@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world;
 
+import io.github.mortuusars.envelope.integration.sable.MovingStructureCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +20,10 @@ public class Position {
         double y = origin.getY() + (target.getY() - origin.getY()) * delta;
         double z = origin.getZ() + (target.getZ() - origin.getZ()) * delta;
         return new Vec3(x, y, z);
+    }
+
+    public static Vec3 lerp(Level level, BlockPos origin, BlockPos target, double delta) {
+        return getGlobalCenter(level, origin).lerp(getGlobalCenter(level, target), delta);
     }
 
     public static BlockPos snapToGrid(BlockPos pos, int size) {
@@ -66,6 +71,33 @@ public class Position {
     public static Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> origin,
                                                    Optional<BlockPos> target, int distance, int seed) {
         return origin.map(pos -> ascendTowards(level, pos, target, distance, seed));
+    }
+
+    public static Vec3 getGlobalCenter(Level level, BlockPos localPos) {
+        return MovingStructureCompat.getGlobalCenter(level, localPos);
+    }
+
+    public static BlockPos getNavigationPos(Level level, BlockPos localPos) {
+        return MovingStructureCompat.getNavigationPos(level, localPos);
+    }
+
+    public static double distanceToSqr(Level level, BlockPos localPos, Vec3 entityPos) {
+        return getGlobalCenter(level, localPos).distanceToSqr(entityPos);
+    }
+
+    /**
+     * Whether an entity is within {@code distance} of a local block target.
+     * Uses projected world-space distance first, then falls back to block-grid distance for flying entities.
+     */
+    public static boolean isWithinReach(Level level, BlockPos localPos, Vec3 entityPos, BlockPos entityBlockPos, double distance) {
+        if (distanceToSqr(level, localPos, entityPos) < distance * distance) {
+            return true;
+        }
+        return localPos.closerThan(entityBlockPos, distance);
+    }
+
+    public static boolean closerThan(Level level, BlockPos localPos, Vec3 entityPos, double distance) {
+        return distanceToSqr(level, localPos, entityPos) < distance * distance;
     }
 
     @Deprecated
@@ -131,6 +163,10 @@ public class Position {
 
     public static int getDistanceBetween(BlockPos a, BlockPos b) {
         return (int) Math.sqrt(a.distSqr(b));
+    }
+
+    public static int getDistanceBetween(Level level, BlockPos a, BlockPos b) {
+        return (int) Math.sqrt(getGlobalCenter(level, a).distanceToSqr(getGlobalCenter(level, b)));
     }
 
     public static Optional<Integer> getDistanceBetween(Optional<BlockPos> a, Optional<BlockPos> b) {

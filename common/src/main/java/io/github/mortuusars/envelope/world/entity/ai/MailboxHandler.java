@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity.ai;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
@@ -89,7 +90,7 @@ public class MailboxHandler {
     public boolean isMailboxValid(Level level, BlockPos entityPos) {
         @Nullable BlockPos currentPos = getTargetPos();
         if (currentPos == null) return false;
-        if (!entityPos.closerThan(currentPos, 32)) return false;
+        if (Position.distanceToSqr(level, currentPos, entityPos.getCenter()) > 32 * 32) return false;
         return level.getBlockEntity(currentPos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.isAvailableForPickup();
     }

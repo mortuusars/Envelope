@@ -3,6 +3,7 @@
   "package": "io.github.mortuusars.envelope.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
+  "plugin": "io.github.mortuusars.envelope.mixin.EnvelopeMixinConfigPlugin",
   "client": [
     "EditBoxMixin",
     "applicator_carrying_tooltip.AbstractContainerScreenMixin",
@@ -22,6 +23,7 @@
     "predators.CatMixin",
     "predators.FoxMixin",
     "predators.OcelotMixin",
+    "sable_compat.MailboxBlockMixin",
     "shears_clearing.ItemStackMixin",
     "shears_clearing.ShearsItemMixin",
     "spawners.MinecraftServerMixin",
