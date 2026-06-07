@@ -13,6 +13,7 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -224,6 +225,12 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         }
     }
 
+    @Override
+    public void clearContent() {
+        super.clearContent();
+        mail.clear();
+    }
+
     // -- Delivery
 
     public boolean tryStartDelivery(Pigeon pigeon) {
@@ -303,8 +310,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     // As inbox can be quite large in size, we cannot store it as regular block entity data.
     // So we use dedicated inbox storage for that, and load/unload each time block entity is being loaded/unloaded.
 
-    protected void loadInbox() {
-        if (level instanceof ServerLevel serverLevel) {
+    public void loadInbox() {
+        if (level instanceof ServerLevel serverLevel && !inboxId.equals(Util.NIL_UUID)) {
             mail = InboxStorage.get(serverLevel).remove(inboxId)
                   .map(Inbox::getAllMail)
                   .orElseGet(ArrayList::new);
@@ -313,8 +320,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         }
     }
 
-    protected void unloadInbox() {
-        if (level instanceof ServerLevel serverLevel && address != null) {
+    public void unloadInbox() {
+        if (level instanceof ServerLevel serverLevel && address != null && !inboxId.equals(Util.NIL_UUID)) {
             InboxStorage.get(serverLevel).put(inboxId, this);
         }
         mail.clear();
@@ -393,19 +400,19 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     // -- Loading/Saving
 
     @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        ContainerHelper.saveAllItems(tag, items, registries);
+        if (address != null) tag.putString("address", address.getString());
+        if (owner != null) tag.putUUID("owner", owner);
+        if (!inboxId.equals(Util.NIL_UUID)) tag.putUUID("inbox_id", inboxId);
+    }
+
+    @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ContainerHelper.loadAllItems(tag, items, registries);
         setAddress(tag.contains("address", Tag.TAG_STRING) ? new BlockAddress(tag.getString("address")) : null);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         inboxId = tag.hasUUID("inbox_id") ? tag.getUUID("inbox_id") : UUID.randomUUID();
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        ContainerHelper.saveAllItems(tag, items, registries);
-        if (address != null) tag.putString("address", address.getString());
-        if (owner != null) tag.putUUID("owner", owner);
-        tag.putUUID("inbox_id", inboxId);
     }
 
     // -- Util
