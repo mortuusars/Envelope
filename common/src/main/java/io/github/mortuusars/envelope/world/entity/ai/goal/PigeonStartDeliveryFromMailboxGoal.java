@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
-import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
+import io.github.mortuusars.envelope.world.entity.ai.PigeonNavigation;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -24,7 +24,7 @@ public class PigeonStartDeliveryFromMailboxGoal extends Goal {
         @Nullable BlockPos pos = pigeon.getMailboxHandler().getTargetPos();
 
         return pos != null
-              && Position.closerToCenterThan(pigeon.level(), pos, pigeon.position(), 2.0)
+              && pigeon.closerThan(pos, PigeonNavigation.DEFAULT_REACH_DISTANCE)
               && pigeon.level().getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.isAvailableForPickup();
     }

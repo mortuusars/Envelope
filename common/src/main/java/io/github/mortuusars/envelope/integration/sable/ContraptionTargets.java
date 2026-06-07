@@ -13,12 +13,34 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+/**
+ * Target discovery for blocks on Sable moving structures, where vanilla POI lookup does not apply.
+ */
 public final class ContraptionTargets {
     private ContraptionTargets() {
     }
 
+    /**
+     * Sorts POI results by projected distance, optionally merging in contraption-local targets when Sable is loaded.
+     */
+    public static List<BlockPos> locateNearby(ServerLevel level, Vec3 entityPos, int radius,
+                                              List<BlockPos> poiResults,
+                                              Supplier<List<BlockPos>> contraptionResults) {
+        if (MovingStructureCompat.isAvailable()) {
+            return mergeWithContraptionTargets(level, entityPos, radius, poiResults, contraptionResults.get())
+                  .toList();
+        }
+
+        return sortByProjectedDistance(level, entityPos, poiResults.stream()).toList();
+    }
+
+    /**
+     * O(n) over all registered mailbox addresses — acceptable while mailbox counts stay small.
+     * {@link ServerLevel#getBlockEntity(BlockPos)} at plot-local positions relies on Sable's level hooks.
+     */
     public static List<BlockPos> findNearbyMailboxes(ServerLevel level, Vec3 entityPos, int radius,
                                                      Predicate<MailboxBlockEntity> filter) {
         double radiusSqr = radius * (double) radius;
@@ -34,6 +56,10 @@ public final class ContraptionTargets {
               .toList();
     }
 
+    /**
+     * O(n) over {@link PigeonholeRegistry} entries for the level.
+     * {@link ServerLevel#getBlockEntity(BlockPos)} at plot-local positions relies on Sable's level hooks.
+     */
     public static List<BlockPos> findNearbyPigeonholes(ServerLevel level, Vec3 entityPos, int radius,
                                                        Predicate<PigeonholeBlockEntity> filter) {
         double radiusSqr = radius * (double) radius;
@@ -51,9 +77,13 @@ public final class ContraptionTargets {
                                                                List<BlockPos> contraptionResults) {
         double radiusSqr = radius * (double) radius;
 
-        return Stream.concat(poiResults.stream(), contraptionResults.stream())
-              .distinct()
-              .filter(pos -> Position.distanceToSqr(level, pos, entityPos) <= radiusSqr)
-              .sorted(Comparator.comparingDouble(pos -> Position.distanceToSqr(level, pos, entityPos)));
+        return sortByProjectedDistance(level, entityPos,
+              Stream.concat(poiResults.stream(), contraptionResults.stream())
+                    .distinct()
+                    .filter(pos -> Position.distanceToSqr(level, pos, entityPos) <= radiusSqr));
+    }
+
+    private static Stream<BlockPos> sortByProjectedDistance(ServerLevel level, Vec3 entityPos, Stream<BlockPos> positions) {
+        return positions.sorted(Comparator.comparingDouble(pos -> Position.distanceToSqr(level, pos, entityPos)));
     }
 }

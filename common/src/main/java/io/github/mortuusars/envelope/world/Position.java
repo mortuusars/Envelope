@@ -1,14 +1,12 @@
 package io.github.mortuusars.envelope.world;
 
 import io.github.mortuusars.envelope.integration.sable.MovingStructureCompat;
-import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -61,10 +59,6 @@ public class Position {
               .above(distance);
     }
 
-    public static BlockPos ascendTowards(Level level, BlockPos origin, BlockPos target, int distance) {
-        return ascendTowards(origin, target, distance);
-    }
-
     public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance, int seed) {
         BlockPos pos = target
               .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
@@ -87,27 +81,23 @@ public class Position {
         return MovingStructureCompat.getNavigationPos(level, localPos);
     }
 
-    /**
-     * Block pigeons pathfind toward when approaching a mailbox — one block in front of the mailbox face.
-     */
-    public static BlockPos getMailboxApproachTarget(Level level, BlockPos mailboxPos) {
-        BlockState state = level.getBlockState(mailboxPos);
-        if (state.getBlock() instanceof MailboxBlock) {
-            return mailboxPos.relative(state.getValue(MailboxBlock.FACING));
-        }
-        return mailboxPos;
-    }
-
     public static double distanceToSqr(Level level, BlockPos localPos, Vec3 entityPos) {
         return getGlobalCenter(level, localPos).distanceToSqr(entityPos);
     }
 
-    public static boolean closerThan(Level level, BlockPos localPos, Vec3 entityPos, double distance) {
-        return distanceToSqr(level, localPos, entityPos) < distance * distance;
+    /**
+     * Whether an entity is within {@code distance} of a local block target.
+     * Uses projected world-space distance first, then falls back to block-grid distance for flying entities.
+     */
+    public static boolean isWithinReach(Level level, BlockPos localPos, Vec3 entityPos, BlockPos entityBlockPos, double distance) {
+        if (distanceToSqr(level, localPos, entityPos) < distance * distance) {
+            return true;
+        }
+        return localPos.closerThan(entityBlockPos, distance);
     }
 
-    public static boolean closerToCenterThan(Level level, BlockPos localPos, Vec3 entityPos, double distance) {
-        return closerThan(level, localPos, entityPos, distance);
+    public static boolean closerThan(Level level, BlockPos localPos, Vec3 entityPos, double distance) {
+        return distanceToSqr(level, localPos, entityPos) < distance * distance;
     }
 
     @Deprecated

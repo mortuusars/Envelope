@@ -43,7 +43,7 @@ public interface AddressLocation {
 
     default Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> targetPos) {
         return getPosition().map(pos -> targetPos
-                    .map(blockPos -> Position.ascendTowards(level, pos, blockPos, ASCEND_DISTANCE))
+                    .map(blockPos -> Position.ascendTowards(pos, blockPos, ASCEND_DISTANCE))
                     .orElseGet(() -> Position.towardsRandomHorizontalDirection(pos, ASCEND_DISTANCE, hashCode())))
               .map(pos -> Position.aboveGround(level, pos, 5));
     }

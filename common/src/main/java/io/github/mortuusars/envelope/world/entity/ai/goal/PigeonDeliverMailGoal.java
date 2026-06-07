@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
-import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.entity.ai.PigeonNavigation;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -52,7 +52,7 @@ public class PigeonDeliverMailGoal extends Goal {
             delivery.getRoute().getSegment(delivery.getPhase()).endPos()
                   .ifPresentOrElse(localPos -> {
                       BlockPos targetLocal = delivery.getPhase().isDescending()
-                            ? Position.getMailboxApproachTarget(level, localPos)
+                            ? PigeonNavigation.getMailboxApproachTarget(level, localPos)
                             : localPos;
 
                       if ((delivery.getPhase().isAscending() || delivery.getPhase().isDescending())
@@ -63,7 +63,7 @@ public class PigeonDeliverMailGoal extends Goal {
                       }
 
                       if (!pigeon.hasReachedTarget(targetLocal)) {
-                          BlockPos navigationPos = Position.getNavigationPos(level, targetLocal);
+                          BlockPos navigationPos = PigeonNavigation.getNavigationPos(pigeon, targetLocal);
                           if (!pigeon.getNavigation().isInProgress()
                                 || !navigationPos.equals(pigeon.getNavigation().getTargetPos())) {
                               pigeon.pathfindDirectlyTowards(targetLocal);

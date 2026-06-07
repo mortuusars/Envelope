@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.integration.sable;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Platform;
+import io.github.mortuusars.envelope.integration.Mods;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -13,12 +13,17 @@ import java.lang.reflect.Method;
 
 /**
  * Optional compatibility with Sable moving structures.
+ * <p>
  * Projects local plot-grid coordinates into shared world space for navigation and distance checks.
+ * <p>
+ * This uses reflection against {@code dev.ryanhcode.sable.Sable.HELPER} rather than a compile-time
+ * dependency on Sable or sable-companion. That keeps Envelope buildable without Sable present, but
+ * method signatures on Sable's side can change between releases. Long term, consider JiJ'ing
+ * <a href="https://github.com/ryanhcode/sable-companion">sable-companion</a> for a stable API surface.
  */
 public final class MovingStructureCompat {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final String SABLE_MOD_ID = "sable";
     private static final String SABLE_CLASS = "dev.ryanhcode.sable.Sable";
     private static final String PROJECT_METHOD = "projectOutOfSubLevel";
 
@@ -32,11 +37,11 @@ public final class MovingStructureCompat {
     }
 
     public static boolean isAvailable() {
-        return Platform.isModLoaded(SABLE_MOD_ID) && ensureInitialized();
+        return Mods.SABLE.isLoaded() && ensureInitialized();
     }
 
     public static Vec3 projectOutOfSubLevel(@Nullable Level level, Vec3 pos) {
-        if (level == null || pos == null || !Platform.isModLoaded(SABLE_MOD_ID)) {
+        if (level == null || pos == null || !Mods.SABLE.isLoaded()) {
             return pos;
         }
 
@@ -49,11 +54,9 @@ public final class MovingStructureCompat {
             if (projected instanceof Vec3 vec3) {
                 return vec3;
             }
+            LOGGER.debug("Sable projection returned a non-Vec3 value; using the original position.");
         } catch (ReflectiveOperationException e) {
-            initializationFailed = true;
-            helperInstance = null;
-            projectOutOfSubLevelMethod = null;
-            logFailure("Failed to project a position out of a Sable sub-level.", e);
+            logProjectionFailure("Failed to project a position out of a Sable sub-level.", e);
         }
 
         return pos;
@@ -94,13 +97,17 @@ public final class MovingStructureCompat {
                 return true;
             } catch (ReflectiveOperationException e) {
                 initializationFailed = true;
-                logFailure("Failed to initialize Sable compatibility hooks.", e);
+                logInitializationFailure("Failed to initialize Sable compatibility hooks.", e);
                 return false;
             }
         }
     }
 
-    private static void logFailure(String message, ReflectiveOperationException e) {
+    private static void logProjectionFailure(String message, ReflectiveOperationException e) {
+        LOGGER.warn(message, e);
+    }
+
+    private static void logInitializationFailure(String message, ReflectiveOperationException e) {
         if (failureLogged) {
             LOGGER.debug(message, e);
         } else {
