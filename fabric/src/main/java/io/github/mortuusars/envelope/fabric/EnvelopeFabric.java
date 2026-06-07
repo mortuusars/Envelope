@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
 import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
+import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
@@ -64,6 +65,7 @@ public class EnvelopeFabric implements ModInitializer {
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(event -> {
             event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+            event.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
         });
 
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
@@ -87,9 +89,13 @@ public class EnvelopeFabric implements ModInitializer {
 
         BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_PIGEON_SPAWNS),
                 MobCategory.CREATURE, Envelope.EntityTypes.PIGEON.get(), 2, 3, 6);
+        BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_CHARRED_PIGEON_SPAWNS),
+              MobCategory.MONSTER, Envelope.EntityTypes.CHARRED_PIGEON.get(), 2, 1, 1);
 
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING, Pigeon::checkSpawnRules);
+        SpawnPlacements.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
+              Heightmap.Types.MOTION_BLOCKING, CharredPigeon::checkSpawnRules);
 
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PAPER_BOX.get(), 50, 15);
         FlammableBlockRegistry.getDefaultInstance().add(Envelope.Blocks.PACKAGE.get(), 50, 15);

@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
@@ -273,6 +274,8 @@ public class Envelope {
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
+        public static final Supplier<SpawnEggItem> CHARRED_PIGEON_SPAWN_EGG = Register.item("charred_pigeon_spawn_egg",
+              () -> new SpawnEggItem(EntityTypes.CHARRED_PIGEON.get(), 0x2B2223, 0xE85F00, new Item.Properties()));
 
         private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
             Supplier<BlockItem> item = Register.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
@@ -355,6 +358,14 @@ public class Envelope {
                     .eyeHeight(0.59375F)
                     .passengerAttachments(0.4625F)
                     .clientTrackingRange(8));
+
+        public static final Supplier<EntityType<CharredPigeon>> CHARRED_PIGEON = Register.entityType("charred_pigeon",
+              CharredPigeon::new, MobCategory.MONSTER, true, builder -> builder
+                    .sized(0.65F, 0.85F)
+                    .eyeHeight(0.59375F)
+                    .passengerAttachments(0.4625F)
+                    .clientTrackingRange(8));
+
 
         static void init() {
         }
@@ -575,6 +586,8 @@ public class Envelope {
         public static class Biomes {
             public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
                   TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_pigeon_spawns"));
+            public static final TagKey<Biome> ALLOWS_CHARRED_PIGEON_SPAWNS =
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_charred_pigeon_spawns"));
 
             public static final TagKey<Biome> SPAWNS_PASSENGER_PIGEONS =
                   TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("spawns_passenger_pigeons"));

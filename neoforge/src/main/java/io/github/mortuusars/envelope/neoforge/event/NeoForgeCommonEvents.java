@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.network.packet.C2SPackets;
 import io.github.mortuusars.envelope.network.packet.CommonPackets;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.network.packet.S2CPackets;
+import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
@@ -95,18 +96,22 @@ public class NeoForgeCommonEvents {
         }
         if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
             event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+            event.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
         }
     }
 
     @SubscribeEvent
     public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
         event.put(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
+        event.put(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
     }
 
     @SubscribeEvent
     public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
         event.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
               Pigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), SpawnPlacementTypes.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING,
+              CharredPigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 
     @SubscribeEvent
