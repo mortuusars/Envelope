@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -43,15 +44,15 @@ public final class ContraptionTargets {
      */
     public static List<BlockPos> findNearbyMailboxes(ServerLevel level, Vec3 entityPos, int radius,
                                                      Predicate<MailboxBlockEntity> filter) {
-        double radiusSqr = radius * (double) radius;
+        int radiusSqr = radius * radius;
         Mailboxes mailboxes = MailService.of(level).getMailboxes();
 
         return mailboxes.getAllAddresses().stream()
               .map(mailboxes::getPositionOf)
-              .flatMap(optionalPos -> optionalPos.stream())
+              .flatMap(Optional::stream)
+              .filter(pos -> Position.distanceToSqr(level, pos, entityPos) <= radiusSqr)
               .filter(pos -> level.getBlockEntity(pos) instanceof MailboxBlockEntity mailbox
                     && filter.test(mailbox))
-              .filter(pos -> Position.distanceToSqr(level, pos, entityPos) <= radiusSqr)
               .sorted(Comparator.comparingDouble(pos -> Position.distanceToSqr(level, pos, entityPos)))
               .toList();
     }
