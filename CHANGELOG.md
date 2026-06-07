@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1 - 2026-06-07
+- Added Sable compatibility (thanks Flooweur).
+- Updated localization files.
+
+_Pigeon wandering is still not fixed in this release. Will be fixed in 0.7._
+
 ## 0.6 - 2026-04-16
 #### Mail Recipes
 Added a new way to craft items by sending a Package with ingredients to the service address.
