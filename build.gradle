@@ -240,7 +240,7 @@ tasks.register('printLatestVersionChangelog') {
 
 publishMods {
     changelog = project.ext.changelog
-    type = ALPHA
+    type = BETA
     dryRun = providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
     def cfOptions = curseforgeOptions {
