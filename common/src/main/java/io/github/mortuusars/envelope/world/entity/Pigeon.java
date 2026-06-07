@@ -452,21 +452,33 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     protected boolean hasReachedTarget(BlockPos localPos, double distance) {
         if (closerThan(localPos, distance)) {
             return true;
-        } else {
-            BlockPos navigationPos = Position.getNavigationPos(level(), localPos);
-            Path path = getNavigation().getPath();
-            return path != null && path.getTarget().equals(navigationPos) && path.canReach() && path.isDone();
         }
+
+        BlockPos navigationPos = Position.getNavigationPos(level(), localPos);
+        Path path = getNavigation().getPath();
+        if (path != null && path.canReach() && path.isDone() && path.getTarget().equals(navigationPos)) {
+            return true;
+        }
+
+        BlockPos navigationTarget = getNavigation().getTargetPos();
+        return !getNavigation().isInProgress()
+              && navigationTarget != null
+              && navigationTarget.equals(navigationPos)
+              && navigationTarget.closerThan(blockPosition(), distance);
     }
 
     public boolean closerThan(BlockPos localPos, double distance) {
-        return Position.closerThan(level(), localPos, position(), distance);
+        Level level = level();
+        if (Position.closerThan(level, localPos, position(), distance)) {
+            return true;
+        }
+        return localPos.closerThan(blockPosition(), distance);
     }
 
     public boolean pathfindDirectlyTowards(BlockPos localPos) {
         BlockPos navigationPos = Position.getNavigationPos(level(), localPos);
         getNavigation().setMaxVisitedNodesMultiplier(10.0F);
-        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 1, 1);
+        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 2, 1);
         return getNavigation().getPath() != null && getNavigation().getPath().canReach();
     }
 
@@ -715,7 +727,12 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
     protected boolean hasReachedSegmentEndPos(Delivery delivery) {
         return delivery.getRoute().getSegment(delivery.getPhase()).endPos()
-              .map(this::hasReachedTarget)
+              .map(endPos -> {
+                  BlockPos target = delivery.getPhase().isDescending()
+                        ? Position.getMailboxApproachTarget(level(), endPos)
+                        : endPos;
+                  return hasReachedTarget(target);
+              })
               .orElse(true);
     }
 

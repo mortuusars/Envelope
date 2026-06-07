@@ -1,87 +1,198 @@
-package io.github.mortuusars.envelope.world.entity.ai.goal;
+package io.github.mortuusars.envelope.world;
 
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.integration.sable.ContraptionTargets;
 import io.github.mortuusars.envelope.integration.sable.MovingStructureCompat;
-import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
-import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiRecord;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Random;
 
-public class PigeonLocateMailboxGoal extends Goal {
-    protected final Pigeon pigeon;
-
-    public PigeonLocateMailboxGoal(Pigeon pigeon) {
-        this.pigeon = pigeon;
+public class Position {
+    public static Vec3 lerp(BlockPos origin, BlockPos target, double delta) {
+        double x = origin.getX() + (target.getX() - origin.getX()) * delta;
+        double y = origin.getY() + (target.getY() - origin.getY()) * delta;
+        double z = origin.getZ() + (target.getZ() - origin.getZ()) * delta;
+        return new Vec3(x, y, z);
     }
 
-    @Override
-    public boolean requiresUpdateEveryTick() {
-        return true;
+    public static Vec3 lerp(Level level, BlockPos origin, BlockPos target, double delta) {
+        return getGlobalCenter(level, origin).lerp(getGlobalCenter(level, target), delta);
     }
 
-    @Override
-    public boolean canUse() {
-        return MailService.operatesIn(pigeon.level())
-              && !pigeon.isDelivering()
-              && pigeon.canStartDelivery()
-              && pigeon.getMailboxHandler().getLocateCooldown() <= 0
-              && pigeon.getMailboxHandler().getTargetPos() == null
-              && pigeon.level().getRandom().nextFloat() < 0.05;
+    public static BlockPos snapToGrid(BlockPos pos, int size) {
+        int x = Math.round(pos.getX() / (float) size) * size;
+        int z = Math.round(pos.getZ() / (float) size) * size;
+        return new BlockPos(x, pos.getY(), z);
     }
 
-    @Override
-    public boolean canContinueToUse() {
-        return false;
+    public static BlockPos nearestHub(BlockPos pos) {
+        return snapToGrid(pos, 1024).atY(500);
     }
 
-    @Override
-    public void start() {
-        pigeon.getMailboxHandler().resetLocateCooldown();
-        List<BlockPos> mailboxes = findNearbyAvailableMailboxes();
-        if (!mailboxes.isEmpty()) {
-            for (BlockPos pos : mailboxes) {
-                if (!pigeon.getMailboxHandler().isTargetBlacklisted(pos)) {
-                    pigeon.getMailboxHandler().setTargetPos(pos);
-                    return;
+    public static BlockPos towardsDirection(BlockPos origin, BlockPos target, double distance) {
+        Vec3 originVec = Vec3.atCenterOf(origin);
+        Vec3 targetVec = Vec3.atCenterOf(target);
+        Vec3 direction = targetVec.subtract(originVec).normalize();
+        return BlockPos.containing(originVec.add(direction.scale(distance)));
+    }
+
+    public static BlockPos towardsHorizontalDirection(BlockPos origin, BlockPos target, double distance) {
+        return towardsDirection(origin, target.atY(origin.getY()), distance);
+    }
+
+    public static BlockPos towardsRandomHorizontalDirection(BlockPos origin, int distance, int seed) {
+        Random random = new Random(seed);
+        random.nextLong(); // For some reason this fixes similar values returned for similar seeds. I'm not going to pretend I know why.
+        double angle = random.nextDouble() * 2 * Math.PI;
+        return origin.offset((int) (Math.cos(angle) * distance), 0, (int) (Math.sin(angle) * distance));
+    }
+
+    public static BlockPos ascendTowards(BlockPos origin, BlockPos target, int distance) {
+        return Position.towardsHorizontalDirection(origin, target, distance)
+              .above(distance);
+    }
+
+    public static BlockPos ascendTowards(Level level, BlockPos origin, BlockPos target, int distance) {
+        return ascendTowards(origin, target, distance);
+    }
+
+    public static BlockPos ascendTowards(Level level, BlockPos origin, Optional<BlockPos> target, int distance, int seed) {
+        BlockPos pos = target
+              .map(recipientPos -> Position.towardsHorizontalDirection(origin, recipientPos, distance))
+              .orElseGet(() -> Position.towardsRandomHorizontalDirection(origin, distance, seed))
+              .above(distance);
+
+        return aboveGround(level, pos, 5);
+    }
+
+    public static Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> origin,
+                                                   Optional<BlockPos> target, int distance, int seed) {
+        return origin.map(pos -> ascendTowards(level, pos, target, distance, seed));
+    }
+
+    public static Vec3 getGlobalCenter(Level level, BlockPos localPos) {
+        return MovingStructureCompat.getGlobalCenter(level, localPos);
+    }
+
+    public static BlockPos getNavigationPos(Level level, BlockPos localPos) {
+        return MovingStructureCompat.getNavigationPos(level, localPos);
+    }
+
+    /**
+     * Block pigeons pathfind toward when approaching a mailbox — one block in front of the mailbox face.
+     */
+    public static BlockPos getMailboxApproachTarget(Level level, BlockPos mailboxPos) {
+        BlockState state = level.getBlockState(mailboxPos);
+        if (state.getBlock() instanceof MailboxBlock) {
+            return mailboxPos.relative(state.getValue(MailboxBlock.FACING));
+        }
+        return mailboxPos;
+    }
+
+    public static double distanceToSqr(Level level, BlockPos localPos, Vec3 entityPos) {
+        return getGlobalCenter(level, localPos).distanceToSqr(entityPos);
+    }
+
+    public static boolean closerThan(Level level, BlockPos localPos, Vec3 entityPos, double distance) {
+        return distanceToSqr(level, localPos, entityPos) < distance * distance;
+    }
+
+    public static boolean closerToCenterThan(Level level, BlockPos localPos, Vec3 entityPos, double distance) {
+        return closerThan(level, localPos, entityPos, distance);
+    }
+
+    @Deprecated
+    public static boolean isInSafeSimulationDistance(ServerLevel level, BlockPos pos) {
+        if (!level.isLoaded(pos)) {
+            return false;
+        }
+        int simDistance = level.getServer().getPlayerList().getSimulationDistance();
+        int range = simDistance - 1; // Reduce by 1 chunk to be safe.
+        return level.players().stream().anyMatch(player -> {
+            double dx = Math.abs(pos.getX() - player.getX()) / 16.0;
+            double dz = Math.abs(pos.getZ() - player.getZ()) / 16.0;
+            return Math.max(dx, dz) <= range;
+        });
+    }
+
+    public static boolean isInSimulationDistance(ServerLevel level, ChunkPos chunkPos) {
+        return level.getChunkSource().chunkMap.getDistanceManager().inEntityTickingRange(chunkPos.toLong());
+    }
+
+    public static boolean isInSimulationDistance(ServerLevel level, BlockPos pos) {
+        return isInSimulationDistance(level, new ChunkPos(pos));
+    }
+
+    public static boolean isInSimulationDistance(ServerLevel level, Entity entity) {
+        return isInSimulationDistance(level, entity.chunkPosition());
+    }
+
+    public static @Nullable BlockPos findNearbyHeightmapSpawnPosition(ServerLevel level, BlockPos pos, int altitude) {
+        double lowestDistance = Double.MAX_VALUE;
+        @Nullable BlockPos closestRandomPos = null;
+
+        for (int i = 0; i < 5; i++) {
+            BlockPos randomPos = aboveGround(level, level.getBlockRandomPos(pos.getX(), pos.getY(), pos.getZ(), 15), altitude);
+
+            if (Position.isInSimulationDistance(level, randomPos)) {
+                double distance = randomPos.distSqr(pos);
+
+                if (distance < lowestDistance) {
+                    lowestDistance = distance;
+                    closestRandomPos = randomPos;
                 }
             }
-
-            pigeon.getMailboxHandler().clearBlacklist();
-            pigeon.getMailboxHandler().setTargetPos(mailboxes.getFirst());
         }
+
+        if (closestRandomPos != null) {
+            return closestRandomPos;
+        }
+
+        BlockPos blockPos = aboveGround(level, pos, altitude);
+        if (Position.isInSimulationDistance(level, blockPos)) {
+            return blockPos;
+        }
+
+        return null;
     }
 
-    private List<BlockPos> findNearbyAvailableMailboxes() {
-        ServerLevel level = (ServerLevel) pigeon.level();
-        int radius = 20;
-        PoiManager poiManager = level.getPoiManager();
-        List<BlockPos> poiResults = poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.MAILBOX), pigeon.blockPosition(), radius, PoiManager.Occupancy.ANY)
-              .map(PoiRecord::getPos)
-              .filter(p -> level.getBlockEntity(p) instanceof MailboxBlockEntity mailbox
-                    && mailbox.isAvailableForPickup())
-              .toList();
+    public static BlockPos aboveGround(Level level, BlockPos pos, int altitude) {
+        int heightmapY = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY();
+        int y = Math.max(pos.getY(), heightmapY + altitude);
+        return pos.getY() == y ? pos : pos.atY(y);
+    }
 
-        if (MovingStructureCompat.isAvailable()) {
-            List<BlockPos> registryResults = ContraptionTargets.findNearbyMailboxes(
-                  level, pigeon.position(), radius, MailboxBlockEntity::isAvailableForPickup);
-            return ContraptionTargets.mergeWithContraptionTargets(
-                        level, pigeon.position(), radius, poiResults, registryResults)
-                  .collect(Collectors.toList());
+    public static int getDistanceBetween(BlockPos a, BlockPos b) {
+        return (int) Math.sqrt(a.distSqr(b));
+    }
+
+    public static int getDistanceBetween(Level level, BlockPos a, BlockPos b) {
+        return (int) Math.sqrt(getGlobalCenter(level, a).distanceToSqr(getGlobalCenter(level, b)));
+    }
+
+    public static Optional<Integer> getDistanceBetween(Optional<BlockPos> a, Optional<BlockPos> b) {
+        if (a.isEmpty() || b.isEmpty()) return Optional.empty();
+        return Optional.of(getDistanceBetween(a.get(), b.get()));
+    }
+
+    public static boolean isFireNearby(Level level, BlockPos pos) {
+        if (level == null) return false;
+
+        for (BlockPos blockPos : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
+            if (level.getBlockState(blockPos).getBlock() instanceof FireBlock) {
+                return true;
+            }
         }
 
-        return poiResults.stream()
-              .sorted(Comparator.comparingDouble(p -> Position.distanceToSqr(level, p, pigeon.position())))
-              .collect(Collectors.toList());
+        return false;
     }
 }

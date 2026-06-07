@@ -52,6 +52,10 @@ public interface AddressLocation {
         return getDistanceTo(pos);
     }
 
+    default int getDistanceTo(Level level, Optional<BlockPos> pos) {
+        return pos.map(p -> getDistanceTo(level, p)).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
+    }
+
     // --
 
     static AddressLocation exact(BlockPos pos) {
