@@ -24,6 +24,7 @@ import java.util.*;
 
 public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiable {
     protected List<Occupant.Mutable> occupants = new ArrayList<>();
+    protected boolean registered;
 
     protected PigeonholeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -36,7 +37,26 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
     // -- Events
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        if (!registered) {
+            PigeonholeRegistry.register(level, getBlockPos());
+            registered = true;
+        }
         tickOccupants(level, pos, state);
+    }
+
+    @Override
+    public void clearRemoved() {
+        super.clearRemoved();
+        registered = false;
+    }
+
+    @Override
+    public void setRemoved() {
+        if (registered && level instanceof ServerLevel serverLevel) {
+            PigeonholeRegistry.unregister(serverLevel, getBlockPos());
+            registered = false;
+        }
+        super.setRemoved();
     }
 
     @Override

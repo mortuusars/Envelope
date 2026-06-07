@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
@@ -141,7 +142,7 @@ public class PigeonholeHandler {
     public boolean isPigeonholeValid(Level level, BlockPos entityPos) {
         @Nullable BlockPos currentPos = getTargetPos();
         if (currentPos == null) return false;
-        if (!entityPos.closerThan(currentPos, 32)) return false;
+        if (Position.distanceToSqr(level, currentPos, entityPos.getCenter()) > 32 * 32) return false;
         return level.getBlockEntity(currentPos) instanceof PigeonholeBlockEntity;
     }
 

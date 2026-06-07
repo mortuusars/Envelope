@@ -43,9 +43,13 @@ public interface AddressLocation {
 
     default Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> targetPos) {
         return getPosition().map(pos -> targetPos
-                    .map(blockPos -> Position.ascendTowards(pos, blockPos, ASCEND_DISTANCE))
+                    .map(blockPos -> Position.ascendTowards(level, pos, blockPos, ASCEND_DISTANCE))
                     .orElseGet(() -> Position.towardsRandomHorizontalDirection(pos, ASCEND_DISTANCE, hashCode())))
               .map(pos -> Position.aboveGround(level, pos, 5));
+    }
+
+    default int getDistanceTo(Level level, BlockPos pos) {
+        return getDistanceTo(pos);
     }
 
     // --
@@ -72,6 +76,11 @@ public interface AddressLocation {
         @Override
         public int getDistanceTo(BlockPos pos) {
             return Position.getDistanceBetween(this.pos, pos);
+        }
+
+        @Override
+        public int getDistanceTo(Level level, BlockPos pos) {
+            return Position.getDistanceBetween(level, this.pos, pos);
         }
     }
 

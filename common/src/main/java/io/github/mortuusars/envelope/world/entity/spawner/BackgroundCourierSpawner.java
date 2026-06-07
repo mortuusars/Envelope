@@ -80,7 +80,7 @@ public class BackgroundCourierSpawner extends Spawner {
         int progress = delivery.getPhaseProgress();
         float completeness = Mth.clamp(progress / (float) duration, 0f, 1f);
 
-        return delivery.getRoute().getSegment(delivery.getPhase()).getCurrentLocation(completeness)
+        return delivery.getRoute().getSegment(delivery.getPhase()).getCurrentLocation(level, completeness)
               .filter(level::isLoaded)
               .map(pos -> Position.aboveGround(level, pos, 2))
               .filter(pos -> Position.isInSimulationDistance(level, pos));

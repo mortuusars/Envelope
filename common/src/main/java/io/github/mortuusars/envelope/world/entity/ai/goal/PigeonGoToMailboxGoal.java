@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
@@ -46,7 +47,8 @@ public class PigeonGoToMailboxGoal extends AbstractGoToBlockGoal {
         }
 
         if (!pigeon.closerThan(handler.getTargetPos(), 16)) {
-            if (!pigeon.blockPosition().closerThan(handler.getTargetPos(), 32)) {
+            if (handler.getTargetPos() != null
+                  && Position.distanceToSqr(pigeon.level(), handler.getTargetPos(), pigeon.position()) > 32 * 32) {
                 handler.dropMailbox();
             } else {
                 pigeon.pathfindRandomlyTowards(handler.getTargetPos());

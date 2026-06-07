@@ -445,31 +445,33 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         return new Vec3(0.0, getEyeHeight() * 0.65F, getBbWidth() * 0.4F);
     }
 
-    public boolean hasReachedTarget(BlockPos pos) {
-        return hasReachedTarget(pos, 2);
+    public boolean hasReachedTarget(BlockPos localPos) {
+        return hasReachedTarget(localPos, 2);
     }
 
-    protected boolean hasReachedTarget(BlockPos pos, double distance) {
-        if (closerThan(pos, distance)) {
+    protected boolean hasReachedTarget(BlockPos localPos, double distance) {
+        if (closerThan(localPos, distance)) {
             return true;
         } else {
+            BlockPos navigationPos = Position.getNavigationPos(level(), localPos);
             Path path = getNavigation().getPath();
-            return path != null && path.getTarget().equals(pos) && path.canReach() && path.isDone();
+            return path != null && path.getTarget().equals(navigationPos) && path.canReach() && path.isDone();
         }
     }
 
-    public boolean closerThan(BlockPos pos, double distance) {
-        return pos.closerThan(blockPosition(), distance);
+    public boolean closerThan(BlockPos localPos, double distance) {
+        return Position.closerThan(level(), localPos, position(), distance);
     }
 
-    public boolean pathfindDirectlyTowards(BlockPos pos) {
+    public boolean pathfindDirectlyTowards(BlockPos localPos) {
+        BlockPos navigationPos = Position.getNavigationPos(level(), localPos);
         getNavigation().setMaxVisitedNodesMultiplier(10.0F);
-        getNavigation().moveTo(pos.getX(), pos.getY(), pos.getZ(), 1, 1);
+        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 1, 1);
         return getNavigation().getPath() != null && getNavigation().getPath().canReach();
     }
 
-    public void pathfindRandomlyTowards(BlockPos pos) {
-        Vec3 vec3 = Vec3.atBottomCenterOf(pos);
+    public void pathfindRandomlyTowards(BlockPos localPos) {
+        Vec3 vec3 = Position.getGlobalCenter(level(), localPos).subtract(0, 0.5, 0);
         int i = 0;
         BlockPos blockPos = this.blockPosition();
         int j = (int) vec3.y - blockPos.getY();
@@ -481,7 +483,7 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
 
         int k = 6;
         int l = 8;
-        int m = blockPos.distManhattan(pos);
+        int m = blockPos.distManhattan(Position.getNavigationPos(level(), localPos));
         if (m < 15) {
             k = m / 2;
             l = m / 2;

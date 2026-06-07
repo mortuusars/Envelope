@@ -1,6 +1,9 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.integration.sable.ContraptionTargets;
+import io.github.mortuusars.envelope.integration.sable.MovingStructureCompat;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
@@ -59,14 +62,26 @@ public class PigeonLocateMailboxGoal extends Goal {
     }
 
     private List<BlockPos> findNearbyAvailableMailboxes() {
-        BlockPos pos = pigeon.blockPosition();
-        PoiManager poiManager = ((ServerLevel) pigeon.level()).getPoiManager();
-        return poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.MAILBOX), pos, 20, PoiManager.Occupancy.ANY)
+        ServerLevel level = (ServerLevel) pigeon.level();
+        int radius = 20;
+        PoiManager poiManager = level.getPoiManager();
+        List<BlockPos> poiResults = poiManager.getInRange(holder ->
+                    holder.is(Envelope.PoiTypes.MAILBOX), pigeon.blockPosition(), radius, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
-              .filter(p -> pigeon.level().getBlockEntity(p) instanceof MailboxBlockEntity mailbox
+              .filter(p -> level.getBlockEntity(p) instanceof MailboxBlockEntity mailbox
                     && mailbox.isAvailableForPickup())
-              .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
+              .toList();
+
+        if (MovingStructureCompat.isAvailable()) {
+            List<BlockPos> registryResults = ContraptionTargets.findNearbyMailboxes(
+                  level, pigeon.position(), radius, MailboxBlockEntity::isAvailableForPickup);
+            return ContraptionTargets.mergeWithContraptionTargets(
+                        level, pigeon.position(), radius, poiResults, registryResults)
+                  .collect(Collectors.toList());
+        }
+
+        return poiResults.stream()
+              .sorted(Comparator.comparingDouble(p -> Position.distanceToSqr(level, p, pigeon.position())))
               .collect(Collectors.toList());
     }
 }

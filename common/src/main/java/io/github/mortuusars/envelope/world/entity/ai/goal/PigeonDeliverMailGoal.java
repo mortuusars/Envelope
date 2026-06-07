@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
@@ -51,23 +52,26 @@ public class PigeonDeliverMailGoal extends Goal {
             pigeon().tickDelivery(level, delivery);
 
             delivery.getRoute().getSegment(delivery.getPhase()).endPos()
-                  .ifPresentOrElse(pos -> {
+                  .ifPresentOrElse(localPos -> {
+                      BlockPos targetLocal = localPos;
                       if (delivery.getPhase().isDescending()) {
-                          BlockState state = level.getBlockState(pos);
+                          BlockState state = level.getBlockState(localPos);
                           if (state.getBlock() instanceof MailboxBlock) {
-                              pos.relative(state.getValue(MailboxBlock.FACING));
+                              targetLocal = localPos.relative(state.getValue(MailboxBlock.FACING));
                           }
                       }
 
                       if ((delivery.getPhase().isAscending() || delivery.getPhase().isDescending())
-                            && pigeon.hasReachedTarget(pos)) {
+                            && pigeon.hasReachedTarget(targetLocal)) {
                           // Complete the phase instantly
                           delivery.setPhaseProgress(pigeon().getPhaseDuration(level, delivery, delivery.getPhase()));
                           return;
                       }
 
-                      if (!pigeon.getNavigation().isInProgress() || !pos.equals(pigeon.getNavigation().getTargetPos())) {
-                          pigeon.pathfindDirectlyTowards(pos);
+                      BlockPos navigationPos = Position.getNavigationPos(level, targetLocal);
+                      if (!pigeon.getNavigation().isInProgress()
+                            || !navigationPos.equals(pigeon.getNavigation().getTargetPos())) {
+                          pigeon.pathfindDirectlyTowards(targetLocal);
                       }
                   }, () -> {
                       @Nullable Vec3 randomPos = AirAndWaterRandomPos.getPos(pigeon, 8, 4, -2,
