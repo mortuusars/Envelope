@@ -63,12 +63,12 @@ public final class ContraptionTargets {
      */
     public static List<BlockPos> findNearbyPigeonholes(ServerLevel level, Vec3 entityPos, int radius,
                                                        Predicate<PigeonholeBlockEntity> filter) {
-        double radiusSqr = radius * (double) radius;
+        int radiusSqr = radius * radius;
 
         return PigeonholeRegistry.getAll(level).stream()
+              .filter(pos -> Position.distanceToSqr(level, pos, entityPos) <= radiusSqr)
               .filter(pos -> level.getBlockEntity(pos) instanceof PigeonholeBlockEntity pigeonhole
                     && filter.test(pigeonhole))
-              .filter(pos -> Position.distanceToSqr(level, pos, entityPos) <= radiusSqr)
               .sorted(Comparator.comparingDouble(pos -> Position.distanceToSqr(level, pos, entityPos)))
               .toList();
     }
@@ -76,7 +76,7 @@ public final class ContraptionTargets {
     public static Stream<BlockPos> mergeWithContraptionTargets(ServerLevel level, Vec3 entityPos, int radius,
                                                                List<BlockPos> poiResults,
                                                                List<BlockPos> contraptionResults) {
-        double radiusSqr = radius * (double) radius;
+        int radiusSqr = radius * radius;
 
         return sortByProjectedDistance(level, entityPos,
               Stream.concat(poiResults.stream(), contraptionResults.stream())

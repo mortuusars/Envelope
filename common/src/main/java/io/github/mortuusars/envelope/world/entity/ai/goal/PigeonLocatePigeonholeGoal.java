@@ -47,24 +47,4 @@ public class PigeonLocatePigeonholeGoal extends Goal {
             pigeon.getPigeonholeHandler().setTargetPos(nearbyPigeonholes.getFirst());
         }
     }
-
-    merge private List<BlockPos> findNearbyPigeonholesWithSpace() {
-        ServerLevel level = (ServerLevel) pigeon.level();
-        int radius = 20;
-        PoiManager poiManager = level.getPoiManager();
-        List<BlockPos> poiResults = poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pigeon.blockPosition(), radius, PoiManager.Occupancy.ANY)
-              .map(PoiRecord::getPos)
-              .filter(p -> level.getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole
-                    && pigeonhole.hasSpaceForAnotherOccupant())
-              .toList();
-
-        return ContraptionTargets.locateNearby(
-              level,
-              pigeon.position(),
-              radius,
-              poiResults,
-              () -> ContraptionTargets.findNearbyPigeonholes(
-                    level, pigeon.position(), radius, PigeonholeBlockEntity::hasSpaceForAnotherOccupant));
-    }
 }

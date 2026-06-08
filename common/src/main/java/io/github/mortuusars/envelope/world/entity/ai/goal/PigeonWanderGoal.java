@@ -36,6 +36,9 @@ public class PigeonWanderGoal extends WaterAvoidingRandomFlyingGoal {
         }
 
         @Nullable BlockPos homePos = pigeon.getPigeonholeHandler().getHomePos();
+        if (homePos != null) {
+            homePos = BlockPos.containing(Position.getGlobalCenter(pigeon.level(), homePos));
+        }
 
         @Nullable Vec3 newPos = choosePos(homePos);
         if (newPos == null || homePos == null) {
@@ -120,22 +123,5 @@ public class PigeonWanderGoal extends WaterAvoidingRandomFlyingGoal {
 
     protected boolean isPathfindable(BlockPos pos) {
         return pigeon.level().isEmptyBlock(pos) || pigeon.level().getBlockState(pos).isPathfindable(PathComputationType.AIR);
-    }
-
-    @Nullable
-    merge private Vec3 findPos() {
-        Vec3 pos;
-        @Nullable BlockPos pigeonholePos = pigeon.getPigeonholeHandler().getTargetPos();
-        if (pigeon.getPigeonholeHandler().isPigeonholeValid(pigeon.level(), pigeon.blockPosition())
-              && pigeonholePos != null && !pigeon.closerThan(pigeonholePos, WANDER_THRESHOLD)) {
-            Vec3 pigeonholeCenter = Position.getGlobalCenter(pigeon.level(), pigeonholePos);
-            pos = pigeonholeCenter.subtract(pigeon.position()).normalize();
-        } else {
-            pos = pigeon.getViewVector(0.0F);
-        }
-
-        int radius = 8;
-        Vec3 hoverPos = HoverRandomPos.getPos(pigeon, radius, 12, pos.x, pos.z, (float) (Math.PI / 2), 3, 1);
-        return hoverPos != null ? hoverPos : AirAndWaterRandomPos.getPos(pigeon, radius, 4, -2, pos.x, pos.z, (float) (Math.PI / 2));
     }
 }

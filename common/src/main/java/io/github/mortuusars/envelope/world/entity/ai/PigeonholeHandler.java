@@ -5,12 +5,12 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.integration.sable.ContraptionTargets;
 import io.github.mortuusars.envelope.util.Ticks;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -18,11 +18,11 @@ import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -153,14 +153,23 @@ public class PigeonholeHandler {
     // --
 
     public List<BlockPos> findNearbyPigeonholesWithSpace(ServerLevel level, BlockPos pos) {
-        PoiManager poiManager = level.getPoiManager();
-        return poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, 48, PoiManager.Occupancy.ANY)
+        int radius = 48;
+        List<BlockPos> poiResults = level.getPoiManager()
+              .getInRange(holder -> holder.is(Envelope.PoiTypes.PIGEONHOLE), pos, radius, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
               .filter(p -> level.getBlockEntity(p) instanceof PigeonholeBlockEntity pigeonhole
                     && pigeonhole.hasSpaceForAnotherOccupant())
-              .sorted(Comparator.comparingDouble(p -> p.distSqr(pos)))
               .collect(Collectors.toList());
+
+        Vec3 position = Vec3.atCenterOf(pos);
+
+        return ContraptionTargets.locateNearby(
+              level,
+              position,
+              radius,
+              poiResults,
+              () -> ContraptionTargets.findNearbyPigeonholes(level, position,
+                    radius, PigeonholeBlockEntity::hasSpaceForAnotherOccupant));
     }
 
     public Optional<PigeonholeBlockEntity> getPigeonholeAtTargetPos(Level level) {

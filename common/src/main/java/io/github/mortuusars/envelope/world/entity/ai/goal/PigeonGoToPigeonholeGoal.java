@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.core.BlockPos;
