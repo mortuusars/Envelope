@@ -2,7 +2,7 @@ plugins {
     id 'dev.architectury.loom' version '1.13-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.gradleup.shadow' version '8.3.6' apply false
-    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
+    id "me.modmuss50.mod-publish-plugin" version "2.0.0"
 }
 
 architectury {
@@ -148,21 +148,21 @@ subprojects {
 
     processResources {
         var expandProps = [
-                minecraft_version               : minecraft_version,
-                minecraft_version_range         : minecraft_version_range,
-                neoforge_version                : neoforge_version,
-                neoforge_version_range          : neoforge_version_range,
-                neoforge_loader_version_range   : neoforge_loader_version_range,
-                mod_id                          : mod_id,
-                mod_name                        : mod_name,
-                mod_version                     : mod_version,
-                mod_authors                     : mod_authors,
-                mod_description                 : mod_description,
-                mod_issues                      : mod_issues,
-                mod_page                        : mod_page,
-                mod_github                      : mod_github,
-                mod_license                     : mod_license,
-                maven_group                     : maven_group
+                minecraft_version            : minecraft_version,
+                minecraft_version_range      : minecraft_version_range,
+                neoforge_version             : neoforge_version,
+                neoforge_version_range       : neoforge_version_range,
+                neoforge_loader_version_range: neoforge_loader_version_range,
+                mod_id                       : mod_id,
+                mod_name                     : mod_name,
+                mod_version                  : mod_version,
+                mod_authors                  : mod_authors,
+                mod_description              : mod_description,
+                mod_issues                   : mod_issues,
+                mod_page                     : mod_page,
+                mod_github                   : mod_github,
+                mod_license                  : mod_license,
+                maven_group                  : maven_group
         ]
         filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/neoforge.mods.toml', "*.mixins.json"]) {
             expand expandProps
@@ -240,8 +240,19 @@ tasks.register('printLatestVersionChangelog') {
 
 publishMods {
     changelog = project.ext.changelog
-    type = BETA
-    dryRun = providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+
+    if (mod_release_type == "beta") {
+        type = BETA
+    } else if (mod_release_type == "alpha") {
+        type = ALPHA
+    } else {
+        type = STABLE
+    }
+
+    var forceDryRun = true
+    dryRun = forceDryRun
+            || (providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null
+            || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null)
 
     def cfOptions = curseforgeOptions {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
