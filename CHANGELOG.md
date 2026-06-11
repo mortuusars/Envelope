@@ -2,6 +2,7 @@
 
 ## 0.6.2 - 2026-06-11
 - Potentially fixed an issue with C2ME.
+- Fixed crash with Flashback mod when recorded replay is viewed.
 - [Fabric] Fixed crash at startup.
 
 ## 0.6.1 - 2026-06-07

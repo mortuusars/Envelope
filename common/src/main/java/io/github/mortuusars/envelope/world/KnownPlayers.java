@@ -44,6 +44,11 @@ public class KnownPlayers extends SavedData {
     // --
 
     public void add(Player player) {
+        if (player.getScoreboardName().equalsIgnoreCase("replay viewer")) {
+            // Flashback mod uses space in the player name, which causes an error.
+            // A mod about pigeons should not validate player names by the mojang's rules.
+            return;
+        }
         data.computeIfAbsent(player.getScoreboardName(), name -> new PlayerData(player.getGameProfile()));
         setDirty();
     }
