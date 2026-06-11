@@ -46,29 +46,7 @@ public class PlatformImpl {
     }
 
     public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, Consumer<RegistryFriendlyByteBuf> extraDataWriter) {
-        ExtendedScreenHandlerFactory<byte[]> extendedScreenHandlerFactory = new ExtendedScreenHandlerFactory<>() {
-            @Override
-            public byte[] getScreenOpeningData(ServerPlayer player) {
-                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.registryAccess());
-                extraDataWriter.accept(buffer);
-                byte[] bytes = ByteBufUtil.getBytes(buffer);
-                buffer.release();
-                return bytes;
-            }
-
-            @Nullable
-            @Override
-            public AbstractContainerMenu createMenu(int i, @NotNull Inventory inventory, @NotNull Player player) {
-                return menuProvider.createMenu(i, inventory, player);
-            }
-
-            @Override
-            public @NotNull Component getDisplayName() {
-                return menuProvider.getDisplayName();
-            }
-        };
-
-        serverPlayer.openMenu(extendedScreenHandlerFactory);
+        HiddenFromScaryClassLoader.openMenu(serverPlayer, menuProvider, extraDataWriter);
     }
 
     public static Path getGameDirectory() {
@@ -87,5 +65,38 @@ public class PlatformImpl {
 
     public static MailDropOffResult postHandleMailDropOffEvent(MailDropOffContext context) {
         return EnvelopeFabricEvents.HANDLE_MAIL_DROP_OFF.invoker().handle(context);
+    }
+
+    /**
+     * Hides the classes from being eaten by a class loader too early
+     * <br>
+     * (ScreenFactory mixins are failing when isModLoading is called)
+     */
+    private static class HiddenFromScaryClassLoader {
+        public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, Consumer<RegistryFriendlyByteBuf> extraDataWriter) {
+            ExtendedScreenHandlerFactory<byte[]> extendedScreenHandlerFactory = new ExtendedScreenHandlerFactory<>() {
+                @Override
+                public byte[] getScreenOpeningData(ServerPlayer player) {
+                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(PacketByteBufs.create(), player.registryAccess());
+                    extraDataWriter.accept(buffer);
+                    byte[] bytes = ByteBufUtil.getBytes(buffer);
+                    buffer.release();
+                    return bytes;
+                }
+
+                @Nullable
+                @Override
+                public AbstractContainerMenu createMenu(int i, @NotNull Inventory inventory, @NotNull Player player) {
+                    return menuProvider.createMenu(i, inventory, player);
+                }
+
+                @Override
+                public @NotNull Component getDisplayName() {
+                    return menuProvider.getDisplayName();
+                }
+            };
+
+            serverPlayer.openMenu(extendedScreenHandlerFactory);
+        }
     }
 }

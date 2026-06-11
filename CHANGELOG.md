@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.2 - 2026-06-11
+- [Fabric] Fixed crash at startup.
+
 ## 0.6.1 - 2026-06-07
 - Added Sable compatibility (thanks Flooweur).
 - Updated localization files.
