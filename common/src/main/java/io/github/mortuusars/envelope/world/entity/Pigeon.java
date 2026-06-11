@@ -121,7 +121,6 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
         super(entityType, level);
         moveControl = new FlyingMoveControl(this, 10, false);
         pigeonholeHandler = new PigeonholeHandler();
-        pigeonholeHandler.setRandomWantCooldownUpToDefault(level.getRandom());
         mailboxHandler = new MailboxHandler();
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
         setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
@@ -153,6 +152,8 @@ public class Pigeon extends Animal implements VariantHolder<PigeonVariant>, Flyi
     @Override
     public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+        getPigeonholeHandler().setRandomWantCooldownUpToDefault(getRandom());
+
         Holder<Biome> biome = level.getBiome(blockPosition());
 
         if (biome.is(Envelope.Tags.Biomes.HAS_PASSENGER_PIGEONS)) {
