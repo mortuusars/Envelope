@@ -17,8 +17,6 @@ dependencies {
     modApi("fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:${forge_config_api_port_version}")
     modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
 
-    api("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}")
-
     // Needed for mixins into JEI for advanced compat
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-lib:${jei_version}")
