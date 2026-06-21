@@ -30,6 +30,7 @@ public class DataGeneration {
         BlockTagsDatagen blockTags = new BlockTagsDatagen(output, registries, existingFileHelper);
         generator.addProvider(event.includeServer(), blockTags);
         generator.addProvider(event.includeServer(), new ItemTagsDatagen(output, registries, blockTags.contentsGetter(), existingFileHelper));
+        generator.addProvider(event.includeServer(), new EntityTypeTagsDatagen(output, registries, existingFileHelper));
         generator.addProvider(event.includeServer(), LootTablesDatagen.create(output, registries));
         generator.addProvider(event.includeServer(), new AdvancementsDatagen(output, registries, existingFileHelper, List.of(
               new AdvancementsDatagen.Generator()

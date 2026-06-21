@@ -1,5 +1,8 @@
 # Changelog
 
+## UNRELEASED
+- Added Pigeon to `minecraft:fall_damage_immune` entity tag.
+
 ## 0.7.0 Snapshot 1
 
 - Added structures: 
