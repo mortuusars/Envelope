@@ -13,10 +13,10 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
-    public static final ModelLayerLocation PIGEON_LAYER = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
+    public static final ModelLayerLocation MODEL_LAYER = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
 
     public PigeonRenderer(EntityRendererProvider.Context context) {
-        super(context, new PigeonModel(context.bakeLayer(PIGEON_LAYER)), 0.35f);
+        super(context, new PigeonModel(context.bakeLayer(MODEL_LAYER)), 0.35f);
         addLayer(new PigeonBackpackLayer(this, context.getModelSet()));
         addLayer(new PigeonHatLayer(this, context.getModelSet()));
     }

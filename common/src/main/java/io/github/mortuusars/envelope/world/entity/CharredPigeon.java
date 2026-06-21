@@ -1,9 +1,7 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.mojang.logging.LogUtils;
-import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.gui.widget.textbox.text.Char;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -13,7 +11,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -23,6 +20,9 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
+import net.minecraft.world.entity.ai.util.HoverRandomPos;
+import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -31,6 +31,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +40,9 @@ import org.slf4j.Logger;
 import java.util.EnumSet;
 
 public class CharredPigeon extends Monster implements Enemy {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(CharredPigeon.class, EntityDataSerializers.BOOLEAN);
-    public static final Logger LOGGER = LogUtils.getLogger();
 
     public float flap;
     public float flapSpeed;
@@ -74,8 +76,8 @@ public class CharredPigeon extends Monster implements Enemy {
         return Mob.createMobAttributes()
               .add(Attributes.MAX_HEALTH, 8.0)
               .add(Attributes.FLYING_SPEED, 1F)
-              .add(Attributes.MOVEMENT_SPEED, 0.4F)
-              .add(Attributes.ATTACK_DAMAGE, 3.0);
+              .add(Attributes.MOVEMENT_SPEED, 0.2F)
+              .add(Attributes.ATTACK_DAMAGE, 4.0);
     }
 
     @Override
@@ -98,9 +100,10 @@ public class CharredPigeon extends Monster implements Enemy {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1, false));
-        this.goalSelector.addGoal(5, new RandomFloatAroundGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, true, arg -> Math.abs(arg.getY() - this.getY()) <= 4.0));
+        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.25, false));
+        goalSelector.addGoal(5, new WanderGoal(this, 0.8));
+        goalSelector.addGoal(8, new FloatGoal(this));
+        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, true, arg -> Math.abs(arg.getY() - this.getY()) <= 4.0));
     }
 
     @Override
@@ -162,6 +165,26 @@ public class CharredPigeon extends Monster implements Enemy {
             LOGGER.info("Charred Pigeon has died in lava at: [{}]!", blockPosition().toShortString());
         }
     }
+
+//    @Override
+//    protected float getBlockSpeedFactor() {
+//        return super.getBlockSpeedFactor();
+//    }
+//
+//    @Override
+//    public float getSpeed() {
+//        return super.getSpeed();
+//    }
+//
+//    @Override
+//    public Vec3 handleRelativeFrictionAndCalculateMovement(Vec3 deltaMovement, float friction) {
+//        return super.handleRelativeFrictionAndCalculateMovement(deltaMovement, friction);
+//    }
+//
+//    @Override
+//    public void moveRelative(float amount, Vec3 relative) {
+//        super.moveRelative(amount, relative);
+//    }
 
     // -- Sound
 
@@ -242,6 +265,45 @@ public class CharredPigeon extends Monster implements Enemy {
 
     // --
 
+    static class CharredPigeonMoveControl extends MoveControl {
+        private final CharredPigeon pigeon;
+        private int floatDuration;
+
+        public CharredPigeonMoveControl(CharredPigeon pigeon) {
+            super(pigeon);
+            this.pigeon = pigeon;
+        }
+
+        public void tick() {
+            if (this.operation == Operation.MOVE_TO) {
+                if (this.floatDuration-- <= 0) {
+                    this.floatDuration += this.pigeon.getRandom().nextInt(5) + 2;
+                    Vec3 vec3 = new Vec3(this.wantedX - this.pigeon.getX(), this.wantedY - this.pigeon.getY(), this.wantedZ - this.pigeon.getZ());
+                    double d = vec3.length();
+                    vec3 = vec3.normalize();
+                    if (this.canReach(vec3, Mth.ceil(d))) {
+                        this.pigeon.setDeltaMovement(this.pigeon.getDeltaMovement().add(vec3.scale(0.1)));
+                    } else {
+                        this.operation = Operation.WAIT;
+                    }
+                }
+            }
+        }
+
+        private boolean canReach(Vec3 pos, int length) {
+            AABB aABB = this.pigeon.getBoundingBox();
+
+            for(int i = 1; i < length; ++i) {
+                aABB = aABB.move(pos);
+                if (!this.pigeon.level().noCollision(this.pigeon, aABB)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
     static class RandomFloatAroundGoal extends Goal {
         private final CharredPigeon pigeon;
 
@@ -276,6 +338,40 @@ public class CharredPigeon extends Monster implements Enemy {
             double e = pigeon.getY() + (randomSource.nextFloat() * 2.0F - 1.0F) * 16.0F;
             double f = pigeon.getZ() + (randomSource.nextFloat() * 2.0F - 1.0F) * 16.0F;
             pigeon.getMoveControl().setWantedPosition(d, e, f, 1.0);
+        }
+    }
+
+    static class WanderGoal extends WaterAvoidingRandomFlyingGoal {
+        final CharredPigeon pigeon;
+
+        public WanderGoal(CharredPigeon pigeon, double speedModifier) {
+            super(pigeon, speedModifier);
+            this.pigeon = pigeon;
+            interval = 50;
+        }
+
+        @Override
+        protected @Nullable Vec3 getPosition() {
+            if (pigeon.isInWaterOrBubble()) {
+                @Nullable Vec3 pos = LandRandomPos.getPos(pigeon, 15, 15);
+                if (pos != null) {
+                    return pos;
+                }
+            }
+
+            Vec3 direction = pigeon.getViewVector(0.0F);
+
+            int range = 8;
+            int yRange = 8;
+
+            Vec3 hoverPos = HoverRandomPos.getPos(pigeon, range, yRange,
+                  direction.x, direction.z, (float) (Math.PI / 2), 3, 1);
+            if (hoverPos != null) {
+                return hoverPos;
+            }
+
+            return AirAndWaterRandomPos.getPos(pigeon, range, yRange, -1,
+                  direction.x, direction.z, (float) (Math.PI / 2));
         }
     }
 }

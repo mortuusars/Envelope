@@ -181,7 +181,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return Mob.createMobAttributes()
               .add(Attributes.MAX_HEALTH, 8.0)
               .add(Attributes.FLYING_SPEED, 1F)
-              .add(Attributes.MOVEMENT_SPEED, 0.4F)
+              .add(Attributes.MOVEMENT_SPEED, 0.2F)
               .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
 

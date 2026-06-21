@@ -48,6 +48,7 @@
   "item.envelope.mailbox": "Mailbox",
 
   "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
+  "item.envelope.charred_pigeon_spawn_egg": "Charred Pigeon Spawn Egg",
 
   "item.envelope.lost_mail": "Lost Mail",
 
@@ -81,6 +82,7 @@
   "error.envelope.address.not_enough_xp_levels": "Not enough experience levels",
 
   "entity.envelope.pigeon": "Pigeon",
+  "entity.envelope.charred_pigeon": "Charred Pigeon",
 
   "gui.envelope.confirm": "Confirm",
   "gui.envelope.cancel": "Cancel",

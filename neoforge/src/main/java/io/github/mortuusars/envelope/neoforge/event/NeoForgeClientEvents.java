@@ -3,8 +3,11 @@ package io.github.mortuusars.envelope.neoforge.event;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.*;
+import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
+import io.github.mortuusars.envelope.client.renderer.entity.CharredPigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
+import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.world.item.Sealable;
@@ -45,13 +48,16 @@ public class NeoForgeClientEvents {
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(Envelope.EntityTypes.PIGEON.get(), PigeonRenderer::new);
+        event.registerEntityRenderer(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeonRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(PigeonRenderer.PIGEON_LAYER, PigeonModel::createLayerDefinition);
-        event.registerLayerDefinition(PigeonBackpackLayer.PIGEON_BACKPACK, PigeonModel::createLayerDefinition);
-        event.registerLayerDefinition(PigeonHatLayer.PIGEON_HAT, PigeonModel::createLayerDefinition);
+        event.registerLayerDefinition(PigeonRenderer.MODEL_LAYER, PigeonModel::createLayerDefinition);
+        event.registerLayerDefinition(PigeonBackpackLayer.MODEL_LAYER, PigeonModel::createLayerDefinition);
+        event.registerLayerDefinition(PigeonHatLayer.MODEL_LAYER, PigeonModel::createLayerDefinition);
+        event.registerLayerDefinition(CharredPigeonRenderer.MODEL_LAYER, CharredPigeonModel::createLayerDefinition);
+        event.registerLayerDefinition(CharredPigeonBackpackLayer.MODEL_LAYER, CharredPigeonModel::createLayerDefinition);
     }
 
     @SubscribeEvent

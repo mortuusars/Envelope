@@ -126,6 +126,7 @@ public class ModelsDatagen extends BlockStateProvider {
         itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get());
 
         itemModels().spawnEggItem(Envelope.Items.PIGEON_SPAWN_EGG.get());
+        itemModels().spawnEggItem(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
     }
 
     @SuppressWarnings("UnusedReturnValue")
