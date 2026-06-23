@@ -47,7 +47,6 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.entity.animal.WolfVariant;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -497,23 +496,28 @@ public class Envelope {
     public static class LootTables {
         public static final ResourceKey<LootTable> PIGEONHOLE_WASTE =
               ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("gameplay/pigeonhole_waste"));
+        public static final ResourceKey<LootTable> CHARRED_PIGEON_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("gameplay/charred_pigeon_mail"));
 
         public static final ResourceKey<LootTable> LOST_MAIL =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail"));
         public static final ResourceKey<LootTable> LOST_MAIL_JUNK =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_junk"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/junk"));
         public static final ResourceKey<LootTable> LOST_MAIL_PLANTS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_plants"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/plants"));
         public static final ResourceKey<LootTable> LOST_MAIL_BLOCKS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_blocks"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/blocks"));
         public static final ResourceKey<LootTable> LOST_MAIL_METALS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_metals"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/metals"));
         public static final ResourceKey<LootTable> LOST_MAIL_TOOLS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_tools"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/tools"));
         public static final ResourceKey<LootTable> LOST_MAIL_WEAPONS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_weapons"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/weapons"));
         public static final ResourceKey<LootTable> LOST_MAIL_VALUABLES =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/lost_mail_valuables"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/valuables"));
+
+        public static final ResourceKey<LootTable> NETHER_LOST_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/nether_lost_mail"));
 
         public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE =
               ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage"));

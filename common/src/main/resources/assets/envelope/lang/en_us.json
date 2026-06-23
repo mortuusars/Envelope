@@ -270,6 +270,7 @@
 
   "envelope.configuration.misc": "Miscellaneous",
   "envelope.configuration.pigeon": "Pigeon",
+  "envelope.configuration.charred_pigeon": "Charred Pigeon",
   "envelope.configuration.delivery": "Delivery",
   "envelope.configuration.hunted_by_fox": "Hunted by Fox",
   "envelope.configuration.spawns_naturally": "Spawns Naturally",

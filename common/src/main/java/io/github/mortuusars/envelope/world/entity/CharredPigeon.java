@@ -1,22 +1,29 @@
 package io.github.mortuusars.envelope.world.entity;
 
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.PackageContents;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
-import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
@@ -27,17 +34,25 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class CharredPigeon extends Monster implements Enemy {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -51,6 +66,8 @@ public class CharredPigeon extends Monster implements Enemy {
     protected float flapping = 1.0F;
     protected float nextFlap = 1.0F;
 
+    private ItemStack carriedMail = ItemStack.EMPTY;
+
     public CharredPigeon(EntityType<? extends Monster> type, Level level) {
         super(type, level);
         moveControl = new FlyingMoveControl(this, 10, false);
@@ -62,15 +79,32 @@ public class CharredPigeon extends Monster implements Enemy {
 
     public static boolean checkSpawnRules(EntityType<CharredPigeon> pigeon, LevelAccessor level,
                                           MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-        //TODO: config spawn
-        return true;
+        return Config.Server.CHARRED_PIGEON_SPAWNS_NATURALLY.get();
     }
 
-//    @Override
-//    public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-//                                                 MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
-//        return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
-//    }
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+        if (level.getRandom().nextDouble() < Config.Server.CHARRED_PIGEON_MAIL_CHANCE.get()) {
+            LootTable table = level.getLevel().getServer().reloadableRegistries().getLootTable(Envelope.LootTables.CHARRED_PIGEON_MAIL);
+            if (table != LootTable.EMPTY) {
+                List<ItemStack> items = new ArrayList<>();
+                LootParams lootParams = new LootParams.Builder(level.getLevel())
+                      .withParameter(LootContextParams.THIS_ENTITY, this)
+                      .withParameter(LootContextParams.ORIGIN, this.position())
+                      .create(LootContextParamSets.EQUIPMENT);
+                LootContext lootContext = new LootContext.Builder(lootParams)
+                      .withOptionalRandomSource(level.getRandom())
+                      .create(Optional.empty());
+                table.getRandomItems(lootContext, items::add);
+                if (!items.isEmpty()) {
+                    setCarriedMail(Util.getRandom(items, level.getRandom()));
+                }
+            }
+        }
+
+        return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+    }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
@@ -92,8 +126,13 @@ public class CharredPigeon extends Monster implements Enemy {
         return entityData.get(DATA_HAS_MAIL);
     }
 
-    public void setHasMail(boolean hasMail) {
-        entityData.set(DATA_HAS_MAIL, hasMail);
+    public ItemStack getCarriedMail() {
+        return carriedMail;
+    }
+
+    public void setCarriedMail(ItemStack carriedMail) {
+        this.carriedMail = carriedMail;
+        entityData.set(DATA_HAS_MAIL, !carriedMail.isEmpty());
     }
 
     // -- AI
@@ -166,25 +205,15 @@ public class CharredPigeon extends Monster implements Enemy {
         }
     }
 
-//    @Override
-//    protected float getBlockSpeedFactor() {
-//        return super.getBlockSpeedFactor();
-//    }
-//
-//    @Override
-//    public float getSpeed() {
-//        return super.getSpeed();
-//    }
-//
-//    @Override
-//    public Vec3 handleRelativeFrictionAndCalculateMovement(Vec3 deltaMovement, float friction) {
-//        return super.handleRelativeFrictionAndCalculateMovement(deltaMovement, friction);
-//    }
-//
-//    @Override
-//    public void moveRelative(float amount, Vec3 relative) {
-//        super.moveRelative(amount, relative);
-//    }
+    @Override
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
+        super.dropCustomDeathLoot(level, damageSource, recentlyHit);
+
+        if (!getCarriedMail().isEmpty()) {
+            spawnAtLocation(getCarriedMail());
+            setCarriedMail(ItemStack.EMPTY);
+        }
+    }
 
     // -- Sound
 
@@ -254,92 +283,16 @@ public class CharredPigeon extends Monster implements Enemy {
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        if (hasMail()) tag.putBoolean("HasMail", true);
+        if (!getCarriedMail().isEmpty()) tag.put("CarriedMail", getCarriedMail().save(registryAccess()));
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        setHasMail(tag.getBoolean("HasMail"));
+        setCarriedMail(ItemStack.parse(registryAccess(), tag.getCompound("CarriedMail")).orElse(ItemStack.EMPTY));
     }
 
     // --
-
-    static class CharredPigeonMoveControl extends MoveControl {
-        private final CharredPigeon pigeon;
-        private int floatDuration;
-
-        public CharredPigeonMoveControl(CharredPigeon pigeon) {
-            super(pigeon);
-            this.pigeon = pigeon;
-        }
-
-        public void tick() {
-            if (this.operation == Operation.MOVE_TO) {
-                if (this.floatDuration-- <= 0) {
-                    this.floatDuration += this.pigeon.getRandom().nextInt(5) + 2;
-                    Vec3 vec3 = new Vec3(this.wantedX - this.pigeon.getX(), this.wantedY - this.pigeon.getY(), this.wantedZ - this.pigeon.getZ());
-                    double d = vec3.length();
-                    vec3 = vec3.normalize();
-                    if (this.canReach(vec3, Mth.ceil(d))) {
-                        this.pigeon.setDeltaMovement(this.pigeon.getDeltaMovement().add(vec3.scale(0.1)));
-                    } else {
-                        this.operation = Operation.WAIT;
-                    }
-                }
-            }
-        }
-
-        private boolean canReach(Vec3 pos, int length) {
-            AABB aABB = this.pigeon.getBoundingBox();
-
-            for(int i = 1; i < length; ++i) {
-                aABB = aABB.move(pos);
-                if (!this.pigeon.level().noCollision(this.pigeon, aABB)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-    static class RandomFloatAroundGoal extends Goal {
-        private final CharredPigeon pigeon;
-
-        public RandomFloatAroundGoal(CharredPigeon pigeon) {
-            this.pigeon = pigeon;
-            this.setFlags(EnumSet.of(Goal.Flag.MOVE));
-        }
-
-        @Override
-        public boolean canUse() {
-            MoveControl moveControl = pigeon.getMoveControl();
-            if (!moveControl.hasWanted()) {
-                return true;
-            } else {
-                double d = moveControl.getWantedX() - pigeon.getX();
-                double e = moveControl.getWantedY() - pigeon.getY();
-                double f = moveControl.getWantedZ() - pigeon.getZ();
-                double g = d * d + e * e + f * f;
-                return g < 1.0 || g > 3600.0;
-            }
-        }
-
-        @Override
-        public boolean canContinueToUse() {
-            return false;
-        }
-
-        @Override
-        public void start() {
-            RandomSource randomSource = pigeon.getRandom();
-            double d = pigeon.getX() + (randomSource.nextFloat() * 2.0F - 1.0F) * 16.0F;
-            double e = pigeon.getY() + (randomSource.nextFloat() * 2.0F - 1.0F) * 16.0F;
-            double f = pigeon.getZ() + (randomSource.nextFloat() * 2.0F - 1.0F) * 16.0F;
-            pigeon.getMoveControl().setWantedPosition(d, e, f, 1.0);
-        }
-    }
 
     static class WanderGoal extends WaterAvoidingRandomFlyingGoal {
         final CharredPigeon pigeon;

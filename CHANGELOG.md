@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 - Added Pigeon to `minecraft:fall_damage_immune` entity tag.
+- Restructured lost mail loot tables
+  - Moved `envelope:packages/lost_mail/lost_mail` to `envelope:packages/lost_mail`.
+  - Removed 'lost_mail_' prefix from loot tables inside the folder.
 
 ## 0.7.0 Snapshot 1
 

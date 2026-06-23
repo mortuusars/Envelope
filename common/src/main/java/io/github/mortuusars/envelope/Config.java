@@ -21,6 +21,10 @@ public abstract class Config {
         public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING;
         public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
 
+        // Charred Pigeon
+        public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_SPAWNS_NATURALLY;
+        public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_MAIL_CHANCE;
+
         // Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE_AFTER_DELIVERY;
@@ -105,6 +109,18 @@ public abstract class Config {
                       .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
                       .define("eats_seeds", true);
 
+                builder.pop();
+            }
+
+            {
+                builder.push("charred_pigeon");
+                CHARRED_PIGEON_SPAWNS_NATURALLY = builder
+                      .comment("Charred Pigeons can spawn naturally in '#envelope:allows_charred_pigeon_spawns' biomes.",
+                            " Default: true")
+                      .define("spawns_naturally", true);
+                CHARRED_PIGEON_MAIL_CHANCE = builder
+                      .comment("Chance of a Charred Pigeon carrying mail when spawned.")
+                      .defineInRange("mail_chance", 0.2, 0.0, 1.0);
                 builder.pop();
             }
 

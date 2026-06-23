@@ -48,7 +48,7 @@
             {
               "components": {
                 "minecraft:container_loot": {
-                  "loot_table": "envelope:packages/lost_mail/lost_mail"
+                  "loot_table": "envelope:packages/lost_mail"
                 }
               },
               "function": "minecraft:set_components"

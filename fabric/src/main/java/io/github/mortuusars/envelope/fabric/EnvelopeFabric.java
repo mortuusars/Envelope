@@ -16,6 +16,7 @@ import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.fml.config.ModConfig;
 
@@ -90,7 +92,10 @@ public class EnvelopeFabric implements ModInitializer {
         BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_PIGEON_SPAWNS),
                 MobCategory.CREATURE, Envelope.EntityTypes.PIGEON.get(), 2, 3, 6);
         BiomeModifications.addSpawn(biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_CHARRED_PIGEON_SPAWNS),
-              MobCategory.MONSTER, Envelope.EntityTypes.CHARRED_PIGEON.get(), 2, 1, 1);
+              MobCategory.MONSTER, Envelope.EntityTypes.CHARRED_PIGEON.get(), 1, 1, 1);
+        BiomeModifications.create(Envelope.resource("charred_pigeon_spawn_cost"))
+              .add(ModificationPhase.ADDITIONS, biomeSelector -> biomeSelector.hasTag(Envelope.Tags.Biomes.ALLOWS_CHARRED_PIGEON_SPAWNS),
+                    context -> context.getSpawnSettings().setSpawnCost(Envelope.EntityTypes.CHARRED_PIGEON.get(), 0.7, 0.15));
 
         SpawnPlacements.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING, Pigeon::checkSpawnRules);
