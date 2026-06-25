@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.client.renderer.entity;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
+import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonFireLayer;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -18,6 +19,7 @@ public class CharredPigeonRenderer extends MobRenderer<CharredPigeon, CharredPig
 
     public CharredPigeonRenderer(EntityRendererProvider.Context context) {
         super(context, new CharredPigeonModel(context.bakeLayer(MODEL_LAYER)), 0.35f);
+        addLayer(new CharredPigeonFireLayer(this));
         addLayer(new CharredPigeonBackpackLayer(this, context.getModelSet()));
     }
 

@@ -20,10 +20,14 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
         public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING;
         public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
+        public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
+        public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
 
         // Charred Pigeon
         public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_SPAWNS_NATURALLY;
         public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_MAIL_CHANCE;
+        public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_CONVERT_INTO_REGULAR;
+        public static final ModConfigSpec.IntValue CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS;
 
         // Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
@@ -109,6 +113,14 @@ public abstract class Config {
                       .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
                       .define("eats_seeds", true);
 
+                PIGEON_CONVERT_INTO_CHARRED = builder
+                      .comment("Pigeon will convert into a Charred Pigeon when it stays in the ultrawarm dimension for some time.", "Default: true")
+                      .define("convert_into_charred", true);
+
+                PIGEON_CONVERT_INTO_CHARRED_TICKS = builder
+                      .comment("Time (in ticks) Pigeon needs to stay in the ultrawarm dimension to convert into Charred Pigeon.")
+                      .defineInRange("convert_into_charred_ticks", 300, 0, Integer.MAX_VALUE);
+
                 builder.pop();
             }
 
@@ -121,6 +133,13 @@ public abstract class Config {
                 CHARRED_PIGEON_MAIL_CHANCE = builder
                       .comment("Chance of a Charred Pigeon carrying mail when spawned.")
                       .defineInRange("mail_chance", 0.2, 0.0, 1.0);
+
+                CHARRED_PIGEON_CONVERT_INTO_REGULAR = builder
+                      .comment("Charred Pigeon will convert into a regular Pigeon when it stays outside of the ultrawarm dimension for some time.", "Default: true")
+                      .define("convert_into_regular", true);
+                CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS = builder
+                      .comment("Time (in ticks) Charred Pigeon needs to stay outside of the ultrawarm dimension to convert into a regular Pigeon.")
+                      .defineInRange("convert_into_regular_ticks", 300, 0, Integer.MAX_VALUE);
                 builder.pop();
             }
 
@@ -221,7 +240,7 @@ public abstract class Config {
                           .defineInRange("notice_sending_additional_interval_per_day_minutes", 1, 0, 9999.0);
                     SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK = builder
                           .comment("Chance of notice letter being sent per tick, assuming that enough time has passed from previous send.", "Default: 0.0002 (about 4 minutes on average)")
-                                .defineInRange("notice_sending_chance_per_tick", 0.0002, 0.0, 1.0);
+                          .defineInRange("notice_sending_chance_per_tick", 0.0002, 0.0, 1.0);
 
                     builder.pop();
                 }

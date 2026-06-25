@@ -34,7 +34,7 @@ public class MailboxHasNewMailS2CP implements Packet {
         }
 
         menu.setHasNewMail(true);
-        player.level().playSound(player, player, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.MASTER, 0.75f, 1f);
+        player.level().playSound(player, player, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.BLOCKS, 0.75f, 1f);
         return true;
     }
 }

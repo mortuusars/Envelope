@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, SpawningWeights weights) {
+public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, SpawningWeights weights, boolean inheritable) {
     public static final ResourceKey<PigeonVariant> GRAY =
           ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("gray"));
     public static final ResourceKey<PigeonVariant> BROWN =
@@ -32,6 +32,8 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
           ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("white"));
     public static final ResourceKey<PigeonVariant> PASSENGER =
           ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("passenger"));
+    public static final ResourceKey<PigeonVariant> CHARRED =
+          ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("charred"));
     public static final ResourceKey<PigeonVariant> DEFAULT = GRAY;
 
     // --
@@ -39,13 +41,15 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
     public static final Codec<PigeonVariant> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
           ResourceLocation.CODEC.fieldOf("texture").forGetter(PigeonVariant::texture),
           RegistryCodecs.homogeneousList(Registries.BIOME).optionalFieldOf("spawn_biomes", HolderSet.empty()).forGetter(PigeonVariant::biomes),
-          SpawningWeights.CODEC.optionalFieldOf("spawn_weights", SpawningWeights.DEFAULT).forGetter(PigeonVariant::weights)
+          SpawningWeights.CODEC.optionalFieldOf("spawn_weights", SpawningWeights.DEFAULT).forGetter(PigeonVariant::weights),
+          Codec.BOOL.optionalFieldOf("inheritable", true).forGetter(PigeonVariant::inheritable)
     ).apply(i, PigeonVariant::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PigeonVariant> DIRECT_STREAM_CODEC = StreamCodec.composite(
           ResourceLocation.STREAM_CODEC, PigeonVariant::texture,
           ByteBufCodecs.holderSet(Registries.BIOME), PigeonVariant::biomes,
           SpawningWeights.STREAM_CODEC, PigeonVariant::weights,
+          ByteBufCodecs.BOOL, PigeonVariant::inheritable,
           PigeonVariant::new
     );
 
@@ -56,6 +60,14 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
           ByteBufCodecs.holder(Envelope.Registries.PIGEON_VARIANT, DIRECT_STREAM_CODEC);
 
     // --
+
+    public static Optional<Holder.Reference<PigeonVariant>> get(RegistryAccess registryAccess, ResourceKey<PigeonVariant> key) {
+        return registryAccess.registryOrThrow(Envelope.Registries.PIGEON_VARIANT).getHolder(key);
+    }
+
+    public static Holder<PigeonVariant> getOrThrow(RegistryAccess registryAccess, ResourceKey<PigeonVariant> key) {
+        return registryAccess.registryOrThrow(Envelope.Registries.PIGEON_VARIANT).getHolderOrThrow(key);
+    }
 
     public static Holder<PigeonVariant> getRandomSpawnVariant(RegistryAccess registryAccess, RandomSource random, Holder<Biome> biome) {
         return getRandomVariant(registryAccess, random,
@@ -131,27 +143,28 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
     // --
 
     public static void bootstrap(BootstrapContext<PigeonVariant> context) {
-        register(context, GRAY, "gray", HolderSet.empty(), new SpawningWeights(12, 10));
-        register(context, BROWN, "brown", HolderSet.empty(), new SpawningWeights(6, 5));
-        register(context, WHITE, "white", HolderSet.empty(), new SpawningWeights(2, 1));
-        register(context, PASSENGER, "passenger", Envelope.Tags.Biomes.SPAWNS_PASSENGER_PIGEONS, new SpawningWeights(1, 0));
+        register(context, GRAY, "gray", HolderSet.empty(), new SpawningWeights(12, 10), true);
+        register(context, BROWN, "brown", HolderSet.empty(), new SpawningWeights(6, 5), true);
+        register(context, WHITE, "white", HolderSet.empty(), new SpawningWeights(2, 1), true);
+        register(context, PASSENGER, "passenger", Envelope.Tags.Biomes.SPAWNS_PASSENGER_PIGEONS, new SpawningWeights(1, 0), true);
+        register(context, CHARRED, "charred", HolderSet.empty(), new SpawningWeights(0, 0), false);
     }
 
     static void register(BootstrapContext<PigeonVariant> context, ResourceKey<PigeonVariant> key,
-                         String name, ResourceKey<Biome> spawnBiome, SpawningWeights weights) {
+                         String name, ResourceKey<Biome> spawnBiome, SpawningWeights weights, boolean inheritable) {
         register(context, key, name,
-              HolderSet.direct(context.lookup(Registries.BIOME).getOrThrow(spawnBiome)), weights);
+              HolderSet.direct(context.lookup(Registries.BIOME).getOrThrow(spawnBiome)), weights, inheritable);
     }
 
     static void register(BootstrapContext<PigeonVariant> context, ResourceKey<PigeonVariant> key,
-                         String name, TagKey<Biome> spawnBiomes, SpawningWeights weights) {
+                         String name, TagKey<Biome> spawnBiomes, SpawningWeights weights, boolean inheritable) {
         register(context, key, name,
-              context.lookup(Registries.BIOME).getOrThrow(spawnBiomes), weights);
+              context.lookup(Registries.BIOME).getOrThrow(spawnBiomes), weights, inheritable);
     }
 
     static void register(BootstrapContext<PigeonVariant> context, ResourceKey<PigeonVariant> key,
-                         String name, HolderSet<Biome> spawnBiomes, SpawningWeights weights) {
+                         String name, HolderSet<Biome> spawnBiomes, SpawningWeights weights, boolean inheritable) {
         context.register(key, new PigeonVariant(Envelope.resource("textures/entity/pigeon/pigeon_" + name + ".png"),
-              spawnBiomes, weights));
+              spawnBiomes, weights, inheritable));
     }
 }

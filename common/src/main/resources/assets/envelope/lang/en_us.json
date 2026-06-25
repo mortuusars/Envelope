@@ -186,6 +186,11 @@
   "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
   "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
 
+  "subtitles.envelope.entity.charred_pigeon.ambient": "Charred Pigeon coos",
+  "subtitles.envelope.entity.charred_pigeon.death": "Charred Pigeon dies",
+  "subtitles.envelope.entity.charred_pigeon.fly": "Charred Pigeon flutters",
+  "subtitles.envelope.entity.charred_pigeon.hurts": "Charred Pigeon hurts",
+
   "subtitles.envelope.entity.villager.throw_pigeon_food": "Villager throws food",
 
   "letter.envelope.courier_death_notice.name": "Courier Death Notice",
@@ -317,6 +322,11 @@
   "envelope.configuration.villager_feeding_pigeons_only_nitwits": "Villagers Feed Pigeons: Only Nitwits",
   "envelope.configuration.eats_seeds": "Eats Seeds",
   "envelope.configuration.fox_tattering": "Fox Tattering",
+  "envelope.configuration.convert_into_charred": "Convert Into Charred",
+  "envelope.configuration.convert_into_charred_ticks": "Ticks To Convert Into Charred",
+  "envelope.configuration.convert_into_regular": "Convert Into Regular",
+  "envelope.configuration.convert_into_regular_ticks": "Ticks To Convert Into Regular",
+  "envelope.configuration.mail_chance": "Mail Chance",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

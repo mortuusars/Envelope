@@ -448,6 +448,12 @@ public class Envelope {
         public static final Supplier<SoundEvent> PIGEON_HURT = register("entity", "pigeon.hurt");
         public static final Supplier<SoundEvent> PIGEON_STEP = register("entity", "pigeon.step");
 
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_AMBIENT = register("entity", "charred_pigeon.ambient");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_DEATH = register("entity", "charred_pigeon.death");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_FLY = register("entity", "charred_pigeon.fly");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_HURT = register("entity", "charred_pigeon.hurt");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_STEP = register("entity", "charred_pigeon.step");
+
         public static final Supplier<SoundEvent> PIGEONHOLE_ENTER = register("block", "pigeonhole.enter");
         public static final Supplier<SoundEvent> PIGEONHOLE_EXIT = register("block", "pigeonhole.exit");
         public static final Supplier<SoundEvent> PIGEONHOLE_WORK = register("block", "pigeonhole.work");

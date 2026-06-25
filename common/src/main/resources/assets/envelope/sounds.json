@@ -245,6 +245,88 @@
       "mob/parrot/step5"
     ]
   },
+  "entity.charred_pigeon.ambient": {
+    "sounds": [
+      {
+        "name": "envelope:mob/charred_pigeon/ambient1"
+      },
+      {
+        "name": "envelope:mob/charred_pigeon/ambient2"
+      },
+      {
+        "name": "envelope:mob/charred_pigeon/ambient3"
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.charred_pigeon.ambient"
+  },
+  "entity.charred_pigeon.death": {
+    "sounds": [
+      {
+        "name": "envelope:mob/charred_pigeon/death1"
+      },
+      {
+        "name": "envelope:mob/charred_pigeon/death2"
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.charred_pigeon.death"
+  },
+  "entity.charred_pigeon.fly": {
+    "sounds": [
+      {
+        "name": "mob/parrot/fly1",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly2",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly3",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly4",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly5",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly6",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly7",
+        "pitch": 0.75
+      },
+      {
+        "name": "mob/parrot/fly8",
+        "pitch": 0.75
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.charred_pigeon.fly"
+  },
+  "entity.charred_pigeon.hurt": {
+    "sounds": [
+      {
+        "name": "envelope:mob/charred_pigeon/hurt1"
+      },
+      {
+        "name": "envelope:mob/charred_pigeon/hurt2"
+      }
+    ],
+    "subtitle": "subtitles.envelope.entity.charred_pigeon.hurts"
+  },
+  "entity.charred_pigeon.step": {
+    "sounds": [
+      "mob/parrot/step1",
+      "mob/parrot/step2",
+      "mob/parrot/step3",
+      "mob/parrot/step4",
+      "mob/parrot/step5"
+    ]
+  },
   "block.pigeonhole.enter": {
     "sounds": [
       {

@@ -3,21 +3,24 @@ package io.github.mortuusars.envelope.world.entity;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
@@ -34,7 +37,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -55,6 +57,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class CharredPigeon extends Monster implements Enemy {
+    public static final int CONVERSION_TIME = 300;
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(CharredPigeon.class, EntityDataSerializers.BOOLEAN);
@@ -66,7 +70,8 @@ public class CharredPigeon extends Monster implements Enemy {
     protected float flapping = 1.0F;
     protected float nextFlap = 1.0F;
 
-    private ItemStack carriedMail = ItemStack.EMPTY;
+    protected ItemStack carriedMail = ItemStack.EMPTY;
+    protected int timeInSafeDimension = 0;
 
     public CharredPigeon(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -139,8 +144,8 @@ public class CharredPigeon extends Monster implements Enemy {
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.25, false));
-        goalSelector.addGoal(5, new WanderGoal(this, 0.8));
+        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.5, false));
+        goalSelector.addGoal(5, new WanderGoal(this, 1));
         goalSelector.addGoal(8, new FloatGoal(this));
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, true, arg -> Math.abs(arg.getY() - this.getY()) <= 4.0));
     }
@@ -157,7 +162,63 @@ public class CharredPigeon extends Monster implements Enemy {
     @Override
     public void aiStep() {
         super.aiStep();
-        this.calculateFlapping();
+        calculateFlapping();
+
+        spawnParticle();
+
+        if (Config.Server.CHARRED_PIGEON_CONVERT_INTO_REGULAR.get() && level() instanceof ServerLevel serverLevel) {
+            if (canConvert()) {
+                timeInSafeDimension++;
+            } else {
+                timeInSafeDimension = 0;
+            }
+
+            if (timeInSafeDimension > Config.Server.CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS.get() && !isDeadOrDying()) {
+                convert(serverLevel);
+            }
+        }
+    }
+
+    protected void spawnParticle() {
+        if (level().isClientSide() && level().getRandom().nextInt(3) == 0) {
+            ParticleOptions particle = getRandom().nextInt(20) == 0
+                  ? ParticleTypes.LAVA
+                  : getRandom().nextBoolean() ? ParticleTypes.FLAME : ParticleTypes.SMALL_FLAME;
+            Vec3 p = position().add(getViewVector(0).scale(-0.25));
+            level().addParticle(particle,
+                  p.x + getRandom().nextFloat() * 0.8f - 0.4f,
+                  p.y + 0.2 + getRandom().nextFloat() * 0.3f,
+                  p.z + getRandom().nextFloat() * 0.8f - 0.4f, 0, 0, 0);
+        }
+    }
+
+    public boolean canConvert() {
+        return !level().dimensionType().ultraWarm() && !isNoAi();
+    }
+
+    protected void convert(ServerLevel serverLevel) {
+        ItemStack carriedMail = getCarriedMail();
+        @Nullable Pigeon pigeon = convertTo(Envelope.EntityTypes.PIGEON.get(), true);
+        if (pigeon != null) {
+            PigeonVariant.get(registryAccess(), PigeonVariant.CHARRED).ifPresentOrElse(pigeon::setVariant,
+                  () -> LOGGER.error("Cannot set charred variant when converting to regular pigeon. Variant is not found."));
+
+            if (!carriedMail.isEmpty()) {
+                spawnAtLocation(carriedMail);
+                setCarriedMail(ItemStack.EMPTY);
+            }
+
+            pigeon.setDeltaMovement(getDeltaMovement());
+            pigeon.setXRot(getXRot());
+            pigeon.setYHeadRot(getYHeadRot());
+            pigeon.setYRot(getYRot());
+            if (getNavigation().getTargetPos() != null) {
+                pigeon.getNavigation().moveTo(pigeon.getNavigation().createPath(getNavigation().getTargetPos(), 1), 1);
+            }
+
+            serverLevel.playSound(null, pigeon, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.6f, 1);
+            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, position().x, position().y + 0.2, position().z, 5, 0.3, 0.3, 0.3, 0);
+        }
     }
 
     protected void calculateFlapping() {
@@ -179,22 +240,38 @@ public class CharredPigeon extends Monster implements Enemy {
     }
 
     @Override
-    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
-    }
-
-    @Override
     protected boolean isFlapping() {
         return flyDist > nextFlap;
     }
 
     @Override
     protected void onFlap() {
-        playSound(Envelope.SoundEvents.PIGEON_FLY.get(), 0.15F, 1.0F);
+        playSound(Envelope.SoundEvents.CHARRED_PIGEON_FLY.get(), 0.15F, 1.0F);
         nextFlap = flyDist + flapSpeed / 2.0F;
     }
 
     public boolean isFlying() {
         return !this.onGround() && !isPassenger();
+    }
+
+    @Override
+    public boolean doHurtTarget(Entity target) {
+        if (super.doHurtTarget(target)) {
+            target.igniteForSeconds(3);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected @NotNull InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (player.getItemInHand(hand).isEmpty() && !getCarriedMail().isEmpty()) {
+            player.setItemInHand(hand, getCarriedMail().copy());
+            setCarriedMail(ItemStack.EMPTY);
+            level().playSound(null, player, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1, 1);
+            return InteractionResult.SUCCESS;
+        }
+        return super.mobInteract(player, hand);
     }
 
     @Override
@@ -220,22 +297,17 @@ public class CharredPigeon extends Monster implements Enemy {
     @Nullable
     @Override
     public SoundEvent getAmbientSound() {
-        return Envelope.SoundEvents.PIGEON_AMBIENT.get();
-    }
-
-    @Override
-    public @NotNull SoundEvent getEatingSound(ItemStack stack) {
-        return Envelope.SoundEvents.PIGEON_EAT.get();
+        return Envelope.SoundEvents.CHARRED_PIGEON_AMBIENT.get();
     }
 
     @Override
     protected @NotNull SoundEvent getHurtSound(DamageSource damageSource) {
-        return Envelope.SoundEvents.PIGEON_HURT.get();
+        return Envelope.SoundEvents.CHARRED_PIGEON_HURT.get();
     }
 
     @Override
     protected @NotNull SoundEvent getDeathSound() {
-        return Envelope.SoundEvents.PIGEON_DEATH.get();
+        return Envelope.SoundEvents.CHARRED_PIGEON_DEATH.get();
     }
 
     /**
@@ -252,7 +324,7 @@ public class CharredPigeon extends Monster implements Enemy {
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
-        playSound(Envelope.SoundEvents.PIGEON_STEP.get(), 0.15F, 1.0F);
+        playSound(Envelope.SoundEvents.CHARRED_PIGEON_STEP.get(), 0.15F, 1.0F);
     }
 
     @Override
@@ -284,12 +356,14 @@ public class CharredPigeon extends Monster implements Enemy {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         if (!getCarriedMail().isEmpty()) tag.put("CarriedMail", getCarriedMail().save(registryAccess()));
+        if (timeInSafeDimension > 0) tag.putInt("TimeInSafeDimension", timeInSafeDimension);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         setCarriedMail(ItemStack.parse(registryAccess(), tag.getCompound("CarriedMail")).orElse(ItemStack.EMPTY));
+        timeInSafeDimension = tag.getInt("TimeInSafeDimension");
     }
 
     // --
@@ -300,7 +374,7 @@ public class CharredPigeon extends Monster implements Enemy {
         public WanderGoal(CharredPigeon pigeon, double speedModifier) {
             super(pigeon, speedModifier);
             this.pigeon = pigeon;
-            interval = 50;
+            interval = 10;
         }
 
         @Override
