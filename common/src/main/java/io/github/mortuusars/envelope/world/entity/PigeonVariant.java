@@ -34,6 +34,8 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
           ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("passenger"));
     public static final ResourceKey<PigeonVariant> CHARRED =
           ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("charred"));
+    public static final ResourceKey<PigeonVariant> ARCHIMEDES =
+          ResourceKey.create(Envelope.Registries.PIGEON_VARIANT, Envelope.resource("archimedes"));
     public static final ResourceKey<PigeonVariant> DEFAULT = GRAY;
 
     // --
@@ -148,6 +150,7 @@ public record PigeonVariant(ResourceLocation texture, HolderSet<Biome> biomes, S
         register(context, WHITE, "white", HolderSet.empty(), new SpawningWeights(2, 1), true);
         register(context, PASSENGER, "passenger", Envelope.Tags.Biomes.SPAWNS_PASSENGER_PIGEONS, new SpawningWeights(1, 0), true);
         register(context, CHARRED, "charred", HolderSet.empty(), new SpawningWeights(0, 0), false);
+        register(context, ARCHIMEDES, "archimedes", HolderSet.empty(), new SpawningWeights(0, 0), false);
     }
 
     static void register(BootstrapContext<PigeonVariant> context, ResourceKey<PigeonVariant> key,

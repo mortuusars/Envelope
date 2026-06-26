@@ -65,7 +65,6 @@ import java.util.function.Predicate;
 public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant>>, FlyingAnimal, PhysicalCourier {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final int CONVERSION_TIME = 300;
     public static final List<String> IGNORED_TAGS = Arrays.asList(
           "Air",
           "ArmorDropChances",
@@ -619,6 +618,10 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
             this.navigation.setMaxVisitedNodesMultiplier(1.0F);
             this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1);
         }
+    }
+
+    public PigeonWanderGoal getWanderGoal() {
+        return wanderGoal;
     }
 
     // -- Pigeonhole

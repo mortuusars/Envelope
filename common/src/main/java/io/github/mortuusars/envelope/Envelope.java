@@ -586,11 +586,15 @@ public class Envelope {
         public static class EntityTypes {
             public static final TagKey<EntityType<?>> PIGEONHOLE_INHABITORS =
                   TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, resource("pigeonhole_inhabitors"));
+            public static final TagKey<EntityType<?>> SPAWNS_ARCHIMEDES =
+                  TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, resource("spawns_archimedes"));
         }
 
         public static class DamageTypes {
             public static final TagKey<DamageType> BYPASSES_PIGEON_DELIVERY_EVASION =
                   TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("bypasses_pigeon_delivery_evasion"));
+            public static final TagKey<DamageType> SPAWNS_ARCHIMEDES =
+                  TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("spawns_archimedes"));
         }
 
         public static class Biomes {

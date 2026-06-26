@@ -3,10 +3,12 @@ package io.github.mortuusars.envelope.client.model;
 import com.google.common.collect.ImmutableList;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.EasingFunction;
+import net.minecraft.Optionull;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import org.jetbrains.annotations.NotNull;
@@ -199,6 +201,20 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
             }
 
             head.xRot += anim;
+        }
+
+        String customName = Optionull.mapOrDefault(pigeon.getCustomName(), Component::getString, "");
+        if (customName.equalsIgnoreCase("drumstick") || customName.equalsIgnoreCase("matisslee")) {
+            body.y += 0.5f;
+            body.z -= 0.5f;
+            head.y += 0.5f;
+            head.z -= 0.75f;
+            head.xScale = 1.1f;
+            body.xScale = 1.15f;
+            body.yScale = 1.1f;
+            body.zScale = 1.15f;
+            beak.xScale = 1.2f;
+            beak.zScale = 0.75f;
         }
     }
 

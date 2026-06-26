@@ -6,7 +6,9 @@
   - 1 in 5 pigeons will spawn with Lost Mail.
   - When brought into Overworld, will turn into a regular pigeon after some time. 
     - Converted pigeons will have special "charred" variant.
-  - Regular pigeon that stays in the nether for some time will be converted into Charred Pigeon. 
+  - Regular pigeon that stays in the nether for some time will be converted into Charred Pigeon.
+- Added Archimedes.
+- Pigeons named "Drumstick" will have a slightly chonkier model.
 - Added Pigeon to `minecraft:fall_damage_immune` entity tag.
 - Restructured lost mail loot tables
   - Moved `envelope:packages/lost_mail/lost_mail` to `envelope:packages/lost_mail`.

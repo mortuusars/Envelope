@@ -67,7 +67,7 @@ public abstract class Config {
         // Misc
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
-
+        public static final ModConfigSpec.DoubleValue ARCHIMEDES_CHANCE;
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -256,6 +256,9 @@ public abstract class Config {
                 VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY = builder
                       .comment("Only Nitwits can feed pigeons.")
                       .define("villager_feeding_pigeons_only_nitwits", true);
+                ARCHIMEDES_CHANCE = builder
+                      .comment("Chance of an Archimedes spawning when 'envelope:spawns_archimedes' mob is killed by 'envelope:spawns_archimedes' damage type (player explosion by default).")
+                      .defineInRange("archimedes_chance", 0.05, 0, 1);
                 builder.pop();
             }
 

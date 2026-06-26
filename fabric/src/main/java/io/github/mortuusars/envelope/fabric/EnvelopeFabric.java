@@ -18,6 +18,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
@@ -108,6 +109,8 @@ public class EnvelopeFabric implements ModInitializer {
         Envelope.Blocks.PIGEONHOLES.forEach((id, block) -> {
             FlammableBlockRegistry.getDefaultInstance().add(block.get(), 20, 15);
         });
+
+        ServerLivingEntityEvents.AFTER_DEATH.register(CommonEvents::livingDeath);
 
         FabricC2SPackets.register();
         FabricS2CPackets.register();
