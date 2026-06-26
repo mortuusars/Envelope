@@ -72,6 +72,7 @@ public class EnvelopeFabric implements ModInitializer {
         });
 
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
+        FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             PlatformImpl.server = server;

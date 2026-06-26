@@ -3,7 +3,7 @@
 ## UNRELEASED
 - Added Charred Pigeon
   - Spawns in the nether in all biomes except Basalt Deltas.
-  - 1 in 5 pigeons will spawn with Lost Mail.
+  - 1 in 5 pigeons will spawn carrying a Package.
   - When brought into Overworld, will turn into a regular pigeon after some time. 
     - Converted pigeons will have special "charred" variant.
   - Regular pigeon that stays in the nether for some time will be converted into Charred Pigeon.
