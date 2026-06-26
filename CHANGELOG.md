@@ -9,6 +9,8 @@
   - Regular pigeon that stays in the nether for some time will be converted into Charred Pigeon.
 - Added Archimedes.
 - Pigeons named "Drumstick" will have a slightly chonkier model.
+- Added 'has_mail' property to Mailbox block.
+  - Unused in the mod, but can be useful for resourcepacks.
 - Added Pigeon to `minecraft:fall_damage_immune` entity tag.
 - Restructured lost mail loot tables
   - Moved `envelope:packages/lost_mail/lost_mail` to `envelope:packages/lost_mail`.

@@ -57,6 +57,7 @@ public class MailboxBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty HANGING = BlockStateProperties.HANGING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
+    public static final BooleanProperty HAS_MAIL = BooleanProperty.create("has_mail");
 
     public static final VoxelShape SHAPE_Z = Shapes.or(
           Block.box(3, 2, 3, 13, 11.5, 13),
@@ -88,7 +89,8 @@ public class MailboxBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any()
               .setValue(FACING, Direction.NORTH)
               .setValue(HANGING, false)
-              .setValue(OPEN, false));
+              .setValue(OPEN, false)
+              .setValue(HAS_MAIL, false));
     }
 
     @Override
@@ -117,7 +119,7 @@ public class MailboxBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, HANGING, OPEN);
+        builder.add(FACING, HANGING, OPEN, HAS_MAIL);
     }
 
     @Override
