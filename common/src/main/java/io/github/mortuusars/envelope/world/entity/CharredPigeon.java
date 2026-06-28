@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.entity;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.bugger.Bugger;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -57,8 +58,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class CharredPigeon extends Monster implements Enemy {
-    public static final int CONVERSION_TIME = 300;
-
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(CharredPigeon.class, EntityDataSerializers.BOOLEAN);
@@ -277,7 +276,7 @@ public class CharredPigeon extends Monster implements Enemy {
     @Override
     public void die(DamageSource damageSource) {
         super.die(damageSource);
-        if (damageSource.is(DamageTypes.LAVA)) {
+        if (damageSource.is(DamageTypes.LAVA) && Bugger.isEnabled()) {
             LOGGER.info("Charred Pigeon has died in lava at: [{}]!", blockPosition().toShortString());
         }
     }

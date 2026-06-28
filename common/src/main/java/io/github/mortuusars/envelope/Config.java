@@ -39,6 +39,7 @@ public abstract class Config {
 
         // Letter
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
+        public static final ModConfigSpec.BooleanValue LETTER_BURNING;
         public static final ModConfigSpec.BooleanValue FOX_LETTER_TATTERING;
 
         // Package
@@ -169,6 +170,10 @@ public abstract class Config {
                       .comment("Letter screen pauses singleplayer game.",
                             " Default: false")
                       .define("pause", false);
+                LETTER_BURNING = builder
+                      .comment("Letter will burn and disappear when used on `envelope:burning` blocks. Doesn't apply to Sealed Letters.",
+                            " Default: true")
+                      .define("burning", true);
                 FOX_LETTER_TATTERING = builder
                       .comment("Letter will become tattered if a Fox picks it up.")
                       .define("fox_tattering", true);

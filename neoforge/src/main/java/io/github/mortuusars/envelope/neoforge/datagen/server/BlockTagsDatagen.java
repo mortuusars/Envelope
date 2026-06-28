@@ -58,6 +58,10 @@ public class BlockTagsDatagen extends BlockTagsProvider {
                     Envelope.Blocks.BAMBOO_PIGEONHOLE.get()
               );
 
+        tag(Envelope.Tags.Blocks.BURNING)
+              .addTag(BlockTags.FIRE)
+              .addTag(BlockTags.CAMPFIRES);
+
         tag(BlockTags.MINEABLE_WITH_AXE)
               .addTag(Envelope.Tags.Blocks.PIGEONHOLES)
               .add(Envelope.Blocks.MAILBOX.get());

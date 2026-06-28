@@ -325,6 +325,7 @@
   "envelope.configuration.convert_into_regular_ticks": "Ticks To Convert Into Regular",
   "envelope.configuration.mail_chance": "Mail Chance",
   "envelope.configuration.archimedes_chance": "Archimedes Chance",
+  "envelope.configuration.burning": "Burning",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

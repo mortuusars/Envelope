@@ -553,6 +553,8 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes"));
             public static final TagKey<Block> PIGEONHOLES_THAT_BURN =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes_that_burn"));
+            public static final TagKey<Block> BURNING =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("burning"));
         }
 
         public static class Items {
