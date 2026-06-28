@@ -18,7 +18,7 @@ public class ServiceAddresses {
     public static final ResourceKey<ServiceAddressDefinition> AUTOMATED_SUPPLY_SERVICE =
           ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("automated_supply_service"));
     public static final ResourceKey<ServiceAddressDefinition> EQUINE_ASSURANCE_BUREAU =
-          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("equine_insurance_bureau"));
+          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("equine_assurance_bureau"));
 
     private final MailService service;
 
@@ -38,8 +38,6 @@ public class ServiceAddresses {
     }
 
     public void tick() {
-        ServiceAddress.get(getMailService().getLevel().registryAccess(), EQUINE_ASSURANCE_BUREAU)
-              .ifPresent(address -> EquineAssuranceBureau.tick(getMailService(), address));
     }
 
     // --

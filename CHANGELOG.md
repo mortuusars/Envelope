@@ -11,7 +11,11 @@
 - Pigeons named "Drumstick" will have a slightly chonkier model.
 - Added 'has_mail' property to Mailbox block.
   - Unused in the mod, but can be useful for resourcepacks.
+- Equine Assurance Bureau notice letter sending is now triggered by taming an animal instead of at random to all players at once. 
+  - Every sent letter decreases the chance of the next. Sending them Gold Block also decreases the chance.
+  - Taming animals other than horses have 1 in 5 chance to trigger sending (which then also stacks with reduced chance of sending). 
 - Added Pigeon to `minecraft:fall_damage_immune` entity tag.
+- Fixed **Equine Assurance Bureau** internal name being 'insurance' instead 'assurance'.
 - Restructured lost mail loot tables
   - Moved `envelope:packages/lost_mail/lost_mail` to `envelope:packages/lost_mail`.
   - Removed 'lost_mail_' prefix from loot tables inside the folder.

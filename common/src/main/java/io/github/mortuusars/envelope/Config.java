@@ -60,9 +60,6 @@ public abstract class Config {
         // Service Addresses
         // Equine Assurance Bureau
         public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
-        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES;
-        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES;
-        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK;
 
         // Misc
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
@@ -230,18 +227,8 @@ public abstract class Config {
                 {
                     builder.push("equine_assurance_bureau");
                     SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder
-                          .comment("A notice letter would be sent out to all players occasionally.", "Default: true")
+                          .comment("A notice letter will be occasionally sent to the player.", "Default: true")
                           .define("notice_sending_enabled", true);
-                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES = builder
-                          .comment("Minimum time (in minutes) from the previous send after which another notice could be sent.")
-                          .defineInRange("notice_sending_base_interval_minutes", 120, 0, 9999.0);
-                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES = builder
-                          .comment("Additional time (in minutes) per the in-game day. More days played = less notices.")
-                          .defineInRange("notice_sending_additional_interval_per_day_minutes", 1, 0, 9999.0);
-                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK = builder
-                          .comment("Chance of notice letter being sent per tick, assuming that enough time has passed from previous send.", "Default: 0.0002 (about 4 minutes on average)")
-                          .defineInRange("notice_sending_chance_per_tick", 0.0002, 0.0, 1.0);
-
                     builder.pop();
                 }
                 builder.pop();

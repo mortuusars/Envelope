@@ -183,7 +183,7 @@
               "components": {
                 "envelope:mail_recipient": {
                   "type": "service",
-                  "definition": "envelope:equine_insurance_bureau"
+                  "definition": "envelope:equine_assurance_bureau"
                 }
               },
               "function": "minecraft:set_components"

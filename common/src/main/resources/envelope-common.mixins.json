@@ -16,6 +16,7 @@
   ],
   "mixins": [
     "dispenser_waste_scooping.DispenserBlockMixin",
+    "equine_assurance_bureau.TameAnimalTriggerMixin",
     "event.ServerLevelMixin",
     "fox_tatter.FoxMixin",
     "injected.ServerLevelMixin",

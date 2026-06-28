@@ -1,6 +1,6 @@
 {
   "type": "envelope:mail_crafting",
-  "address": "envelope:equine_insurance_bureau",
+  "address": "envelope:equine_assurance_bureau",
   "ingredients": [
     {
       "item": "minecraft:gold_block"
