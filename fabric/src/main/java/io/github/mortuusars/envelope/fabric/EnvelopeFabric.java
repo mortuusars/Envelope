@@ -23,15 +23,22 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.neoforged.fml.config.ModConfig;
 
 public class EnvelopeFabric implements ModInitializer {
@@ -40,6 +47,7 @@ public class EnvelopeFabric implements ModInitializer {
         Envelope.init();
 
         NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.SERVER, Config.Server.SPEC);
+        NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.COMMON, Config.Common.SPEC);
         NeoForgeConfigRegistry.INSTANCE.register(Envelope.ID, ModConfig.Type.CLIENT, Config.Client.SPEC);
 
         CommonEvents.commonSetup();
@@ -113,7 +121,27 @@ public class EnvelopeFabric implements ModInitializer {
 
         ServerLivingEntityEvents.AFTER_DEATH.register(CommonEvents::livingDeath);
 
+        LootTableEvents.MODIFY.register(EnvelopeFabric::modifyLoot);
+
         FabricC2SPackets.register();
         FabricS2CPackets.register();
+    }
+
+    private static void modifyLoot(ResourceKey<LootTable> tableKey, LootTable.Builder builder,
+                                   LootTableSource source, HolderLookup.Provider provider) {
+        if (!Config.Common.LOOT.get()) {
+            return;
+        }
+
+        if (BuiltInLootTables.ABANDONED_MINESHAFT.equals(tableKey)) {
+            builder.pool(LootPool.lootPool()
+                  .add(NestedLootTable.lootTableReference(Envelope.LootTables.ABANDONED_MINESHAFT_INJECT))
+                  .build());
+        }
+        if (BuiltInLootTables.PILLAGER_OUTPOST.equals(tableKey)) {
+            builder.pool(LootPool.lootPool()
+                  .add(NestedLootTable.lootTableReference(Envelope.LootTables.PILLAGER_OUTPOST_INJECT))
+                  .build());
+        }
     }
 }

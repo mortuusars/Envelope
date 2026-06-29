@@ -243,10 +243,10 @@ public abstract class Config {
                 builder.push("misc");
                 VILLAGER_FEEDING_PIGEONS = builder
                       .comment("Villagers will feed nearby pigeons by throwing them seeds.",
-                            "Requires 'pigeon.eats_seeds' config option to be enabled.")
+                            "Requires 'pigeon.eats_seeds' config option to be enabled.", "Default: true")
                       .define("villager_feeding_pigeons", true);
                 VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY = builder
-                      .comment("Only Nitwits can feed pigeons.")
+                      .comment("Only Nitwits can feed pigeons.", "Default: true")
                       .define("villager_feeding_pigeons_only_nitwits", true);
                 ARCHIMEDES_CHANCE = builder
                       .comment("Chance of an Archimedes spawning when 'envelope:spawns_archimedes' mob is killed by 'envelope:spawns_archimedes' damage type (player explosion by default).")
@@ -257,7 +257,7 @@ public abstract class Config {
             {
                 builder.push("debug");
                 DEBUG = builder
-                      .comment("Enable debug features. Will affect performance negatively. Don't enable unless it's needed.")
+                      .comment("Enable debug features. Will negatively impact performance. Don't enable unless it's needed.")
                       .define("debug_mode", false);
                 builder.pop();
             }
@@ -266,14 +266,22 @@ public abstract class Config {
         }
     }
 
-    /*public static class Common {
+    public static class Common {
         public static final ModConfigSpec SPEC;
+
+        // Loot
+        public static final ModConfigSpec.BooleanValue LOOT;
 
         static {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+
+            LOOT = builder
+                  .comment("Envelope will add its items to various loot chests, etc. Use datapack if you need finer control. This is basically a kill switch.", "Default: true")
+                  .define("loot", true);
+
             SPEC = builder.build();
         }
-    }*/
+    }
 
     public static class Client {
         public static final ModConfigSpec SPEC;

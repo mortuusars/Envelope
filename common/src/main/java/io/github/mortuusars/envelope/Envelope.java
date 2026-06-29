@@ -541,6 +541,11 @@ public class Envelope {
               ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/construction"));
         public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_DOCK_NOTE =
               ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("letters/collapsed_mail_hub/dock_note"));
+
+        public static final ResourceKey<LootTable> ABANDONED_MINESHAFT_INJECT =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/abandoned_mineshaft_inject"));
+        public static final ResourceKey<LootTable> PILLAGER_OUTPOST_INJECT =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/pillager_outpost_inject"));
     }
 
     public static class Tags {

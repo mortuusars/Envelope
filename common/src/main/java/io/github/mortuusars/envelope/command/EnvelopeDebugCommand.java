@@ -9,13 +9,21 @@ import io.github.mortuusars.envelope.util.bugger.test.cases.CourierDeliveryTests
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
+import io.github.mortuusars.envelope.world.item.component.LetterContent;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -75,6 +83,15 @@ public class EnvelopeDebugCommand {
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
+
+        Component text = Component.literal("       Report to Chief\n\n  Patrol we sent to village not return. Unexpected danger possible.\n\n  Must know more. Asking reinforcements.")
+              .setStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt")));
+
+        ItemStack letter = Mail.createLetter(text)
+              .set(DataComponents.ITEM_NAME, Component.literal("Report")
+                    .withStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt")))).get();
+
+        player.addItem(letter);
 
 //        player.level().getEntitiesOfClass(Pigeon.class, player.getBoundingBox().inflate(16))
 //              .forEach(p -> p.restrictTo(player.blockPosition(), 4));

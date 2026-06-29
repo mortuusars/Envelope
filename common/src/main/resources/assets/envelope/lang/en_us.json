@@ -268,6 +268,16 @@
   "letter.envelope.collapsed_mail_hub.dock_note_7": "             Status:\n\n  Most systems operational.\n\n    Major fault detected:\n Heavy altitude fluctuations\n\n      Requires immediate\n          maintenance\n\n   Mail throughput range: \n  50-80 per day (regular)",
   "letter.envelope.collapsed_mail_hub.dock_note_8": "             Status:\n\n  Most systems operational.\n\n    Major fault detected:\n Heavy altitude fluctuations\n\n      Requires immediate\n          maintenance\n\n   Mail throughput range: \n 80-120 per day (elevated)",
 
+  "letter.envelope.abandoned_mineshaft.journal_page.name": "Torn Journal Page",
+  "letter.envelope.abandoned_mineshaft.journal_page_1": "  ... \n\n  Four days have passed since the entrance collapsed. All attempts to dig it out have yielded nothing...\n\n  We don't have much supplies left. Maybe for a couple of days...\n\n  ...",
+  "letter.envelope.abandoned_mineshaft.journal_page_2": "  ... \n\n  Sitting here on the cold, damp stone, with little to no light, the scary stories my sister used to tell me grow more believable with each passing day.\n\n  Were they only stories?...\n\n  ...",
+  "letter.envelope.abandoned_mineshaft.journal_page_3": "  ... \n\n  The growling won't stop... \n\n  Is it coming from one of these old tunnels? Or is it in my head?...\n\n  I think I'm going mad...",
+
+  "letter.envelope.pillager_outpost.report.name": "Report",
+  "letter.envelope.pillager_outpost.report_1": "       Report to Chief\n\n  Patrol we sent to village not return. Unexpected danger possible.\n\n  Must know more. Asking reinforcements.",
+  "letter.envelope.pillager_outpost.report_2": "       Report to Chief\n\n  Receive reports of nearby outpost problems.\n\n  Many die. Supplies stolen.\n\n  Must send help.",
+  "letter.envelope.pillager_outpost.report_3": "       Report to Chief\n\n  Supplies collected in raid. \n\n  Send soon.",
+  "letter.envelope.pillager_outpost.report_4": "       Report to Chief\n\n  Capture one golem. Try peace. No success.\n\n  Keep try more.",
 
   "letter.envelope.mail_service.signature": "Mail Service",
 
@@ -326,6 +336,7 @@
   "envelope.configuration.mail_chance": "Mail Chance",
   "envelope.configuration.archimedes_chance": "Archimedes Chance",
   "envelope.configuration.burning": "Burning",
+  "envelope.configuration.loot": "Loot",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

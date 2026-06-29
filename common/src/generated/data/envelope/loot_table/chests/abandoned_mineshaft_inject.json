@@ -1,0 +1,125 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 3.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "envelope:paper_box"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 2
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.abandoned_mineshaft.journal_page_1"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.abandoned_mineshaft.journal_page.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.abandoned_mineshaft.journal_page_2"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.abandoned_mineshaft.journal_page.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.abandoned_mineshaft.journal_page_3"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.abandoned_mineshaft.journal_page.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 16
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:chests/abandoned_mineshaft_inject"
+}
