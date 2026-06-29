@@ -67,10 +67,10 @@ public class PigeonInStructureSpawner implements CustomSpawner {
     }
 
     protected int spawnInVillage(ServerLevel serverLevel, BlockPos pos) {
-        int area = 48;
+        int area = 64;
         if (serverLevel.getPoiManager().getCountInRange(holder ->
               holder.is(PoiTypes.HOME), pos, area, PoiManager.Occupancy.IS_OCCUPIED) > 4L) {
-            List<Pigeon> pigeonsInArea = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area, 8.0, area));
+            List<Pigeon> pigeonsInArea = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area, area / 2.0, area));
             if (pigeonsInArea.size() < 5) {
                  return spawn(serverLevel, pos);
             }
@@ -80,8 +80,8 @@ public class PigeonInStructureSpawner implements CustomSpawner {
     }
 
     protected int spawnInStructure(ServerLevel serverLevel, BlockPos pos) {
-        int area = 16;
-        List<Pigeon> list = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area, 8.0, area));
+        int area = 48;
+        List<Pigeon> list = serverLevel.getEntitiesOfClass(Pigeon.class, new AABB(pos).inflate(area));
         return list.isEmpty() ? this.spawn(serverLevel, pos) : 0;
     }
 
