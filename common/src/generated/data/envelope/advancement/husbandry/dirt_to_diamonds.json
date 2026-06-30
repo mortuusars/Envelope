@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:husbandry/root",
+  "parent": "envelope:husbandry/just_dont_smoke_it",
   "criteria": {
     "scoop_diamond": {
       "trigger": "envelope:scoop_diamond"

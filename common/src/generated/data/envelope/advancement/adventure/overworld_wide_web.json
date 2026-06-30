@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:adventure/root",
+  "criteria": {
+    "place_mailbox": {
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "envelope:mailbox"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:placed_block"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.overworld_wide_web.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "envelope:mailbox"
+    },
+    "title": {
+      "translate": "advancement.envelope.overworld_wide_web.title"
+    }
+  },
+  "requirements": [
+    [
+      "place_mailbox"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

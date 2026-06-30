@@ -32,13 +32,14 @@ public class DataGeneration {
         generator.addProvider(event.includeServer(), new ItemTagsDatagen(output, registries, blockTags.contentsGetter(), existingFileHelper));
         generator.addProvider(event.includeServer(), new EntityTypeTagsDatagen(output, registries, existingFileHelper));
         generator.addProvider(event.includeServer(), LootTablesDatagen.create(output, registries));
-        generator.addProvider(event.includeServer(), new AdvancementsDatagen(output, registries, existingFileHelper, List.of(
-              new AdvancementsDatagen.Generator()
-        )));
 
         DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
         generator.addProvider(event.includeServer(), datapackRegistries);
         generator.addProvider(event.includeServer(), new SealImpressionTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
         generator.addProvider(event.includeServer(), new ServiceAddressTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
+
+        generator.addProvider(event.includeServer(), new AdvancementsDatagen(output, datapackRegistries.getRegistryProvider(), existingFileHelper, List.of(
+              new AdvancementsDatagen.Generator()
+        )));
     }
 }

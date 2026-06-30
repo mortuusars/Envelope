@@ -2,6 +2,10 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.advancements.critereon.BreakPaperBoxWhenFallingTrigger;
+import io.github.mortuusars.envelope.advancements.critereon.MailDeliveredTrigger;
+import io.github.mortuusars.envelope.advancements.predicate.ItemOccludingBlockPredicate;
+import io.github.mortuusars.envelope.advancements.predicate.ItemPackagePredicate;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
@@ -28,6 +32,7 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import net.minecraft.advancements.critereon.ItemSubPredicate;
 import net.minecraft.advancements.critereon.PlayerTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -488,13 +493,22 @@ public class Envelope {
     }
 
     public static class CriteriaTriggers {
+        public static Supplier<MailDeliveredTrigger> MAIL_DELIVERED = Register.criterionTrigger("mail_delivered", MailDeliveredTrigger::new);
+        public static Supplier<BreakPaperBoxWhenFallingTrigger> BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER = Register.criterionTrigger("break_paper_box_when_falling", BreakPaperBoxWhenFallingTrigger::new);
+        public static Supplier<PlayerTrigger> SMOKE_PIGEONHOLE = Register.criterionTrigger("smoke_pigeonhole", PlayerTrigger::new);
         public static Supplier<PlayerTrigger> SCOOP_DIAMOND = Register.criterionTrigger("scoop_diamond", PlayerTrigger::new);
+        public static Supplier<PlayerTrigger> SPAWN_ARCHIMEDES = Register.criterionTrigger("spawn_archimedes", PlayerTrigger::new);
 
         public static void init() {
         }
     }
 
     public static class ItemSubPredicates {
+        public static Supplier<ItemSubPredicate.Type<ItemPackagePredicate>> PACKAGE_CONTENTS = Register.itemSubPredicate("package_contents",
+              () -> new ItemSubPredicate.Type<>(ItemPackagePredicate.CODEC));
+        public static Supplier<ItemSubPredicate.Type<ItemOccludingBlockPredicate>> OCCLUDING_BLOCK = Register.itemSubPredicate("occluding_block",
+              () -> new ItemSubPredicate.Type<>(ItemOccludingBlockPredicate.CODEC));
+
         public static void init() {
         }
     }

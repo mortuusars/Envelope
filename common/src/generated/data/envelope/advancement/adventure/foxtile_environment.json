@@ -1,0 +1,42 @@
+{
+  "parent": "envelope:adventure/overworld_wide_web",
+  "criteria": {
+    "get_tattered_letter": {
+      "conditions": {
+        "items": [
+          {
+            "components": {
+              "envelope:letter_tattered": {}
+            },
+            "items": [
+              "envelope:letter",
+              "envelope:sealed_letter"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.foxtile_environment.description"
+    },
+    "icon": {
+      "components": {
+        "envelope:letter_tattered": {}
+      },
+      "count": 1,
+      "id": "envelope:letter"
+    },
+    "title": {
+      "translate": "advancement.envelope.foxtile_environment.title"
+    }
+  },
+  "requirements": [
+    [
+      "get_tattered_letter"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

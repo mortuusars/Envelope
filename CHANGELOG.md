@@ -10,7 +10,8 @@
 - Added Archimedes.
 - Pigeons named "Drumstick" will have a slightly chonkier model.
 - Added Paper Boxes and Letters to Abandoned Mineshaft and Pillager Outpost chests.
-- Added Letter burning: using the item on a fire or campfire will consume the letter. Doesn't apply to Sealed Letters. 
+- Added Letter burning: using the item on a fire or campfire will consume the letter. Doesn't apply to Sealed Letters.
+- Added advancements.
 - Added 'has_mail' property to Mailbox block.
   - Unused in the mod, but can be useful for resourcepacks.
 - Equine Assurance Bureau notice letter sending is now triggered by taming an animal instead of at random to all players at once. 

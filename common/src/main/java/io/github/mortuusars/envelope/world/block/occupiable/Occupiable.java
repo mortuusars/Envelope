@@ -195,12 +195,6 @@ public interface Occupiable {
     }
 
     default void tickOccupants(Level level, BlockPos pos, BlockState state) {
-        if (!getOccupants().isEmpty()
-              && (level.getGameTime() + pos.hashCode()) % 20 == 0
-              && CampfireBlock.isSmokeyPos(level, pos)) {
-            releaseAllOccupants(level, pos, state, ReleaseReason.EMERGENCY);
-        }
-
         if (getOccupants().removeIf(occupant -> occupant.tick()
               && releaseOccupant(level, pos, state, occupant.toImmutable(), ReleaseReason.DEFAULT).isPresent())) {
             onOccupantsChanged();

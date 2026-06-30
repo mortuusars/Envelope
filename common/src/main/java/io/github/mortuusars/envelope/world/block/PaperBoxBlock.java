@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -135,7 +136,12 @@ public class PaperBoxBlock extends Block {
             if (!level.isClientSide()) {
                 boolean drop = !(entity instanceof Player player) || !player.isCreative();
                 level.destroyBlock(pos, drop);
-                //TODO: advancement
+
+                if (entity instanceof ServerPlayer serverPlayer) {
+                    // Adding 2 to compensate for wrong fallDistance (maybe due to speed or something)
+                    // It's better to trigger for slightly less, than not trigger for expected height.
+                    Envelope.CriteriaTriggers.BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER.get().trigger(serverPlayer, fallDistance + 2);
+                }
             }
         } else {
             super.fallOn(level, state, pos, entity, fallDistance);

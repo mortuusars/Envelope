@@ -35,6 +35,7 @@ dependencies {
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
 
     modLocalRuntime("maven.modrinth:jade:${jade_version}+neoforge") { transitive = false }
+    modLocalRuntime("maven.modrinth:better-advancements:FjTYILOi")
     //modLocalRuntime("curse.maven:embeddium-908741:6118392")
     //modLocalRuntime("maven.modrinth:sodium:${sodium_version}-neoforge") // Doesn't want to work
 

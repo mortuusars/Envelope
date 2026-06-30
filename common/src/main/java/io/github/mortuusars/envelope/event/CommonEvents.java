@@ -62,7 +62,7 @@ public class CommonEvents {
             Vec3 direction = entity.position().subtract(source.getSourcePosition());
             pigeon.setDeltaMovement(direction.normalize().scale(0.75));
 
-            //TODO: advancement
+            Envelope.CriteriaTriggers.SPAWN_ARCHIMEDES.get().trigger(player);
         }
     }
 }

@@ -1,0 +1,27 @@
+{
+  "parent": "envelope:husbandry/just_dont_smoke_it",
+  "criteria": {
+    "spawn_archimedes": {
+      "trigger": "envelope:spawn_archimedes"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.its_filthy_in_there.description"
+    },
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:tnt"
+    },
+    "title": {
+      "translate": "advancement.envelope.its_filthy_in_there.title"
+    }
+  },
+  "requirements": [
+    [
+      "spawn_archimedes"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
