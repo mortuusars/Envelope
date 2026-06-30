@@ -1,5 +1,10 @@
 # Changelog
 
+## UNRELEASED
+- Minor pixel shuffling on Pigeon's texture.
+  - Slightly darkened underside of wings and tail.  
+  - Fixed texture of the underside of a Pigeon's wing being flipped. 
+
 ## 0.7.0 Snapshot 2
 
 - Added Charred Pigeon
