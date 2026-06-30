@@ -1,6 +1,7 @@
 # Changelog
 
-## UNRELEASED
+## 0.7.0 Snapshot 2
+
 - Added Charred Pigeon
   - Spawns in the nether in all biomes except Basalt Deltas.
   - 1 in 5 pigeons will spawn carrying a Package.
