@@ -19,7 +19,7 @@ public record GameplayLootProvider(HolderLookup.Provider registries) implements 
               Envelope.LootTables.PIGEONHOLE_WASTE,
               LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
-                    .add(LootItem.lootTableItem(Items.BONE_MEAL).setWeight(100))
+                    .add(LootItem.lootTableItem(Items.BONE_MEAL).setWeight(99))
                     .add(LootItem.lootTableItem(Items.DIAMOND).setWeight(1))
               )
         );

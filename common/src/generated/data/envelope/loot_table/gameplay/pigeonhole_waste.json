@@ -7,7 +7,7 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:bone_meal",
-          "weight": 100
+          "weight": 99
         },
         {
           "type": "minecraft:item",
