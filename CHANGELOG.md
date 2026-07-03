@@ -1,9 +1,15 @@
 # Changelog
 
 ## UNRELEASED
+- Seal data shuffle:
+  - Renamed `envelope:seal_stamp_impression` to `envelope:seal_stamp_die`.
+    - Old component is still available, to not break existing stamps. It will be replaced with a new one on use.
+  - Renamed `envelope:seal_impression` registry to `envelope:seal_symbol`.
+  - Renamed `assets/envelope/textures/seal/impression` folder to `assets/envelope/textures/seal/symbol`
+  - Existing seals will remain intact.
 - Minor pixel shuffling on Pigeon's texture.
   - Slightly darkened underside of wings and tail.  
-  - Fixed texture of the underside of a Pigeon's wing being flipped. 
+  - Fixed texture of the underside of a Pigeon's wing being flipped.
 
 ## 0.7.0 Snapshot 2
 

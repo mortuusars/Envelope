@@ -12,7 +12,7 @@
   ],
   "result": {
     "components": {
-      "envelope:seal_stamp_impression": "envelope:hoe"
+      "envelope:seal_stamp_die": "envelope:hoe"
     },
     "count": 1,
     "id": "envelope:seal_stamp"

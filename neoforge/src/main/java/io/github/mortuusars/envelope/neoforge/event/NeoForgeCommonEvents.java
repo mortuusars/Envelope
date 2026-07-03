@@ -13,7 +13,7 @@ import io.github.mortuusars.envelope.network.packet.S2CPackets;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.network.FriendlyByteBuf;
@@ -120,7 +120,7 @@ public class NeoForgeCommonEvents {
         event.dataPackRegistry(Envelope.Registries.PIGEON_VARIANT, PigeonVariant.DIRECT_CODEC, PigeonVariant.DIRECT_CODEC);
         event.dataPackRegistry(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, ServiceAddressDefinition.DIRECT_CODEC, ServiceAddressDefinition.DIRECT_CODEC);
         event.dataPackRegistry(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
-        event.dataPackRegistry(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
+        event.dataPackRegistry(Envelope.Registries.SEAL_SYMBOL, SealSymbol.DIRECT_CODEC, SealSymbol.DIRECT_CODEC);
     }
 
     @SubscribeEvent

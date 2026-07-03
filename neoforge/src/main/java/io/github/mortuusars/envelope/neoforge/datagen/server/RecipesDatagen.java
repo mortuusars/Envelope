@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.neoforge.datagen.server;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequestCancelingRecipe;
@@ -160,14 +160,14 @@ public class RecipesDatagen extends RecipeProvider {
               ),
               null);
 
-        sealStamp(output, address, Ingredient.of(Items.GOLDEN_APPLE), SealImpression.APPLE);
-        sealStamp(output, address, Ingredient.of(ItemTags.SWORDS), SealImpression.SWORD);
-        sealStamp(output, address, Ingredient.of(ItemTags.PICKAXES), SealImpression.PICKAXE);
-        sealStamp(output, address, Ingredient.of(ItemTags.SHOVELS), SealImpression.SHOVEL);
-        sealStamp(output, address, Ingredient.of(ItemTags.AXES), SealImpression.AXE);
-        sealStamp(output, address, Ingredient.of(ItemTags.HOES), SealImpression.HOE);
-        sealStamp(output, address, Ingredient.of(Items.BOOK), SealImpression.BOOK);
-        sealStamp(output, address, Ingredient.of(Items.SKELETON_SKULL), SealImpression.SKELETON);
+        sealStamp(output, address, Ingredient.of(Items.GOLDEN_APPLE), SealSymbol.APPLE);
+        sealStamp(output, address, Ingredient.of(ItemTags.SWORDS), SealSymbol.SWORD);
+        sealStamp(output, address, Ingredient.of(ItemTags.PICKAXES), SealSymbol.PICKAXE);
+        sealStamp(output, address, Ingredient.of(ItemTags.SHOVELS), SealSymbol.SHOVEL);
+        sealStamp(output, address, Ingredient.of(ItemTags.AXES), SealSymbol.AXE);
+        sealStamp(output, address, Ingredient.of(ItemTags.HOES), SealSymbol.HOE);
+        sealStamp(output, address, Ingredient.of(Items.BOOK), SealSymbol.BOOK);
+        sealStamp(output, address, Ingredient.of(Items.SKELETON_SKULL), SealSymbol.SKELETON);
     }
 
     private void automatedSupplyService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
@@ -239,15 +239,15 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output);
     }
 
-    protected void sealStamp(RecipeOutput output, ServiceAddress address, Ingredient ingredient, ResourceKey<SealImpression> impression) {
+    protected void sealStamp(RecipeOutput output, ServiceAddress address, Ingredient ingredient, ResourceKey<SealSymbol> impression) {
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Envelope.Items.SEAL_STAMP.get()))
               .requires(ingredient)
               .forResult(Util.make(() -> {
                   ItemStack stamp = new ItemStack(Envelope.Items.SEAL_STAMP.get());
-                  HolderLookup.RegistryLookup<SealImpression> lookup = Objects.requireNonNull(registries)
-                        .lookupOrThrow(Envelope.Registries.SEAL_IMPRESSION);
-                  stamp.set(Envelope.DataComponents.SEAL_STAMP_IMPRESSION, lookup.getOrThrow(impression));
+                  HolderLookup.RegistryLookup<SealSymbol> lookup = Objects.requireNonNull(registries)
+                        .lookupOrThrow(Envelope.Registries.SEAL_SYMBOL);
+                  stamp.set(Envelope.DataComponents.SEAL_STAMP_DIE, lookup.getOrThrow(impression));
                   return stamp;
               }))
               .experience(1.5f)

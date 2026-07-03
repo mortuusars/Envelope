@@ -28,20 +28,36 @@ public class SealStampItem extends Item implements ApplicatorItem {
         super(properties);
     }
 
+    @SuppressWarnings("removal")
+    public Optional<Holder<SealSymbol>> getDie(ItemStack stack) {
+        if (stack.has(Envelope.DataComponents.SEAL_STAMP_IMPRESSION)) {
+            stack.set(Envelope.DataComponents.SEAL_STAMP_DIE, stack.remove(Envelope.DataComponents.SEAL_STAMP_IMPRESSION));
+        }
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_DIE));
+    }
+
+    public Holder<SealSymbol> getDieOrDefault(ItemStack stack, RegistryAccess registryAccess, @Nullable Player player) {
+        return getDie(stack).orElseGet(() ->
+              SealSymbol.getOrThrow(registryAccess, SealSymbol.firstCharOrDefault(player)));
+    }
+
+    // --
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
-        Holder<SealImpression> impression = stack.get(Envelope.DataComponents.SEAL_STAMP_IMPRESSION);
-        if (flag.isAdvanced() && impression != null) {
-            impression.unwrapKey().ifPresent(key -> {
-                components.add(Component.literal("Impression: ").withStyle(ChatFormatting.DARK_GRAY)
-                      .append(Component.literal(key.location().toString()).withStyle(ChatFormatting.GRAY)));
-            });
+        if (flag.isAdvanced()) {
+            getDie(stack)
+                  .flatMap(Holder::unwrapKey)
+                  .ifPresent(key -> {
+                      components.add(Component.literal("Die: ").withStyle(ChatFormatting.DARK_GRAY)
+                            .append(Component.literal(key.location().toString()).withStyle(ChatFormatting.GRAY)));
+                  });
         }
     }
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of(new SealDieTooltipComponent(Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_IMPRESSION))));
+        return Optional.of(new SealDieTooltipComponent(getDie(stack)));
     }
 
     @Override
@@ -92,17 +108,8 @@ public class SealStampItem extends Item implements ApplicatorItem {
     public Seal createSeal(ItemStack stack, Player player) {
         return new Seal(
               SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX),
-              getImpressionOrDefault(stack, player.registryAccess(), player),
+              getDieOrDefault(stack, player.registryAccess(), player),
               player.getName());
-    }
-
-    public Optional<Holder<SealImpression>> getImpression(ItemStack stack) {
-        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_IMPRESSION));
-    }
-
-    public Holder<SealImpression> getImpressionOrDefault(ItemStack stack, RegistryAccess registryAccess, @Nullable Player player) {
-        return getImpression(stack).orElseGet(() ->
-              SealImpression.getOrThrow(registryAccess, SealImpression.firstCharOrDefault(player)));
     }
 
     protected boolean canApplyGold(ItemStack stack, Player player) {

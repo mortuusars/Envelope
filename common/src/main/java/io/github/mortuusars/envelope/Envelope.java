@@ -16,7 +16,7 @@ import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
@@ -336,8 +336,11 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = Register.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<Holder<SealImpression>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
-              b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC).cacheEncoding());
+        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_DIE = Register.dataComponentType("seal_stamp_die",
+              b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
+        @Deprecated(forRemoval = true)
+        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
+              b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
 
         // -- Payback
 
@@ -634,10 +637,10 @@ public class Envelope {
         }
 
         public static class SealImpressions {
-            public static final TagKey<SealImpression> SPECIAL =
-                  TagKey.create(Registries.SEAL_IMPRESSION, resource("special"));
-            public static final TagKey<SealImpression> TOOLS =
-                  TagKey.create(Registries.SEAL_IMPRESSION, resource("tools"));
+            public static final TagKey<SealSymbol> SPECIAL =
+                  TagKey.create(Registries.SEAL_SYMBOL, resource("special"));
+            public static final TagKey<SealSymbol> TOOLS =
+                  TagKey.create(Registries.SEAL_SYMBOL, resource("tools"));
         }
 
         public static class ServiceAddresses {
@@ -663,7 +666,7 @@ public class Envelope {
 
         public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIAL =
               ResourceKey.createRegistryKey(resource("seal_material"));
-        public static final ResourceKey<Registry<SealImpression>> SEAL_IMPRESSION =
-              ResourceKey.createRegistryKey(resource("seal_impression"));
+        public static final ResourceKey<Registry<SealSymbol>> SEAL_SYMBOL =
+              ResourceKey.createRegistryKey(resource("seal_symbol"));
     }
 }

@@ -40,7 +40,7 @@
           "functions": [
             {
               "components": {
-                "envelope:seal_stamp_impression": "envelope:heart"
+                "envelope:seal_stamp_die": "envelope:heart"
               },
               "function": "minecraft:set_components"
             }
@@ -52,7 +52,7 @@
           "functions": [
             {
               "components": {
-                "envelope:seal_stamp_impression": "envelope:creeper"
+                "envelope:seal_stamp_die": "envelope:creeper"
               },
               "function": "minecraft:set_components"
             }
@@ -64,7 +64,7 @@
           "functions": [
             {
               "components": {
-                "envelope:seal_stamp_impression": "envelope:letter"
+                "envelope:seal_stamp_die": "envelope:letter"
               },
               "function": "minecraft:set_components"
             }
@@ -76,7 +76,7 @@
           "functions": [
             {
               "components": {
-                "envelope:seal_stamp_impression": "envelope:swords"
+                "envelope:seal_stamp_die": "envelope:swords"
               },
               "function": "minecraft:set_components"
             }
@@ -88,7 +88,7 @@
           "functions": [
             {
               "components": {
-                "envelope:seal_stamp_impression": "envelope:villager"
+                "envelope:seal_stamp_die": "envelope:villager"
               },
               "function": "minecraft:set_components"
             }
