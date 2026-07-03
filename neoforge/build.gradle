@@ -61,6 +61,8 @@ dependencies {
     modLocalRuntime("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
     modLocalRuntime("dev.ryanhcode.offroad:offroad-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
 
+    modLocalRuntime("org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1")
+
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
@@ -83,6 +85,16 @@ loom {
             programArgs "--all", "--mod", "${mod_id}"
             programArgs "--output", project(':common').file("src/generated").absolutePath // Outputs to common project
             programArgs "--existing", project(':common').file("src/main/resources").absolutePath // Makes datagen see resources from common folder
+        }
+
+        exportClient {
+            client()
+            property('wiki_exporter.enabled', 'true')
+        }
+        exportServer {
+            server()
+            programArgs('nogui')
+            property('wiki_exporter.enabled', 'true')
         }
     }
 }

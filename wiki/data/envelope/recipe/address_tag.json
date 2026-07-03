@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "tag": "minecraft:signs"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:address_tag"
+  }
+}

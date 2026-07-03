@@ -1,0 +1,71 @@
+---
+id: envelope:package
+title: Package
+type: item
+related_items: ["envelope:paper_box", "envelope:sealed_package", "envelope:seal_stamp"]
+custom:
+    Mailable: "Yes"
+---
+
+A **package** is an item that can store up to 6 stacks worth of items within itself.\
+Can be mailed.
+
+## Obtaining
+
+### Packing
+Package is created by packing items into a [paper box](@envelope:paper_box).
+
+### Mailing
+Packages can be received by mail as result of a service crafting or from another player.
+
+### Loot
+Packages can be found on a [collapsed mail hub](@envelope:collapsed_mail_hub) or dropped from a [charred pigeon](@envelope:charred_pigeon)
+
+## Usage
+### Opening
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Packages can effectively condense 6 slots of items into single slot, thus they are quite handy as a cheap, single-use backpack.
+
+        <Callout variant="info">When a package is created, items cannot be added or taken out without fully breaking it.</Callout>
+
+        Using the item in hand will open an interface where stored items can be seen and removed from their slots.
+
+        Player can open and close the interface however many times they want, but removing any item will trigger a "break-ready" state,
+        which will be indicated in GUI by red color. Closing the interface in this state will destroy the package
+        and remove all contained items from it, placing them in player's inventory, or dropping them on the ground if no space is available.
+
+        <Callout>Using the item while sneaking will destroy the package without opening the interface.
+        Stored items will be placed in player's inventory or dropped, same as they do when opened through the interface.</Callout>
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:gui/package" width={380} />
+        <div style={{ marginTop: "6px"}}>*Package interface*</div>
+    </center>
+</div>
+
+### Placing
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        When used on the block while sneaking, package will be placed as a block.
+
+        Breaking a placed package will drop intact package item, with items inside.\
+        Breaking it while sneaking will destroy the package and drop stored items on the ground.
+
+        #### Automation
+        [Dispenser](https://minecraft.wiki/w/Dispenser) can place packages and
+        a [piston](https://minecraft.wiki/w/Piston) can destroy it when pushing, dropping the items.
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:block/package" width={216} style={{ borderRadius: "10px" }} />
+        <div style={{ marginTop: "6px"}}>*Placed Package*</div>
+    </center>
+</div>
+
+### Sealing
+Package can be sealed with a [seal stamp](@envelope:seal_stamp), creating a [sealed package](@envelope:sealed_package).
+
+
+

@@ -1,0 +1,64 @@
+---
+id: envelope:pigeon
+icon: envelope:entity/pigeon
+title: Pigeon
+type: entity
+custom:
+    Health: "8 (4 hearts)"
+    Behavior: "Passive"
+---
+
+A **pigeon** is a flying neutral mob that lives in [pigeonhole](@envelope:oak_pigeonhole) and interacts with [mailbox](@envelope:mailbox) to deliver mail.\
+When a pigeon stays in [the Nether](https://minecraft.wiki/w/The_Nether) for 15 seconds, it will become a [Charred Pigeon](@envelope:charred_pigeon).
+
+## Variants and Spawning
+There are currently 4 natural pigeon variants in the mod:
+
+- <ModAsset location="envelope:pigeon/pigeon_gray" width={54} /> Gray
+- <ModAsset location="envelope:pigeon/pigeon_brown" width={54} /> Brown
+- <ModAsset location="envelope:pigeon/pigeon_white" width={54} /> White
+- <ModAsset location="envelope:pigeon/pigeon_passenger" width={54} /> Passenger
+
+And 2 special variants:
+- <ModAsset location="envelope:pigeon/pigeon_charred" width={54} /> Charred
+- <ModAsset location="envelope:pigeon/pigeon_archimedes" width={54} /> Archimedes
+
+**Gray**, **Brown** and **White** are what's known as "common variants". They spawn in mountainous biomes and in a village, with following distribution:
+ - **Gray**: 62.5%
+ - **Brown**: 31.25%
+ - **White**: 6.25%
+
+**Passenger** variant spawns in Old Growth biomes (birch, pine and spruce). They **do not** spawn in a village.
+
+<Callout variant="info">Village spawning works similar to how cats spawn in vanilla.</Callout>
+
+A pigeon will have a **Charred** variant when a [Charred Pigeon](@envelope:charred_pigeon) converts into regular pigeon.
+
+**Archimedes** has 1 in 20 chance to spawn when player blows up a *zombie, pillager, piglin or wandering trader*, granting a hidden advancement.
+
+## Behavior
+
+### Breeding
+
+When pigeons are given seeds, they enter love mode. Breeding creates a baby pigeon, and the parents cannot breed again for 5 minutes.
+Variant of the baby is chosen randomly from one of the parents with a *50%/50%* chance.
+
+<center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+    <ModAsset location="envelope:pigeon/pigeon_baby" width={500} style={{ borderRadius: "10px" }} />\
+    <div style={{ marginTop: "6px"}}>*Baby and parent*</div>
+
+</center>
+
+<Callout variant="info">Special variants cannot be inherited from parents.\
+If parent with a special variant is chosen - variant from common pool would be selected instead.</Callout>
+
+### Eating
+Pigeons look for seed items dropped on the ground and eat them. They can eat a lot of seeds, so be careful.\
+Nitwit villagers will occasionally throw some seeds for nearby pigeons.
+
+<center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+    <ModAsset location="envelope:pigeon/nitwit_feeding.gif" width={500} style={{ borderRadius: "10px" }} />\
+    <div style={{ marginTop: "6px"}}>*Nitwit feeding*</div>
+</center>
+
+

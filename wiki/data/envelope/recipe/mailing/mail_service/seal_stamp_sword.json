@@ -1,0 +1,20 @@
+{
+  "type": "envelope:mail_crafting",
+  "address": "envelope:mail_service",
+  "experience": 1.5,
+  "ingredients": [
+    {
+      "item": "envelope:seal_stamp"
+    },
+    {
+      "tag": "minecraft:swords"
+    }
+  ],
+  "result": {
+    "components": {
+      "envelope:seal_stamp_impression": "envelope:sword"
+    },
+    "count": 1,
+    "id": "envelope:seal_stamp"
+  }
+}

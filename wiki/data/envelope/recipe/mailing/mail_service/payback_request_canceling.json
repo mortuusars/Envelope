@@ -1,0 +1,9 @@
+{
+  "type": "envelope:mail_payback_request_canceling",
+  "address": "envelope:mail_service",
+  "ingredients": [
+    {
+      "item": "envelope:payback_tag"
+    }
+  ]
+}

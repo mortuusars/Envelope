@@ -1,0 +1,18 @@
+---
+id: envelope:mail
+title: Mail
+type: item
+related_items: ["envelope:address_tag", "envelope:mailbox", "envelope:letter", "envelope:sealed_letter", "envelope:package", "envelope:sealed_package"]
+---
+
+Any item that has `#envelope:mailable` item tag can be delivered.
+
+Having this tag enables following functionality:
+- [Address Tag](@envelope:address_tag) recipient application
+- Item can be placed in [mailbox](@envelope:mailbox) sending slot
+
+### Currently mailable items:
+- <ModAsset location="envelope:item/letter" width={36} /> [Letter](@envelope:letter)
+- <ModAsset location="envelope:item/sealed_letter" width={36} /> [Sealed Letter](@envelope:sealed_letter)
+- <ModAsset location="envelope:item/package" width={36} /> [Package](@envelope:package)
+- <ModAsset location="envelope:item/sealed_package" width={36} /> [Sealed Package](@envelope:sealed_package)

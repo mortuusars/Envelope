@@ -1,0 +1,10 @@
+{
+  "schema": "1",
+  "id": "envelope",
+  "modid": "envelope",
+  "platforms": {
+    "curseforge": "envelope",
+    "modrinth": "envelope"
+  },
+  "owners": ["mortuusars"]
+}

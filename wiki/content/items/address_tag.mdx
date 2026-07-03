@@ -1,0 +1,35 @@
+---
+id: envelope:address_tag
+title: Address Tag
+type: item
+related_items: ["envelope:mailbox", "envelope:letter", "envelope:sealed_letter", "envelope:package", "envelope:sealed_package"]
+---
+
+**Address Tag** is a craftable item used for specifying the recipient [address](@envelope:address) on a mailable item.\
+It's also used to change address of a [mailbox](@envelope:mailbox).
+
+## Usage
+
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        ### Address selection
+        Using the item in hand will open interface where player can input an [address](@envelope:address).\
+        Interface will show autocomplete suggestions, which can be selected with mouse or arrow keys and applied by pressing [Tab].
+        <Callout variant="info">Pressing [Ctrl] will toggle the suggestions box, and will show all known addresses when input box is empty.</Callout>
+    </div>
+
+    <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:gui/address_tag" width={450} style={{ borderRadius: "10px" }} />
+        <div style={{ marginTop: "6px"}}>*Address Tag interface*</div>
+    </center>
+</div>
+
+### Application
+Address tag is applied to a mailable item by picking it up in inventory and right-clicking with it on the target item, similar to a [bundle](https://minecraft.wiki/w/Bundle).\
+Alternatively, address tag can be applied by crafting it together with mailable item.
+
+### Changing mailbox address
+Using it on the [mailbox](@envelope:mailbox) will open the same interface that can be seen when placing a mailbox,
+allowing its address to be changed without breaking the block.
+
+<Callout variant="info">Changing mailbox address also costs 3 levels of experience.</Callout>

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "pigeonhole",
+  "key": {
+    "H": {
+      "item": "minecraft:hay_block"
+    },
+    "P": {
+      "item": "minecraft:cherry_planks"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PHP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "envelope:cherry_pigeonhole"
+  }
+}

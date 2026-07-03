@@ -1,0 +1,36 @@
+---
+id: envelope:letter_and_quill
+title: Letter and Quill
+type: item
+related_items: ["envelope:letter", "envelope:sealed_letter"]
+---
+
+A letter and quill is an item that can be used to write and edit text. It only has 1 page, but it can fit roughly one 1/3 of a page more text than a single book page.\
+Folding finalizes it and prevents further edits, creating a [letter](@envelope:letter).
+
+## Usage
+### Writing
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        By using a book and quill in their hand, the player can open a text editor GUI.
+
+        The player can write 16 lines of text, and each line can have a width of 142 pixels.\
+        Letters have text formatting support, similar to [Scholar](https://github.com/mortuusars/Scholar).
+
+        Letter will automatically save changes when GUI is closed.
+
+        <Callout variant="info">Singleplayer world will **not** be paused when editing a letter, unless enabled in config.</Callout>
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:gui/letter_and_quill" width={424} />
+        <div style={{ marginTop: "6px"}}>*Letter and Quill interface*</div>
+    </center>
+</div>
+
+### Copying
+Letter and Quill can be used to copy a [letter](@envelope:letter), but crafting both items together.
+
+### Folding
+Letters can be folded by pressing the "Fold" button while in the interface, converting it to a [letter](@envelope:letter) item.\
+After it has been folded, it cannot be edited again.

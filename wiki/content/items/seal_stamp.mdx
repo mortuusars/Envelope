@@ -1,0 +1,55 @@
+---
+id: envelope:seal_stamp
+title: Seal Stamp
+type: item
+related_items: ["envelope:sealed_letter", "envelope:sealed_package"]
+---
+
+**Seal stamp** is an item that allows sealing [letters](@envelope:letter) and [packages](@envelope:package), adding a proof of authorship and integrity.
+
+## Obtaining
+### Crafting
+Seal stamps can be crafted in a [crafting table](https://minecraft.wiki/w/Crafting_Table). Crafted stamps will have the default [die](#die).
+
+### Mailing
+Several unique seal stamps can be obtained by sending any seal stamp with a special item to the <ModAsset location="envelope:gui/address_service" width={20} /> Mail Service.
+
+### Loot
+Some seal stamps with unique [dies](#die) can be found on the [collapsed mail hub](@envelope:collapsed_mail_hub) storage platform.
+
+## Die
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Seal stamps can have different dies that create different impressions.
+
+        Dies can be divided into two categories:
+        - **Basic** - letters A-Z and numbers 0-9.
+        - **Unique** - various symbols and pictograms.
+
+        If seal stamp item does not have a specific die defined, a "default" die will be chosen, i.e. the first letter of a sealer's name.
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:gui/seal_stamp_die_tooltip" width={310} />
+        <div style={{ marginTop: "6px"}}>*Seal Stamp tooltip showing the die*</div>
+    </center>
+</div>
+
+
+## Usage
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Seal stamp can be used on a [letter](@envelope:letter) or [package](@envelope:package) by picking it up in inventory
+        and right-clicking with it on the target item, similar to a [bundle](https://minecraft.wiki/w/Bundle).
+
+        Seal is shown in the sealed item tooltip, along with the name of a person who sealed it.
+
+        Stamp does not have durability and can infinitely create seals.
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:gui/seal" width={340} />
+        <div style={{ marginTop: "6px"}}>*Seal Stamp tooltip showing the die*</div>
+    </center>
+</div>
+

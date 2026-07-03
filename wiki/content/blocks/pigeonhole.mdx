@@ -1,0 +1,55 @@
+---
+id:
+    - envelope:oak_pigeonhole
+    - envelope:spruce_pigeonhole
+    - envelope:birch_pigeonhole
+    - envelope:jungle_pigeonhole
+    - envelope:acacia_pigeonhole
+    - envelope:dark_oak_pigeonhole
+    - envelope:mangrove_pigeonhole
+    - envelope:cherry_pigeonhole
+title: Pigeonhole
+type: block
+---
+
+**Pigeonholes** are craftable blocks that house [pigeons](envelope:entity/pigeon), which fill their homes with waste when they rest inside.
+Dirty pigeonholes can be cleaned with a [shovel](https://minecraft.wiki/w/shovel), which will drop a [bone meal](https://minecraft.wiki/w/bone_meal).
+
+Pigeonholes are pretty similar to [beehives](https://minecraft.wiki/w/beehive):
+they also keep pigeons inside when broken with [Silk Touch](https://minecraft.wiki/w/silk_touch),
+[comparator](https://minecraft.wiki/w/comparator) reads the waste level the same as honey level, etc.
+
+## Usage
+
+### Pigeon housing
+Pigeonholes can house up to 3 pigeons at a time. They can enter through any unobstructed side, top,
+or bottom, but can exit only from the front, and only if it is unobstructed by a block that has collision.
+
+Pigeons fly into a pigeonhole at night, during rain, and when they are tired after mail delivery.
+They first look for one that they remember as home (last rest), but if there is no pigeonhole there,
+or it already contains 3 pigeons when they arrive, they search the nearby area for another one.
+
+Igniting or smoking (using [campfire](https://minecraft.wiki/w/campfire)) a pigeonhole forces any pigeons inside to escape.
+
+### Waste
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Each time pigeon exits a pigeonhole, it has a 20% chance (or 100% when tired) to increase the waste level of a block.
+
+        Once it has the maximum waste level of 5, block changes its appearance.
+        [Shovel](https://minecraft.wiki/w/shovel) can then be used to clean the pigeonhole,
+        resetting its waste level back to 0 and dropping a [bone meal](https://minecraft.wiki/w/bone_meal).
+        Additionally, cleaning has a 1% chance to drop a [diamond](https://minecraft.wiki/w/diamond), granting a hidden advancement.
+
+        Alternatively, pigeonhole can be cleaned by powering a dispenser containing a shovel. The dispenser must be directly facing the block.
+    </div>
+
+    <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:item/oak_pigeonhole_waste" width={128}  />
+        <div style={{ marginTop: "6px"}}>*Dirty Pigeonhole*</div>
+    </center>
+</div>
+
+### Redstone output
+Pigeonholes have a redstone comparator output with a strength equal to the waste level in the block, with a maximum signal strength of 5 once the block is completely full and ready for cleaning.
+

@@ -1,0 +1,12 @@
+{
+  "type": "envelope:mail_letter_broadcasting",
+  "address": "envelope:mail_service",
+  "ingredients": [
+    {
+      "tag": "envelope:letters"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ]
+}

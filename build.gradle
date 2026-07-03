@@ -3,6 +3,7 @@ plugins {
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.gradleup.shadow' version '8.3.6' apply false
     id "me.modmuss50.mod-publish-plugin" version "2.0.0"
+    id 'org.moddedmc.wiki.toolkit' version '0.4.1'
 }
 
 architectury {
@@ -111,6 +112,11 @@ subprojects {
         // Sable
         maven {
             url = "https://maven.ryanhcode.dev/releases"
+        }
+
+        // moddedmc.wiki, etc.
+        maven {
+            url "https://maven.sinytra.org"
         }
     }
 
@@ -299,5 +305,13 @@ publishMods {
         displayName = "${mod_name} - ${mod_version}"
         requires("fabric-api")
         requires("forge-config-api-port")
+    }
+}
+
+wiki {
+    docs {
+        envelope {
+            root = file('wiki/')
+        }
     }
 }
