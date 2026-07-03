@@ -15,6 +15,7 @@
     "tooltip.ClientTooltipComponentMixin"
   ],
   "mixins": [
+    "charred_pigeon_water.ThrownPotionMixin",
     "dispenser_waste_scooping.DispenserBlockMixin",
     "equine_assurance_bureau.TameAnimalTriggerMixin",
     "event.ServerLevelMixin",

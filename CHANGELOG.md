@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Charred Pigeon now converts instantly when it is splashed with water or touches it. 
 - Seal data shuffle:
   - Renamed `envelope:seal_stamp_impression` to `envelope:seal_stamp_die`.
     - Old component is still available, to not break existing stamps. It will be replaced with a new one on use.

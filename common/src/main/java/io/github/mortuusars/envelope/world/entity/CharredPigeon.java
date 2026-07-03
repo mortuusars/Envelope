@@ -8,7 +8,6 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -168,12 +167,12 @@ public class CharredPigeon extends Monster implements Enemy {
         if (Config.Server.CHARRED_PIGEON_CONVERT_INTO_REGULAR.get() && level() instanceof ServerLevel serverLevel) {
             if (canConvert()) {
                 timeInSafeDimension++;
+
+                if (!isDeadOrDying() && (isInWaterOrBubble() || timeInSafeDimension > Config.Server.CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS.get())) {
+                    convert(serverLevel);
+                }
             } else {
                 timeInSafeDimension = 0;
-            }
-
-            if (timeInSafeDimension > Config.Server.CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS.get() && !isDeadOrDying()) {
-                convert(serverLevel);
             }
         }
     }
@@ -195,7 +194,7 @@ public class CharredPigeon extends Monster implements Enemy {
         return !level().dimensionType().ultraWarm() && !isNoAi();
     }
 
-    protected void convert(ServerLevel serverLevel) {
+    public void convert(ServerLevel serverLevel) {
         ItemStack carriedMail = getCarriedMail();
         @Nullable Pigeon pigeon = convertTo(Envelope.EntityTypes.PIGEON.get(), true);
         if (pigeon != null) {
