@@ -9,12 +9,14 @@ import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.placement.HorizontalAlignment;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.AbstractRecipeCategory;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -74,9 +76,12 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
-        builder.addDrawable(background, 0, 0);
+    public void draw(RecipeHolder<MailRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        background.draw(guiGraphics, 0, 0);
+    }
 
+    @Override
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
         Component component = recipeHolder.value().getAddress()
               .format()
               .withIcon()

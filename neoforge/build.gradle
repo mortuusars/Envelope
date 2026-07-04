@@ -34,6 +34,10 @@ dependencies {
 
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
 
+    // EMI
+    //modLocalRuntime("dev.emi:emi-neoforge:${emi_version}") { transitive = false }
+    //modLocalRuntime("maven.modrinth:tmrv:0.9.0+mc.21.1")
+
     modLocalRuntime("maven.modrinth:jade:${jade_version}+neoforge") { transitive = false }
     modLocalRuntime("maven.modrinth:better-advancements:FjTYILOi")
     //modLocalRuntime("curse.maven:embeddium-908741:6118392")

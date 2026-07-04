@@ -12,6 +12,7 @@
 - Minor pixel shuffling on Pigeon's texture.
   - Slightly darkened underside of wings and tail.  
   - Fixed texture of the underside of a Pigeon's wing being flipped.
+- Fixed mailing recipe category not displaying correctly with _EMI_ and _TooManyRecipeViewers_.
 
 ## 0.7.0 Snapshot 2
 

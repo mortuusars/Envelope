@@ -118,6 +118,12 @@ subprojects {
         maven {
             url "https://maven.sinytra.org"
         }
+
+        // EMI
+        maven {
+            name = "TerraformersMC"
+            url = "https://maven.terraformersmc.com/"
+        }
     }
 
     loom {
