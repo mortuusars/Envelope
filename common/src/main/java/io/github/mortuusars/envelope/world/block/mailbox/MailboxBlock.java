@@ -246,15 +246,18 @@ public class MailboxBlock extends BaseEntityBlock {
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
                                                         Player player, BlockHitResult hitResult) {
+        if (!(level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity)) {
+            return super.useWithoutItem(state, level, pos, player, hitResult);
+        }
+
         if (!MailService.operatesIn(level)) {
             player.displayClientMessage(Component.literal("Mail Service does not operate in this dimension.")
                   .withStyle(ChatFormatting.RED), true);
             return InteractionResult.SUCCESS_NO_ITEM_USED;
         }
 
-        if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
-            blockEntity.openMenu(player);
-        }
+        blockEntity.openMenu(player);
+        player.awardStat(Envelope.Stats.INTERACT_WITH_MAILBOX.get());
 
         return InteractionResult.SUCCESS_NO_ITEM_USED;
     }

@@ -180,6 +180,7 @@ public interface Courier {
                       .ifPresent(player -> {
                           if (player instanceof ServerPlayer serverPlayer) {
                               Envelope.CriteriaTriggers.MAIL_DELIVERED.get().trigger(serverPlayer, delivery);
+                              player.awardStat(Envelope.Stats.MAIL_DELIVERIES.get());
                           }
                       });
             }

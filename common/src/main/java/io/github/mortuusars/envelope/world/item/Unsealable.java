@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.util.Minecrft;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -48,7 +49,8 @@ public interface Unsealable {
             Minecrft.releaseUseButton();
         }
 
-        //TODO: SEALS_BROKEN Stat
-        //player.awardStat(Envelope.Stats.SEALS_BROKEN);
+        if (entity instanceof ServerPlayer serverPlayer) {
+            serverPlayer.awardStat(Envelope.Stats.SEALS_BROKEN.get());
+        }
     }
 }

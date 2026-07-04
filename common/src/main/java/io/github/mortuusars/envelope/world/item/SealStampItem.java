@@ -100,7 +100,8 @@ public class SealStampItem extends Item implements ApplicatorItem {
         ItemStack sealResult = sealable.seal(player.level(), target, createSeal(stack, player));
         slot.set(sealResult);
         player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
-        //TODO: sealed stat
+
+        player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
 
         return true;
     }

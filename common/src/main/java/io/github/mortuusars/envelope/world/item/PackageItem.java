@@ -149,12 +149,15 @@ public class PackageItem extends BlockItem implements Sealable {
         unpack(stack, level, pos, player).forEach(item ->
               Containers.dropItemStack(level, pos.x(), pos.y(), pos.z(), item));
         dropExperience(stack, level, pos);
-        onDestroyed(stack, level, pos);
+        onDestroyed(stack, level, pos, player);
     }
 
-    public void onDestroyed(ItemStack stack, Level level, Vec3 pos) {
+    public void onDestroyed(ItemStack stack, Level level, Vec3 pos, @Nullable Player player) {
         if (!level.isClientSide() && level.getRandom().nextDouble() < getBoxReturnChance(stack)) {
             Containers.dropItemStack(level, pos.x(), pos.y(), pos.z(), createBoxReturnItem(stack));
+        }
+        if (player != null) {
+            player.awardStat(Envelope.Stats.PACKAGES_OPENED.get());
         }
     }
 

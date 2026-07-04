@@ -45,6 +45,7 @@ import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.stats.StatFormatter;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Unit;
@@ -90,11 +91,11 @@ public class Envelope {
         EntityDataSerializers.init();
         Items.init();
         DataComponents.init();
-        Stats.init();
         CriteriaTriggers.init();
         ItemSubPredicates.init();
         MenuTypes.init();
         RecipeTypes.init();
+        Stats.init();
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
@@ -491,6 +492,21 @@ public class Envelope {
     }
 
     public static class Stats {
+        public static final Supplier<ResourceLocation> INTERACT_WITH_MAILBOX =
+              Register.stat(resource("interact_with_mailbox"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> MAIL_DELIVERIES =
+              Register.stat(resource("mail_deliveries"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> SEALS_APPLIED =
+              Register.stat(resource("seals_applied"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> SEALS_BROKEN =
+              Register.stat(resource("seals_broken"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> LETTERS_FOLDED =
+              Register.stat(resource("letters_folded"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> PACKAGES_CREATED =
+              Register.stat(resource("packages_created"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> PACKAGES_OPENED =
+              Register.stat(resource("packages_opened"), StatFormatter.DEFAULT);
+
         public static void init() {
         }
     }
