@@ -26,6 +26,7 @@ public abstract class Config {
         // Charred Pigeon
         public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_SPAWNS_NATURALLY;
         public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_MAIL_CHANCE;
+        public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_IGNITE_SECONDS;
         public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_CONVERT_INTO_REGULAR;
         public static final ModConfigSpec.IntValue CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS;
 
@@ -131,6 +132,10 @@ public abstract class Config {
                 CHARRED_PIGEON_MAIL_CHANCE = builder
                       .comment("Chance of a Charred Pigeon carrying mail when spawned.")
                       .defineInRange("mail_chance", 0.2, 0.0, 1.0);
+
+                CHARRED_PIGEON_IGNITE_SECONDS = builder
+                      .comment("Seconds that the target will be ignited for when Charred Pigeon attacks them.")
+                      .defineInRange("ignite_seconds", 3, 0.0, 999.0);
 
                 CHARRED_PIGEON_CONVERT_INTO_REGULAR = builder
                       .comment("Charred Pigeon will convert into a regular Pigeon when it stays outside of the ultrawarm dimension for some time.", "Default: true")

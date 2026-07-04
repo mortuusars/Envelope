@@ -255,7 +255,7 @@ public class CharredPigeon extends Monster implements Enemy {
     @Override
     public boolean doHurtTarget(Entity target) {
         if (super.doHurtTarget(target)) {
-            target.igniteForSeconds(3);
+            target.igniteForSeconds((float) Config.Server.CHARRED_PIGEON_IGNITE_SECONDS.getAsDouble());
             return true;
         }
         return false;

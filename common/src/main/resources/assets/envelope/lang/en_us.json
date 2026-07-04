@@ -337,6 +337,7 @@
   "envelope.configuration.archimedes_chance": "Archimedes Chance",
   "envelope.configuration.burning": "Burning",
   "envelope.configuration.loot": "Loot",
+  "envelope.configuration.ignite_seconds": "Ignite Seconds",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
