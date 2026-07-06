@@ -1,7 +1,7 @@
 {
   "type": "minecraft:jigsaw",
   "biomes": "#envelope:has_structure/collapsed_mail_hub",
-  "step": "top_layer_modification",
+  "step": "surface_structures",
   "spawn_overrides": {},
   "start_pool": "envelope:collapsed_mail_hub/start",
   "size": 6,
