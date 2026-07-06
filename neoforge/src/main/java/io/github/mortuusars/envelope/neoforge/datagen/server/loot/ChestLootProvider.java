@@ -141,15 +141,21 @@ public class ChestLootProvider implements LootTableSubProvider {
 
         output.accept(
               Envelope.LootTables.COLLAPSED_MAIL_HUB_DISPATCHERY,
-              LootTable.lootTable().withPool(LootPool.lootPool()
-                    .setRolls(UniformGenerator.between(1.0F, 3.0F))
-                    .add(LootItem.lootTableItem(Items.WRITABLE_BOOK).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
-                    .add(LootItem.lootTableItem(Items.BOOK).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
-                    .add(LootItem.lootTableItem(Items.PAPER).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 8.0F))))
-                    .add(LootItem.lootTableItem(Items.FEATHER).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 8.0F))))
-                    .add(LootItem.lootTableItem(Items.BLACK_DYE).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 8.0F))))
-                    .add(LootItem.lootTableItem(Envelope.Items.LETTER_AND_QUILL.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
-              )
+              LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                          .setRolls(UniformGenerator.between(1.0F, 3.0F))
+                          .add(LootItem.lootTableItem(Items.PAPER).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 8.0F))))
+                          .add(LootItem.lootTableItem(Items.FEATHER).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 8.0F))))
+                          .add(LootItem.lootTableItem(Items.BLACK_DYE).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 8.0F))))
+                          .add(LootItem.lootTableItem(Items.BOOK).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
+                          .add(LootItem.lootTableItem(Items.MAP).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
+                          .add(LootItem.lootTableItem(Items.WRITABLE_BOOK).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
+                          .add(LootItem.lootTableItem(Envelope.Items.LETTER_AND_QUILL.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))))
+                    .withPool(LootPool.lootPool()
+                          .setRolls(ConstantValue.exactly(1f))
+                          .add(LootItem.lootTableItem(Items.MUSIC_DISC_CREATOR))
+                          .add(LootItem.lootTableItem(Items.DIAMOND).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))).setWeight(2))
+                          .add(EmptyLootItem.emptyItem().setWeight(7)))
         );
 
         output.accept(
