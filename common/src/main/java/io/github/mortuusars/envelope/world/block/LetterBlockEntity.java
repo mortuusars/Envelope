@@ -88,6 +88,11 @@ public class LetterBlockEntity extends BlockEntity implements Nameable {
     }
 
     @Override
+    public boolean hasCustomName() {
+        return Nameable.super.hasCustomName() || letter.has(DataComponents.ITEM_NAME);
+    }
+
+    @Override
     public @Nullable Component getCustomName() {
         return letter.get(DataComponents.CUSTOM_NAME);
     }
