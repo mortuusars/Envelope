@@ -18,7 +18,7 @@
 - Added Letter burning: using the item on a fire or campfire will consume the letter
   - Doesn't apply to Sealed Letters
 - Added ability to add a 5th box to Paper Box block, which will make it a full block
-- Added fall absorbtion property to Paper Box block
+- Added fall absorption property to Paper Box block
   - The block will be broken, dropping boxes on the ground
 - Added Nitwit villager behavior: throwing seeds for nearby pigeons
 - Added new Pigeon behaviors:
