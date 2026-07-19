@@ -34,7 +34,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
     public PigeonModel(ModelPart root) {
         // bodyYOffset = 24 * (babyBodyScale - 1)
         // babyYHeadOffset = I have not been able to crack the code. so have a magic number instead.
-        super(true, 6.7F, 0, 1.75F, 2.1F, 24F * 1.1F);
+        super(true, 10F, 0, 2F, 2F, 24F);
         this.root = root;
 
         head = root.getChild("head");
