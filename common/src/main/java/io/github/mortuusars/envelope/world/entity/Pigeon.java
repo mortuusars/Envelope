@@ -576,7 +576,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     public boolean hasReachedTarget(BlockPos localPos) {
-        return PigeonNavigation.hasReachedTarget(this, localPos, PigeonNavigation.DEFAULT_REACH_DISTANCE);
+        return PigeonNavigation.hasReachedTarget(this, localPos, PigeonNavigation.getReachDistance());
     }
 
     protected boolean hasReachedTarget(BlockPos localPos, double distance) {
@@ -590,7 +590,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     public boolean pathfindDirectlyTowards(BlockPos localPos) {
         BlockPos navigationPos = PigeonNavigation.getNavigationPos(this, localPos);
         getNavigation().setMaxVisitedNodesMultiplier(10.0F);
-        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 2, 1);
+        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 1, 1);
         return getNavigation().getPath() != null && getNavigation().getPath().canReach();
     }
 

@@ -25,7 +25,7 @@ public class PigeonEnterPigeonholeGoal extends Goal {
 
         if (pos != null
               && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon)
-              && pigeon.closerThan(pos, PigeonNavigation.DEFAULT_REACH_DISTANCE)
+              && pigeon.closerThan(pos, PigeonNavigation.getReachDistance() + 0.5f)
               && pigeon.level().getBlockEntity(pos) instanceof PigeonholeBlockEntity blockEntity
               && PigeonholeHandler.isPigeonholeSafe(pigeon.level(), pos)) {
             if (blockEntity.hasSpaceForAnotherOccupant()) {

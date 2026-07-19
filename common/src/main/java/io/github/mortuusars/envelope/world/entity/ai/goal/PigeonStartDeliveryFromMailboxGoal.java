@@ -24,7 +24,7 @@ public class PigeonStartDeliveryFromMailboxGoal extends Goal {
         @Nullable BlockPos pos = pigeon.getMailboxHandler().getTargetPos();
 
         return pos != null
-              && pigeon.closerThan(pos, PigeonNavigation.DEFAULT_REACH_DISTANCE)
+              && pigeon.closerThan(pos, PigeonNavigation.getReachDistance())
               && pigeon.level().getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.isAvailableForPickup();
     }
