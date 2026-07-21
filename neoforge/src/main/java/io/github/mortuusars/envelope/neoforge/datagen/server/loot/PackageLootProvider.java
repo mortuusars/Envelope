@@ -202,41 +202,6 @@ public class PackageLootProvider implements LootTableSubProvider {
     }
 
     private void charredMail(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
-        output.accept(
-              Envelope.LootTables.CHARRED_PIGEON_MAIL,
-              LootTable.lootTable().withPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1))
-                    .add(recipePackage(ServiceAddresses.MAIL_SERVICE,
-                          new ItemStack(Envelope.Items.ADDRESS_TAG.get(), 3),
-                          new ItemStack(Items.RED_DYE, 3)).setWeight(2))
-                    .add(recipePackage(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE,
-                          new ItemStack(Items.ANDESITE, 4),
-                          new ItemStack(Items.FLINT, 4),
-                          new ItemStack(Items.FLINT, 4),
-                          new ItemStack(Items.FLINT, 4),
-                          new ItemStack(Items.FLINT, 4),
-                          new ItemStack(Items.FLINT, 4)).setWeight(2))
-                    .add(recipePackage(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE,
-                          new ItemStack(Items.DIORITE, 4),
-                          new ItemStack(Items.BONE_MEAL, 4),
-                          new ItemStack(Items.BONE_MEAL, 4),
-                          new ItemStack(Items.BONE_MEAL, 4),
-                          new ItemStack(Items.BONE_MEAL, 4),
-                          new ItemStack(Items.BONE_MEAL, 4)).setWeight(2))
-                    .add(recipePackage(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE,
-                          new ItemStack(Items.INK_SAC, 4),
-                          new ItemStack(Items.GLOWSTONE, 4),
-                          new ItemStack(Items.GLOWSTONE, 4),
-                          new ItemStack(Items.GLOWSTONE, 4),
-                          new ItemStack(Items.GLOWSTONE, 4),
-                          new ItemStack(Items.GLOWSTONE, 4)).setWeight(2))
-                    .add(recipePackage(ServiceAddresses.EQUINE_ASSURANCE_BUREAU,
-                          new ItemStack(Items.GOLD_BLOCK, 1)))
-                    .add(LootItem.lootTableItem(Envelope.Items.PACKAGE.get())
-                          .apply(SetNameFunction.setName(Component.translatable("item.envelope.lost_mail"), SetNameFunction.Target.ITEM_NAME))
-                          .apply(SetComponentsFunction.setComponent(DataComponents.CONTAINER_LOOT, new SeededContainerLoot(Envelope.LootTables.NETHER_LOST_MAIL, 0L)))))
-        );
-
         LootTable barteringTable = LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(UniformGenerator.between(1, 2))
                     .add(NestedLootTable.lootTableReference(BuiltInLootTables.PIGLIN_BARTERING)))
@@ -246,14 +211,8 @@ public class PackageLootProvider implements LootTableSubProvider {
               Envelope.LootTables.NETHER_LOST_MAIL,
               LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
-                    .add(NestedLootTable.inlineLootTable(barteringTable).setWeight(5))
+                    .add(NestedLootTable.inlineLootTable(barteringTable).setWeight(3))
                     .add(NestedLootTable.lootTableReference(Envelope.LootTables.LOST_MAIL)))
         );
-    }
-
-    protected LootPoolSingletonContainer.Builder<?> recipePackage(ResourceKey<ServiceAddressDefinition> address, ItemStack... ingredients) {
-        return LootItem.lootTableItem(Envelope.Items.PACKAGE.get())
-              .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.MAIL_RECIPIENT, ServiceAddress.getOrThrow(registries, address)))
-              .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(Arrays.stream(ingredients).toList())));
     }
 }

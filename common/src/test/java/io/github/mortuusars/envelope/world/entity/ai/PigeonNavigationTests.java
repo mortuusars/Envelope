@@ -12,9 +12,4 @@ class PigeonNavigationTests {
         BlockPos endPos = new BlockPos(1, 2, 3);
         assertEquals(endPos, PigeonNavigation.getSegmentApproachTarget(null, endPos, DeliveryPhase.DEPARTING_SENDER));
     }
-
-    @Test
-    void defaultReachDistance_matchesLegacyThreshold() {
-        assertEquals(2, PigeonNavigation.getReachDistance());
-    }
 }

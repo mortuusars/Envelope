@@ -12,7 +12,7 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.function.BiConsumer;
 
-public record GameplayLootProvider(HolderLookup.Provider registries) implements LootTableSubProvider {
+public record GameplayBlockLootProvider(HolderLookup.Provider registries) implements LootTableSubProvider {
     @Override
     public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
         output.accept(

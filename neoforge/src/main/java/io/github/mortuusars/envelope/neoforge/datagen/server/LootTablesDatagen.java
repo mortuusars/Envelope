@@ -39,7 +39,8 @@ public class LootTablesDatagen extends LootTableProvider {
                         new LootTableProvider.SubProviderEntry(EntityLootProvider::new, LootContextParamSets.ENTITY),
                         new LootTableProvider.SubProviderEntry(ChestLootProvider::new, LootContextParamSets.CHEST),
                         new LootTableProvider.SubProviderEntry(PackageLootProvider::new, LootContextParamSets.CHEST),
-                        new LootTableProvider.SubProviderEntry(GameplayLootProvider::new, LootContextParamSets.BLOCK)
+                        new LootTableProvider.SubProviderEntry(GameplayBlockLootProvider::new, LootContextParamSets.BLOCK),
+                        new LootTableProvider.SubProviderEntry(GameplayEquipmentLootProvider::new, LootContextParamSets.EQUIPMENT)
                 ),
                 registries
         );
