@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.7.0 - Integration Hell 
+## 0.7.0 - Integration Hell - 2026-07-21
+### Devlog / Showcase: 
+https://youtu.be/cYj1cDlv14w
 
 ### New Features
 - Added Collapsed Mail Hub structure
