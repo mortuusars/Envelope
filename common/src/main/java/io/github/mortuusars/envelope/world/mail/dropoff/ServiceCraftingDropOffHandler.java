@@ -18,6 +18,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceCraftingDropOffHandler implements MailDropOffHandler {
@@ -91,6 +92,7 @@ public class ServiceCraftingDropOffHandler implements MailDropOffHandler {
         if (!remainingInput.isEmpty()) {
             ItemStack remainderPackage = mail.copy();
             remainderPackage.set(Envelope.DataComponents.PACKAGE_CONTENTS, remainingInput);
+            results = new ArrayList<>(results); // Ensure mutability
             results.addFirst(remainderPackage);
             hasRemainder = true;
         }

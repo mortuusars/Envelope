@@ -1,0 +1,422 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 12.0,
+                "min": 4.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:paper",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 8.0,
+                "min": 4.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "envelope:paper_box",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:container_loot": {
+                  "loot_table": "envelope:packages/lost_mail"
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 2.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "envelope:package"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 3.0,
+        "min": 1.0
+      }
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_1"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_2"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_3"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_4"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_5"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_6"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.common_7",
+                    "with": [
+                      {
+                        "translate": "address.envelope.automated_supply_service"
+                      }
+                    ]
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_1"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_2"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_3"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_4"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_5"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_6"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_7"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.nether_8"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"item.envelope.lost_mail\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 5
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:chests/collapsed_mail_hub/storage_mail"
+}

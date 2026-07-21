@@ -1,0 +1,107 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 6.0,
+                "min": 2.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:paper"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 2.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "envelope:seal_stamp",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:seal_stamp_die": "envelope:heart"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:seal_stamp"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:seal_stamp_die": "envelope:creeper"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:seal_stamp"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:seal_stamp_die": "envelope:letter"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:seal_stamp"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:seal_stamp_die": "envelope:swords"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:seal_stamp"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:seal_stamp_die": "envelope:villager"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:seal_stamp"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 3.0,
+        "min": 1.0
+      }
+    }
+  ],
+  "random_sequence": "envelope:chests/collapsed_mail_hub/storage_stamps"
+}

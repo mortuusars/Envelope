@@ -7,6 +7,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityAttachment;
 import net.minecraft.world.phys.Vec3;
@@ -65,7 +66,7 @@ public class BuggerEntityOverhead {
     public interface EntityDataDisplay {
         void addLines(Entity entity, ArrayList<Component> lines);
 
-        default Component line(String text) {
+        default MutableComponent line(String text) {
             return Component.literal(text);
         }
     }

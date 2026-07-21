@@ -12,6 +12,7 @@ import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @EventBusSubscriber(modid = Envelope.ID)
@@ -29,11 +30,16 @@ public class DataGeneration {
         BlockTagsDatagen blockTags = new BlockTagsDatagen(output, registries, existingFileHelper);
         generator.addProvider(event.includeServer(), blockTags);
         generator.addProvider(event.includeServer(), new ItemTagsDatagen(output, registries, blockTags.contentsGetter(), existingFileHelper));
+        generator.addProvider(event.includeServer(), new EntityTypeTagsDatagen(output, registries, existingFileHelper));
         generator.addProvider(event.includeServer(), LootTablesDatagen.create(output, registries));
 
         DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
         generator.addProvider(event.includeServer(), datapackRegistries);
         generator.addProvider(event.includeServer(), new SealImpressionTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
         generator.addProvider(event.includeServer(), new ServiceAddressTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
+
+        generator.addProvider(event.includeServer(), new AdvancementsDatagen(output, datapackRegistries.getRegistryProvider(), existingFileHelper, List.of(
+              new AdvancementsDatagen.Generator()
+        )));
     }
 }

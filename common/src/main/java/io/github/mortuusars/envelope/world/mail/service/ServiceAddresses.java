@@ -18,7 +18,7 @@ public class ServiceAddresses {
     public static final ResourceKey<ServiceAddressDefinition> AUTOMATED_SUPPLY_SERVICE =
           ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("automated_supply_service"));
     public static final ResourceKey<ServiceAddressDefinition> EQUINE_ASSURANCE_BUREAU =
-          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("equine_insurance_bureau"));
+          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("equine_assurance_bureau"));
 
     private final MailService service;
 
@@ -38,8 +38,6 @@ public class ServiceAddresses {
     }
 
     public void tick() {
-        ServiceAddress.get(getMailService().getLevel().registryAccess(), EQUINE_ASSURANCE_BUREAU)
-              .ifPresent(address -> EquineAssuranceBureau.tick(getMailService(), address));
     }
 
     // --
@@ -48,11 +46,11 @@ public class ServiceAddresses {
         context.register(MAIL_SERVICE, new ServiceAddressDefinition(
               Component.translatable("address.envelope.mail_service"),
               EnvelopeSymbols.ADDRESS_MAIL_SERVICE,
-              new AddressLocation.Relative(1000))); //TODO: use 0? mail hub
+              new AddressLocation.Relative(0)));
         context.register(AUTOMATED_SUPPLY_SERVICE, new ServiceAddressDefinition(
               Component.translatable("address.envelope.automated_supply_service"),
               EnvelopeSymbols.ADDRESS_SERVICE,
-              new AddressLocation.Relative(2000)));
+              new AddressLocation.Relative(1000)));
         context.register(EQUINE_ASSURANCE_BUREAU, new ServiceAddressDefinition(
               Component.translatable("address.envelope.equine_assurance_bureau"),
               EnvelopeSymbols.ADDRESS_SERVICE,

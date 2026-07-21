@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:chests/collapsed_mail_hub/storage_mail",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:chests/collapsed_mail_hub/storage_materials"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:chests/collapsed_mail_hub/storage_stamps"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:chests/collapsed_mail_hub/storage"
+}

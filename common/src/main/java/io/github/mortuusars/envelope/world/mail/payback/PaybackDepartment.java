@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryPhase;
@@ -17,6 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.util.List;
 
 public class PaybackDepartment {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -45,6 +48,12 @@ public class PaybackDepartment {
 
     // --
 
+    public List<PaybackSubject> getSubjectsOf(Address sender) {
+        return getData().getPaybackPendingSubjects().values().stream()
+              .filter(subject -> subject.returnAddress().equals(sender))
+              .toList();
+    }
+
     public int getPendingPaybackSubjectCount() {
         return getData().getPaybackPendingSubjects().size();
     }
@@ -70,6 +79,14 @@ public class PaybackDepartment {
     protected void awaitPayback(PaybackSubject paybackSubject) {
         getData().getPaybackPendingSubjects().put(paybackSubject.id(), paybackSubject);
         getData().setDirty();
+    }
+
+    public @Nullable PaybackSubject removeSubject(Id id) {
+        @Nullable PaybackSubject removed = getData().getPaybackPendingSubjects().remove(id);
+        if (removed != null) {
+            getData().setDirty();
+        }
+        return removed;
     }
 
     // --
@@ -102,6 +119,15 @@ public class PaybackDepartment {
     }
 
     public void returnSubjectToSender(PaybackSubject subject, Component reason) {
+        @Nullable PaybackSubject removed = removeSubject(subject.id());
+
+        if (removed == null) {
+            LOGGER.error("Cannot return payback subject: {} is not in the department.", subject);
+            return;
+        }
+
+        subject = removed;
+
         ItemStack mail = subject.mail().copy();
 
         Mail.returned(mail, reason);

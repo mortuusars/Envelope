@@ -38,7 +38,7 @@ public record MailboxPlaceC2SP(InteractionHand hand, String address, BlockHitRes
     public boolean handle(PacketFlow direction, Player player) {
         ItemStack mailbox = player.getItemInHand(hand);
 
-        if (mailbox.isEmpty() || !(mailbox.getItem() instanceof MailboxBlockItem blockItem)) {
+        if (mailbox.isEmpty() || !(mailbox.getItem() instanceof MailboxBlockItem)) {
             Envelope.LOGGER.error("Cannot handle {} packet: {} is not a valid mailbox item.", ID, mailbox);
             return false;
         }

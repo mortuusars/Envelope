@@ -102,7 +102,7 @@ public class PackageMenu extends AbstractInHandContainerMenu {
 
     protected void onDestroyed(@NotNull Player player, ItemStack stack) {
         if (stack.getItem() instanceof PackageItem item) {
-            item.onDestroyed(stack, player.level(), player.position());
+            item.onDestroyed(stack, player.level(), player.position(), player);
         }
     }
 }

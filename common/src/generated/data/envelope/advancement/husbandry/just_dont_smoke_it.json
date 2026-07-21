@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "criteria": {
+    "place_pigeonhole": {
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "#envelope:pigeonholes"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:placed_block"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.just_dont_smoke_it.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "envelope:oak_pigeonhole"
+    },
+    "title": {
+      "translate": "advancement.envelope.just_dont_smoke_it.title"
+    }
+  },
+  "requirements": [
+    [
+      "place_pigeonhole"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

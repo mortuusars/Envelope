@@ -6,11 +6,13 @@ import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
     @Nullable
     protected Path lastPath;
+    protected Vec3 lastStuckCheckPos = Vec3.ZERO;
 
     public PigeonGoToPigeonholeGoal(Pigeon pigeon) {
         super(pigeon);
@@ -26,7 +28,7 @@ public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
         return super.canUse()
               && pigeon.getPigeonholeHandler().wantsToEnterPigeonhole(pigeon)
               && pigeon.level().getBlockState(pigeon.getPigeonholeHandler().getTargetPos()).is(Envelope.Tags.Blocks.PIGEONHOLES)
-              && !Position.isFireNearby(pigeon.level(), pigeon.getPigeonholeHandler().getTargetPos());
+              && PigeonholeHandler.isPigeonholeSafe(pigeon.level(), pigeon.getPigeonholeHandler().getTargetPos());
     }
 
     @Override
@@ -41,18 +43,20 @@ public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
             return;
         }
 
+        if (pigeon.tickCount % 20 == 0) {
+            if (pigeon.position().distanceToSqr(lastStuckCheckPos) < 0.1) {
+                pigeon.pathfindRandomlyTowards(handler.getTargetPos());
+                return;
+            }
+
+            lastStuckCheckPos = pigeon.position();
+        }
+
         if (pigeon.getNavigation().isInProgress()) {
             return;
         }
 
-        if (!pigeon.closerThan(handler.getTargetPos(), 16)) {
-            if (handler.getTargetPos() != null
-                  && Position.distanceToSqr(pigeon.level(), handler.getTargetPos(), pigeon.position()) > 32 * 32) {
-                handler.dropPigeonhole();
-            } else {
-                pigeon.pathfindRandomlyTowards(handler.getTargetPos());
-            }
-        } else {
+        if (pigeon.closerThan(handler.getTargetPos(), 16)) {
             boolean canReach = pigeon.pathfindDirectlyTowards(handler.getTargetPos());
             if (!canReach) {
                 handler.dropAndBlacklistPigeonhole();
@@ -64,6 +68,13 @@ public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
                 }
             } else {
                 lastPath = pigeon.getNavigation().getPath();
+            }
+        } else {
+            if (handler.getTargetPos() != null
+                  && Position.distanceToSqr(pigeon.level(), handler.getTargetPos(), pigeon.position()) > 32 * 32) {
+                handler.dropPigeonhole();
+            } else {
+                pigeon.pathfindRandomlyTowards(handler.getTargetPos());
             }
         }
     }

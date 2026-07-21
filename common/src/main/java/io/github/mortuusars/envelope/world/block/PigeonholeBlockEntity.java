@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -76,16 +77,15 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
 
     @Override
     public void onOccupantReleased(Level level, Entity entity, ReleaseReason reason) {
-        if (reason == ReleaseReason.EMERGENCY) return;
-
-        if (getBlockState().getBlock() instanceof PigeonholeBlock block
+        if (reason != ReleaseReason.EMERGENCY
+              && getBlockState().getBlock() instanceof PigeonholeBlock block
               && level.random.nextDouble() < getWasteIncreaseChanceOnRelease(entity)) {
             block.addWaste(level, getBlockPos(), getBlockState());
             setChanged();
         }
 
         if (entity instanceof Pigeon pigeon) {
-            pigeon.releasedFromPigeonhole(getBlockPos(), getBlockState(), reason); // Calling before mail sending to set home pos etc
+            pigeon.releasedFromPigeonhole(getBlockPos(), getBlockState(), reason);
         }
     }
 
@@ -98,6 +98,27 @@ public class PigeonholeBlockEntity extends BlockEntity implements PigeonOccupiab
     @Override
     public void onOccupantsChanged() {
         setChanged();
+    }
+
+    @Override
+    public void tickOccupants(Level level, BlockPos pos, BlockState state) {
+        if (!getOccupants().isEmpty()
+              && (level.getGameTime() + pos.hashCode()) % 20 == 0
+              && CampfireBlock.isSmokeyPos(level, pos)) {
+            releaseAllOccupants(level, pos, state, ReleaseReason.EMERGENCY);
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.players()
+                      .stream()
+                      .min(Comparator.comparingDouble(pl -> pos.distSqr(pl.blockPosition())))
+                      .ifPresent(player -> {
+                          // Triggering on the nearest player is not ideal, someone standing further can place campfire.
+                          // But doing it properly seems to be too much hassle for simple joke advancement.
+                          Envelope.CriteriaTriggers.SMOKE_PIGEONHOLE.get().trigger(player);
+                      });
+            }
+        }
+
+        PigeonOccupiable.super.tickOccupants(level, pos, state);
     }
 
     // -- Component

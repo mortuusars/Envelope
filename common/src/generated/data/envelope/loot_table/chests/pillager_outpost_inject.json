@@ -1,0 +1,157 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 3.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "envelope:paper_box"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 2
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "font": "minecraft:illageralt",
+                    "translate": "letter.envelope.pillager_outpost.report_1"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "font": "minecraft:illageralt",
+                    "translate": "letter.envelope.pillager_outpost.report_2"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "font": "minecraft:illageralt",
+                    "translate": "letter.envelope.pillager_outpost.report_3"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "font": "minecraft:illageralt",
+                    "translate": "letter.envelope.pillager_outpost.report_4"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:letter_tattered": {}
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 16
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:chests/pillager_outpost_inject"
+}

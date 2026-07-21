@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=east,has_content=false,tattered=false": {
+      "model": "envelope:block/letter",
+      "y": 90
+    },
+    "facing=east,has_content=false,tattered=true": {
+      "model": "envelope:block/letter_tattered",
+      "y": 90
+    },
+    "facing=east,has_content=true,tattered=false": {
+      "model": "envelope:block/letter_content",
+      "y": 90
+    },
+    "facing=east,has_content=true,tattered=true": {
+      "model": "envelope:block/letter_tattered_content",
+      "y": 90
+    },
+    "facing=north,has_content=false,tattered=false": {
+      "model": "envelope:block/letter"
+    },
+    "facing=north,has_content=false,tattered=true": {
+      "model": "envelope:block/letter_tattered"
+    },
+    "facing=north,has_content=true,tattered=false": {
+      "model": "envelope:block/letter_content"
+    },
+    "facing=north,has_content=true,tattered=true": {
+      "model": "envelope:block/letter_tattered_content"
+    },
+    "facing=south,has_content=false,tattered=false": {
+      "model": "envelope:block/letter",
+      "y": 180
+    },
+    "facing=south,has_content=false,tattered=true": {
+      "model": "envelope:block/letter_tattered",
+      "y": 180
+    },
+    "facing=south,has_content=true,tattered=false": {
+      "model": "envelope:block/letter_content",
+      "y": 180
+    },
+    "facing=south,has_content=true,tattered=true": {
+      "model": "envelope:block/letter_tattered_content",
+      "y": 180
+    },
+    "facing=west,has_content=false,tattered=false": {
+      "model": "envelope:block/letter",
+      "y": 270
+    },
+    "facing=west,has_content=false,tattered=true": {
+      "model": "envelope:block/letter_tattered",
+      "y": 270
+    },
+    "facing=west,has_content=true,tattered=false": {
+      "model": "envelope:block/letter_content",
+      "y": 270
+    },
+    "facing=west,has_content=true,tattered=true": {
+      "model": "envelope:block/letter_tattered_content",
+      "y": 270
+    }
+  }
+}

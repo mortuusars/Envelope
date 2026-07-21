@@ -1,24 +1,46 @@
 package io.github.mortuusars.envelope.command;
 
+import com.google.common.base.Stopwatch;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.util.Pair;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.test.TestResults;
 import io.github.mortuusars.envelope.util.bugger.test.cases.CourierDeliveryTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
 import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
+import io.github.mortuusars.envelope.world.item.component.LetterContent;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
-import io.github.mortuusars.envelope.world.mail.service.EquineAssuranceBureau;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
+import net.minecraft.commands.arguments.ResourceOrTagKeyArgument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.commands.LocateCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.levelgen.structure.Structure;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
@@ -79,8 +101,63 @@ public class EnvelopeDebugCommand {
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-        EquineAssuranceBureau.sendNotice(MailService.of(player.serverLevel()),
-              ServiceAddress.getOrThrow(player.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU));
+        /* Structure test
+        List<BlockPos> positions = new ArrayList<>();
+
+        for (int i = 0; i < 50; i++) {
+            BlockPos pos = locateStructure(context.getSource(), ResourceKey.create(Registries.STRUCTURE, Envelope.resource("dovecote_plains")));
+            if (pos.equals(BlockPos.ZERO)) {
+                continue;
+            }
+
+            positions.add(pos);
+        }
+
+        if (positions.size() < 2) {
+            context.getSource().sendFailure(Component.literal("Too few positions"));
+            return 0;
+        }
+
+        List<Integer> lowestDistances = new ArrayList<>();
+        int totalDistance = 0;
+
+        for (BlockPos position : positions) {
+            int lowest = Integer.MAX_VALUE;
+            for (BlockPos pos : positions) {
+                if (!pos.equals(position)) {
+                    int distance = (int) Math.sqrt(position.distSqr(pos));
+                    if (distance < lowest) {
+                        lowest = distance;
+                    }
+                }
+            }
+            lowestDistances.add(lowest);
+            totalDistance += lowest;
+        }
+
+        double average = (double) totalDistance / positions.size();
+
+
+        boolean a = true;*/
+
+
+//        Component text = Component.literal("       Report to Chief\n\n  Patrol we sent to village not return. Unexpected danger possible.\n\n  Must know more. Asking reinforcements.")
+//              .setStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt")));
+//
+//        ItemStack letter = Mail.createLetter(text)
+//              .set(DataComponents.ITEM_NAME, Component.literal("Report")
+//                    .withStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt")))).get();
+//
+//        player.addItem(letter);
+
+
+//        player.level().getEntitiesOfClass(Pigeon.class, player.getBoundingBox().inflate(16))
+//              .forEach(p -> p.restrictTo(player.blockPosition(), 4));
+//        player.level().getEntitiesOfClass(Villager.class, player.getBoundingBox().inflate(16))
+//              .forEach(p -> p.restrictTo(player.blockPosition(), 4));
+
+        //        EquineAssuranceBureau.sendNotice(MailService.of(player.serverLevel()),
+//              ServiceAddress.getOrThrow(player.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU));
 
 //        ItemStack item = new ItemStack(Envelope.Items.LETTER.get());
 //        item.set(Envelope.DataComponents.LETTER_CONTENT,
@@ -135,5 +212,34 @@ public class EnvelopeDebugCommand {
 //        Containers.dropItemStack(context.getSource().getLevel(), player.getX(), player.getY(), player.getZ(), paybackPackage);
 
         return 0;
+    }
+
+    private static BlockPos locateStructure(CommandSourceStack source, ResourceKey<Structure> key) throws CommandSyntaxException {
+        Registry<Structure> registry = source.getLevel().registryAccess().registryOrThrow(Registries.STRUCTURE);
+        Holder.Reference<Structure> holder = registry.getHolderOrThrow(key);
+        HolderSet.Direct<Structure> holderSet = HolderSet.direct(holder);
+        BlockPos blockPos = BlockPos.containing(source.getPosition());
+        ServerLevel serverLevel = source.getLevel();
+        Stopwatch stopwatch = Stopwatch.createStarted(Util.TICKER);
+        Pair<BlockPos, Holder<Structure>> pair = serverLevel.getChunkSource().getGenerator()
+              .findNearestMapStructure(serverLevel, holderSet, blockPos, 100, true);
+        stopwatch.stop();
+
+        if (pair == null) {
+            source.sendFailure(Component.literal("Cannot find " + key.location()));
+            return BlockPos.ZERO;
+        } else {
+            BlockPos pos = pair.getFirst();
+
+            Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ()))
+                  .withStyle(
+                        style -> style.withColor(ChatFormatting.GREEN)
+                              .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
+                              .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
+                  );
+
+            source.sendSuccess(() -> component, true);
+            return pos;
+        }
     }
 }

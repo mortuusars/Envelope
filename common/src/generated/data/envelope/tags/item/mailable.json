@@ -5,6 +5,10 @@
     "envelope:package",
     "envelope:sealed_package",
     "envelope:payback_box",
-    "envelope:payback_package"
+    "envelope:payback_package",
+    {
+      "id": "#create:packages",
+      "required": false
+    }
   ]
 }

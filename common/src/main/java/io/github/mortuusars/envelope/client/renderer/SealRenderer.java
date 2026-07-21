@@ -50,7 +50,7 @@ public class SealRenderer {
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
-    public void renderDie(SealImpression impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {
+    public void renderDie(SealSymbol impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {
         ResourceLocation impressionTexture = impression.texture();
 
         // Background

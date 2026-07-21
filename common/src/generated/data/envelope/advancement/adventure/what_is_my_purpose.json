@@ -1,0 +1,90 @@
+{
+  "parent": "envelope:adventure/overworld_wide_web",
+  "criteria": {
+    "deliver_package_full_of_blocks": {
+      "conditions": {
+        "delivery": {
+          "mail": {
+            "items": "#envelope:packages",
+            "predicates": {
+              "envelope:package_contents": {
+                "items": {
+                  "contains": [
+                    {
+                      "count": {
+                        "min": 64
+                      },
+                      "predicates": {
+                        "envelope:occluding_block": {}
+                      }
+                    },
+                    {
+                      "count": {
+                        "min": 64
+                      },
+                      "predicates": {
+                        "envelope:occluding_block": {}
+                      }
+                    },
+                    {
+                      "count": {
+                        "min": 64
+                      },
+                      "predicates": {
+                        "envelope:occluding_block": {}
+                      }
+                    },
+                    {
+                      "count": {
+                        "min": 64
+                      },
+                      "predicates": {
+                        "envelope:occluding_block": {}
+                      }
+                    },
+                    {
+                      "count": {
+                        "min": 64
+                      },
+                      "predicates": {
+                        "envelope:occluding_block": {}
+                      }
+                    },
+                    {
+                      "count": {
+                        "min": 64
+                      },
+                      "predicates": {
+                        "envelope:occluding_block": {}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "trigger": "envelope:mail_delivered"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.what_is_my_purpose.description"
+    },
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "envelope:sealed_package"
+    },
+    "title": {
+      "translate": "advancement.envelope.what_is_my_purpose.title"
+    }
+  },
+  "requirements": [
+    [
+      "deliver_package_full_of_blocks"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

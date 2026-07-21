@@ -56,6 +56,7 @@ public record LetterEditC2SP(int slot, String text, boolean fold) implements Pac
 
             player.level().playSound(null, player, Envelope.SoundEvents.PAPER_CRACKLE.get(), SoundSource.PLAYERS, 1, 1);
             player.getInventory().setItem(slot, letter);
+            player.awardStat(Envelope.Stats.LETTERS_FOLDED.get());
         } else {
             if (!content.isEmpty()) {
                 letterAndQuill.set(Envelope.DataComponents.LETTER_AND_QUILL_CONTENT, content);

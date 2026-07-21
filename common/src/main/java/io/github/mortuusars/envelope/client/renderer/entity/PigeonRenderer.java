@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -14,22 +13,17 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
-    public static final ModelLayerLocation PIGEON_LAYER = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
-
-    public static final ResourceLocation GRAY = Envelope.resource("textures/entity/pigeon/pigeon_gray.png");
-    public static final ResourceLocation BROWN = Envelope.resource("textures/entity/pigeon/pigeon_brown.png");
-    public static final ResourceLocation WHITE = Envelope.resource("textures/entity/pigeon/pigeon_white.png");
-    public static final ResourceLocation PASSENGER = Envelope.resource("textures/entity/pigeon/pigeon_passenger.png");
+    public static final ModelLayerLocation MODEL_LAYER = new ModelLayerLocation(Envelope.resource("pigeon"), "main");
 
     public PigeonRenderer(EntityRendererProvider.Context context) {
-        super(context, new PigeonModel(context.bakeLayer(PIGEON_LAYER)), 0.35f);
+        super(context, new PigeonModel(context.bakeLayer(MODEL_LAYER)), 0.35f);
         addLayer(new PigeonBackpackLayer(this, context.getModelSet()));
         addLayer(new PigeonHatLayer(this, context.getModelSet()));
     }
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(Pigeon entity) {
-        return getVariantTexture(entity.getVariant());
+        return entity.getVariant().value().texture();
     }
 
     @Override
@@ -37,16 +31,5 @@ public class PigeonRenderer extends MobRenderer<Pigeon, PigeonModel> {
         float f = Mth.lerp(partialTick, livingBase.oFlap, livingBase.flap);
         float g = Mth.lerp(partialTick, livingBase.oFlapSpeed, livingBase.flapSpeed);
         return (Mth.sin(f) + 1.0F) * g;
-    }
-
-    // --
-
-    public static @NotNull ResourceLocation getVariantTexture(PigeonVariant variant) {
-        return switch (variant) {
-            case GRAY -> GRAY;
-            case BROWN -> BROWN;
-            case WHITE -> WHITE;
-            case PASSENGER -> PASSENGER;
-        };
     }
 }

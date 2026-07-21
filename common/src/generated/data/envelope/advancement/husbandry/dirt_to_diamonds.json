@@ -1,0 +1,28 @@
+{
+  "parent": "envelope:husbandry/just_dont_smoke_it",
+  "criteria": {
+    "scoop_diamond": {
+      "trigger": "envelope:scoop_diamond"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.dirt_to_diamonds.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:dirt"
+    },
+    "title": {
+      "translate": "advancement.envelope.dirt_to_diamonds.title"
+    }
+  },
+  "requirements": [
+    [
+      "scoop_diamond"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -43,8 +43,8 @@ public class PaybackPackingScreen extends AbstractInHandContainerScreen<PaybackP
         packButton = new ImageButton(leftPos + 126, topPos + 40, 26, 20,
               PACK_BUTTON_SPRITES,
               button -> pack(),
-              Component.translatable("gui.envelope.package.pack"));
-        packButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.package.pack")));
+              Component.translatable("gui.envelope.packing.pack"));
+        packButton.setTooltip(Tooltip.create(Component.translatable("gui.envelope.packing.pack")));
         addRenderableWidget(packButton);
     }
 

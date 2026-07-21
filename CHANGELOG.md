@@ -1,5 +1,131 @@
 # Changelog
 
+## 0.7.0 - Integration Hell - 2026-07-21
+### Devlog / Showcase: 
+https://youtu.be/cYj1cDlv14w
+
+### New Features
+- Added Collapsed Mail Hub structure
+  - Piece of once great infrastructure now in disrepair. Generates high in the sky.
+- Added Plains, Taiga, Savanna and Desert Dovecotes
+- Added Charred Pigeon
+  - Spawns in the nether in all biomes except Basalt Deltas
+  - 1 in 5 pigeons will spawn carrying a Package
+  - When brought into Overworld, will turn into a regular pigeon after some time.
+    - Converted pigeons will have special "charred" variant
+  - Regular pigeon that stays in the nether for some time will be converted into Charred Pigeon
+- Added Pigeonhole variants for all wood types
+- Added unique sounds to Pigeonhole waste scooping and pigeon entering, leaving and working
+- Added ability to place Letters on the wall (by holding sneak)
+- Added Letter burning: using the item on a fire or campfire will consume the letter
+  - Doesn't apply to Sealed Letters
+- Added ability to add a 5th box to Paper Box block, which will make it a full block
+- Added fall absorption property to Paper Box block
+  - The block will be broken, dropping boxes on the ground
+- Added Nitwit villager behavior: throwing seeds for nearby pigeons
+- Added new Pigeon behaviors:
+  - Eating seeds dropped on the ground
+  - Following Nitwits to potentially get some seeds
+- Added 1% chance of receiving a Diamond when scooping waste from a Pigeonhole  
+  - Grants hidden advancement
+- Added 'hanging' property to Mailbox block
+  - When placed on the side of a block, the model will have slightly different style
+- Added Payback Request Canceling mailing recipe to Mail Service address
+  - Last request will be canceled
+- Added special "Archimedes" Pigeon variant
+- Added Paper Boxes and Letters to Abandoned Mineshaft and Pillager Outpost chests
+- Added advancements:
+  - Dirt to Diamonds
+  - Just Don't Smoke It
+  - And You Did It Anyway
+  - Foxtile Environment
+  - Overworld Wide Web
+  - What Is My Purpose?
+  - It's Filthy in There
+  - Soft Landing
+  - System Failure
+- Added stats:
+  - Interactions with Mailbox
+  - Mail Deliveries
+  - Seals Applied
+  - Seals Broken
+  - Letters Folded
+  - Packages Created
+  - Packages Opened
+
+### Changes and Fixes
+Pigeon
+- Improved wandering:
+  - Pigeons now perch occasionally on leaves and wooden blocks, similar to parrots
+  - Reduced wandering movement speed slightly
+  - Other minor changes and fixes
+- Improved and fixed pigeon's "home" mechanic:
+  - When a Pigeon exits Pigeonhole - it becomes its home position
+  - Pigeon will not wander outside 24 block radius of it
+  - Pigeon will pathfind back to the home radius if it happens to be outside of it
+  - Pigeon will forget its home after 3 in-game days of not resting inside a Pigeonhole, and will be free to wander off anywhere
+  - Pigeon can still enter any Pigeonhole when it already has a home, which will make it its new home
+- Small adjustment to pigeon spawning in village to reduce spawn counts in some cases
+- Increased Pigeonhole location distance
+- Minor adjustments to predator avoidance behavior
+- Tired pigeons fly slower now
+- Pigeons named "Drumstick" will have a slightly chonkier model
+- Minor tweaks of Pigeon textures:
+  - Slightly darkened underside of wings and tail.
+  - Fixed texture of the underside of a Pigeon's wing being flipped.
+- Fixed wings of pigeons sitting in boats or seats having wrong position
+- Fixed position of Create's Conductor and Logistics hat on a Pigeon
+- Fixed pigeons exiting (and re-entering immediately) the Pigeonhole when it's raining without thunderstorm
+
+Pigeonhole
+- Improved pigeon behavior when the block is smoked
+- Waste scooping now uses loot table for drops
+- Fixed waste generation of tired pigeons being less than intended
+
+Mailbox
+- Adjusted Mailbox collision shape to better reflect the model
+  - Fixes some cases of wrong culling
+
+Services
+- Equine Assurance Bureau notice letter sending is now triggered by taming an animal instead of at random to all players at once
+  - Every sent letter decreases the chance of the next. Sending them Gold Block also decreases the chance
+  - Taming animals other than horses have 1 in 5 chance to trigger sending (which then also stacks with reduced chance of sending)
+- Reduced virtual distance to service addresses:
+  - Mail Service (1000 -> 0)
+  - Automated Supply Service (2000 -> 1000)
+
+Integration
+- Added Paper Box recipe using Cardboard from Create
+- Packages from Create can be delivered now
+  - Address Tag is still required, regardless of the address on the package. Address Tag can be applied automatically with crafters
+- When moving mail recipe ingredients into a Package with JEI - address of the recipe will be remembered and applied when items are packed, consuming an Address Tag
+- Fixed mailing recipe category not displaying correctly with _EMI_ and _TooManyRecipeViewers_.
+
+Misc
+- Fixed a crash occurring when a service address returned unprocessed items in a craft (sending back remaining items)
+
+### Technical Changes
+- Pigeon Variants are now data-driven
+  - You can create and spawn in world a custom variant using datapack + resourcepack
+- Added Pigeon to `minecraft:fall_damage_immune` entity tag
+- Renamed tag `has_passenger_pigeons` to `spawns_passenger_pigeons`
+- Moved pigeon hat and backpack textures into `misc` subfolder
+- Added 'has_mail' property to Mailbox block
+  - Will be set to true if inbox is not empty
+  - Unused in the mod, but can be useful for resourcepacks
+- Seal data:
+  - Renamed `envelope:seal_stamp_impression` to `envelope:seal_stamp_die`
+    - Old component is still available, to not break existing stamps and it will be replaced with a new one on use
+  - Renamed `envelope:seal_impression` registry to `envelope:seal_symbol`
+  - Renamed `assets/envelope/textures/seal/impression` folder to `assets/envelope/textures/seal/symbol`  
+    - Existing seals will remain intact
+- Renamed **Equine Assurance Bureau** internal name from `equine_insurance_bureau` to `equine_assurance_bureau`
+- Restructured lost mail loot tables
+  - Moved `envelope:lost_mail` to `envelope:packages/lost_mail`
+  - Moved sub-tables into `envelope:packages/lost_mail/` folder and removed `lost_mail_` prefix from them
+  - Open your existing Lost Mail packages before updating to this version
+- Added config option for fox letter tattering
+
 ## 0.6.2 - 2026-06-11
 - Potentially fixed an issue with C2ME.
 - Fixed crash with Flashback mod when recorded replay is viewed.

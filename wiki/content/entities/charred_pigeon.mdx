@@ -1,0 +1,45 @@
+---
+id: envelope:charred_pigeon
+icon: envelope:entity/charred_pigeon
+title: Charred Pigeon
+custom:
+    Health: "8 (4 hearts)"
+    Damage: "4 (2 hearts)"
+    Behavior: "Aggressive"
+---
+
+**Charred pigeon** is a flying hostile mob found in [the Nether](https://minecraft.wiki/w/The_Nether).
+It wanders aimlessly and attacks any player on sight. It cannot take part in deliveries, unless converted into a regular [Pigeon](@envelope:pigeon).
+
+## Spawning
+Charred Pigeon spawns in all Nether biomes, except [Basalt Deltas](https://minecraft.wiki/w/Basalt_Deltas).
+
+### Conversion
+When a regular [Pigeon](@envelope:pigeon) stays in the Nether for 15 seconds, it will be converted into a Charred Pigeon.\
+And vice-versa: Charred Pigeon that stays outside of the Nether for 15 seconds will be "extinguished" into a regular [Pigeon](@envelope:pigeon).
+Pigeon will always have a **Charred** variant when that happens.
+
+## Mail
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Charred Pigeons spawned randomly have 1 in 5 chance to spawn carrying mail.
+
+        Carried items include several variants of packages for service crafting and a nether variant of
+        [Lost Mail](@envelope:lost_mail) package, that has items from [piglin bartering](https://minecraft.wiki/w/Bartering) most of the time
+
+        Carried mail will be dropped on the ground when Charred Pigeon dies or is converted into a regular [Pigeon](@envelope:pigeon).\
+        Mail can also be removed by interacting with a pigeon with an empty hand.
+    </div>
+
+    <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:entity/charred_pigeon_mail" width={180}  />\
+        <div style={{ marginTop: "6px"}}>*Charred Pigeon carrying mail*</div>
+    </center>
+</div>
+
+<Callout variant="info">Although this scenario should not happen in game due to delivery mechanics,
+a special logic is implemented to keep the carried mail when a regular Pigeon is converted into a Charred Pigeon.</Callout>
+
+## Drops
+Charred Pigeon does not drop any items when killed, except the mail it is carrying.
+

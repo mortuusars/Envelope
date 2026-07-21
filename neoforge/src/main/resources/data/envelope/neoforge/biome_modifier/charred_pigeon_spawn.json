@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#envelope:allows_charred_pigeon_spawns",
+  "spawners": {
+    "type": "envelope:charred_pigeon",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

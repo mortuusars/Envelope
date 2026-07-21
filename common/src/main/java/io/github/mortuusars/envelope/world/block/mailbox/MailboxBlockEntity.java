@@ -302,6 +302,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     @Override
     public void onInboxChanged() {
+        setChanged();
         if (level != null) {
             level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
         }
@@ -374,12 +375,21 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (!isRemoved() && level instanceof ServerLevel serverLevel) {
             BlockState state = getBlockState();
             boolean isOpen = state.getValue(MailboxBlock.OPEN);
+            boolean hasMail = state.getValue(MailboxBlock.HAS_MAIL);
+
             boolean shouldBeOpen = isAvailableForPickup();
-            if (isOpen != shouldBeOpen) {
-                serverLevel.setBlockAndUpdate(getBlockPos(), state.setValue(MailboxBlock.OPEN, shouldBeOpen));
-                playSound(shouldBeOpen ? SoundEvents.CHERRY_WOOD_TRAPDOOR_OPEN : SoundEvents.CHERRY_WOOD_TRAPDOOR_CLOSE,
-                      0.75f,
-                      shouldBeOpen ? 1f : 0.75f);
+            boolean shouldHaveMail = !getAllMail().isEmpty();
+
+            if (isOpen != shouldBeOpen || hasMail != shouldHaveMail) {
+                serverLevel.setBlockAndUpdate(getBlockPos(), state
+                      .setValue(MailboxBlock.OPEN, shouldBeOpen)
+                      .setValue(MailboxBlock.HAS_MAIL, shouldHaveMail));
+
+                if (isOpen != shouldBeOpen) {
+                    playSound(shouldBeOpen ? SoundEvents.CHERRY_WOOD_TRAPDOOR_OPEN : SoundEvents.CHERRY_WOOD_TRAPDOOR_CLOSE,
+                          0.75f,
+                          shouldBeOpen ? 1f : 0.75f);
+                }
             }
         }
     }

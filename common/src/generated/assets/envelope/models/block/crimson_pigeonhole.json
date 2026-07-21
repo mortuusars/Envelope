@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "bottom": "envelope:block/crimson_pigeonhole_end",
+    "front": "envelope:block/crimson_pigeonhole_front",
+    "side": "envelope:block/crimson_pigeonhole_side",
+    "top": "envelope:block/crimson_pigeonhole_end"
+  }
+}

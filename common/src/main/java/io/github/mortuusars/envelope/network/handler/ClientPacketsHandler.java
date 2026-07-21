@@ -25,6 +25,10 @@ public class ClientPacketsHandler {
         }
     }
 
+    public static void openPlacedLetterViewScreen(OpenLetterBlockViewScreenS2CP packet) {
+        Minecrft.get().setScreen(new LetterBlockViewScreen(packet.letter(), packet.pos()));
+    }
+
     public static void openAddressTagScreen(OpenAddressTagScreenS2CP packet) {
         if (Minecrft.player().getItemInHand(packet.hand()).getItem() instanceof AddressTagItem) {
             AddressTagScreen screen = new AddressTagScreen(packet.hand(), packet.knownAddresses(),

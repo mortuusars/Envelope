@@ -10,16 +10,16 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
-public record Seal(Holder<SealMaterial> material, Holder<SealImpression> impression, Component signature) implements TooltipComponent {
+public record Seal(Holder<SealMaterial> material, Holder<SealSymbol> impression, Component signature) implements TooltipComponent {
     public static final Codec<Seal> CODEC = RecordCodecBuilder.create(i -> i.group(
           SealMaterial.CODEC.fieldOf("material").forGetter(Seal::material),
-          SealImpression.CODEC.fieldOf("impression").forGetter(Seal::impression),
+          SealSymbol.CODEC.fieldOf("impression").forGetter(Seal::impression),
           ComponentSerialization.CODEC.optionalFieldOf("signature", CommonComponents.EMPTY).forGetter(Seal::signature)
     ).apply(i, Seal::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Seal> STREAM_CODEC = StreamCodec.composite(
           SealMaterial.STREAM_CODEC, Seal::material,
-          SealImpression.STREAM_CODEC, Seal::impression,
+          SealSymbol.STREAM_CODEC, Seal::impression,
           ComponentSerialization.STREAM_CODEC, Seal::signature,
           Seal::new
     );

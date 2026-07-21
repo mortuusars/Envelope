@@ -1,0 +1,27 @@
+{
+  "parent": "envelope:husbandry/just_dont_smoke_it",
+  "criteria": {
+    "smoke_pigeonhole": {
+      "trigger": "envelope:smoke_pigeonhole"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.and_you_did_it_anyway.description"
+    },
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:campfire"
+    },
+    "title": {
+      "translate": "advancement.envelope.and_you_did_it_anyway.title"
+    }
+  },
+  "requirements": [
+    [
+      "smoke_pigeonhole"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

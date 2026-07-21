@@ -9,6 +9,7 @@ import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
@@ -25,11 +26,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.function.Function;
 
 public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
+    public static final Logger LOGGER = LogUtils.getLogger();
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result = Mail.createLetter(Component.empty())
           .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
@@ -81,7 +84,7 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
         Map<PlayerAddress, BlockAddress> defaultAddresses = service.getKnownPlayers().getDefaultAddresses();
 
         if (content.isEmpty()) {
-            LogUtils.getLogger().error("Cannot broadcast a letter: no suitable letter was provided or the letter is missing a content. {}", input);
+            LOGGER.error("Cannot broadcast a letter: no suitable letter was provided or the letter is missing a content. {}", input);
 
             Component reportText = Component.empty()
                   .append(Component.translatable("letter.envelope.broadcast_report.title").withStyle(ChatFormatting.ITALIC))
@@ -119,8 +122,9 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
 
             int count = 0;
 
-            for (BlockAddress recipient : defaultAddresses.values()) {
-                if (recipient.equals(input.sender())) {
+            for (Address recipient : defaultAddresses.keySet()) {
+                Address resolvedRecipient = recipient.resolve(service);
+                if (resolvedRecipient.isUnknown() || resolvedRecipient.equals(input.sender())) {
                     continue;
                 }
 

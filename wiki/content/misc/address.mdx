@@ -1,0 +1,90 @@
+---
+id: envelope:address
+icon: envelope:misc/address
+title: Address
+type: other
+related_items: ["envelope:address_tag", "envelope:mailbox"]
+---
+
+**Address** is a crucial part of a delivery system, allowing correct routing of mail.
+
+## Usage
+
+### Mailbox
+Each [mailbox](@envelope:mailbox) should have an address to be able to send and deliver mail.
+
+### Mail
+Address is selected and applied to a mailable item using an [address tag](@envelope:address_tag).\
+It's also used in a "sender" field and delivery log.
+
+## Types
+
+There are 5 types of addresses:
+- <ModAsset location="envelope:misc/address_block" width={36} /> - **Block**: *mailbox*
+- <ModAsset location="envelope:misc/address_player" width={36} /> - **Player**: *player name; resolves to player's default mailbox*
+- <ModAsset location="envelope:misc/address_service" width={36} /> - **Service**: *NPCs*
+- <ModAsset location="envelope:misc/address_custom" width={36} /> - **Custom**: *for use in commands; cannot receive mail*
+- <ModAsset location="envelope:misc/address_unknown" width={36} /> - **Unknown**: *for cases where address could not be determined or does not exist*
+
+Players would mostly be dealing with **Block**, **Player** and **Service** types in-game.
+
+<Callout variant="info">Service addresses use translations for their names,
+and they will work and resolve correctly regardless of the selected language.</Callout>
+
+## Data
+
+### Definition
+Addresses can be defined in commands or json like this:
+
+```json json
+{ "type":"block", "id":"Mortuus Base" }
+{ "type":"player", "name":"mortuusars" }
+{ "type":"service", "definition":"envelope:automated_supply_service" }
+{ "type":"custom", "name":{ "translate": "entity.minecraft.villager" } }
+{ "type":"unknown" }
+```
+
+### Service Address
+As opposed to the rest of the types which can be defined freely, service addresses must have it's "definition" registered first.
+
+<Callout>Note that service address by itself doesn't do anything, it's meant to be used in combination with mail recipes or custom mail handlers to be useful.</Callout>
+
+To register a definition, json file needs to be created in the `data/<namespace>/envelope/service_address/` folder.\
+*For example:*
+```json data/envelope/envelope/service_address/mail_service.json
+{
+  "name": { // translation key or literal 'text'
+    "translate": "address.envelope.mail_service"
+  },
+  "icon": "", // optional
+  "location": { // see further below
+    "type": "relative",
+    "distance": 0
+  }
+}
+```
+
+<Callout variant="info">Icon can be any symbol.\
+Mail service uses "`\uEE05`" in combination with custom font to display a unique icon.</Callout>
+
+Location controls delivery duration and is calculated relative to the nearest mail hub. *Possible definitions:*
+
+<CodeTabs>
+```json !!tabs relative
+"location": {
+    "type": "relative",
+    "distance": 500
+}
+```
+```json !!tabs exact
+"location": {
+    "type": "exact",
+    "pos": [12, 64, 42]
+}
+```
+```json !!tabs default
+"location": {
+    "type": "default" // `delivery.default_distance` from envelope-server config will be used
+}
+```
+</CodeTabs>

@@ -1,0 +1,7 @@
+{
+  "spawn_weights": {
+    "common": 10,
+    "service": 12
+  },
+  "texture": "envelope:textures/entity/pigeon/pigeon_gray.png"
+}

@@ -1,0 +1,10 @@
+{
+  "type": "envelope:add_table",
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+    }
+  ],
+  "table": "envelope:chests/abandoned_mineshaft_inject"
+}

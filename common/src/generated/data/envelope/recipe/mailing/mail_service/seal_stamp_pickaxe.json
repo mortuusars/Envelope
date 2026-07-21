@@ -12,7 +12,7 @@
   ],
   "result": {
     "components": {
-      "envelope:seal_stamp_impression": "envelope:pickaxe"
+      "envelope:seal_stamp_die": "envelope:pickaxe"
     },
     "count": 1,
     "id": "envelope:seal_stamp"

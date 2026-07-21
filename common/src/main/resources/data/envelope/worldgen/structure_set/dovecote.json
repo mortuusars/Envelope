@@ -1,0 +1,26 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 16149811,
+    "separation": 12,
+    "spacing": 32
+  },
+  "structures": [
+    {
+      "structure": "envelope:dovecote_plains",
+      "weight": 1
+    },
+    {
+      "structure": "envelope:dovecote_taiga",
+      "weight": 1
+    },
+    {
+      "structure": "envelope:dovecote_savanna",
+      "weight": 1
+    },
+    {
+      "structure": "envelope:dovecote_desert",
+      "weight": 1
+    }
+  ]
+}

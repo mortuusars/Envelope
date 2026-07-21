@@ -12,15 +12,15 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.ResourceLocation;
 
 public class PigeonBackpackLayer extends RenderLayer<Pigeon, PigeonModel> {
-    public static final ModelLayerLocation PIGEON_BACKPACK = new ModelLayerLocation(Envelope.resource("pigeon_backpack"), "main");
+    public static final ModelLayerLocation MODEL_LAYER = new ModelLayerLocation(Envelope.resource("pigeon_backpack"), "main");
 
-    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/pigeon_backpack.png");
+    public static final ResourceLocation TEXTURE = Envelope.resource("textures/entity/pigeon/misc/pigeon_backpack.png");
 
     protected final PigeonModel model;
 
     public PigeonBackpackLayer(RenderLayerParent<Pigeon, PigeonModel> renderer, EntityModelSet modelSet) {
         super(renderer);
-        model = new PigeonModel(modelSet.bakeLayer(PIGEON_BACKPACK));
+        model = new PigeonModel(modelSet.bakeLayer(MODEL_LAYER));
     }
 
     @Override

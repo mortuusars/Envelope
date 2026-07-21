@@ -35,6 +35,7 @@ public class EnvelopeBuggerPage implements BuggerPage {
 
                   ListTag deliveries = tag.getList("deliveries", Tag.TAG_STRING);
                   if (!deliveries.isEmpty()) {
+                      lines.add("");
                       lines.add("Deliveries:");
                       for (Tag delivery : deliveries) {
                           lines.add("  " + delivery.getAsString());

@@ -28,7 +28,7 @@ public class PaperBoxItem extends BlockItem {
     public @NotNull InteractionResult useOn(UseOnContext context) {
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if (context.getPlayer() != null && !context.getPlayer().isSecondaryUseActive()
-              && (!(state.getBlock() instanceof PaperBoxBlock) || state.getValue(PaperBoxBlock.BOXES) >= 4)) {
+              && (!(state.getBlock() instanceof PaperBoxBlock) || state.getValue(PaperBoxBlock.BOXES) >= PaperBoxBlock.MAX_BOXES)) {
             openPackingMenu(context.getPlayer(), context.getHand(), context.getItemInHand());
             return InteractionResult.SUCCESS_NO_ITEM_USED;
         }

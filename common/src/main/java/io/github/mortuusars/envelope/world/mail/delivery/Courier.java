@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -9,6 +10,7 @@ import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.dropoff.*;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
@@ -26,6 +28,7 @@ public interface Courier {
     );
 
     Optional<Delivery> getCurrentDelivery();
+
     CourierOrigin getOrigin();
 
     default boolean isDelivering() {
@@ -170,7 +173,18 @@ public interface Courier {
         MailDropOffContext context = new MailDropOffContext(MailService.of(level), recipient, delivery);
         MailDropOffResult result = DROP_OFF_HANDLER.handle(context);
 
-        if (result.isHandled()) {
+        if (result.isHandled() && !(result instanceof MailDropOffResult.Returned)) {
+            if (recipient.equals(delivery.getRecipient())) {
+                delivery.getOwner()
+                      .map(level::getPlayerByUUID)
+                      .ifPresent(player -> {
+                          if (player instanceof ServerPlayer serverPlayer) {
+                              Envelope.CriteriaTriggers.MAIL_DELIVERED.get().trigger(serverPlayer, delivery);
+                              player.awardStat(Envelope.Stats.MAIL_DELIVERIES.get());
+                          }
+                      });
+            }
+
             ItemStack mail = result.getMail();
             if (result.isReply()) {
                 if (delivery.getPhase().isReturning()) {

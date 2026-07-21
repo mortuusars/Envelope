@@ -1,0 +1,231 @@
+{
+  "type": "minecraft:equipment",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:mail_recipient": {
+                  "type": "service",
+                  "definition": "envelope:mail_service"
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:package_contents": [
+                  {
+                    "count": 3,
+                    "id": "envelope:address_tag"
+                  },
+                  {
+                    "count": 3,
+                    "id": "minecraft:red_dye"
+                  }
+                ]
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:package",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:mail_recipient": {
+                  "type": "service",
+                  "definition": "envelope:automated_supply_service"
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:package_contents": [
+                  {
+                    "count": 4,
+                    "id": "minecraft:andesite"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:flint"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:flint"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:flint"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:flint"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:flint"
+                  }
+                ]
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:package",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:mail_recipient": {
+                  "type": "service",
+                  "definition": "envelope:automated_supply_service"
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:package_contents": [
+                  {
+                    "count": 4,
+                    "id": "minecraft:diorite"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:bone_meal"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:bone_meal"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:bone_meal"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:bone_meal"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:bone_meal"
+                  }
+                ]
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:package",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:mail_recipient": {
+                  "type": "service",
+                  "definition": "envelope:automated_supply_service"
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:package_contents": [
+                  {
+                    "count": 4,
+                    "id": "minecraft:ink_sac"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:glowstone_dust"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:glowstone_dust"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:glowstone_dust"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:glowstone_dust"
+                  },
+                  {
+                    "count": 4,
+                    "id": "minecraft:glowstone_dust"
+                  }
+                ]
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:package",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:mail_recipient": {
+                  "type": "service",
+                  "definition": "envelope:equine_assurance_bureau"
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "envelope:package_contents": [
+                  {
+                    "count": 1,
+                    "id": "minecraft:gold_block"
+                  }
+                ]
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:package"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "item.envelope.lost_mail"
+              },
+              "target": "item_name"
+            },
+            {
+              "components": {
+                "minecraft:container_loot": {
+                  "loot_table": "envelope:packages/nether_lost_mail"
+                }
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:package"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:gameplay/charred_pigeon_mail"
+}

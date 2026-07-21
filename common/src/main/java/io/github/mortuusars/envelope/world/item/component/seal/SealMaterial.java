@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 public final class SealMaterial {
@@ -96,8 +97,12 @@ public final class SealMaterial {
 
     // --
 
-    public static Holder<SealMaterial> getHolder(RegistryAccess access, ResourceKey<SealMaterial> key) {
-        return access.registryOrThrow(Envelope.Registries.SEAL_MATERIAL).getHolderOrThrow(key);
+    public static Optional<Holder.Reference<SealMaterial>> get(HolderLookup.Provider registries, ResourceKey<SealMaterial> key) {
+        return registries.lookupOrThrow(Envelope.Registries.SEAL_MATERIAL).get(key);
+    }
+
+    public static Holder<SealMaterial> getOrThrow(HolderLookup.Provider registries, ResourceKey<SealMaterial> key) {
+        return registries.lookupOrThrow(Envelope.Registries.SEAL_MATERIAL).getOrThrow(key);
     }
 
     public static void bootstrap(BootstrapContext<SealMaterial> context) {

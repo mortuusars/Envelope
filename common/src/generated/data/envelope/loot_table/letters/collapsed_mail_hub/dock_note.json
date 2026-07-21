@@ -1,0 +1,188 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_1"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.note\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_2"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.note\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_3"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.status\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_4"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.status\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_5"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.status\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_6"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.status\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_7"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.status\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "envelope:letter_content": {
+                  "text": {
+                    "translate": "letter.envelope.collapsed_mail_hub.dock_note_8"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            },
+            {
+              "components": {
+                "minecraft:item_name": "{\"translate\":\"letter.envelope.collapsed_mail_hub.dock_note.name.status\"}"
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "envelope:letter"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:letters/collapsed_mail_hub/dock_note"
+}

@@ -15,11 +15,15 @@
     "tooltip.ClientTooltipComponentMixin"
   ],
   "mixins": [
+    "charred_pigeon_water.ThrownPotionMixin",
     "dispenser_waste_scooping.DispenserBlockMixin",
+    "equine_assurance_bureau.TameAnimalTriggerMixin",
     "event.ServerLevelMixin",
     "fox_tatter.FoxMixin",
     "injected.ServerLevelMixin",
+    "jei.BasicRecipeTransferHandlerMixin",
     "jei.JeiKeyConflictContextMixin",
+    "paper_box_fall.EntityMixin",
     "predators.CatMixin",
     "predators.FoxMixin",
     "predators.OcelotMixin",
@@ -28,7 +32,8 @@
     "shears_clearing.ShearsItemMixin",
     "spawners.MinecraftServerMixin",
     "spawners.ServerLevelMixin",
-    "tooltip.ItemStackMixin"
+    "tooltip.ItemStackMixin",
+    "villager_feeds_pigeon.VillagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

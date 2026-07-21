@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.neoforge.datagen.client;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
+import io.github.mortuusars.envelope.world.block.LetterBlock;
 import io.github.mortuusars.envelope.world.block.PaperBoxBlock;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.item.component.PaybackDuration;
@@ -41,8 +42,18 @@ public class ModelsDatagen extends BlockStateProvider {
         horizontalBlock(Envelope.Blocks.PACKAGE.get(), models().getExistingFile(modLoc("block/package")));
         horizontalBlock(Envelope.Blocks.SEALED_PACKAGE.get(), models().getExistingFile(modLoc("block/sealed_package")));
 
+        getVariantBuilder(Envelope.Blocks.LETTER.get()).forAllStates(state -> {
+            String model = "letter"
+                  + (state.getValue(LetterBlock.TATTERED) ? "_tattered" : "")
+                  + (state.getValue(LetterBlock.HAS_CONTENT) ? "_content" : "");
+            return ConfiguredModel.builder()
+                  .modelFile(models().getExistingFile(modLoc("block/" + model)))
+                  .rotationY(((int)state.getValue(LetterBlock.FACING).toYRot() + 180) % 360)
+                  .build();
+        });
+
         getVariantBuilder(Envelope.Blocks.PAPER_BOX.get()).forAllStates(state -> {
-            String[] boxes = {"one", "two", "three", "four"};
+            String[] boxes = {"one", "two", "three", "four", "five"};
             ModelFile.ExistingModelFile model = models().getExistingFile(
                   modLoc("block/paper_box_" + boxes[state.getValue(PaperBoxBlock.BOXES) - 1]));
             return ConfiguredModel.builder()
@@ -115,6 +126,7 @@ public class ModelsDatagen extends BlockStateProvider {
         itemModels().basicItem(Envelope.Items.PAYBACK_PACKAGE.get());
 
         itemModels().spawnEggItem(Envelope.Items.PIGEON_SPAWN_EGG.get());
+        itemModels().spawnEggItem(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
     }
 
     @SuppressWarnings("UnusedReturnValue")

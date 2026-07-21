@@ -1,0 +1,44 @@
+---
+id: envelope:mailbox
+title: Mailbox
+type: block
+---
+
+**Mailboxes** are craftable blocks that send and receive mail.
+
+## Placement
+Trying to place mailbox in the world will open an **address selection** interface, similar to that of [address tag](@envelope:address_tag).\
+After choosing a unique address and confirming, **3 levels of experience** will be consumed and the mailbox block will be placed.
+
+<Callout variant="info">After placement, [address tag](@envelope:address_tag) can be used to change the address to a new one, without breaking and replacing the block.</Callout>
+
+## Usage
+
+### Interface
+Using the mailbox opens its interface, where current address, inbox area, pigeon food slot and slot for sending mail can be seen.
+
+<center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+    <ModAsset location="envelope:gui/mailbox" width={610} />
+    <div style={{ marginTop: "6px"}}>*Mailbox interface*</div>
+</center>
+
+### Default address
+A button in the mailbox interface near the current address can be pressed to set this mailbox as player's **default address**.\
+This address will then be used when mail is send to this player's name.
+
+If the player does not currently have a default address, the button will flash, prompting a player to set it.
+
+<Callout variant="info">Multiple players can have their default address set to the same mailbox.</Callout>
+
+## Delivery
+Mail feature of the mailbox is its ability to start deliveries.
+
+Three things are needed for the delivery:
+- [Mailable](@envelope:mail) item with an [address tag](@envelope:address_tag) applied to it.
+- Food for the [pigeon](@envelope:pigeon), any seeds can be used.
+- A [pigeon](@envelope:pigeon).
+
+Placing mail in the sending slot and seeds in the food slot will open the front hatch of a mailbox. Nearby pigeons,
+that are not tired will fly to the mailbox, consume the food, pick up the mail and start a [delivery process](@envelope:pigeon).
+
+Front hatch will be automatically closed when either the mail or food is missing.

@@ -3,10 +3,12 @@ package io.github.mortuusars.envelope.client.model;
 import com.google.common.collect.ImmutableList;
 import io.github.mortuusars.envelope.client.util.Minecrft;
 import io.github.mortuusars.envelope.util.EasingFunction;
+import net.minecraft.Optionull;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +34,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
     public PigeonModel(ModelPart root) {
         // bodyYOffset = 24 * (babyBodyScale - 1)
         // babyYHeadOffset = I have not been able to crack the code. so have a magic number instead.
-        super(true, 6.7F, 0, 1.75F, 2.1F, 24F * 1.1F);
+        super(true, 10F, 0, 2F, 2F, 24F);
         this.root = root;
 
         head = root.getChild("head");
@@ -57,8 +59,8 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
         PartDefinition head = part.addOrReplaceChild("head",
               CubeListBuilder.create()
                     .texOffs(0, 14)
-                    .addBox(-3.0F, -4.0F, -5.0F, 6.0F, 6.0F, 6.0F, CubeDeformation.NONE),
-              PartPose.offset(0.0F, 16.0F, -1.0F));
+                    .addBox(-3.0F, -6.0F, -3.0F, 6.0F, 6.0F, 6.0F, CubeDeformation.NONE),
+              PartPose.offset(0.0F, 18f, -3.0F));
 
         PartDefinition beak = head.addOrReplaceChild("beak",
               CubeListBuilder.create()
@@ -66,7 +68,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                     .addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.01F))
                     .texOffs(0, 16)
                     .addBox(0.0F, 0.0F, -2.0F, 0.0F, 1.0F, 1.0F, CubeDeformation.NONE),
-              PartPose.offset(0.0F, -1.0F, -5.0F));
+              PartPose.offset(0.0F, -3.0F, -3.0F));
 
         PartDefinition hat = head.addOrReplaceChild("hat",
               CubeListBuilder.create()
@@ -74,7 +76,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                     .addBox(-3.5F, -2.0F, -3.5F, 7.0F, 2.0F, 7.0F, CubeDeformation.NONE)
                     .texOffs(0, 55)
                     .addBox(-3.5F, 0.0F, -4.5F, 7.0F, 1.0F, 8.0F, CubeDeformation.NONE),
-              PartPose.offsetAndRotation(0.0F, -4.0F, -2.0F, -0.1745F, 0.0F, 0.0F));
+              PartPose.offsetAndRotation(0.0F, -5.75F, 0.0F, -0.1745F, 0.0F, 0.0F));
 
         PartDefinition body = part.addOrReplaceChild("body",
               CubeListBuilder.create()
@@ -136,10 +138,12 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
         head.xRot = headPitch * (float) (Math.PI / 180.0);
         head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
 
+        float partialTick = Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true);
+
         switch (getState(pigeon)) {
             case FLYING -> {
-                leftWing.zRot = -bob;
-                rightWing.zRot = bob;
+                leftWing.zRot = -(bob + 0.3f);
+                rightWing.zRot = bob + 0.3f;
 
                 leftLeg.xRot = 0.75f * limbSwingAmount;
                 leftLeg.yRot = -0.15f;
@@ -147,27 +151,27 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                 rightLeg.yRot = 0.15f;
 
                 // Rock back and forth
-                float anim = ((pigeon.tickCount + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) % 60) / 60;
+                float anim = ((pigeon.tickCount + partialTick) % 60) / 60;
                 anim *= 2;
                 if (anim > 1) {
                     anim = 2 - anim;
                 }
                 anim = ((float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim));
-                body.xRot = anim * 0.1f;
-                head.xRot = -anim * 0.05f;
-                head.z -= 0.75F * (anim);
+                body.xRot = anim * 0.05f;
+                head.xRot = -anim * 0.025f;
+                head.z -= 0.5F * (anim);
 
-                leftWing.xRot += (anim * 0.2f);
-                leftWing.y -= 0.35F * (anim);
+                leftWing.xRot += (anim * 0.1f);
+                leftWing.y -= 0.3F * (anim);
                 leftWing.z -= 0.5F * (anim);
 
-                rightWing.xRot += (anim * 0.2f);
-                rightWing.y -= 0.35F * (anim);
+                rightWing.xRot += (anim * 0.1f);
+                rightWing.y -= 0.3F * (anim);
                 rightWing.z -= 0.5F * (anim);
 
-                tail.xRot += (limbSwingAmount * 0.75F) + (anim * 0.1f);
-                tail.y -= 0.35F * (anim);
-                tail.z -= 0.5F * (anim);
+                tail.xRot += (limbSwingAmount * 0.5F) + (anim * 0.1f);
+                tail.y -= 0.3F * (anim);
+                tail.z -= 0.4F * (anim);
             }
             case STANDING -> {
                 leftWing.zRot = -0.3927F;
@@ -186,6 +190,31 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
 
                 tail.xRot = 0.75f;
             }
+        }
+
+        int eatingTicks = pigeon.getEatingTicks();
+        if (eatingTicks > 0) {
+            float anim = Mth.clamp((eatingTicks + partialTick) / 10f, 0.0f, 1.0f);
+            anim *= 2;
+            if (anim > 1) {
+                anim = 2 - anim;
+            }
+
+            head.xRot += anim;
+        }
+
+        String customName = Optionull.mapOrDefault(pigeon.getCustomName(), Component::getString, "");
+        if (customName.equalsIgnoreCase("drumstick") || customName.equalsIgnoreCase("matisslee")) {
+            body.y += 0.5f;
+            body.z -= 0.5f;
+            head.y += 0.5f;
+            head.z -= 0.75f;
+            head.xScale = 1.1f;
+            body.xScale = 1.15f;
+            body.yScale = 1.1f;
+            body.zScale = 1.15f;
+            beak.xScale = 1.2f;
+            beak.zScale = 0.75f;
         }
     }
 

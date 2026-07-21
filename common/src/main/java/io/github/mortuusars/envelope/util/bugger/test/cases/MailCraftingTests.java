@@ -23,7 +23,6 @@ public class MailCraftingTests extends BuggerTests {
     public MailCraftingTests(MinecraftServer server) {
         this.server = server;
 
-
         add("MailCrafting_CraftsWithoutRemainder", Test.isTrue(() -> {
             Mailing.Result result = Mailing.craft(
                   recipe(

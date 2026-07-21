@@ -10,8 +10,10 @@ import io.github.mortuusars.envelope.network.packet.C2SPackets;
 import io.github.mortuusars.envelope.network.packet.CommonPackets;
 import io.github.mortuusars.envelope.network.packet.Packet;
 import io.github.mortuusars.envelope.network.packet.S2CPackets;
+import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.entity.PigeonVariant;
+import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.network.FriendlyByteBuf;
@@ -32,6 +34,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -94,25 +97,30 @@ public class NeoForgeCommonEvents {
         }
         if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
             event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+            event.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
         }
     }
 
     @SubscribeEvent
     public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
         event.put(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
+        event.put(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
     }
 
     @SubscribeEvent
     public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
         event.register(Envelope.EntityTypes.PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
               Pigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
+              CharredPigeon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 
     @SubscribeEvent
     public static void addDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(Envelope.Registries.PIGEON_VARIANT, PigeonVariant.DIRECT_CODEC, PigeonVariant.DIRECT_CODEC);
         event.dataPackRegistry(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, ServiceAddressDefinition.DIRECT_CODEC, ServiceAddressDefinition.DIRECT_CODEC);
         event.dataPackRegistry(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
-        event.dataPackRegistry(Envelope.Registries.SEAL_IMPRESSION, SealImpression.DIRECT_CODEC, SealImpression.DIRECT_CODEC);
+        event.dataPackRegistry(Envelope.Registries.SEAL_SYMBOL, SealSymbol.DIRECT_CODEC, SealSymbol.DIRECT_CODEC);
     }
 
     @SubscribeEvent
@@ -145,5 +153,10 @@ public class NeoForgeCommonEvents {
     @SubscribeEvent
     public static void entityLeaveLevel(EntityLeaveLevelEvent event) {
         CommonEvents.entityLeaveLevel(event.getLevel(), event.getEntity());
+    }
+
+    @SubscribeEvent
+    public static void entityDeath(LivingDeathEvent event) {
+        CommonEvents.livingDeath(event.getEntity(), event.getSource());
     }
 }

@@ -18,9 +18,11 @@ import org.jetbrains.annotations.Nullable;
  * stored positions and let {@link Position} project them when comparing or navigating.
  */
 public final class PigeonNavigation {
-    public static final double DEFAULT_REACH_DISTANCE = 2;
-
     private PigeonNavigation() {
+    }
+
+    public static double getReachDistance() {
+        return 1;
     }
 
     /**

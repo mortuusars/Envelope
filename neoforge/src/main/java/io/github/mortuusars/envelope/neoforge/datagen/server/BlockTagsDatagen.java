@@ -22,17 +22,45 @@ public class BlockTagsDatagen extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
         tag(Envelope.Tags.Blocks.PIGEONS_SPAWNABLE_ON)
-                .add(Blocks.GRASS_BLOCK)
-                .add(Blocks.DIRT)
-                .add(Blocks.PODZOL)
-                .add(Blocks.COARSE_DIRT)
-                .add(Blocks.AIR)
-                .addTag(BlockTags.LEAVES)
-                .addTag(BlockTags.LOGS)
-                .addTag(BlockTags.BASE_STONE_OVERWORLD);
+              .add(Blocks.GRASS_BLOCK)
+              .add(Blocks.DIRT)
+              .add(Blocks.PODZOL)
+              .add(Blocks.COARSE_DIRT)
+              .add(Blocks.AIR)
+              .addTag(BlockTags.LEAVES)
+              .addTag(BlockTags.LOGS)
+              .addTag(BlockTags.BASE_STONE_OVERWORLD);
+
+        tag(Envelope.Tags.Blocks.PIGEONS_PERCHABLE_ON)
+              .addTag(BlockTags.LEAVES)
+              .addTag(BlockTags.LOGS)
+              .addTag(BlockTags.WOODEN_DOORS)
+              .addTag(BlockTags.WOODEN_FENCES)
+              .addTag(BlockTags.WOODEN_SLABS)
+              .addTag(BlockTags.WOODEN_STAIRS)
+              .addTag(BlockTags.WOODEN_TRAPDOORS)
+              .addTag(BlockTags.WALL_HANGING_SIGNS)
+              .addTag(BlockTags.PLANKS);
 
         tag(Envelope.Tags.Blocks.PIGEONHOLES)
-                .add(Envelope.Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(Block[]::new));
+              .add(Envelope.Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(Block[]::new));
+
+        tag(Envelope.Tags.Blocks.PIGEONHOLES_THAT_BURN)
+              .add(
+                    Envelope.Blocks.OAK_PIGEONHOLE.get(),
+                    Envelope.Blocks.SPRUCE_PIGEONHOLE.get(),
+                    Envelope.Blocks.BIRCH_PIGEONHOLE.get(),
+                    Envelope.Blocks.JUNGLE_PIGEONHOLE.get(),
+                    Envelope.Blocks.ACACIA_PIGEONHOLE.get(),
+                    Envelope.Blocks.DARK_OAK_PIGEONHOLE.get(),
+                    Envelope.Blocks.MANGROVE_PIGEONHOLE.get(),
+                    Envelope.Blocks.CHERRY_PIGEONHOLE.get(),
+                    Envelope.Blocks.BAMBOO_PIGEONHOLE.get()
+              );
+
+        tag(Envelope.Tags.Blocks.BURNING)
+              .addTag(BlockTags.FIRE)
+              .addTag(BlockTags.CAMPFIRES);
 
         tag(BlockTags.MINEABLE_WITH_AXE)
               .addTag(Envelope.Tags.Blocks.PIGEONHOLES)

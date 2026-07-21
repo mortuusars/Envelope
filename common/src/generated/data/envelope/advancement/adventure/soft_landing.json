@@ -1,0 +1,31 @@
+{
+  "parent": "minecraft:adventure/root",
+  "criteria": {
+    "fall_on_paper_box_from_big_height": {
+      "conditions": {
+        "distance": {
+          "min": 100.0
+        }
+      },
+      "trigger": "envelope:break_paper_box_when_falling"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.soft_landing.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "envelope:paper_box"
+    },
+    "title": {
+      "translate": "advancement.envelope.soft_landing.title"
+    }
+  },
+  "requirements": [
+    [
+      "fall_on_paper_box_from_big_height"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -32,31 +32,42 @@ dependencies {
 
     include(modApi("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}"))
 
-    modRuntimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
+    modLocalRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
 
-    modRuntimeOnly("maven.modrinth:jade:${jade_version}+neoforge") { transitive = false }
-    //modRuntimeOnly("curse.maven:embeddium-908741:6118392")
-    //modRuntimeOnly("maven.modrinth:sodium:${sodium_version}-neoforge") // Doesn't want to work
+    // EMI
+    //modLocalRuntime("dev.emi:emi-neoforge:${emi_version}") { transitive = false }
+    //modLocalRuntime("maven.modrinth:tmrv:0.9.0+mc.21.1")
+
+    modLocalRuntime("maven.modrinth:jade:${jade_version}+neoforge") { transitive = false }
+    modLocalRuntime("maven.modrinth:better-advancements:FjTYILOi")
+//    modLocalRuntime("curse.maven:embeddium-908741:6118392")
+    modLocalRuntime("maven.modrinth:simplefog:ywT5urX0")
+    modLocalRuntime("maven.modrinth:cloth-config:izKINKFg")
+    //modLocalRuntime("maven.modrinth:sodium:${sodium_version}-neoforge") // Doesn't want to work
 
     modCompileOnlyApi("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
-    //modRuntimeOnly("dev.latvian.mods:rhino:${rhino_version}")
+    //modLocalRuntime("dev.latvian.mods:rhino:${rhino_version}")
     //implementation("dev.latvian.apps:tiny-java-server:${tiny_server_version}")
     //modImplementation("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
 
-    modRuntimeOnly("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}" )
+    modLocalRuntime("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}" )
+
+    modLocalRuntime("maven.modrinth:c2me-neoforge:0.3.0+alpha.0.91+1.21.1")
 
     // Create
-    modRuntimeOnly("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-    modRuntimeOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
-    modRuntimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
-    modRuntimeOnly("com.tterrag.registrate:Registrate:${registrate_version}")
+    modLocalRuntime("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    modLocalRuntime("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
+    modLocalRuntime("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    modLocalRuntime("com.tterrag.registrate:Registrate:${registrate_version}")
 
     // Sable + Aeronautics
-    runtimeOnly("foundry.veil:veil-neoforge-${project.minecraft_version}:4.1.2")
-    modRuntimeOnly("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
-    modRuntimeOnly("dev.simulated_team.simulated:simulated-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
-    modRuntimeOnly("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
-    modRuntimeOnly("dev.ryanhcode.offroad:offroad-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+    localRuntime("foundry.veil:veil-neoforge-${project.minecraft_version}:4.1.2")
+    modLocalRuntime("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
+    modLocalRuntime("dev.simulated_team.simulated:simulated-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+    modLocalRuntime("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+    modLocalRuntime("dev.ryanhcode.offroad:offroad-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+
+    modLocalRuntime("org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
@@ -80,6 +91,16 @@ loom {
             programArgs "--all", "--mod", "${mod_id}"
             programArgs "--output", project(':common').file("src/generated").absolutePath // Outputs to common project
             programArgs "--existing", project(':common').file("src/main/resources").absolutePath // Makes datagen see resources from common folder
+        }
+
+        exportClient {
+            client()
+            property('wiki_exporter.enabled', 'true')
+        }
+        exportServer {
+            server()
+            programArgs('nogui')
+            property('wiki_exporter.enabled', 'true')
         }
     }
 }

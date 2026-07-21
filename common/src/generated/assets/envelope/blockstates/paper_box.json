@@ -12,6 +12,9 @@
     "axis=x,boxes=4": {
       "model": "envelope:block/paper_box_four"
     },
+    "axis=x,boxes=5": {
+      "model": "envelope:block/paper_box_five"
+    },
     "axis=z,boxes=1": {
       "model": "envelope:block/paper_box_one",
       "y": 90
@@ -26,6 +29,10 @@
     },
     "axis=z,boxes=4": {
       "model": "envelope:block/paper_box_four",
+      "y": 90
+    },
+    "axis=z,boxes=5": {
+      "model": "envelope:block/paper_box_five",
       "y": 90
     }
   }

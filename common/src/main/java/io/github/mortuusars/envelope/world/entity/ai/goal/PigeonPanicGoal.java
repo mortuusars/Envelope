@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.entity.ai.goal;
 
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -12,16 +13,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 public class PigeonPanicGoal extends PanicGoal {
-    public PigeonPanicGoal(PathfinderMob mob, double speedModifier) {
-        super(mob, speedModifier);
+    public PigeonPanicGoal(Pigeon pigeon, double speedModifier) {
+        super(pigeon, speedModifier);
     }
 
-    public PigeonPanicGoal(PathfinderMob mob, double speedModifier, TagKey<DamageType> panicCausingDamageTypes) {
-        super(mob, speedModifier, panicCausingDamageTypes);
+    public PigeonPanicGoal(Pigeon pigeon, double speedModifier, TagKey<DamageType> panicCausingDamageTypes) {
+        super(pigeon, speedModifier, panicCausingDamageTypes);
     }
 
-    public PigeonPanicGoal(PathfinderMob mob, double speedModifier, Function<PathfinderMob, TagKey<DamageType>> panicCausingDamageTypes) {
-        super(mob, speedModifier, panicCausingDamageTypes);
+    public PigeonPanicGoal(Pigeon pigeon, double speedModifier, Function<PathfinderMob, TagKey<DamageType>> panicCausingDamageTypes) {
+        super(pigeon, speedModifier, panicCausingDamageTypes);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class PigeonPanicGoal extends PanicGoal {
         if (!(mob.getLastDamageSource() instanceof DamageSource damageSource)) return false;
         if (!(damageSource.getDirectEntity() instanceof Entity entity)) return false;
 
-        @Nullable Vec3 pos = PigeonAvoidEntityGoal.getPosAway(mob, 6, 3, entity.position());
+        @Nullable Vec3 pos = PigeonAvoidEntityGoal.getPosAway(mob, 14, 8, entity.position());
 
         if (pos != null) {
             this.posX = pos.x;

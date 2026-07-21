@@ -1,0 +1,28 @@
+---
+id: envelope:sealed_letter
+title: Sealed Letter
+type: item
+related_items: ["envelope:letter_and_quill", "envelope:letter", "envelope:seal_stamp"]
+custom:
+    Mailable: "Yes"
+---
+
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        A **sealed letter** is a variant of a [letter](@envelope:letter) that has a proof of authorship and integrity.\
+        Seal impression and name of the sealer is shown in the item's tooltip.\
+        Can be mailed.
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <ModAsset location="envelope:gui/sealed_letter" width={350} />
+        <div style={{ marginTop: "6px"}}>*Sealed Letter tooltip*</div>
+    </center>
+</div>
+
+## Obtaining
+Sealed Letters can be obtained by sealing a [letter](@envelope:letter) with a [seal stamp](@envelope:seal_stamp).
+
+## Usage
+Seal can be removed by using the item and waiting for the animation to finish.\
+Removing the seal clears the authorship information and returns the item back to a regular [letter](@envelope:letter).

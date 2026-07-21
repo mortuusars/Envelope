@@ -1,0 +1,43 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/junk",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/plants",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/blocks",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/metals"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/tools"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/weapons"
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "envelope:packages/lost_mail/valuables"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "envelope:packages/lost_mail"
+}

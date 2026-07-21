@@ -70,6 +70,10 @@ public class KnownPlayers extends SavedData {
         return Optional.ofNullable(data.get(playerName));
     }
 
+    public Optional<PlayerData> getDataOf(UUID uuid) {
+        return data.values().stream().filter(d -> d.profile.getId().equals(uuid)).findFirst();
+    }
+
     // --
 
     public Optional<BlockAddress> getDefaultAddressOf(Player player) {

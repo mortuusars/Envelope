@@ -1,0 +1,77 @@
+{
+  "envelope:bamboo_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:address_tag": {
+    "stack_size": 64
+  },
+  "envelope:mailbox": {
+    "stack_size": 64
+  },
+  "envelope:crimson_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:charred_pigeon_spawn_egg": {
+    "stack_size": 64
+  },
+  "envelope:sealed_letter": {
+    "stack_size": 64
+  },
+  "envelope:dark_oak_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:oak_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:pigeon_spawn_egg": {
+    "stack_size": 64
+  },
+  "envelope:spruce_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:payback_tag": {
+    "stack_size": 64
+  },
+  "envelope:mangrove_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:cherry_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:jungle_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:acacia_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:warped_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:birch_pigeonhole": {
+    "stack_size": 64,
+    "flammable": true
+  },
+  "envelope:paper_box": {
+    "stack_size": 16,
+    "flammable": true
+  },
+  "envelope:letter": {
+    "stack_size": 64
+  },
+  "envelope:package": {
+    "flammable": true
+  },
+  "envelope:sealed_package": {
+    "flammable": true
+  }
+}

@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
@@ -96,8 +97,11 @@ public interface Occupiable {
               getMinimumTicksInsideForOccupant(entity), 0).toMutable());
 
         entity.level().gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, state));
-
-        playSound(getOccupantEnterSound(entity), 1f, 1f);
+        playSound(getOccupantEnterSound(entity), 1.0F, entity.level().getRandom().nextFloat() * 0.2F + 0.85F);
+        if (entity.level() instanceof ServerLevel level) {
+            level.sendParticles(ParticleTypes.CLOUD,
+                  entity.getX(), entity.getY(), entity.getZ(), 1, 0.2f, 0.2f, 0.2f, 0);
+        }
 
         entity.discard();
         onOccupantsChanged();
@@ -105,7 +109,7 @@ public interface Occupiable {
 
     default Optional<Entity> releaseOccupant(Level level, BlockPos pos, BlockState state, Occupant occupant, ReleaseReason reason) {
         if (!(level instanceof ServerLevel serverLevel)) return Optional.empty();
-        if ((level.isNight() || level.isThundering()) && reason != ReleaseReason.EMERGENCY) {
+        if ((level.isNight() || level.isRaining() || level.isThundering()) && reason != ReleaseReason.EMERGENCY) {
             return Optional.empty();
         }
 
@@ -126,8 +130,10 @@ public interface Occupiable {
         double z = (double) pos.getZ() + 0.5 + offset * (double) direction.getStepZ();
         entity.moveTo(x, y, z, entity.getYRot(), entity.getXRot());
 
-        playSound(getOccupantExitSound(entity), 1.0F, 1.0F);
         level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(entity, state));
+        playSound(getOccupantExitSound(entity), 1.0F, entity.level().getRandom().nextFloat() * 0.2F + 0.85F);
+        serverLevel.sendParticles(ParticleTypes.CLOUD,
+              entity.getX(), entity.getY() + 0.5f, entity.getZ(), 1, 0.2f, 0.2f, 0.2f, 0);
 
         if (level.addFreshEntity(entity)) {
             onOccupantReleased(serverLevel, entity, reason);
@@ -189,12 +195,6 @@ public interface Occupiable {
     }
 
     default void tickOccupants(Level level, BlockPos pos, BlockState state) {
-        if (!getOccupants().isEmpty()
-              && (level.getGameTime() + pos.hashCode()) % 20 == 0
-              && CampfireBlock.isSmokeyPos(level, pos)) {
-            releaseAllOccupants(level, pos, state, ReleaseReason.EMERGENCY);
-        }
-
         if (getOccupants().removeIf(occupant -> occupant.tick()
               && releaseOccupant(level, pos, state, occupant.toImmutable(), ReleaseReason.DEFAULT).isPresent())) {
             onOccupantsChanged();
@@ -202,7 +202,7 @@ public interface Occupiable {
 
         if (!getOccupants().isEmpty()) {
             if (level.getRandom().nextDouble() < 0.004 * getOccupants().size()) {
-                playSound(getOccupantWorkSound(), 0.5F, 1.0F);
+                playSound(getOccupantWorkSound(), 1.0F, level.getRandom().nextFloat() * 0.2F + 0.9F);
             }
         }
     }

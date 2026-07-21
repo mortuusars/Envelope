@@ -19,6 +19,16 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
         public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING;
+        public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
+        public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
+        public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
+
+        // Charred Pigeon
+        public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_SPAWNS_NATURALLY;
+        public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_MAIL_CHANCE;
+        public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_IGNITE_SECONDS;
+        public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_CONVERT_INTO_REGULAR;
+        public static final ModConfigSpec.IntValue CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS;
 
         // Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
@@ -30,6 +40,8 @@ public abstract class Config {
 
         // Letter
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
+        public static final ModConfigSpec.BooleanValue LETTER_BURNING;
+        public static final ModConfigSpec.BooleanValue FOX_LETTER_TATTERING;
 
         // Package
         public static final ModConfigSpec.BooleanValue PACKAGE_SNEAK_QUICK_UNPACK;
@@ -50,9 +62,11 @@ public abstract class Config {
         // Service Addresses
         // Equine Assurance Bureau
         public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
-        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES;
-        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES;
-        public static final ModConfigSpec.DoubleValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK;
+
+        // Misc
+        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
+        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
+        public static final ModConfigSpec.DoubleValue ARCHIMEDES_CHANCE;
 
         // Debug
         public static final ModConfigSpec.BooleanValue DEBUG;
@@ -94,6 +108,41 @@ public abstract class Config {
                       .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
                       .defineInRange("damage_evasion_chance_while_delivering", 0.0, 0.0, 1.0);
 
+                PIGEON_EATS_SEEDS = builder
+                      .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
+                      .define("eats_seeds", true);
+
+                PIGEON_CONVERT_INTO_CHARRED = builder
+                      .comment("Pigeon will convert into a Charred Pigeon when it stays in the ultrawarm dimension for some time.", "Default: true")
+                      .define("convert_into_charred", true);
+
+                PIGEON_CONVERT_INTO_CHARRED_TICKS = builder
+                      .comment("Time (in ticks) Pigeon needs to stay in the ultrawarm dimension to convert into Charred Pigeon.")
+                      .defineInRange("convert_into_charred_ticks", 300, 0, Integer.MAX_VALUE);
+
+                builder.pop();
+            }
+
+            {
+                builder.push("charred_pigeon");
+                CHARRED_PIGEON_SPAWNS_NATURALLY = builder
+                      .comment("Charred Pigeons can spawn naturally in '#envelope:allows_charred_pigeon_spawns' biomes.",
+                            " Default: true")
+                      .define("spawns_naturally", true);
+                CHARRED_PIGEON_MAIL_CHANCE = builder
+                      .comment("Chance of a Charred Pigeon carrying mail when spawned.")
+                      .defineInRange("mail_chance", 0.2, 0.0, 1.0);
+
+                CHARRED_PIGEON_IGNITE_SECONDS = builder
+                      .comment("Seconds that the target will be ignited for when Charred Pigeon attacks them.")
+                      .defineInRange("ignite_seconds", 3, 0.0, 999.0);
+
+                CHARRED_PIGEON_CONVERT_INTO_REGULAR = builder
+                      .comment("Charred Pigeon will convert into a regular Pigeon when it stays outside of the ultrawarm dimension for some time.", "Default: true")
+                      .define("convert_into_regular", true);
+                CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS = builder
+                      .comment("Time (in ticks) Charred Pigeon needs to stay outside of the ultrawarm dimension to convert into a regular Pigeon.")
+                      .defineInRange("convert_into_regular_ticks", 300, 0, Integer.MAX_VALUE);
                 builder.pop();
             }
 
@@ -126,6 +175,13 @@ public abstract class Config {
                       .comment("Letter screen pauses singleplayer game.",
                             " Default: false")
                       .define("pause", false);
+                LETTER_BURNING = builder
+                      .comment("Letter will burn and disappear when used on `envelope:burning` blocks. Doesn't apply to Sealed Letters.",
+                            " Default: true")
+                      .define("burning", true);
+                FOX_LETTER_TATTERING = builder
+                      .comment("Letter will become tattered if a Fox picks it up.")
+                      .define("fox_tattering", true);
                 builder.pop();
             }
 
@@ -181,28 +237,32 @@ public abstract class Config {
                 {
                     builder.push("equine_assurance_bureau");
                     SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder
-                          .comment("A notice letter would be sent out to all players occasionally.", "Default: true")
+                          .comment("A notice letter will be occasionally sent to the player.", "Default: true")
                           .define("notice_sending_enabled", true);
-                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_BASE_INTERVAL_MINUTES = builder
-                          .comment("Minimum time (in minutes) from the previous send after which another notice could be sent.")
-                          .defineInRange("notice_sending_base_interval_minutes", 120, 0, 9999.0);
-                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ADDITIONAL_INTERVAL_PER_DAY_MINUTES = builder
-                          .comment("Additional time (in minutes) per the in-game day. More days played = less notices.")
-                          .defineInRange("notice_sending_additional_interval_per_day_minutes", 1, 0, 9999.0);
-                    SERVICE_EQUINE_BUREAU_NOTICE_SENDING_CHANCE_PER_TICK = builder
-                          .comment("Chance of notice letter being sent per tick, assuming that enough time has passed from previous send.", "Default: 0.0002 (about 4 minutes on average)")
-                                .defineInRange("notice_sending_chance_per_tick", 0.0002, 0.0, 1.0);
-
                     builder.pop();
                 }
                 builder.pop();
             }
 
             {
+                builder.push("misc");
+                VILLAGER_FEEDING_PIGEONS = builder
+                      .comment("Villagers will feed nearby pigeons by throwing them seeds.",
+                            "Requires 'pigeon.eats_seeds' config option to be enabled.", "Default: true")
+                      .define("villager_feeding_pigeons", true);
+                VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY = builder
+                      .comment("Only Nitwits can feed pigeons.", "Default: true")
+                      .define("villager_feeding_pigeons_only_nitwits", true);
+                ARCHIMEDES_CHANCE = builder
+                      .comment("Chance of an Archimedes spawning when 'envelope:spawns_archimedes' mob is killed by 'envelope:spawns_archimedes' damage type (player explosion by default).")
+                      .defineInRange("archimedes_chance", 0.05, 0, 1);
+                builder.pop();
+            }
+
+            {
                 builder.push("debug");
                 DEBUG = builder
-                      .comment("Enable debug features. Will affect performance negatively. Don't enable unless it's needed.",
-                            " Default: false.")
+                      .comment("Enable debug features. Will negatively impact performance. Don't enable unless it's needed.")
                       .define("debug_mode", false);
                 builder.pop();
             }
@@ -211,14 +271,22 @@ public abstract class Config {
         }
     }
 
-    /*public static class Common {
+    public static class Common {
         public static final ModConfigSpec SPEC;
+
+        // Loot
+        public static final ModConfigSpec.BooleanValue LOOT;
 
         static {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+
+            LOOT = builder
+                  .comment("Envelope will add its items to various loot chests, etc. Use datapack if you need finer control. This is basically a kill switch.", "Default: true")
+                  .define("loot", true);
+
             SPEC = builder.build();
         }
-    }*/
+    }
 
     public static class Client {
         public static final ModConfigSpec SPEC;

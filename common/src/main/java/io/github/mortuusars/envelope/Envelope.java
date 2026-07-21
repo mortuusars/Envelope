@@ -2,19 +2,26 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.advancements.critereon.BreakPaperBoxWhenFallingTrigger;
+import io.github.mortuusars.envelope.advancements.critereon.MailDeliveredTrigger;
+import io.github.mortuusars.envelope.advancements.predicate.ItemOccludingBlockPredicate;
+import io.github.mortuusars.envelope.advancements.predicate.ItemPackagePredicate;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
+import io.github.mortuusars.envelope.world.entity.CharredPigeon;
+import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.component.seal.SealImpression;
+import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcastingRecipe;
+import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequestCancelingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.serializer.MailRecipeSerializer;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -25,6 +32,8 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import net.minecraft.advancements.critereon.ItemSubPredicate;
+import net.minecraft.advancements.critereon.PlayerTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -32,9 +41,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.stats.StatFormatter;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Unit;
@@ -77,13 +88,14 @@ public class Envelope {
         BlockEntityTypes.init();
         PoiTypes.init();
         EntityTypes.init();
+        EntityDataSerializers.init();
         Items.init();
         DataComponents.init();
-        Stats.init();
         CriteriaTriggers.init();
         ItemSubPredicates.init();
         MenuTypes.init();
         RecipeTypes.init();
+        Stats.init();
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
@@ -103,7 +115,17 @@ public class Envelope {
     public static class Blocks {
         public static final Map<ResourceLocation, Supplier<PigeonholeBlock>> PIGEONHOLES = new HashMap<>();
 
-        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak", MapColor.WOOD);
+        public static final Supplier<PigeonholeBlock> OAK_PIGEONHOLE = pigeonhole("oak", net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> SPRUCE_PIGEONHOLE = pigeonhole("spruce", net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> BIRCH_PIGEONHOLE = pigeonhole("birch", net.minecraft.world.level.block.Blocks.BIRCH_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> JUNGLE_PIGEONHOLE = pigeonhole("jungle", net.minecraft.world.level.block.Blocks.JUNGLE_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> ACACIA_PIGEONHOLE = pigeonhole("acacia", net.minecraft.world.level.block.Blocks.ACACIA_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> DARK_OAK_PIGEONHOLE = pigeonhole("dark_oak", net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> MANGROVE_PIGEONHOLE = pigeonhole("mangrove", net.minecraft.world.level.block.Blocks.MANGROVE_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> CHERRY_PIGEONHOLE = pigeonhole("cherry", net.minecraft.world.level.block.Blocks.CHERRY_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> BAMBOO_PIGEONHOLE = pigeonhole("bamboo", net.minecraft.world.level.block.Blocks.BAMBOO_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> CRIMSON_PIGEONHOLE = pigeonhole("crimson", net.minecraft.world.level.block.Blocks.CRIMSON_PLANKS.defaultMapColor());
+        public static final Supplier<PigeonholeBlock> WARPED_PIGEONHOLE = pigeonhole("warped", net.minecraft.world.level.block.Blocks.WARPED_PLANKS.defaultMapColor());
 
         public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
               () -> new MailboxBlock(BlockBehaviour.Properties.of()
@@ -138,6 +160,15 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
 
+        public static final Supplier<LetterBlock> LETTER = Register.block("letter",
+              () -> new LetterBlock(BlockBehaviour.Properties.of()
+                    .pushReaction(PushReaction.DESTROY)
+                    .sound(SoundTypes.PAPER)
+                    .ignitedByLava()
+                    .instabreak()
+                    .noCollission()
+                    .noOcclusion()));
+
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
             Supplier<PigeonholeBlock> block = Register.block(id,
@@ -164,6 +195,10 @@ public class Envelope {
         public static final Supplier<BlockEntityType<PackageBlockEntity>> PACKAGE =
               Register.blockEntityType("package", () -> Register.newBlockEntityType(
                     PackageBlockEntity::new, Blocks.PACKAGE.get(), Blocks.SEALED_PACKAGE.get()));
+
+        public static final Supplier<BlockEntityType<LetterBlockEntity>> LETTER =
+              Register.blockEntityType("letter", () -> Register.newBlockEntityType(
+                    LetterBlockEntity::new, Blocks.LETTER.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
             return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
@@ -202,6 +237,16 @@ public class Envelope {
         public static final List<Supplier<BlockItem>> PIGEONHOLES = new ArrayList<>();
 
         public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
+        public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = pigeonhole("spruce", Blocks.SPRUCE_PIGEONHOLE);
+        public static final Supplier<BlockItem> BIRCH_PIGEONHOLE = pigeonhole("birch", Blocks.BIRCH_PIGEONHOLE);
+        public static final Supplier<BlockItem> JUNGLE_PIGEONHOLE = pigeonhole("jungle", Blocks.JUNGLE_PIGEONHOLE);
+        public static final Supplier<BlockItem> ACACIA_PIGEONHOLE = pigeonhole("acacia", Blocks.ACACIA_PIGEONHOLE);
+        public static final Supplier<BlockItem> DARK_OAK_PIGEONHOLE = pigeonhole("dark_oak", Blocks.DARK_OAK_PIGEONHOLE);
+        public static final Supplier<BlockItem> MANGROVE_PIGEONHOLE = pigeonhole("mangrove", Blocks.MANGROVE_PIGEONHOLE);
+        public static final Supplier<BlockItem> CHERRY_PIGEONHOLE = pigeonhole("cherry", Blocks.CHERRY_PIGEONHOLE);
+        public static final Supplier<BlockItem> BAMBOO_PIGEONHOLE = pigeonhole("bamboo", Blocks.BAMBOO_PIGEONHOLE);
+        public static final Supplier<BlockItem> CRIMSON_PIGEONHOLE = pigeonhole("crimson", Blocks.CRIMSON_PIGEONHOLE);
+        public static final Supplier<BlockItem> WARPED_PIGEONHOLE = pigeonhole("warped", Blocks.WARPED_PIGEONHOLE);
 
         public static final Supplier<MailboxBlockItem> MAILBOX = Register.item("mailbox",
               () -> new MailboxBlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
@@ -209,7 +254,7 @@ public class Envelope {
         public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = Register.item("letter_and_quill",
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = Register.item("letter",
-              () -> new LetterItem(new Item.Properties()));
+              () -> new LetterItem(Blocks.LETTER.get(), new Item.Properties()));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
               () -> new SealedLetterItem(new Item.Properties()));
 
@@ -234,6 +279,8 @@ public class Envelope {
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
+        public static final Supplier<SpawnEggItem> CHARRED_PIGEON_SPAWN_EGG = Register.item("charred_pigeon_spawn_egg",
+              () -> new SpawnEggItem(EntityTypes.CHARRED_PIGEON.get(), 0x2B2223, 0xE85F00, new Item.Properties()));
 
         private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
             Supplier<BlockItem> item = Register.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
@@ -290,8 +337,11 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = Register.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<Holder<SealImpression>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
-              b -> b.persistent(SealImpression.CODEC).networkSynchronized(SealImpression.STREAM_CODEC).cacheEncoding());
+        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_DIE = Register.dataComponentType("seal_stamp_die",
+              b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
+        @Deprecated(forRemoval = true)
+        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
+              b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
 
         // -- Payback
 
@@ -316,6 +366,22 @@ public class Envelope {
                     .eyeHeight(0.59375F)
                     .passengerAttachments(0.4625F)
                     .clientTrackingRange(8));
+
+        public static final Supplier<EntityType<CharredPigeon>> CHARRED_PIGEON = Register.entityType("charred_pigeon",
+              CharredPigeon::new, MobCategory.MONSTER, true, builder -> builder
+                    .sized(0.65F, 0.85F)
+                    .eyeHeight(0.59375F)
+                    .passengerAttachments(0.4625F)
+                    .clientTrackingRange(8));
+
+
+        static void init() {
+        }
+    }
+
+    public static class EntityDataSerializers {
+        public static final Supplier<EntityDataSerializer<Holder<PigeonVariant>>> PIGEON_VARIANT =
+              Register.entityDataSerializer("pigeon_variant", EntityDataSerializer.forValueType(PigeonVariant.STREAM_CODEC));
 
         static void init() {
         }
@@ -367,6 +433,8 @@ public class Envelope {
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
         public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_LETTER_BROADCASTING = Register.recipeSerializer(
               "mail_letter_broadcasting", MailLetterBroadcastingRecipe.Serializer::new);
+        public static final Supplier<RecipeSerializer<MailPaybackRequestCancelingRecipe>> MAIL_PAYBACK_REQUEST_CANCELING = Register.recipeSerializer(
+              "mail_payback_request_canceling", MailPaybackRequestCancelingRecipe.Serializer::new);
 
         static void init() {
         }
@@ -389,6 +457,20 @@ public class Envelope {
         public static final Supplier<SoundEvent> PIGEON_HURT = register("entity", "pigeon.hurt");
         public static final Supplier<SoundEvent> PIGEON_STEP = register("entity", "pigeon.step");
 
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_AMBIENT = register("entity", "charred_pigeon.ambient");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_DEATH = register("entity", "charred_pigeon.death");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_FLY = register("entity", "charred_pigeon.fly");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_HURT = register("entity", "charred_pigeon.hurt");
+        public static final Supplier<SoundEvent> CHARRED_PIGEON_STEP = register("entity", "charred_pigeon.step");
+
+        public static final Supplier<SoundEvent> PIGEONHOLE_ENTER = register("block", "pigeonhole.enter");
+        public static final Supplier<SoundEvent> PIGEONHOLE_EXIT = register("block", "pigeonhole.exit");
+        public static final Supplier<SoundEvent> PIGEONHOLE_WORK = register("block", "pigeonhole.work");
+        public static final Supplier<SoundEvent> PIGEONHOLE_WORK_MULTIPLE = register("block", "pigeonhole.work_multiple");
+        public static final Supplier<SoundEvent> PIGEONHOLE_SCOOP = register("block", "pigeonhole.scoop");
+
+        public static final Supplier<SoundEvent> VILLAGER_THROW_PIGEON_FOOD = register("entity", "villager.throw_pigeon_food");
+
         private static Supplier<SoundEvent> register(String category, String key) {
             Preconditions.checkState(category != null && !category.isEmpty(), "'category' should not be empty.");
             Preconditions.checkState(key != null && !key.isEmpty(), "'key' should not be empty.");
@@ -410,50 +492,119 @@ public class Envelope {
     }
 
     public static class Stats {
+        public static final Supplier<ResourceLocation> INTERACT_WITH_MAILBOX =
+              Register.stat(resource("interact_with_mailbox"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> MAIL_DELIVERIES =
+              Register.stat(resource("mail_deliveries"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> SEALS_APPLIED =
+              Register.stat(resource("seals_applied"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> SEALS_BROKEN =
+              Register.stat(resource("seals_broken"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> LETTERS_FOLDED =
+              Register.stat(resource("letters_folded"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> PACKAGES_CREATED =
+              Register.stat(resource("packages_created"), StatFormatter.DEFAULT);
+        public static final Supplier<ResourceLocation> PACKAGES_OPENED =
+              Register.stat(resource("packages_opened"), StatFormatter.DEFAULT);
+
         public static void init() {
         }
     }
 
     public static class CriteriaTriggers {
+        public static Supplier<MailDeliveredTrigger> MAIL_DELIVERED = Register.criterionTrigger("mail_delivered", MailDeliveredTrigger::new);
+        public static Supplier<BreakPaperBoxWhenFallingTrigger> BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER = Register.criterionTrigger("break_paper_box_when_falling", BreakPaperBoxWhenFallingTrigger::new);
+        public static Supplier<PlayerTrigger> SMOKE_PIGEONHOLE = Register.criterionTrigger("smoke_pigeonhole", PlayerTrigger::new);
+        public static Supplier<PlayerTrigger> SCOOP_DIAMOND = Register.criterionTrigger("scoop_diamond", PlayerTrigger::new);
+        public static Supplier<PlayerTrigger> SPAWN_ARCHIMEDES = Register.criterionTrigger("spawn_archimedes", PlayerTrigger::new);
+
         public static void init() {
         }
     }
 
     public static class ItemSubPredicates {
+        public static Supplier<ItemSubPredicate.Type<ItemPackagePredicate>> PACKAGE_CONTENTS = Register.itemSubPredicate("package_contents",
+              () -> new ItemSubPredicate.Type<>(ItemPackagePredicate.CODEC));
+        public static Supplier<ItemSubPredicate.Type<ItemOccludingBlockPredicate>> OCCLUDING_BLOCK = Register.itemSubPredicate("occluding_block",
+              () -> new ItemSubPredicate.Type<>(ItemOccludingBlockPredicate.CODEC));
+
         public static void init() {
         }
     }
 
     public static class LootTables {
+        public static final ResourceKey<LootTable> PIGEONHOLE_WASTE =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("gameplay/pigeonhole_waste"));
+        public static final ResourceKey<LootTable> CHARRED_PIGEON_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("gameplay/charred_pigeon_mail"));
+
         public static final ResourceKey<LootTable> LOST_MAIL =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail"));
         public static final ResourceKey<LootTable> LOST_MAIL_JUNK =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_junk"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/junk"));
         public static final ResourceKey<LootTable> LOST_MAIL_PLANTS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_plants"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/plants"));
         public static final ResourceKey<LootTable> LOST_MAIL_BLOCKS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_blocks"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/blocks"));
         public static final ResourceKey<LootTable> LOST_MAIL_METALS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_metals"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/metals"));
         public static final ResourceKey<LootTable> LOST_MAIL_TOOLS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_tools"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/tools"));
         public static final ResourceKey<LootTable> LOST_MAIL_WEAPONS =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_weapons"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/weapons"));
         public static final ResourceKey<LootTable> LOST_MAIL_VALUABLES =
-              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("lost_mail_valuables"));
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/lost_mail/valuables"));
+
+        public static final ResourceKey<LootTable> NETHER_LOST_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("packages/nether_lost_mail"));
+
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE_MAIL =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage_mail"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE_MATERIALS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage_materials"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_STORAGE_STAMPS =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/storage_stamps"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_MANUFACTORY =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/manufactory"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_DISPATCHERY =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/dispatchery"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_CONSTRUCTION =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/collapsed_mail_hub/construction"));
+        public static final ResourceKey<LootTable> COLLAPSED_MAIL_HUB_DOCK_NOTE =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("letters/collapsed_mail_hub/dock_note"));
+
+        public static final ResourceKey<LootTable> ABANDONED_MINESHAFT_INJECT =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/abandoned_mineshaft_inject"));
+        public static final ResourceKey<LootTable> PILLAGER_OUTPOST_INJECT =
+              ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, Envelope.resource("chests/pillager_outpost_inject"));
     }
 
     public static class Tags {
         public static class Blocks {
             public static final TagKey<Block> PIGEONS_SPAWNABLE_ON =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeons_spawnable_on"));
+            public static final TagKey<Block> PIGEONS_PERCHABLE_ON =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeons_perchable_on"));
             public static final TagKey<Block> PIGEONHOLES =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes"));
+            public static final TagKey<Block> PIGEONHOLES_THAT_BURN =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes_that_burn"));
+            public static final TagKey<Block> BURNING =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("burning"));
         }
 
         public static class Items {
             public static final TagKey<Item> PIGEON_FOOD =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeon_food"));
+
+            public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_COMMON =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_common"));
+            public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_UNCOMMON =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_uncommon"));
+            public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_RARE =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_rare"));
 
             public static final TagKey<Item> PIGEONHOLES =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeonholes"));
@@ -475,19 +626,25 @@ public class Envelope {
         public static class EntityTypes {
             public static final TagKey<EntityType<?>> PIGEONHOLE_INHABITORS =
                   TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, resource("pigeonhole_inhabitors"));
+            public static final TagKey<EntityType<?>> SPAWNS_ARCHIMEDES =
+                  TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, resource("spawns_archimedes"));
         }
 
         public static class DamageTypes {
             public static final TagKey<DamageType> BYPASSES_PIGEON_DELIVERY_EVASION =
                   TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("bypasses_pigeon_delivery_evasion"));
+            public static final TagKey<DamageType> SPAWNS_ARCHIMEDES =
+                  TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("spawns_archimedes"));
         }
 
         public static class Biomes {
             public static final TagKey<Biome> ALLOWS_PIGEON_SPAWNS =
                   TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_pigeon_spawns"));
+            public static final TagKey<Biome> ALLOWS_CHARRED_PIGEON_SPAWNS =
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("allows_charred_pigeon_spawns"));
 
-            public static final TagKey<Biome> HAS_PASSENGER_PIGEONS =
-                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("has_passenger_pigeons"));
+            public static final TagKey<Biome> SPAWNS_PASSENGER_PIGEONS =
+                  TagKey.create(net.minecraft.core.registries.Registries.BIOME, resource("spawns_passenger_pigeons"));
         }
 
         public static class Structures {
@@ -496,10 +653,10 @@ public class Envelope {
         }
 
         public static class SealImpressions {
-            public static final TagKey<SealImpression> SPECIAL =
-                  TagKey.create(Registries.SEAL_IMPRESSION, resource("special"));
-            public static final TagKey<SealImpression> TOOLS =
-                  TagKey.create(Registries.SEAL_IMPRESSION, resource("tools"));
+            public static final TagKey<SealSymbol> SPECIAL =
+                  TagKey.create(Registries.SEAL_SYMBOL, resource("special"));
+            public static final TagKey<SealSymbol> TOOLS =
+                  TagKey.create(Registries.SEAL_SYMBOL, resource("tools"));
         }
 
         public static class ServiceAddresses {
@@ -517,12 +674,15 @@ public class Envelope {
     }
 
     public static class Registries {
+        public static final ResourceKey<Registry<PigeonVariant>> PIGEON_VARIANT =
+              ResourceKey.createRegistryKey(resource("pigeon_variant"));
+
         public static final ResourceKey<Registry<ServiceAddressDefinition>> SERVICE_ADDRESS_DEFINITION =
               ResourceKey.createRegistryKey(resource("service_address"));
 
         public static final ResourceKey<Registry<SealMaterial>> SEAL_MATERIAL =
               ResourceKey.createRegistryKey(resource("seal_material"));
-        public static final ResourceKey<Registry<SealImpression>> SEAL_IMPRESSION =
-              ResourceKey.createRegistryKey(resource("seal_impression"));
+        public static final ResourceKey<Registry<SealSymbol>> SEAL_SYMBOL =
+              ResourceKey.createRegistryKey(resource("seal_symbol"));
     }
 }

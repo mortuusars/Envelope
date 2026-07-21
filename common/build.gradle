@@ -17,8 +17,9 @@ dependencies {
     modApi("fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:${forge_config_api_port_version}")
     modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
 
-    // Needed for mixin to fix formatting key conflicts
+    // Needed for mixins into JEI for advanced compat
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common:${jei_version}")
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-lib:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-gui:${jei_version}")
 
     modCompileOnly("dev.ryanhcode.sable:sable-common-${minecraft_version}:${sable_version}")

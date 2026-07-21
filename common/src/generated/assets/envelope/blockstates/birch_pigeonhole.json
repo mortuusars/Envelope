@@ -1,0 +1,94 @@
+{
+  "variants": {
+    "facing=east,waste_level=0": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 90
+    },
+    "facing=east,waste_level=1": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 90
+    },
+    "facing=east,waste_level=2": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 90
+    },
+    "facing=east,waste_level=3": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 90
+    },
+    "facing=east,waste_level=4": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 90
+    },
+    "facing=east,waste_level=5": {
+      "model": "envelope:block/birch_pigeonhole_waste",
+      "y": 90
+    },
+    "facing=north,waste_level=0": {
+      "model": "envelope:block/birch_pigeonhole"
+    },
+    "facing=north,waste_level=1": {
+      "model": "envelope:block/birch_pigeonhole"
+    },
+    "facing=north,waste_level=2": {
+      "model": "envelope:block/birch_pigeonhole"
+    },
+    "facing=north,waste_level=3": {
+      "model": "envelope:block/birch_pigeonhole"
+    },
+    "facing=north,waste_level=4": {
+      "model": "envelope:block/birch_pigeonhole"
+    },
+    "facing=north,waste_level=5": {
+      "model": "envelope:block/birch_pigeonhole_waste"
+    },
+    "facing=south,waste_level=0": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 180
+    },
+    "facing=south,waste_level=1": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 180
+    },
+    "facing=south,waste_level=2": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 180
+    },
+    "facing=south,waste_level=3": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 180
+    },
+    "facing=south,waste_level=4": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 180
+    },
+    "facing=south,waste_level=5": {
+      "model": "envelope:block/birch_pigeonhole_waste",
+      "y": 180
+    },
+    "facing=west,waste_level=0": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 270
+    },
+    "facing=west,waste_level=1": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 270
+    },
+    "facing=west,waste_level=2": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 270
+    },
+    "facing=west,waste_level=3": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 270
+    },
+    "facing=west,waste_level=4": {
+      "model": "envelope:block/birch_pigeonhole",
+      "y": 270
+    },
+    "facing=west,waste_level=5": {
+      "model": "envelope:block/birch_pigeonhole_waste",
+      "y": 270
+    }
+  }
+}

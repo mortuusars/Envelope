@@ -1,5 +1,15 @@
 {
   "values": [
-    "envelope:oak_pigeonhole"
+    "envelope:jungle_pigeonhole",
+    "envelope:dark_oak_pigeonhole",
+    "envelope:oak_pigeonhole",
+    "envelope:crimson_pigeonhole",
+    "envelope:warped_pigeonhole",
+    "envelope:cherry_pigeonhole",
+    "envelope:birch_pigeonhole",
+    "envelope:acacia_pigeonhole",
+    "envelope:spruce_pigeonhole",
+    "envelope:mangrove_pigeonhole",
+    "envelope:bamboo_pigeonhole"
   ]
 }

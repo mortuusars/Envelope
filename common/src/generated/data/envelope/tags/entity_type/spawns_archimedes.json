@@ -1,0 +1,12 @@
+{
+  "remove": [
+    "minecraft:drowned"
+  ],
+  "values": [
+    "#minecraft:zombies",
+    "#minecraft:raiders",
+    "minecraft:wandering_trader",
+    "minecraft:piglin",
+    "minecraft:piglin_brute"
+  ]
+}

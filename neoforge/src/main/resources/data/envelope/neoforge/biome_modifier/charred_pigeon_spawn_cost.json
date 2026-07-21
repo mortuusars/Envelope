@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_spawn_costs",
+  "biomes": "#envelope:allows_charred_pigeon_spawns",
+  "entity_types": "envelope:charred_pigeon",
+  "spawn_cost": {
+    "energy_budget": 0.15,
+    "charge": 0.7
+  }
+}
