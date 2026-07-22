@@ -261,7 +261,7 @@ publishMods {
         type = STABLE
     }
 
-    var forceDryRun = true
+    var forceDryRun = false
     dryRun = forceDryRun
             || (providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null
             || providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null)
