@@ -246,6 +246,11 @@ public class MailboxMenu extends AbstractContainerMenu {
             if (!moveMailToInventory(player, 0)) {
                 return movedSomething;
             }
+
+            if (player.level().isClientSide()) {
+                return true;
+            }
+
             movedSomething = true;
         }
         return true;
