@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.1 - 2026-07-23
+- Fixed service crafting returning the input package instead of a package with leftover items when not all items were used in the craft.
+
 ## 0.7.0 - Integration Hell - 2026-07-21
 
 ### Devlog / Showcase: 

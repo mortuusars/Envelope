@@ -173,8 +173,8 @@ public interface Courier {
         MailDropOffContext context = new MailDropOffContext(MailService.of(level), recipient, delivery);
         MailDropOffResult result = DROP_OFF_HANDLER.handle(context);
 
-        if (result.isHandled() && !(result instanceof MailDropOffResult.Returned)) {
-            if (recipient.equals(delivery.getRecipient())) {
+        if (result.isHandled()) {
+            if (recipient.equals(delivery.getRecipient()) && !(result instanceof MailDropOffResult.Returned)) {
                 delivery.getOwner()
                       .map(level::getPlayerByUUID)
                       .ifPresent(player -> {
@@ -193,6 +193,7 @@ public interface Courier {
                     Mail.writeToLog(mail, DeliveryRecord.sentFrom(delivery.getRecipient()));
                 }
             }
+
             delivery.setMail(mail);
         }
     }
