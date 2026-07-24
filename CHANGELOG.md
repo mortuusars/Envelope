@@ -1,5 +1,8 @@
 # Changelog
 
+## UNRELEASED
+- Fixed pigeon head not tilting up/down to look at stuff when flying. 
+
 ## 0.7.1 - 2026-07-23
 - Fixed service crafting returning the input package instead of a package with leftover items when not all items were used in the craft.
 - Fixed transferring all mail from inbox with Ctrl+Shift+Click hanging the client indefinitely. 

@@ -158,7 +158,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                 }
                 anim = ((float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim));
                 body.xRot = anim * 0.05f;
-                head.xRot = -anim * 0.025f;
+                head.xRot += -anim * 0.025f;
                 head.z -= 0.5F * (anim);
 
                 leftWing.xRot += (anim * 0.1f);
