@@ -190,7 +190,6 @@ public class PackageLootProvider implements LootTableSubProvider {
                     .add(LootItem.lootTableItem(Items.GOLD_INGOT).setWeight(50).apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 16.0F))))
                     .add(LootItem.lootTableItem(Items.EMERALD).setWeight(50).apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 16.0F))))
                     .add(LootItem.lootTableItem(Items.AMETHYST_SHARD).setWeight(25).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 4.0F))))
-                    .add(LootItem.lootTableItem(Items.AMETHYST_SHARD).setWeight(25).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 4.0F))))
                     .add(LootItem.lootTableItem(Items.LAPIS_LAZULI).setWeight(25).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 12.0F))))
                     .add(LootItem.lootTableItem(Items.BOOK).setWeight(25).apply(EnchantWithLevelsFunction.enchantWithLevels(registries, ConstantValue.exactly(30.0F))))
                     .add(LootItem.lootTableItem(Items.EXPERIENCE_BOTTLE).setWeight(25).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 6.0F))))

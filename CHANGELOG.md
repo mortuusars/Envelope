@@ -1,7 +1,8 @@
 # Changelog
 
 ## UNRELEASED
-- Fixed pigeon head not tilting up/down to look at stuff when flying. 
+- Fixed pigeon head not tilting up/down to look at stuff when flying 
+- Removed duplicated amethyst shard entry in `envelope:packages/lost_mail/valuables` loot table
 
 ## 0.7.1 - 2026-07-23
 - Fixed service crafting returning the input package instead of a package with leftover items when not all items were used in the craft.
