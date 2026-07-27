@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## 0.7.2 - 2026-07-27
 - Fixed pigeon head not tilting up/down to look at stuff when flying
 - Fixed KubeJS handleMailDropOff event not working correctly.
 - Removed duplicated amethyst shard entry in `envelope:packages/lost_mail/valuables` loot table
