@@ -4,13 +4,15 @@ title: Mailbox
 type: block
 ---
 
-**Mailboxes** are craftable blocks that send and receive mail.
+**Mailbox** is a craftable block that send, receive and store mail.
 
 ## Placement
 Trying to place mailbox in the world will open an **address selection** interface, similar to that of [address tag](@envelope:address_tag).\
-After choosing a unique address and confirming, **3 levels of experience** will be consumed and the mailbox block will be placed.
+After choosing a unique address and confirming, **<img src="https://minecraft.wiki/images/Experience_Orb_Value_3-6.png" width={20}/> 3 levels of experience** will be consumed and the mailbox block will be placed.
 
 <Callout variant="info">After placement, [address tag](@envelope:address_tag) can be used to change the address to a new one, without breaking and replacing the block.</Callout>
+
+Mailbox will have a **hanging** shape when placed while looking at a side of another block.
 
 ## Usage
 
@@ -18,11 +20,11 @@ After choosing a unique address and confirming, **3 levels of experience** will 
 Using the mailbox opens its interface, where current address, inbox area, pigeon food slot and slot for sending mail can be seen.
 
 <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
-    <ModAsset location="envelope:gui/mailbox" width={610} />
+    <Asset location="envelope:gui/mailbox" width={610} />
     <div style={{ marginTop: "6px"}}>*Mailbox interface*</div>
 </center>
 
-### Default address
+#### Default address
 A button in the mailbox interface near the current address can be pressed to set this mailbox as player's **default address**.\
 This address will then be used when mail is send to this player's name.
 
@@ -30,15 +32,26 @@ If the player does not currently have a default address, the button will flash, 
 
 <Callout variant="info">Multiple players can have their default address set to the same mailbox.</Callout>
 
-## Delivery
-Mail feature of the mailbox is its ability to start deliveries.
-
-Three things are needed for the delivery:
-- [Mailable](@envelope:mail) item with an [address tag](@envelope:address_tag) applied to it.
-- Food for the [pigeon](@envelope:pigeon), any seeds can be used.
-- A [pigeon](@envelope:pigeon).
+### Sending mail
+Three things are needed to start a [delivery](@envelope:delivery):
+- [Mailable](@envelope:mail) item with an [address tag](@envelope:address_tag) applied to it
+- Food for the [pigeon](@envelope:pigeon) (accepts any seeds)
+- A [pigeon](@envelope:pigeon)
 
 Placing mail in the sending slot and seeds in the food slot will open the front hatch of a mailbox. Nearby pigeons,
-that are not tired will fly to the mailbox, consume the food, pick up the mail and start a [delivery process](@envelope:pigeon).
+that are not tired will fly to the mailbox, consume the food, pick up the mail and start the [delivery process](@envelope:delivery).
 
 Front hatch will be automatically closed when either the mail or food is missing.
+
+### Receiving mail
+When mail is delivered to a mailbox, it will be stored in an inbox. Mailbox can hold up to 512 item stacks of mail.
+
+Mail can be retrieved from the inbox by clicking on it in mailbox interface:
+- `Click` *- pick up*
+- `Shift+Click` *- transfer to the inventory*
+- `Ctrl+Shift+Click` *- transfer all to the inventory*
+
+[Hoppers](@minecraft:hopper) will also extract mail from inbox, when placed underneath the block.
+
+### Redstone signal
+[Redstone comparator](https://minecraft.wiki/w/comparator) will output a signal strength of 15 when the inbox has any mail inside, and 0 otherwise.

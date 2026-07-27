@@ -1,0 +1,40 @@
+---
+id: envelope:dovecote
+title: Dovecote
+icon: envelope:item/dovecote_plains
+type: other
+related_items: ["envelope:oak_pigeonhole", "envelope:pigeon"]
+---
+
+**Dovecote** is a small structure that generates naturally in various [Overworld](@minecraft:overworld) surface biomes.
+
+## Description
+Dovecotes are houses for pigeons, scattered randomly throughout the world. They are elevated from the ground to keep predators away.
+
+They come in four styles: *plains, taiga, savanna and desert*. Each uses the wood type and general design of its village type counterpart.
+Some dovecote styles have several variants:
+- Plains and Taiga dovecotes has shorter and taller variant (base is 1 block higher)
+- Savanna has Terracotta and Wood variants
+
+Some dovecote styles have a "decay", where a couple of random blocks may be missing.
+
+<Asset location="envelope:structure/dovecotes" width={2400} style={{ borderRadius: "10px" }} />
+<center>Plains | Taiga | Savanna (Terracotta) | Savanna (Wood) | Desert</center>
+
+Each dovecote contains [pigeonholes](@envelope:oak_pigeonhole), with desert style having the largest amount of them.\
+Some of the pigeonholes will be dirty.
+
+## Generation
+Dovecotes generate naturally in the following vanilla biomes:
+
+| Dovecote Style | Biome |
+| - | - |
+| <img src="https://minecraft.wiki/images/EnvSprite_new-village.png"/> Plains | [<img src="https://minecraft.wiki/images/BiomeSprite_plains.png"/> Plains](@minecraft:plains) <br/> [<img src="https://minecraft.wiki/images/BiomeSprite_meadow.png"/> Meadow](@minecraft:meadow) |
+| <img src="https://minecraft.wiki/images/EnvSprite_taiga-village.png"/> Taiga | [<img src="https://minecraft.wiki/images/BiomeSprite_taiga.png"/> Taiga](@minecraft:taiga) |
+| <img src="https://minecraft.wiki/images/EnvSprite_savanna-village.png"/> Savanna | [<img src="https://minecraft.wiki/images/BiomeSprite_savanna.png"/> Savanna](@minecraft:savanna) |
+| <img src="https://minecraft.wiki/images/EnvSprite_desert-village.png"/> Desert | [<img src="https://minecraft.wiki/images/BiomeSprite_desert.png"/> Desert](@minecraft:desert) |
+
+<Callout variant="info">Dovecotes use #minecraft:has_structure/village_*\<type\>* structure tag, so they will automatically support modded biomes if they have relevant tags.</Callout>
+
+Several [pigeons](@envelope:pigeon) will be spawned together with the structure upon generation.
+

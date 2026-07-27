@@ -1,0 +1,80 @@
+Envelope adds two events to [KubeJS](https://www.curseforge.com/minecraft/mc-mods/kubejs):
+
+## `EnvelopeEvents.handleMailDropOff`
+**handleMailDropOff** fires every time the mail is dropped off by the courier, including returns to sender or replies.
+
+This event fires before anything else and handling it prevents further logic from executing (mail would not be inserted into a mailbox, etc.)
+
+```js server_scripts/server.js
+// To reference a MailDropOffResult we need to load this java class first:
+const $MailDropOffResult = Java.loadClass('io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult')
+
+EnvelopeEvents.handleMailDropOff(event => {
+    console.info("Trying to drop off mail at " + event.getContext().getTarget())
+
+    // Exclude returned mail or replies:
+    if (event.getContext().getDelivery().getRecipient() != event.getContext().getTarget() ) {
+        return // do nothing
+    }
+
+    // Prevent mail receiving at night:
+    let time = event.getLevel().getDayTime()
+    if (time > 13000 && time < 23000) {
+        console.info("Mailboxes are closed at night.")
+        // Because we do not check for the specific address or address type,
+        // this will prevent all addresses from receiving mail at night.
+        event.success($MailDropOffResult.returned(event.getContext().getMail()))
+    }
+
+    // If not night - we let usual logic handle the delivery.
+})
+```
+
+Relevant envelope classes:
+- [HandleMailDropOffEventJS](https://github.com/mortuusars/Envelope/blob/1.21.1/neoforge/src/main/java/io/github/mortuusars/envelope/neoforge/integration/kubejs/event/HandleMailDropOffEventJS.java)
+- [MailDropOffContext](https://github.com/mortuusars/Envelope/blob/1.21.1/common/src/main/java/io/github/mortuusars/envelope/world/mail/dropoff/MailDropOffContext.java)
+- [MailDropOffResult](https://github.com/mortuusars/Envelope/blob/1.21.1/common/src/main/java/io/github/mortuusars/envelope/world/mail/dropoff/MailDropOffResult.java)
+
+## `EnvelopeEvents.registerServiceDropOffHandlers`
+**registerServiceDropOffHandlers** is a dedicated event for adding logic to custom [service addresses](../../content/services#definition).
+
+Mailing recipes of a service address are processed before the handler.
+
+```js startup_scripts/startup.js
+// To reference a MailDropOffResult we need to load this java class first:
+const $MailDropOffResult = Java.loadClass('io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult')
+
+EnvelopeEvents.registerServiceDropOffHandlers(event => {
+    // Handler is registered for a specific address:
+    event.register("namespace:test", context => {
+        console.info("[Test Address] Received mail: " + context.getMail())
+
+        let packageContents = context.getMail().get('envelope:package_contents')
+        console.log(packageContents)
+        if (packageContents) {
+            let items = packageContents.getItems()
+
+            let hasEmerald = false
+            for (let index = 0; index < items.size(); index++) {
+                if (items[index].getItem() == 'minecraft:emerald') {
+                    hasEmerald = true
+                }
+            }
+
+            if (hasEmerald) {
+                console.info("[Test Address] Sending a reply.")
+                let replyLetter = Item.of('envelope:letter[envelope:letter_content={text:{text:\'Very nice emerald\'}}]')
+                return $MailDropOffResult.reply(replyLetter);
+            }
+        }
+
+        console.info("[Test Address] Passing. Mail will be returned to sender.")
+        return $MailDropOffResult.PASS;
+    })
+})
+```
+
+Relevant envelope classes:
+- [RegisterServiceDropOffHandlersEventJS](https://github.com/mortuusars/Envelope/blob/1.21.1/neoforge/src/main/java/io/github/mortuusars/envelope/neoforge/integration/kubejs/event/RegisterServiceDropOffHandlersEventJS.java)
+- [MailDropOffContext](https://github.com/mortuusars/Envelope/blob/1.21.1/common/src/main/java/io/github/mortuusars/envelope/world/mail/dropoff/MailDropOffContext.java)
+- [MailDropOffResult](https://github.com/mortuusars/Envelope/blob/1.21.1/common/src/main/java/io/github/mortuusars/envelope/world/mail/dropoff/MailDropOffResult.java)

@@ -1,0 +1,36 @@
+---
+id: envelope:payback_tag
+title: Payback Tag
+type: item
+related_items: ["envelope:mailbox", "envelope:letter", "envelope:sealed_letter", "envelope:package", "envelope:sealed_package"]
+---
+
+**Payback Tag** is an item used for setting a [payback](delivery#payback) request on a [mailable item](@envelope:mail), allowing for a safe trade of items between addresses.
+
+## Obtaining
+Payback tag is obtained through mailing. Sending an [address tag](@envelope:address_tag) with red dye to the <Asset location="envelope:gui/address_mail_service" width={20} /> **Mail Service** will produce a reply with payback tag.
+
+## Usage
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        ### Payback request selection
+        Using the item in hand will open interface where player can select requested items and request duration.
+
+        Placing an item from player's inventory in the payback slots will set a "ghost" of this item. Placed items are not consumed.\
+        Items can also be dragged from [JEI](https://www.curseforge.com/minecraft/mc-mods/jei).
+
+        Scrolling with mouse over requested slot will change the count.\
+        Holding `Shift` increases change per single scroll from 1 to 10.
+    </div>
+
+    <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:gui/payback_tag" width={450} style={{ borderRadius: "10px" }} />
+        <div style={{ marginTop: "6px"}}>*Payback Tag interface*</div>
+    </center>
+</div>
+
+### Application
+Payback tag is applied to a mailable item by picking it up in inventory and right-clicking with it on the target item, similar to a [bundle](@minecraft:bundle).\
+Alternatively, payback tag can be applied by crafting it together with mailable item.
+
+Tag is consumed in the process.

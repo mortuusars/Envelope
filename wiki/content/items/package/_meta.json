@@ -1,4 +1,8 @@
 {
+  "paper_box.mdx": "Paper Box",
   "package.mdx": "Package",
-  "sealed_package.mdx": "Sealed Package"
+  "sealed_package.mdx": "Sealed Package",
+  "payback_box.mdx": "Payback Box",
+  "payback_package.mdx": "Payback Package",
+  "lost_mail.mdx": "Lost Mail"
 }

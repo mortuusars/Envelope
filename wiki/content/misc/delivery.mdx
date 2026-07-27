@@ -1,0 +1,96 @@
+---
+id: envelope:delivery
+title: Delivery
+icon: envelope:misc/delivery/delivery
+type: other
+related_items: ["envelope:pigeon", "envelope:mailbox", "envelope:address_tag", "envelope:letter", "envelope:sealed_letter", "envelope:package", "envelope:sealed_package"]
+---
+
+**Delivery** is the process of carrying [mail](@envelope:mail) from sender to the recipient and returning back, with or without a reply.
+
+## Route
+Delivery route has 5 positions:
+- Sender
+- Sender transition point
+- Mail Hub
+- Recipient transition point
+- Recipient
+
+It looks similar to a flight of an airplane: courier ascends to the sender transition point, travels to the hub then travels to the recipient transition point, then descend to the recipient. Return back home follows the same logic but reversed.
+
+Ascends and descends are the only parts of a courier's flight that happen in the world. They use regular entity pathfinding to try to reach the target position of a phase.
+
+- When the chunk with a courier unloads - delivery will continue in the background regardless of the phase
+- If the chunk becomes loaded again - courier will return to the world
+- When a courier finishes delivery in an unloaded chunk - it will be spawned next time that chunk is loaded
+
+<center style={{ backgroundColor: "#7F7F7F15", borderRadius: "10px", paddingBottom: "4px"}}>
+    <Asset location="envelope:misc/delivery/delivery_route" width={1698} />
+    <div style={{ marginTop: "6px"}}>*Route schematic and courier visibility*</div>
+</center>
+
+## Mail Hub
+Couriers do not fly straight from A to B. They must go through a virtual point called Mail Hub.
+
+<Callout variant="info">
+Don't mix up Mail Hub with [Collapsed Mail Hub](collapsed_mail_hub).\
+Even though they are representing the same idea:
+- • **mail hub**: virtual, inaccessible place; used by the code for delivery logic
+- • **collapsed mail hub**: real place for exploration, lore and loot; does not play any role in deliveries
+</Callout>
+
+Hub is where many important decisions and checks are made -
+recipient existence, distance calculation (influencing flight duration), handling [payback](@envelope:payback_tag).
+
+### Location
+Hubs are located in a 1024 block grid, at Y320.
+
+When delivery starts - hub nearest to the sender is chosen:\
+*If sender is at `X720, Z1337` and recipient is at `X999999, Z999999` - mail hub at `X1024, Z1024` will be chosen.*
+
+Mail hub location will impact the direction courier flies off to, [delivery duration](#duration) and other delivery properties.
+
+<Callout variant="info">
+Because the Mail Service location is set to be relative with a distance of 0 - mail hub can be considered as its location.
+</Callout>
+
+## Duration
+Delivery duration is based on distance between the sender, recipient and a chosen mail hub.\
+Duration uses the following formula:\
+`duration` = (`distance from sender to hub` + `distance from recipient to hub`) / `courier travel speed`\
+By default, `courier travel speed` is 20 blocks/second.
+
+For the duration calculation, distance from an address to mail hub is capped at 5000 blocks, so distant deliveries wouldn't take too much time.
+
+All this only applies to the traveling phases of a delivery, when a courier is in a background.
+
+## Payback
+Delivery involving payback is handled differently from usual deliveries:
+
+Instead of being delivered straight to the buyer, mail with payback request will be kept at Mail Service and the courier will immediately return back to seller.\
+Simultaneously, a [payback box](@envelope:payback_box) will be sent to the buyer by a service courier.
+
+Mail with request will remain at Mail Service for the duration selected on the payback tag, awaiting payback from the buyer.\
+If buyer does not send [payback package](@envelope:payback_package) in time, mail with request will be returned back to the seller.
+
+When buyer sends required items, Mail Service does some checks, and, if all is fine, sends the original mail to the buyer using the same courier.\
+Simultaneously, buyer's [payback package](@envelope:payback_package) will be sent to the seller by a service courier.
+
+<Callout variant="info">[Payback package](@envelope:payback_package) is converted into a regular [package](@envelope:package) when sent to the seller.</Callout>
+
+<center style={{ paddingBottom: "4px"}}>
+    <Asset location="envelope:misc/delivery/delivery_payback.gif" width={600} style={{ borderRadius: "10px" }}/>
+    <div style={{ marginTop: "6px"}}>*Payback delivery*</div>
+</center>
+
+Player can cancel a payback request by sending a [payback tag](@envelope:payback_tag) to <Asset location="envelope:gui/address_mail_service" width={20} /> **Mail Service**.\
+Last request will be cancelled and mail will return to the sender.
+
+## Commands
+Delivery can also be started using the `/envelope send <item[recipient]> [sender]` command.
+
+`/envelope send envelope:letter[envelope:mail_recipient={type:"player", name:"Steve"}] {type:"player", name:"mortuusars"}`
+
+- `envelope:mail_recipient` [address](@envelope:address) must be set
+- sender [address](@envelope:address) is optional, if omitted - receiver will see the sender as "Unknown"
+- any item can be sent, regardless if it has `#envelope:mailable` tag or not

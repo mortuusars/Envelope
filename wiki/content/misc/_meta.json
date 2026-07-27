@@ -1,3 +1,6 @@
 {
-  "address.mdx": "Address"
+  "address.mdx": "Address",
+  "mail.mdx": "Mail",
+  "delivery.mdx": "Delivery",
+  "services.mdx": "Services"
 }

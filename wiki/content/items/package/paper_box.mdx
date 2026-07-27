@@ -1,0 +1,56 @@
+---
+id: envelope:paper_box
+title: Paper Box
+type: item
+related_items: ["envelope:package"]
+---
+
+**Paper Box** is a craftable item that can be used to create a [package](@envelope:package).
+
+## Obtaining
+Paper box can be crafted in a [crafting table](https://minecraft.wiki/w/Crafting_Table) from [paper](@minecraft:paper) and a [honeycomb](@minecraft:honeycomb).
+
+It also generates as a block and in loot on a [collapsed mail hub](@envelope:collapsed_mail_hub) structure.\
+Some loot chests can contain it as well.
+
+Unpacking a [package](@envelope:package) has a 50% chance to return a paper box.
+
+## Usage
+### Packing
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Using the item in hand will open an interface where items can be placed in the box slots and packed.
+
+        Closing the interface without packing will return placed items back to player's inventory.
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:gui/paper_box" width={380} />
+        <div style={{ marginTop: "6px"}}>*Paper Box interface*</div>
+    </center>
+</div>
+
+### Placing
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        When used on the block while sneaking, paper box will be placed as a block.
+
+{/* Links don't work if not at the line start, again */}
+It's placed similar to [candles](@minecraft:candle) or [sea pickles](@minecraft:sea_pickle) -
+clicking on the block will add another box to the pile.
+        5th box will make a full block.
+
+        Paper box block can be placed on two axes.
+
+        Using the block with an empty hand while sneaking, will remove one box from the pile.
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:block/paper_box" width={380} style={{ borderRadius: "10px" }} />
+        <div style={{ marginTop: "6px"}}>*Placed Paper Boxes*</div>
+    </center>
+</div>
+
+### Fall Breaking
+When an entity falls onto a paper box block from unsafe height (when it would take damage),
+paper box will absorb the fall and break, dropping itself as an item.

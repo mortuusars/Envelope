@@ -11,7 +11,7 @@ related_items: ["envelope:address_tag", "envelope:mailbox"]
 ## Usage
 
 ### Mailbox
-Each [mailbox](@envelope:mailbox) should have an address to be able to send and deliver mail.
+Each [mailbox](@envelope:mailbox) must have an address to be able to send and receive mail.
 
 ### Mail
 Address is selected and applied to a mailable item using an [address tag](@envelope:address_tag).\
@@ -20,11 +20,11 @@ It's also used in a "sender" field and delivery log.
 ## Types
 
 There are 5 types of addresses:
-- <ModAsset location="envelope:misc/address_block" width={36} /> - **Block**: *mailbox*
-- <ModAsset location="envelope:misc/address_player" width={36} /> - **Player**: *player name; resolves to player's default mailbox*
-- <ModAsset location="envelope:misc/address_service" width={36} /> - **Service**: *NPCs*
-- <ModAsset location="envelope:misc/address_custom" width={36} /> - **Custom**: *for use in commands; cannot receive mail*
-- <ModAsset location="envelope:misc/address_unknown" width={36} /> - **Unknown**: *for cases where address could not be determined or does not exist*
+- <Asset location="envelope:misc/address_block" width={36} /> - **Block**: *mailbox*
+- <Asset location="envelope:misc/address_player" width={36} /> - **Player**: *player name; resolves to player's default mailbox*
+- <Asset location="envelope:misc/address_service" width={36} /> - **Service**: *NPCs*
+- <Asset location="envelope:misc/address_custom" width={36} /> - **Custom**: *for use in commands; cannot receive mail*
+- <Asset location="envelope:misc/address_unknown" width={36} /> - **Unknown**: *for cases where address could not be determined or does not exist*
 
 Players would mostly be dealing with **Block**, **Player** and **Service** types in-game.
 
@@ -44,47 +44,7 @@ Addresses can be defined in commands or json like this:
 { "type":"unknown" }
 ```
 
-### Service Address
-As opposed to the rest of the types which can be defined freely, service addresses must have it's "definition" registered first.
+<Callout>
+As opposed to the rest of the types which can be defined freely, **service address** needs to be [registered](services#definition) first.
+</Callout>
 
-<Callout>Note that service address by itself doesn't do anything, it's meant to be used in combination with mail recipes or custom mail handlers to be useful.</Callout>
-
-To register a definition, json file needs to be created in the `data/<namespace>/envelope/service_address/` folder.\
-*For example:*
-```json data/envelope/envelope/service_address/mail_service.json
-{
-  "name": { // translation key or literal 'text'
-    "translate": "address.envelope.mail_service"
-  },
-  "icon": "", // optional
-  "location": { // see further below
-    "type": "relative",
-    "distance": 0
-  }
-}
-```
-
-<Callout variant="info">Icon can be any symbol.\
-Mail service uses "`\uEE05`" in combination with custom font to display a unique icon.</Callout>
-
-Location controls delivery duration and is calculated relative to the nearest mail hub. *Possible definitions:*
-
-<CodeTabs>
-```json !!tabs relative
-"location": {
-    "type": "relative",
-    "distance": 500
-}
-```
-```json !!tabs exact
-"location": {
-    "type": "exact",
-    "pos": [12, 64, 42]
-}
-```
-```json !!tabs default
-"location": {
-    "type": "default" // `delivery.default_distance` from envelope-server config will be used
-}
-```
-</CodeTabs>

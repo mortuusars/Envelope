@@ -1,0 +1,33 @@
+---
+id: envelope:payback_package
+title: Payback Package
+type: item
+related_items: ["envelope:payback_box", "envelope:package"]
+custom:
+    Mailable: "Yes"
+---
+
+A **payback package** is a special type of [package](@envelope:package) that is used to send payment for a [payback](@envelope:payback_tag) request.\
+Can be mailed.
+
+## Obtaining
+The only way to obtain a payback package is by packing a [payback box](@envelope:payback_box).
+
+## Usage
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Payback Packages can be opened the same as regular [packages](@envelope:package).
+
+Unpacking a payback package has a 75% chance to return a [payback box](@envelope:payback_box), allowing for another try at packing.
+
+        <Callout variant="info">Unlike a regular [package](@envelope:package), payback package cannot be placed as a block.</Callout>
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:gui/payback_package" width={380} />
+        <div style={{ marginTop: "6px"}}>*Payback Package interface*</div>
+    </center>
+</div>
+
+
+

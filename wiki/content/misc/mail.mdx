@@ -5,14 +5,32 @@ type: item
 related_items: ["envelope:address_tag", "envelope:mailbox", "envelope:letter", "envelope:sealed_letter", "envelope:package", "envelope:sealed_package"]
 ---
 
-Any item that has `#envelope:mailable` item tag can be delivered.
+**Mail** is an item that's being carried by a courier during [delivery](@envelope:delivery).\
+Delivered mail will show a sender [address](address) in item's tooltip.
 
-Having this tag enables following functionality:
-- [Address Tag](@envelope:address_tag) recipient application
-- Item can be placed in [mailbox](@envelope:mailbox) sending slot
+## Mailable
+To apply an [Address Tag](@envelope:address_tag) to the item or insert the item into
+[Mailbox](@envelope:mailbox) sending slot, it needs to have a `#envelope:mailable` tag.
 
-### Currently mailable items:
-- <ModAsset location="envelope:item/letter" width={36} /> [Letter](@envelope:letter)
-- <ModAsset location="envelope:item/sealed_letter" width={36} /> [Sealed Letter](@envelope:sealed_letter)
-- <ModAsset location="envelope:item/package" width={36} /> [Package](@envelope:package)
-- <ModAsset location="envelope:item/sealed_package" width={36} /> [Sealed Package](@envelope:sealed_package)
+### Mailable items in Envelope:
+- <Asset location="envelope:item/letter" width={36} /> [Letter](@envelope:letter)
+- <Asset location="envelope:item/sealed_letter" width={36} /> [Sealed Letter](@envelope:sealed_letter)
+- <Asset location="envelope:item/package" width={36} /> [Package](@envelope:package)
+- <Asset location="envelope:item/sealed_package" width={36} /> [Sealed Package](@envelope:sealed_package)
+
+## Delivery Log
+
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Delivery log has information about sender and recipient addresses, as well as other information related to the delivery: payback status, return reason, etc.
+
+        When a mail was delivered, holding `Shift` will show a delivery log of this item, instead of a sender's address.
+
+        <Callout variant="info">Delivery Log is also shown in the inbox, when hovered over an address.</Callout>
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:misc/delivery_log_tooltip" width={426} />
+        <div style={{ marginTop: "6px"}}>*Delivery Log tooltip*</div>
+    </center>
+</div>

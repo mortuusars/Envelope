@@ -8,8 +8,10 @@ custom:
     Behavior: "Aggressive"
 ---
 
-**Charred pigeon** is a flying hostile mob found in [the Nether](https://minecraft.wiki/w/The_Nether).
-It wanders aimlessly and attacks any player on sight. It cannot take part in deliveries, unless converted into a regular [Pigeon](@envelope:pigeon).
+**Charred pigeon** is a flying hostile mob found in [the Nether](https://minecraft.wiki/w/The_Nether).\
+It wanders aimlessly and attacks any player on sight. It cannot take part in deliveries.
+
+Can be converted back into a regular [Pigeon](@envelope:pigeon).
 
 ## Spawning
 Charred Pigeon spawns in all Nether biomes, except [Basalt Deltas](https://minecraft.wiki/w/Basalt_Deltas).
@@ -17,22 +19,23 @@ Charred Pigeon spawns in all Nether biomes, except [Basalt Deltas](https://minec
 ### Conversion
 When a regular [Pigeon](@envelope:pigeon) stays in the Nether for 15 seconds, it will be converted into a Charred Pigeon.\
 And vice-versa: Charred Pigeon that stays outside of the Nether for 15 seconds will be "extinguished" into a regular [Pigeon](@envelope:pigeon).
-Pigeon will always have a **Charred** variant when that happens.
+Pigeon will always have a **Charred** [variant](pigeon#variants-and-spawning) when that happens.
 
 ## Mail
-<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
     <div style={{ flex: 1, marginTop: "-20px"}}>
-        Charred Pigeons spawned randomly have 1 in 5 chance to spawn carrying mail.
+        Charred Pigeons have 20% chance to spawn carrying mail.
 
-        Carried items include several variants of packages for service crafting and a nether variant of
-        [Lost Mail](@envelope:lost_mail) package, that has items from [piglin bartering](https://minecraft.wiki/w/Bartering) most of the time
+        Carried items include several variants of packages for service crafting and the Nether variant of
+        [Lost Mail](lost_mail) package, that has 75% chance to contain items from [piglin bartering](https://minecraft.wiki/w/Bartering)
+        and 25% chance to contain regular [Lost Mail](lost_mail) items.
 
         Carried mail will be dropped on the ground when Charred Pigeon dies or is converted into a regular [Pigeon](@envelope:pigeon).\
         Mail can also be removed by interacting with a pigeon with an empty hand.
     </div>
 
     <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
-        <ModAsset location="envelope:entity/charred_pigeon_mail" width={180}  />\
+        <Asset location="envelope:entity/charred_pigeon_mail" width={180}  />\
         <div style={{ marginTop: "6px"}}>*Charred Pigeon carrying mail*</div>
     </center>
 </div>
@@ -42,4 +45,8 @@ a special logic is implemented to keep the carried mail when a regular Pigeon is
 
 ## Drops
 Charred Pigeon does not drop any items when killed, except the mail it is carrying.
+
+<img src="https://minecraft.wiki/images/Experience_Orb_Value_3-6.png" width={20}/>5 [experience](https://minecraft.wiki/w/Experience)
+points are dropped when killed by a player or a tamed wolf.
+
 

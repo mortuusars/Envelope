@@ -7,7 +7,7 @@ custom:
     Mailable: "Yes"
 ---
 
-<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
     <div style={{ flex: 1, marginTop: "-20px"}}>
         A **sealed package** is a variant of a [package](@envelope:package) that has a proof of authorship and integrity.\
         Seal impression and name of the sealer is shown in the item's tooltip.\
@@ -15,7 +15,7 @@ custom:
     </div>
 
     <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
-        <ModAsset location="envelope:gui/sealed_package" width={350} />
+        <Asset location="envelope:gui/sealed_package" width={350} />
         <div style={{ marginTop: "6px"}}>*Sealed Package tooltip*</div>
     </center>
 </div>
@@ -24,5 +24,5 @@ custom:
 Sealed Package can be obtained by sealing a [package](@envelope:package) with a [seal stamp](@envelope:seal_stamp).
 
 ## Usage
-Seal can be removed by using the item and waiting for the animation to finish.\
+Seal can be removed by holding the use button until a "seal ripping" animation is finished.\
 Removing the seal clears the authorship information and returns the item back to a regular [package](@envelope:package).

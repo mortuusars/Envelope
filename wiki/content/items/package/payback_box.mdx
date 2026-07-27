@@ -1,0 +1,33 @@
+---
+id: envelope:payback_box
+title: Payback Box
+type: item
+related_items: ["envelope:payback_package"]
+---
+
+A **payback Box** is a special type of [paper box](@envelope:paper_box) that is used to pack a payment for a [payback](@envelope:payback_tag) request.
+
+## Obtaining
+Payback box is received from Mail Service as part of a payback delivery process.\
+Additionally, payback box has a 75% chance to drop when a [payback package](@envelope:payback_package) is unpacked, allowing for another try at packing.
+
+## Usage
+### Packing
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        Using the item in hand will open an interface where items can be placed in the box slots and packed.\
+        The interface displays requested items as placeholders and has a display slot where the item buyer will receive is shown.
+
+        Only items matching the request can be inserted into the box.\
+        Ability to pack the box into a [payback package](@envelope:payback_package) will be available only when all requested items are present.
+
+        Closing the interface without packing will return placed items back to player's inventory.
+
+        <Callout variant="info">Unlike a [paper box](@envelope:paper_box), payback box cannot be placed as a block.</Callout>
+    </div>
+
+    <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:gui/payback_box" width={380} />
+        <div style={{ marginTop: "6px"}}>*Payback Box interface*</div>
+    </center>
+</div>

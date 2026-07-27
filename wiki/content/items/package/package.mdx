@@ -16,14 +16,14 @@ Can be mailed.
 Package is created by packing items into a [paper box](@envelope:paper_box).
 
 ### Mailing
-Packages can be received by mail as result of a service crafting or from another player.
+Packages can be received by mail as a result of a service crafting or from another player.
 
 ### Loot
-Packages can be found on a [collapsed mail hub](@envelope:collapsed_mail_hub) or dropped from a [charred pigeon](@envelope:charred_pigeon)
+[Lost mail](lost_mail) packages can be found on a [collapsed mail hub](@envelope:collapsed_mail_hub) or dropped from a [charred pigeon](@envelope:charred_pigeon).
 
 ## Usage
 ### Opening
-<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
     <div style={{ flex: 1, marginTop: "-20px"}}>
         Packages can effectively condense 6 slots of items into single slot, thus they are quite handy as a cheap, single-use backpack.
 
@@ -37,29 +37,32 @@ Packages can be found on a [collapsed mail hub](@envelope:collapsed_mail_hub) or
 
         <Callout>Using the item while sneaking will destroy the package without opening the interface.
         Stored items will be placed in player's inventory or dropped, same as they do when opened through the interface.</Callout>
+
+        Unpacking a package has a 50% chance to return a [paper box](@envelope:paper_box).
     </div>
 
     <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
-        <ModAsset location="envelope:gui/package" width={380} />
+        <Asset location="envelope:gui/package" width={380} />
         <div style={{ marginTop: "6px"}}>*Package interface*</div>
     </center>
 </div>
 
 ### Placing
-<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start", marginBottom: "-2rem" }}>
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
     <div style={{ flex: 1, marginTop: "-20px"}}>
+
         When used on the block while sneaking, package will be placed as a block.
 
         Breaking a placed package will drop intact package item, with items inside.\
         Breaking it while sneaking will destroy the package and drop stored items on the ground.
 
-        #### Automation
+        ### Automation
         [Dispenser](https://minecraft.wiki/w/Dispenser) can place packages and
         a [piston](https://minecraft.wiki/w/Piston) can destroy it when pushing, dropping the items.
     </div>
 
     <center style={{ marginLeft: "1rem", marginRight: "0.2rem" }}>
-        <ModAsset location="envelope:block/package" width={216} style={{ borderRadius: "10px" }} />
+        <Asset location="envelope:block/package" width={216} style={{ borderRadius: "10px" }} />
         <div style={{ marginTop: "6px"}}>*Placed Package*</div>
     </center>
 </div>

@@ -1,6 +1,11 @@
 {
-  "index.mdx": {
-    "name": "Index",
-    "icon": null
+  "customization": "Customization",
+  "faq.mdx": {
+    "icon": "CircleQuestionMark",
+    "name": "FAQ"
+  },
+  "contributing_to_the_wiki.mdx": {
+    "icon": "ListPlus",
+    "name": "Contributing To The Wiki"
   }
 }

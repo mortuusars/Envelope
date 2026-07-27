@@ -1,0 +1,147 @@
+---
+id: envelope:services
+icon: envelope:misc/services
+title: Services
+type: other
+related_items: ["envelope:mail", "envelope:mailbox", "envelope:delivery"]
+---
+
+**Services** are virtual recipients that can receive and handle mail.
+
+## List of services
+Envelope currently has 3 services:
+
+### Mail Service
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        <Asset location="envelope:gui/address_mail_service" width={20} /> **Mail Service** is a special address that is used for mail infrastructure related correspondence.
+
+        It has several mailing recipes:
+        - [Letter](letter) broadcasting
+        - [Seal stamps](seal_stamp) with unique dies
+        - [Lost mail](lost_mail)
+        - [Payback tag](payback_tag)
+        - [Payback](delivery#payback) request cancelling
+
+        Mail Service also sends a Courier Death Notice to the sender's mailbox, when a courier dies while delivering.
+    </div>
+
+    <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:service/courier_death_notice" width={367} />
+        <div style={{ marginTop: "6px"}}>*Courier Death Notice*</div>
+    </center>
+</div>
+
+### Automated Supply Service
+<Asset location="envelope:gui/address_service" width={20} /> **Automated Supply Service** is a purely crafting oriented address.\
+It has various recipes like [rotten flesh](@minecraft:rotten_flesh) to [leather](@minecraft:leather), [saddle](@minecraft:saddle),
+[name tag](@minecraft:name_tag), alternative [book and quill](@minecraft:writable_book) and [letter and quill](@envelope:letter_and_quill), etc.
+
+### Equine Assurance Bureau
+<Asset location="envelope:gui/address_service" width={20} /> **Equine Assurance Bureau** sends spam letters asking players for a [block of gold](@minecraft:gold_block).
+
+Spam letter has a chance of being sent when player tames an animal.\
+Horse-like mobs have a 100% chance to trigger it, other animals only 20%.\
+Each letter sent or [block of gold](@minecraft:gold_block) received also lowers the chance of the next one.
+
+<details>
+<summary>Sending the gold (mild spoiler)</summary>
+<p>
+Sending a [block of gold](@minecraft:gold_block) to Equine Assurance Bureau will result in
+[golden horse armor](https://minecraft.wiki/w/Golden_Horse_Armor) being sent back.
+</p>
+</details>
+
+<Callout variant="info">
+**Equine Assurance Bureau** is hidden from address suggestions. Players need to manually type it's name into an [address tag](address_tag).\
+When typed correctly, address icon in the tag interface will change to the 'service': <Asset location="envelope:gui/address_service" width={20}/>
+</Callout>
+
+## Mailing
+<div style={{ display: "flex", flexWrap: "wrap", width: "100%", alignItems: "flex-start" }}>
+    <div style={{ flex: 1, marginTop: "-20px"}}>
+        All service addresses support mail crafting recipes by default.
+
+        Sending a package with items to an address will produce a result if matching recipe is found.\
+        Multiple crafting operations can be done with a single package.
+
+        If some if the items were unprocessed, they will be returned using the sender's courier and crafting results will arrive with a service courier.
+
+        ### Recipe Definition
+        Mailing recipes are defined similarly to the vanilla shapeless recipes:
+        ```json envelope:mailing/mail_service/payback_tag.json
+        {
+          "type": "envelope:mail_crafting",
+          "address": "envelope:mail_service",
+          "ingredients": [
+            {
+              "item": "envelope:address_tag"
+            },
+            {
+              "tag": "c:dyes/red"
+            }
+          ],
+          "result": {
+            "count": 1,
+            "id": "envelope:payback_tag"
+          }
+        }
+        ```
+    </div>
+
+    <center style={{ alignItems: 'top', marginLeft: "1rem", marginRight: "0.2rem" }}>
+        <Asset location="envelope:service/mailing" width={367} style={{ borderRadius: "10px" }} />
+        <div style={{ marginTop: "6px"}}>*Mailing recipes shown in [JEI](https://www.curseforge.com/minecraft/mc-mods/jei)*</div>
+    </center>
+</div>
+
+## Definition
+For the game to know about a service, it's definition must be registered.
+
+To register a definition, json file needs to be created in the `data/<namespace>/envelope/service_address/` folder.\
+*For example:*
+```json data/envelope/envelope/service_address/mail_service.json
+{
+  "name": { // translation key or literal 'text'
+    "translate": "address.envelope.mail_service"
+  },
+  "icon": "", // optional
+  "location": { // see further below
+    "type": "relative",
+    "distance": 0
+  }
+}
+```
+
+<Callout variant="info">Icon can be any symbol.\
+Mail service uses "`\uEE05`" in combination with custom font to display a unique icon.</Callout>
+
+`location` controls delivery duration and is calculated relative to the [mail hub](delivery#mail-hub).\
+*Possible definitions:*
+
+<CodeTabs>
+```json !!tabs relative
+"location": {
+    "type": "relative",
+    "distance": 500
+}
+```
+```json !!tabs exact
+"location": {
+    "type": "exact",
+    "pos": [12, 64, 42]
+}
+```
+```json !!tabs default
+"location": {
+    "type": "default" // `delivery.default_distance` from envelope-server config will be used
+}
+```
+</CodeTabs>
+
+**Note that service address by itself doesn't do anything, it's meant to be used
+in combination with mailing recipes or custom mail handlers to be useful.**
+
+### Custom Handlers
+Custom mail drop off handlers can be registered in code (from another java mod, that depends on Envelope) or using a [KubeJS](../docs/customization/kubejs).
+
