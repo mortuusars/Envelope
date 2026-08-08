@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -209,5 +210,13 @@ public class PaybackTagScreen extends AbstractInHandContainerScreen<PaybackTagMe
         int id = startId + hoveredSlot.index + (fast ? PaybackRequest.SLOTS : 0);
         getMenu().clickMenuButton(getMenu().getPlayer(), id);
         Minecrft.gameMode().handleInventoryButtonClick(getMenu().containerId, id);
+    }
+
+    @Override
+    protected boolean shouldRenderDisabledOverlayOver(Slot slot) {
+        if (slot instanceof GhostSlot) {
+            return false;
+        }
+        return super.shouldRenderDisabledOverlayOver(slot);
     }
 }

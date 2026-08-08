@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.inventory.slot;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,13 @@ public class GhostSlot extends Slot {
         this.filter = filter;
     }
 
+    /**
+     * Due to other mods using {@link #mayPlace} to check if they can insert items into the slot - we check if the item is valid separately.
+     */
+    public boolean canContain(ItemStack stack) {
+        return filter.test(stack);
+    }
+
     @Override
     public boolean isFake() {
         return true;
@@ -23,7 +31,12 @@ public class GhostSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return filter.test(stack);
+        return false;
+    }
+
+    @Override
+    public boolean mayPickup(Player player) {
+        return false;
     }
 
     @Override

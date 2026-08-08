@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.3 - 2026-08-08
+- Fixed dupe bug with Payback Tag and inventory sorter mods.
+
 ## 0.7.2 - 2026-07-27
 - Fixed pigeon head not tilting up/down to look at stuff when flying
 - Fixed KubeJS handleMailDropOff event not working correctly.

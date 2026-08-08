@@ -6,6 +6,11 @@ import io.github.mortuusars.envelope.world.inventory.slot.GhostSlot;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.PaybackDuration;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.CrashReportDetail;
+import net.minecraft.ReportedException;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -131,8 +136,8 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
             slots.get(index).setByPlayer(ItemStack.EMPTY);
         } else if (index < slots.size()) {
             for (int i = 0; i < PaybackRequest.SLOTS; i++) {
-                Slot paybackSlot = slots.get(i);
-                if (paybackSlot.getItem().isEmpty() && paybackSlot.mayPlace(clickedStack)) {
+                GhostSlot paybackSlot = ((GhostSlot) slots.get(i));
+                if (paybackSlot.getItem().isEmpty() && paybackSlot.canContain(clickedStack)) {
                     paybackSlot.setByPlayer(clickedStack.copy());
                     break;
                 }
@@ -191,28 +196,37 @@ public class PaybackTagMenu extends AbstractInHandContainerMenu {
 
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
-        if (slotId < 0 || slotId >= PaybackRequest.SLOTS) {
-            super.clicked(slotId, button, clickType, player);
-            return;
-        }
+        try {
+            if (slotId >= 0 && slotId < slots.size() && slots.get(slotId) instanceof GhostSlot paybackSlot) {
+                if (getCarried().isEmpty() || !paybackSlot.canContain(getCarried())) {
+                    paybackSlot.setByPlayer(ItemStack.EMPTY);
+                    return;
+                }
 
-        Slot paybackSlot = this.slots.get(slotId);
+                ItemStack result = getCarried().copy();
 
-        if (getCarried().isEmpty() || !paybackSlot.mayPlace(getCarried())) {
-            paybackSlot.setByPlayer(ItemStack.EMPTY);
-            return;
-        }
-
-        ItemStack result = getCarried().copy();
-
-        if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
-            if (ItemStack.isSameItemSameComponents(paybackSlot.getItem(), result)) {
-                result.setCount(paybackSlot.getItem().getCount() + 1);
-            } else {
-                result.setCount(1);
+                if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
+                    if (ItemStack.isSameItemSameComponents(paybackSlot.getItem(), result)) {
+                        result.setCount(paybackSlot.getItem().getCount() + 1);
+                    } else {
+                        result.setCount(1);
+                    }
+                }
+                paybackSlot.setByPlayer(result);
+                return;
             }
+        } catch (Exception e) {
+            CrashReport crashReport = CrashReport.forThrowable(e, "Envelope Container click");
+            CrashReportCategory crashReportCategory = crashReport.addCategory("Click info");
+            crashReportCategory.setDetail("Menu Class", () -> this.getClass().getCanonicalName());
+            crashReportCategory.setDetail("Slot Count", this.slots.size());
+            crashReportCategory.setDetail("Slot", slotId);
+            crashReportCategory.setDetail("Button", button);
+            crashReportCategory.setDetail("Type", clickType);
+            throw new ReportedException(crashReport);
         }
-        paybackSlot.setByPlayer(result);
+
+        super.clicked(slotId, button, clickType, player);
     }
 
     @Override

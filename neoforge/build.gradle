@@ -50,7 +50,8 @@ dependencies {
     //implementation("dev.latvian.apps:tiny-java-server:${tiny_server_version}")
     //modImplementation("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
 
-    modLocalRuntime("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}" )
+    modLocalRuntime("tschipp.carryon:carryon-neoforge-${minecraft_version}:${carry_on_version}")
+    modLocalRuntime("curse.maven:inventory-sorter-240633:7188660")
 
     modLocalRuntime("maven.modrinth:c2me-neoforge:0.3.0+alpha.0.91+1.21.1")
 
