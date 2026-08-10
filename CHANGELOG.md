@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.4 - 2026-08-10
+- Fixed item dupe related to packages. Containers are hard.
+
 ## 0.7.3 - 2026-08-08
 - Fixed dupe bug with Payback Tag and inventory sorter mods.
 

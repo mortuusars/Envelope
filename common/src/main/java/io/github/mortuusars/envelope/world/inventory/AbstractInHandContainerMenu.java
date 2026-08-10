@@ -6,6 +6,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -111,6 +112,16 @@ public abstract class AbstractInHandContainerMenu extends AbstractContainerMenu 
         getContainer().setChanged();
 
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void clicked(int slotId, int button, ClickType clickType, Player player) {
+        if (clickType == ClickType.SWAP && usedSlot == button) {
+            // Fixes item dupe by moving the used item to another slot with 1-9 keys.
+            // It would be nice of mojang to at least check mayPickup on the source slot, but yeah...
+            return;
+        }
+        super.clicked(slotId, button, clickType, player);
     }
 
     @Override
