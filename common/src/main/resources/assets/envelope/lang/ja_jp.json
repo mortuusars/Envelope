@@ -1,13 +1,33 @@
 {
   "block.envelope.oak_pigeonhole": "オークの鳩小屋",
+  "block.envelope.spruce_pigeonhole": "トウヒの鳩小屋",
+  "block.envelope.birch_pigeonhole": "シラカバの鳩小屋",
+  "block.envelope.jungle_pigeonhole": "ジャングルの鳩小屋",
+  "block.envelope.acacia_pigeonhole": "アカシアの鳩小屋",
+  "block.envelope.dark_oak_pigeonhole": "ダークオークの鳩小屋",
+  "block.envelope.mangrove_pigeonhole": "マングローブの鳩小屋",
+  "block.envelope.cherry_pigeonhole": "サクラの鳩小屋",
+  "block.envelope.bamboo_pigeonhole": "竹の鳩小屋",
+  "block.envelope.crimson_pigeonhole": "真紅の鳩小屋",
+  "block.envelope.warped_pigeonhole": "歪んだ鳩小屋",
+
   "block.envelope.mailbox": "郵便箱",
   "block.envelope.paper_box": "ダンボール",
   "block.envelope.package": "小包",
   "block.envelope.sealed_package": "封印された小包",
-
-  "item.envelope.lost_mail": "紛失した郵便物",
+  "block.envelope.letter": "手紙",
 
   "item.envelope.oak_pigeonhole": "オークの鳩小屋",
+  "item.envelope.spruce_pigeonhole": "トウヒの鳩小屋",
+  "item.envelope.birch_pigeonhole": "シラカバの鳩小屋",
+  "item.envelope.jungle_pigeonhole": "ジャングルの鳩小屋",
+  "item.envelope.acacia_pigeonhole": "アカシアの鳩小屋",
+  "item.envelope.dark_oak_pigeonhole": "ダークオークの鳩小屋",
+  "item.envelope.mangrove_pigeonhole": "マングローブの鳩小屋",
+  "item.envelope.cherry_pigeonhole": "サクラの鳩小屋",
+  "item.envelope.bamboo_pigeonhole": "竹の鳩小屋",
+  "item.envelope.crimson_pigeonhole": "真紅の鳩小屋",
+  "item.envelope.warped_pigeonhole": "歪んだ鳩小屋",
 
   "item.envelope.letter_and_quill": "手紙と羽ペン",
   "item.envelope.letter": "手紙",
@@ -28,6 +48,9 @@
   "item.envelope.mailbox": "郵便箱",
 
   "item.envelope.pigeon_spawn_egg": "鳩のスポーンエッグ",
+  "item.envelope.charred_pigeon_spawn_egg": "焦げた鳩のスポーンエッグ",
+
+  "item.envelope.lost_mail": "紛失した郵便物",
 
   "container.envelope.mailbox": "郵便箱",
   "container.envelope.payback_tag": "引換札",
@@ -38,7 +61,10 @@
   "envelope.letter_and_quill.fold_button": "たたむ",
   "envelope.letter_and_quill.fold_warning": "注意！ 手紙をたたむと、これ以上編集できなくなります。",
 
-  "gui.envelope.package.pack": "梱包",
+  "gui.envelope.packing.pack": "梱包",
+  "gui.envelope.packing.preset_address": "住所",
+  "gui.envelope.packing.preset_address.will_apply": "梱包時に住所ラベルが貼付されます",
+  "gui.envelope.packing.preset_address.no_address_tag": "利用可能な住所タグがありません",
 
   "gui.envelope.address_tag.title": "住所",
 
@@ -56,6 +82,7 @@
   "error.envelope.address.not_enough_xp_levels": "経験値が足りません",
 
   "entity.envelope.pigeon": "鳩",
+  "entity.envelope.charred_pigeon": "焦げた鳩",
 
   "gui.envelope.confirm": "完了",
   "gui.envelope.cancel": "キャンセル",
@@ -99,6 +126,7 @@
   "gui.envelope.delivery_log.message.payback.subject_not_found": "引換対象なし",
   "gui.envelope.delivery_log.message.payback.is_not_valid": "無効な引換",
   "gui.envelope.delivery_log.message.payback.expired": "引換期限切れ",
+  "gui.envelope.delivery_log.message.payback.canceled": "引換キャンセル",
 
   "gui.envelope.delivery_log.message.crafting.unable_to_process": "処理不能",
   "gui.envelope.delivery_log.message.crafting.unprocessed_items": "未処理アイテム",
@@ -149,14 +177,21 @@
   "address_type.envelope.custom": "住所",
   "address_type.envelope.unknown": "不明",
 
-  "subtitle.envelope.paper.crackle": "紙がカサカサ鳴る",
-  "subtitle.envelope.paper.tear": "紙が破れる",
+  "subtitles.envelope.paper.crackle": "紙がカサカサ鳴る",
+  "subtitles.envelope.paper.tear": "紙が破れる",
 
   "subtitles.envelope.entity.pigeon.ambient": "鳩が鳴く",
   "subtitles.envelope.entity.pigeon.death": "鳩が死ぬ",
   "subtitles.envelope.entity.pigeon.eats": "鳩が食べる",
   "subtitles.envelope.entity.pigeon.fly": "鳩が羽ばたく",
   "subtitles.envelope.entity.pigeon.hurts": "鳩がダメージを受ける",
+
+  "subtitles.envelope.entity.charred_pigeon.ambient": "焦げた鳩が鳴く",
+  "subtitles.envelope.entity.charred_pigeon.death": "焦げた鳩が死ぬ",
+  "subtitles.envelope.entity.charred_pigeon.fly": "焦げた鳩が羽ばたく",
+  "subtitles.envelope.entity.charred_pigeon.hurts": "焦げた鳩がダメージを受ける",
+
+  "subtitles.envelope.entity.villager.throw_pigeon_food": "村人が餌を投げる",
 
   "letter.envelope.courier_death_notice.name": "宅配鳩訃報通知",
   "letter.envelope.courier_death_notice.title": "     宅配鳩　訃報通知\n\n",
@@ -190,7 +225,6 @@
   "letter.envelope.courier_death_notice.condolence_2": "\n\n%sのご逝去を悼み、謹んでお悔やみ申し上げます。その記憶は、永遠に色褪せることはないでしょう。",
   "letter.envelope.courier_death_notice.condolence_3": "\n\n%sとの思い出が、貴殿の心の支えとなりますよう、謹んでお祈り申し上げます。",
   "letter.envelope.courier_death_notice.condolence_4": "\n\n%sの記憶は、弊局員一同の胸に永く刻まれることと存じます。",
-  "letter.envelope.mail_service.signature": "郵便サービス",
 
   "letter.envelope.broadcast_report.name": "ブロードキャストレポート",
   "letter.envelope.broadcast_report.title": "       ブロードキャストレポート",
@@ -202,7 +236,56 @@
   "letter.envelope.equine_assurance_notice.name": "馬用保険に関する通知",
   "letter.envelope.equine_assurance_notice.body": "お客様の馬に関する延長保証について、ご連絡を試みておりましたが、まだご連絡が取れておりません。\n\n十分な保証がないと、車両の全損など予期せぬ事態を招く恐れがあります。\n\n完全な保証パッケージをご利用いただくには、%sをご送付ください。\n\nお早めにご対応いただき、愛馬の将来を守りましょう！",
 
+  "letter.envelope.payback_request_cancel_report.name": "引換キャンセル報告",
+  "letter.envelope.payback_request_cancel_report.title": "       返金リクエスト \n        キャンセル報告書",
+  "letter.envelope.payback_request_cancel_report.error_no_requests": "キャンセルに失敗しました。\nこの住所からの返金待ちの郵便物は保管されていません。",
+
+  "letter.envelope.collapsed_mail_hub.common_1": "           最後の警告\n\n  支払うと約束してから既に2回も破られています。これが最後の催促です。\n\n  来週までに道具の代金を支払ってください。さもなければ、あなたの店との全ての契約を解除し、他の業者にもこの件を広めることになります。",
+  "letter.envelope.collapsed_mail_hub.common_2": "        金属が飛ぶだって？\n\n  隣人から聞いたんだけど、私たちが使っているこの郵便サービスは、空に浮かぶ巨大な金属の拠点から運営されているらしい。信じられるかい？ バカバカしい！ 金属は空気より重い、それは間違いない！\n\n  でも考えてみれば、地上で郵便サービスの建物なんて見たことがないな… 本当にそんなことが可能なんだろうか？ もしそうなら… どうやって？ そしてなぜ？",
+  "letter.envelope.collapsed_mail_hub.common_3": "       届かない小包\n\n  防具の小包が全く届きません。丸3日待ちましたが… 何も届きませんでした。\n\n  決して安いものではなかったので、代わりに代替品を送っていただけると助かります。",
+  "letter.envelope.collapsed_mail_hub.common_4": "              私の弟\n\n  2週間前、弟はいつものように仲間たちと炭鉱へ向かいました。しかし、それ以来連絡がありません…\n\n  弟やその仲間たちの消息については、誰も何も知りません。もう耐えられません。一体彼らに何があったのでしょうか？ 私はどうすればいいの…？",
+  "letter.envelope.collapsed_mail_hub.common_5": "           私たちの農場\n\n  素晴らしい知らせです！ 数ヶ月にわたる作業の末、私たちの農場がついに形になってきました。全て順調に進んでおり、注文も増え始めています！\n\n  あなたの協力なしでは達成できませんでした。お礼に肉をいくつか用意して送りますね。\n\n  ありがとうございました！",
+  "letter.envelope.collapsed_mail_hub.common_6": "           迷惑メール\n\n  あの迷惑メール、もう届いた？ 先日届いたやつは馬がどうとか書いてあったな。最後まで読みもしないで速攻でゴミ箱に放り込んだよ！\n\n  またあんなのが届いたら、絶対に郵便受けを叩き割ってやる！",
+  "letter.envelope.collapsed_mail_hub.common_7": "           補給サービス\n\n  最近導入された「%s」を試してみるといいよ。かなり便利だから！ \n\n  もっと取り扱い商品が増えるといいんだけどね。\n\nいつか市場に行く必要すらなくなるのかな？ 自宅の快適な場所から売買が完結するなんて、夢のようだと思わないか？",
+
+  "letter.envelope.collapsed_mail_hub.nether_1": "         地下に眠る富\n\n  期待通り、ポータルの開発を進めた甲斐があった！ 向こう側にどれほど豊かな資源が眠っているか知ったら驚くぞ。しかも、私たちはまだほんの表面を撫でただけに過ぎないんだ！\n\n  ポータルを作った時の余りがまだ残っている。できるだけ早く送るよ。誰かに先を越される前に急ぐんだ！",
+  "letter.envelope.collapsed_mail_hub.nether_2": "        宝が待っている！\n\n  あそこは想像を絶する場所だ！\nポータルに大金を投じた甲斐があった — 本当に報われたよ！\n\n  私の分の余りを送っておいた。\n\n  一刻も早く合流してくれ。ここには手に入れるべきものが山ほどある、絶対に驚くはずだ！",
+  "letter.envelope.collapsed_mail_hub.nether_3": "        大金持ちになれるぞ！\n\n  奴らが造ったポータルに忍び込むことに成功した。ここは… 思っていた以上だ！ 大量の金や貴重品が転がっている！ 俺たちは大金持ちになれるぞ！\n\n  手持ちの黒曜石を全部持ってきてくれ。試した通りフレームは確かにこれでできているが、サイズの問題だろうか？ 一刻も早く作業を再開する必要がある。",
+  "letter.envelope.collapsed_mail_hub.nether_4": "         ポータル報告書\n\n  実験は成功した。何度かの試行の末、ポータルは想定通りに機能した。\n\n  向こう側の環境は予期していたものとは大きく異なっていた。気温は極めて高いが、許容範囲内である。\n\n  現地資源の回収および調査を現在進めている。",
+  "letter.envelope.collapsed_mail_hub.nether_5": "         ポータル報告書\n\n  ポータルの実験は成功した。稼働させるまでにそう時間はかからなかった。\n\n  向こう側はさらに過酷な環境だ。気温の高さが問題となり得るが、対処は可能である。\n\n  採取可能な資源は豊富に存在する。貴重な標本も多い。一部はさらなる調査が必要である。",
+  "letter.envelope.collapsed_mail_hub.nether_6": "        事業拡大の可能性\n\n  奴らはポータルを見せつけてきて、事業を向こう側へ拡大したがっている。個人的には馬鹿げた考えだと思うね。見た限り、あの環境は配達に適しているとは言えない。\n\n  だが、我々に選択の余地はあまりない。奴らの投資がなければ、既存の運営すら維持できないのだから。なんとかうまくいけばいいのだが…",
+  "letter.envelope.collapsed_mail_hub.nether_7": "      ポータルに関する懸念\n\n  例のポータルは見たか？ 今一番熱い話題だよ。誰もがその恩恵に預かろうと必死になっている。\n\n  だが嫌な予感がする… 安全かどうかも分かっていないんだぞ！ どんな想像を絶する危険が潜んでいるか分からないだろ？\n\n  慎重になるべきだ…",
+  "letter.envelope.collapsed_mail_hub.nether_8": "           危険な発見\n\n  ポータルの向こう側からサンプルを入手できた。この一週間かけて分析を行ったが… 結果は芳しくない。\n\n[ 36% | 22% | 17% | 16% | 9% ]\n\n  遠征の責任者を見つけてこのデータを見せてくれ。すぐに中止させるんだ。手遅れでなければいいが…",
+
+  "letter.envelope.collapsed_mail_hub.dock_note.name.note": "郵便ハブのメモ",
+  "letter.envelope.collapsed_mail_hub.dock_note.name.status": "郵便ハブのステータス",
+  "letter.envelope.collapsed_mail_hub.dock_note_1": "          エンジニアへ\n\n  乗組員の報告により、突発的な高度低下と、それに続く規定高度への復帰が確認されました。\n\n  スラスターが原因と疑われます。\n\n  点検の上、必要に応じて交換してください。",
+  "letter.envelope.collapsed_mail_hub.dock_note_2": "       エンジニアへのメモ\n\n  乗組員から急激な高度低下の報告がありました。故障したスラスターが原因と思われます。\n\n  確認し、必要なら交換をお願いします。",
+  "letter.envelope.collapsed_mail_hub.dock_note_3": "             統計\n\n全システム正常稼働中\n 重大な不具合の記録なし\n\n郵便処理能力範囲：\n  1日あたり 20-50件（断続的）\n\n軽微な高度の変動を検知\n- 要詳細分析",
+  "letter.envelope.collapsed_mail_hub.dock_note_4": "             統計\n\n 全システム正常稼働中\n 重大な不具合の記録なし\n\n郵便処理能力範囲：\n  1日あたり 50-80件（普通）\n\n 軽微な高度の変動を検知\n- 要詳細分析",
+  "letter.envelope.collapsed_mail_hub.dock_note_5": "             統計\n\n全システム正常稼働中\n 重大な不具合の記録なし\n\n郵便処理能力範囲：\n  1日あたり 80-120件（高水準）\n\n 軽微な高度の変動を検知\n- 要詳細分析",
+  "letter.envelope.collapsed_mail_hub.dock_note_6": "             統計\n\n  ほとんどのシステムは正常。\n\n    重大な障害を検出：\n     激しい高度の変動\n\n      要緊急メンテナンス\n\n   郵便処理能力範囲：\n1日あたり 20-50件（断続的）",
+  "letter.envelope.collapsed_mail_hub.dock_note_7": "             統計\n\n  ほとんどのシステムは正常。\n\n    重大な障害を検出：\n     激しい高度の変動\n\n      要緊急メンテナンス\n\n   郵便処理能力範囲：\n1日あたり 50-80件（通常）",
+  "letter.envelope.collapsed_mail_hub.dock_note_8": "             統計\n\n  ほとんどのシステムは正常。\n\n    重大な障害を検出：\n     激しい高度の変動\n\n      要緊急メンテナンス\n\n   郵便処理能力範囲：\n1日あたり 80-120件（高水準）",
+
+  "letter.envelope.abandoned_mineshaft.journal_page.name": "破られた日記のページ",
+  "letter.envelope.abandoned_mineshaft.journal_page_1": "  ... \n\n  入口が崩落してから4日が過ぎた。掘り起こそうとするあらゆる試みも成果を結ばない…\n\n  食料はほとんど残っていない。あと2日持てばいい方か…\n\n  ...",
+  "letter.envelope.abandoned_mineshaft.journal_page_2": "  ... \n\n  冷たく湿った石の上に座り、明かりもほとんどない中で過ごしていると、昔姉が語ってくれた恐ろしいおとぎ話が、日を追うごとに真実味を帯びてくる。\n\n  あれは本当にただの作り話だったのだろうか？…\n\n  ...",
+  "letter.envelope.abandoned_mineshaft.journal_page_3": "  ... \n\n  うなり声がやまない… \n\n  この古い坑道のどこから聞こえてくるのか？ それとも頭の中の幻聴なのか？…\n\n  頭がおかしくなりそうだ…",
+
+  "letter.envelope.pillager_outpost.report.name": "報告書",
+  "letter.envelope.pillager_outpost.report_1": "         ボスへの報告\n\n  村へ送った偵察隊、戻らない。\n予期せぬ危険の可能性アリ。\n\n  状況確認が必要。増援を要請。",
+  "letter.envelope.pillager_outpost.report_2": "         ボスへの報告\n\n  近くの前哨基地でトラブルの報告あり。\n\n  大勢死亡。物資奪われた。\n\n  助けを送るべし。",
+  "letter.envelope.pillager_outpost.report_3": "         ボスへの報告\n\n  襲撃で物資集めた。\n\n  すぐ送る。",
+  "letter.envelope.pillager_outpost.report_4": "         ボスへの報告\n\n  ゴーレムを1体捕らえた。和解試みるも失敗。\n\n  試みを継続する。",
+
+  "letter.envelope.mail_service.signature": "郵便サービス",
+
+  "package.envelope.canceled_payback_request.name": "キャンセルされた引換リクエスト",
+
+  "envelope.configuration.misc": "その他",
   "envelope.configuration.pigeon": "鳩",
+  "envelope.configuration.charred_pigeon": "焦げた鳩",
   "envelope.configuration.delivery": "配達",
   "envelope.configuration.hunted_by_fox": "キツネから攻撃を受ける",
   "envelope.configuration.spawns_naturally": "自然にスポーン",
@@ -239,12 +322,22 @@
   "envelope.configuration.request_duration_medium": "引換期限 - 中",
   "envelope.configuration.request_duration_short": "引換期限 - 短",
   "envelope.configuration.request_duration_long": "引換期限 - 長",
-  "envelope.configuration.notice_sending_additional_interval_per_day_minutes": "お知らせ：日ごとの追加送信間隔",
-  "envelope.configuration.notice_sending_chance_per_tick": "お知らせ：ティックごとの確率",
   "envelope.configuration.service_addresses": "サービス住所",
   "envelope.configuration.notice_sending_enabled": "お知らせ：有効",
-  "envelope.configuration.notice_sending_base_interval_minutes": "お知らせ：基本送信間隔",
   "envelope.configuration.equine_assurance_bureau": "馬用保険機関",
+  "envelope.configuration.villager_feeding_pigeons": "村人による鳩の餌やり",
+  "envelope.configuration.villager_feeding_pigeons_only_nitwits": "村人による鳩の餌やり: 無職の村人のみ",
+  "envelope.configuration.eats_seeds": "種での手懐け・誘導",
+  "envelope.configuration.fox_tattering": "キツネによる劣化",
+  "envelope.configuration.convert_into_charred": "焦げた状態に変える",
+  "envelope.configuration.convert_into_charred_ticks": "焦げるまでの時間（ティック）",
+  "envelope.configuration.convert_into_regular": "鎮火した状態に変える",
+  "envelope.configuration.convert_into_regular_ticks": "鎮火するまでの時間（ティック）",
+  "envelope.configuration.mail_chance": "配達確率",
+  "envelope.configuration.archimedes_chance": "アルキメデスの召喚確率",
+  "envelope.configuration.burning": "燃焼",
+  "envelope.configuration.loot": "ルートテーブル",
+  "envelope.configuration.ignite_seconds": "炎上時間（秒）",
 
   "container.envelope.package.contents_unknown": "内容不明",
 
@@ -258,5 +351,37 @@
   "gui.envelope.payback_tag.duration_medium": "期間：中",
   "gui.envelope.payback_tag.duration_long": "期間：長",
 
-  "gui.envelope.payback_tag.tooltip.scroll": "§8［§7スクロール§8］で量を変更"
+  "gui.envelope.payback_tag.tooltip.scroll": "§8［§7スクロール§8］で量を変更",
+
+  "advancement.envelope.dirt_to_diamonds.title": "ウンを掴む",
+  "advancement.envelope.dirt_to_diamonds.description": "鳩小屋のフンの中からダイヤモンドを見つける",
+  "advancement.envelope.just_dont_smoke_it.title": "それを燻さないでね",
+  "advancement.envelope.just_dont_smoke_it.description": "鳩小屋を設置する",
+  "advancement.envelope.and_you_did_it_anyway.title": "それでもやっちゃったんだね",
+  "advancement.envelope.and_you_did_it_anyway.description": "鳩小屋を燻す",
+  "advancement.envelope.foxtile_environment.title": "フォックススタイル",
+  "advancement.envelope.foxtile_environment.description": "ボロボロの手紙を手に入れる",
+  "advancement.envelope.overworld_wide_web.title": "オーバーワールド・ワイド・ウェブ",
+  "advancement.envelope.overworld_wide_web.description": "郵便箱を設置する",
+  "advancement.envelope.what_is_my_purpose.title": "私の目的は？",
+  "advancement.envelope.what_is_my_purpose.description": "ブロックが詰まった小包を届ける",
+  "advancement.envelope.its_filthy_in_there.title": "あそこはひどく汚れている",
+  "advancement.envelope.its_filthy_in_there.description": "鳩を見つける... 風変わりな場所で",
+  "advancement.envelope.soft_landing.title": "安全着陸",
+  "advancement.envelope.soft_landing.description": "100ブロック以上の高さからダンボールの上に落下する",
+  "advancement.envelope.system_failure.title": "システム障害",
+  "advancement.envelope.system_failure.description": "崩落した郵便ハブに足を踏み入れる",
+
+  "subtitles.envelope.block.pigeonhole.enter": "鳩が鳩小屋に入る",
+  "subtitles.envelope.block.pigeonhole.exit": "鳩が鳩小屋から出る",
+  "subtitles.envelope.block.pigeonhole.work": "鳩が働く",
+  "subtitles.envelope.block.pigeonhole.scoop": "鳩小屋からフンを取り除く",
+
+  "stat.envelope.interact_with_mailbox": "郵便箱を開いた回数",
+  "stat.envelope.mail_deliveries": "宅配数",
+  "stat.envelope.seals_applied": "郵便物に封をした回数",
+  "stat.envelope.seals_broken": "郵便物の封を開けた回数",
+  "stat.envelope.letters_folded": "手紙をたたんだ回数",
+  "stat.envelope.packages_created": "小包を作った回数",
+  "stat.envelope.packages_opened": "小包を開いた回数"
 }
