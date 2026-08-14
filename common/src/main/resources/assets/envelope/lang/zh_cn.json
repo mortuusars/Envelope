@@ -1,13 +1,33 @@
 {
   "block.envelope.oak_pigeonhole": "橡木鸽舍",
+  "block.envelope.spruce_pigeonhole": "云杉木鸽舍",
+  "block.envelope.birch_pigeonhole": "白桦木鸽舍",
+  "block.envelope.jungle_pigeonhole": "丛林木鸽舍",
+  "block.envelope.acacia_pigeonhole": "金合欢木鸽舍",
+  "block.envelope.dark_oak_pigeonhole": "深色橡木鸽舍",
+  "block.envelope.mangrove_pigeonhole": "红树木鸽舍",
+  "block.envelope.cherry_pigeonhole": "樱花木鸽舍",
+  "block.envelope.bamboo_pigeonhole": "竹鸽舍",
+  "block.envelope.crimson_pigeonhole": "绯红木鸽舍",
+  "block.envelope.warped_pigeonhole": "诡异木鸽舍",
+
   "block.envelope.mailbox": "邮箱",
   "block.envelope.paper_box": "纸箱",
   "block.envelope.package": "包裹",
   "block.envelope.sealed_package": "密封包裹",
-
-  "item.envelope.lost_mail": "遗失的邮件",
+  "block.envelope.letter": "信件",
 
   "item.envelope.oak_pigeonhole": "橡木鸽舍",
+  "item.envelope.spruce_pigeonhole": "云杉木鸽舍",
+  "item.envelope.birch_pigeonhole": "白桦木鸽舍",
+  "item.envelope.jungle_pigeonhole": "丛林木鸽舍",
+  "item.envelope.acacia_pigeonhole": "金合欢木鸽舍",
+  "item.envelope.dark_oak_pigeonhole": "深色橡木鸽舍",
+  "item.envelope.mangrove_pigeonhole": "红树木鸽舍",
+  "item.envelope.cherry_pigeonhole": "樱花木鸽舍",
+  "item.envelope.bamboo_pigeonhole": "竹鸽舍",
+  "item.envelope.crimson_pigeonhole": "绯红木鸽舍",
+  "item.envelope.warped_pigeonhole": "诡异木鸽舍",
 
   "item.envelope.letter_and_quill": "信件与羽毛笔",
   "item.envelope.letter": "信件",
@@ -28,6 +48,9 @@
   "item.envelope.mailbox": "邮箱",
 
   "item.envelope.pigeon_spawn_egg": "鸽子刷怪蛋",
+  "item.envelope.charred_pigeon_spawn_egg": "焦黑鸽子刷怪蛋",
+
+  "item.envelope.lost_mail": "遗失的邮件",
 
   "container.envelope.mailbox": "邮箱",
   "container.envelope.payback_tag": "回寄",
@@ -38,7 +61,10 @@
   "envelope.letter_and_quill.fold_button": "折叠",
   "envelope.letter_and_quill.fold_warning": "注意！信件折叠后将无法再编辑。",
 
-  "gui.envelope.package.pack": "打包",
+  "gui.envelope.packing.pack": "打包",
+  "gui.envelope.packing.preset_address": "地址",
+  "gui.envelope.packing.preset_address.will_apply": "打包时将使用一个地址标签",
+  "gui.envelope.packing.preset_address.no_address_tag": "没有可用的地址标签",
 
   "gui.envelope.address_tag.title": "地址",
 
@@ -56,6 +82,7 @@
   "error.envelope.address.not_enough_xp_levels": "经验等级不足",
 
   "entity.envelope.pigeon": "鸽子",
+  "entity.envelope.charred_pigeon": "焦黑鸽子",
 
   "gui.envelope.confirm": "确认",
   "gui.envelope.cancel": "取消",
@@ -99,6 +126,7 @@
   "gui.envelope.delivery_log.message.payback.subject_not_found": "回寄对象未找到",
   "gui.envelope.delivery_log.message.payback.is_not_valid": "回寄无效",
   "gui.envelope.delivery_log.message.payback.expired": "回寄请求已过期",
+  "gui.envelope.delivery_log.message.payback.canceled": "回寄请求已取消",
 
   "gui.envelope.delivery_log.message.crafting.unable_to_process": "无法处理",
   "gui.envelope.delivery_log.message.crafting.unprocessed_items": "未处理的物品",
@@ -149,14 +177,21 @@
   "address_type.envelope.custom": "地址",
   "address_type.envelope.unknown": "未知",
 
-  "subtitle.envelope.paper.crackle": "纸张窸窣声",
-  "subtitle.envelope.paper.tear": "纸张撕裂声",
+  "subtitles.envelope.paper.crackle": "纸张窸窣声",
+  "subtitles.envelope.paper.tear": "纸张撕裂声",
 
-  "subtitles.envelope.entity.pigeon.ambient": "鸽子咕咕叫",
-  "subtitles.envelope.entity.pigeon.death": "鸽子死亡",
-  "subtitles.envelope.entity.pigeon.eats": "鸽子进食",
-  "subtitles.envelope.entity.pigeon.fly": "鸽子扑翼",
-  "subtitles.envelope.entity.pigeon.hurts": "鸽子受伤",
+  "subtitles.envelope.entity.pigeon.ambient": "鸽子：咕咕叫",
+  "subtitles.envelope.entity.pigeon.death": "鸽子：死亡",
+  "subtitles.envelope.entity.pigeon.eats": "鸽子：进食",
+  "subtitles.envelope.entity.pigeon.fly": "鸽子：扑翼",
+  "subtitles.envelope.entity.pigeon.hurts": "鸽子：受伤",
+  
+  "subtitles.envelope.entity.charred_pigeon.ambient": "焦黑鸽子：咕咕叫",
+  "subtitles.envelope.entity.charred_pigeon.death": "焦黑鸽子：死亡",
+  "subtitles.envelope.entity.charred_pigeon.fly": "焦黑鸽子：扑翼",
+  "subtitles.envelope.entity.charred_pigeon.hurts": "焦黑鸽子：受伤",
+
+  "subtitles.envelope.entity.villager.throw_pigeon_food": "村民：抛撒鸽粮",
   
   "letter.envelope.courier_death_notice.name": "信使死亡通知",
   "letter.envelope.courier_death_notice.title": "     信使死亡通知\n\n",
@@ -190,7 +225,6 @@
   "letter.envelope.courier_death_notice.condolence_2": "\n\n请接受我们对失去 %s 的深切哀悼。其记忆将永存。",
   "letter.envelope.courier_death_notice.condolence_3": "\n\n愿 %s 的回忆带给您慰藉。",
   "letter.envelope.courier_death_notice.condolence_4": "\n\n%s 将永远留在我们心中。",
-  "letter.envelope.mail_service.signature": "邮政服务",
 
   "letter.envelope.broadcast_report.name": "广播报告",
   "letter.envelope.broadcast_report.title": "       广播报告",
@@ -202,7 +236,56 @@
   "letter.envelope.equine_assurance_notice.name": "马匹保障通知",
   "letter.envelope.equine_assurance_notice.body": "我们一直在尝试联系您关于您马匹的延长保障事宜。\n\n缺乏保障可能导致意外事故，包括您的坐骑完全损失。\n\n要获得完整的保障套餐，请发送给我们：%s。\n\n请尽快行动，保障您坐骑的未来！",
 
+  "letter.envelope.payback_request_cancel_report.name": "回寄请求取消报告",
+  "letter.envelope.payback_request_cancel_report.title": "       回寄请求 \n        取消报告",
+  "letter.envelope.payback_request_cancel_report.error_no_requests": "取消失败。\n该地址没有需要回寄的邮件",
+
+  "letter.envelope.collapsed_mail_hub.common_1": "         最后警告\n\n  你已经承诺付款两次了。这是最后一次提醒。\n\n  请在下周之前支付工具的费用，否则我们将终止与你商店的所有合同，并向其他供应商散布此事。",
+  "letter.envelope.collapsed_mail_hub.common_2": "        金属会飞吗？\n\n  我听邻居说，我们正在使用的这个邮政服务是在天空中巨大的金属平台上运行的。你能相信吗？这简直太荒谬了！我敢肯定金属比空气重！\n\n  不过话说回来，我确实没有在地面上见过任何邮政服务建筑……你觉得这可能吗？如果是真的——它是怎么做到的？……又为什么要这样？",
+  "letter.envelope.collapsed_mail_hub.common_3": "       遗失的包裹\n\n  我的盔甲包裹一直没有送到。我等了整整三天——什么都没有。\n\n  希望你能给我补发一份，毕竟那东西一点也不便宜。",
+  "letter.envelope.collapsed_mail_hub.common_4": "          我的兄弟\n\n  两周前，我的兄弟像往常一样，和他的队伍一起去了矿井。但从那以后，我再也没有听到他的消息……\n\n  没有人知道，也没有人听说过他或他的任何同伴发生了什么。我再也受不了了。他们到底发生了什么？我该怎么办？……",
+  "letter.envelope.collapsed_mail_hub.common_5": "           我们的农场\n\n  好消息！经过数月的努力，我们的农场终于开始步入正轨。一切似乎都进展顺利，订单也开始增加了！\n\n  没有你的帮助，我们无法做到这一点。我们会准备一些肉寄给你。\n\n  谢谢你！",
+  "letter.envelope.collapsed_mail_hub.common_6": "           垃圾邮件\n\n  你收到过那些垃圾邮件吗？我上一次收到的好像是关于什么马的东西之类的。我甚至没读完就把它扔进垃圾桶了！\n\n  再来一封那种东西，我发誓我要把我的邮箱砸成两半！",
+  "letter.envelope.collapsed_mail_hub.common_7": "       供应服务\n\n  你应该试试他们最近推出的 %s。非常方便！\n\n  我只是希望他们能增加更多商品。\n\n  也许有一天我们连市场都不需要了？坐在家里就能买卖所有东西！这不是梦想中的生活吗？",
+  
+  "letter.envelope.collapsed_mail_hub.nether_1": "         地底的财富\n\n  正如我所希望的，研究传送门完全值得！你一定会震惊另一边隐藏着多少资源，而我们甚至还只是探索了冰山一角！\n\n  我这里还有一些建造传送门剩下的材料。我会尽快寄过去。快点，别让其他人抢走了！",
+  "letter.envelope.collapsed_mail_hub.nether_2": "       宝藏在等待！\n\n  那个地方简直无法想象！\n我就知道在传送门上投入这么多资金一定会有回报——事实也确实如此！\n\n  我寄了一些建造传送门剩下的材料给你。\n\n  尽快加入我们吧。那里有太多东西了，你会大吃一惊的！",
+  "letter.envelope.collapsed_mail_hub.nether_3": "        我们会发财的！\n\n  我成功偷偷溜进了他们建造的传送门。那里……那里甚至比我们想象的还要好！这里有大量黄金和其他珍宝！我们发财了！\n\n  带上你手头上多余的黑曜石。正如我们尝试的那样，框架确实是由它构成的，但我猜问题在于尺寸？我们必须尽快继续工作。",
+  "letter.envelope.collapsed_mail_hub.nether_4": "        传送门报告\n\n  我们的实验成功了。经过数次调整，传送门终于按照预期运行。\n\n  另一侧与我们的预想大不相同。那里的温度比这里高得多，但仍在可承受范围内。\n\n  对当地资源的收集与研究仍在继续。",
+  "letter.envelope.collapsed_mail_hub.nether_5": "        传送门报告\n\n  传送门实验成功了。让它运作起来并没有花费太长时间。\n\n  另一侧更加严峻。温度可能会成为问题，但仍然可以应对。\n\n  可开采资源非常丰富，许多样本都价值非凡。有些需要进一步研究。",
+  "letter.envelope.collapsed_mail_hub.nether_6": "   扩展可能性\n\n  他们向我展示了他们的传送门，并希望我们将服务扩展到另一边。要我说，这是个愚蠢的想法。从我看到的情况来看，那里的环境并不适合运输。\n\n  但我们没有太多选择。如果没有他们的投资，我们甚至无法维持现有业务。希望一切顺利吧……",
+  "letter.envelope.collapsed_mail_hub.nether_7": "     关于传送门\n\n  你见过那些传送门吗？它现在可是非常热门的东西。所有人都想从中分一杯羹。\n\n  这让我感到担忧……我们甚至不知道它是否安全！谁知道里面隐藏着什么无法想象的危险？\n\n  我们应该小心一点……",
+  "letter.envelope.collapsed_mail_hub.nether_8": "    令人担忧的发现\n\n  我成功获得了一份来自传送门另一侧的样本。经过整整一周的分析——结果并不乐观：\n\n[ 36% | 22% | 17% | 16% | 9% ]\n\n  找到负责这次探险的人，把这些数据交给他们。他们必须立即停止行动。希望现在还不算太晚……",
+  
+  "letter.envelope.collapsed_mail_hub.dock_note.name.note": "邮件中转记录",
+  "letter.envelope.collapsed_mail_hub.dock_note.name.status": "邮件中转状态",
+  "letter.envelope.collapsed_mail_hub.dock_note_1": "     给工程师：\n\n  船员报告指出，出现了突然下降高度，随后恢复至指定高度的情况。\n\n  怀疑原因是推进器。\n\n  请检查并根据需要更换。",
+  "letter.envelope.collapsed_mail_hub.dock_note_2": "   给工程师的记录：\n\n  船员报告了快速下降高度的情况。似乎是由故障的推进器导致。\n\n  请检查并在需要时更换。",
+  "letter.envelope.collapsed_mail_hub.dock_note_3": "             状态：\n\n   所有系统运行正常。\n 未记录重大故障。\n\n   邮件吞吐量范围：\n20-50 件/天（断续）\n\n 检测到轻微高度波动。需要进一步\n           分析。",
+  "letter.envelope.collapsed_mail_hub.dock_note_4": "             状态：\n\n   所有系统运行正常。\n 未记录重大故障。\n\n   邮件吞吐量范围：\n 50-80 件/天（中等）\n\n 检测到轻微高度波动。需要进一步\n           分析。",
+  "letter.envelope.collapsed_mail_hub.dock_note_5": "             状态：\n\n   所有系统运行正常。\n 未记录重大故障。\n\n   邮件吞吐量范围：\n 80-120 件/天（较高）\n\n 检测到轻微高度波动。需要进一步\n           分析。",
+  "letter.envelope.collapsed_mail_hub.dock_note_6": "             状态：\n\n  大部分系统运行正常。\n\n    检测到重大故障：\n 高度严重波动\n\n      需要立即\n          维护\n\n   邮件吞吐量范围：\n20-50 件/天（断续）",
+  "letter.envelope.collapsed_mail_hub.dock_note_7": "             状态：\n\n  大部分系统运行正常。\n\n    检测到重大故障：\n 高度严重波动\n\n      需要立即\n          维护\n\n   邮件吞吐量范围：\n  50-80 件/天（正常）",
+  "letter.envelope.collapsed_mail_hub.dock_note_8": "             状态：\n\n  大部分系统运行正常。\n\n    检测到重大故障：\n 高度严重波动\n\n      需要立即\n          维护\n\n   邮件吞吐量范围：\n 80-120 件/天（较高）",
+
+  "letter.envelope.abandoned_mineshaft.journal_page.name": "破损的日记页",
+  "letter.envelope.abandoned_mineshaft.journal_page_1": "  ……\n\n  入口坍塌已经过去四天了。所有挖掘出口的尝试都毫无结果……\n\n  我们剩下的物资不多了。也许只能撑几天……\n\n  ……",
+  "letter.envelope.abandoned_mineshaft.journal_page_2": "  ……\n\n  坐在冰冷潮湿的石头上，几乎没有光亮，我姐姐曾经告诉我的那些恐怖故事，随着时间推移变得越来越真实。\n\n  那些真的只是故事吗？……\n\n  ……",
+  "letter.envelope.abandoned_mineshaft.journal_page_3": "  ……\n\n  那低沉的咆哮声一直没有停止……\n\n  它是从这些废弃的矿道里传来的吗？还是只是在我的脑海里？……\n\n  我觉得自己快疯了……",
+
+  "letter.envelope.pillager_outpost.report.name": "报告",
+  "letter.envelope.pillager_outpost.report_1": "       致首领的报告\n\n  派往村庄的巡逻队没有回来。可能遭遇未知危险。\n\n  必须了解更多情况。请求增援。",
+  "letter.envelope.pillager_outpost.report_2": "       致首领的报告\n\n  收到附近哨站出现问题的报告。\n\n  许多人死亡。物资被盗。\n\n  必须派遣援助。",
+  "letter.envelope.pillager_outpost.report_3": "       致首领的报告\n\n  袭击中搜刮到物资。\n\n  很快送达。",
+  "letter.envelope.pillager_outpost.report_4": "       致首领的报告\n\n  捕获一只铁傀儡。尝试和平交流。失败。\n\n  继续尝试。",
+
+  "letter.envelope.mail_service.signature": "邮政服务",
+
+  "package.envelope.canceled_payback_request.name": "已取消的回寄请求",
+
+  "envelope.configuration.misc": "杂项",
   "envelope.configuration.pigeon": "鸽子",
+  "envelope.configuration.charred_pigeon": "焦黑鸽子",
   "envelope.configuration.delivery": "投递",
   "envelope.configuration.hunted_by_fox": "会被狐狸猎杀",
   "envelope.configuration.spawns_naturally": "自然生成",
@@ -239,12 +322,22 @@
   "envelope.configuration.request_duration_medium": "请求时间 - 中等",
   "envelope.configuration.request_duration_short": "请求时间 - 短",
   "envelope.configuration.request_duration_long": "请求时间 - 长",
-  "envelope.configuration.notice_sending_additional_interval_per_day_minutes": "通知：每日额外间隔",
-  "envelope.configuration.notice_sending_chance_per_tick": "通知：每刻概率",
-  "envelope.configuration.service_addresses": "邮政服务",
+  "envelope.configuration.service_addresses": "服务地址",
   "envelope.configuration.notice_sending_enabled": "通知：启用",
-  "envelope.configuration.notice_sending_base_interval_minutes": "通知：基础发送间隔",
   "envelope.configuration.equine_assurance_bureau": "马匹保障局",
+  "envelope.configuration.villager_feeding_pigeons": "村民喂鸽子",
+  "envelope.configuration.villager_feeding_pigeons_only_nitwits": "村民喂鸽子：仅限笨蛋村民",
+  "envelope.configuration.eats_seeds": "食用种子",
+  "envelope.configuration.fox_tattering": "狐狸破坏",
+  "envelope.configuration.convert_into_charred": "转变为焦黑形态",
+  "envelope.configuration.convert_into_charred_ticks": "转变为焦黑形态所需刻数",
+  "envelope.configuration.convert_into_regular": "恢复为普通形态",
+  "envelope.configuration.convert_into_regular_ticks": "恢复为普通形态所需刻数",
+  "envelope.configuration.mail_chance": "邮件概率",
+  "envelope.configuration.archimedes_chance": "阿基米德概率",
+  "envelope.configuration.burning": "燃烧",
+  "envelope.configuration.loot": "战利品",
+  "envelope.configuration.ignite_seconds": "点燃时长（秒）",
 
   "container.envelope.package.contents_unknown": "内容物未知",
 
@@ -258,5 +351,37 @@
   "gui.envelope.payback_tag.duration_medium": "时间：中等",
   "gui.envelope.payback_tag.duration_long": "时间：长",
 
-  "gui.envelope.payback_tag.tooltip.scroll": "§8[§7滚动§8]更改数量"
+  "gui.envelope.payback_tag.tooltip.scroll": "§8[§7滚动§8]更改数量",
+
+  "advancement.envelope.dirt_to_diamonds.title": "泥土变钻石",
+  "advancement.envelope.dirt_to_diamonds.description": "在鸽舍废料中找到一颗钻石",
+  "advancement.envelope.just_dont_smoke_it.title": "别拿烟熏它",
+  "advancement.envelope.just_dont_smoke_it.description": "放置一个鸽舍",
+  "advancement.envelope.and_you_did_it_anyway.title": "但你还是这么干了",
+  "advancement.envelope.and_you_did_it_anyway.description": "烟熏一个鸽舍",
+  "advancement.envelope.foxtile_environment.title": "狐闹环境",
+  "advancement.envelope.foxtile_environment.description": "获得一封撕碎的信件",
+  "advancement.envelope.overworld_wide_web.title": "主世界万维网",
+  "advancement.envelope.overworld_wide_web.description": "放置一个邮箱",
+  "advancement.envelope.what_is_my_purpose.title": "我的目标是？",
+  "advancement.envelope.what_is_my_purpose.description": "投递一个装满方块的包裹",
+  "advancement.envelope.its_filthy_in_there.title": "里面脏透了",
+  "advancement.envelope.its_filthy_in_there.description": "在某个……奇妙的地方找到一只鸽子",
+  "advancement.envelope.soft_landing.title": "软着陆",
+  "advancement.envelope.soft_landing.description": "从100格或更高的高度落到纸箱上",
+  "advancement.envelope.system_failure.title": "系统瘫痪",
+  "advancement.envelope.system_failure.description": "踏入废弃邮政枢纽",
+
+  "subtitles.envelope.block.pigeonhole.enter": "鸽子：进入鸽舍",
+  "subtitles.envelope.block.pigeonhole.exit": "鸽子：离开鸽舍",
+  "subtitles.envelope.block.pigeonhole.work": "鸽子：\"工作\"",
+  "subtitles.envelope.block.pigeonhole.scoop": "铲子：铲取",
+
+  "stat.envelope.interact_with_mailbox": "邮箱互动次数",
+  "stat.envelope.mail_deliveries": "邮件投递次数",
+  "stat.envelope.seals_applied": "盖上封蜡次数",
+  "stat.envelope.seals_broken": "拆开封蜡次数",
+  "stat.envelope.letters_folded": "折叠信件次数",
+  "stat.envelope.packages_created": "打包包裹次数",
+  "stat.envelope.packages_opened": "拆开包裹次数"
 }
