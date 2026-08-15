@@ -40,7 +40,7 @@ public class EnvelopeModule extends EveryCompatModule {
                     Envelope.resource("block/pigeonhole_front_everycompat_mask")
               )
               .addTexture(TextureInfo.of(Envelope.resource("block/oak_pigeonhole_front"))
-                    .mask(Envelope.resource("block/pigeonhole_front_everycompat_mask"))
+                    .mask(Envelope.resource("block/pigeonhole_front_waste_everycompat_mask"))
                     .overlay(Envelope.resource("block/pigeonhole_front_waste_everycompat_overlay"))
                     .customTexture("block/oak_pigeonhole_front_waste"))
               .addTexture(Envelope.resource("block/oak_pigeonhole_end"))
@@ -56,12 +56,10 @@ public class EnvelopeModule extends EveryCompatModule {
 
         this.addEntry(pigeonholes);
 
-        Envelope.LOGGER.info("Every compat Mod init");
         RegHelper.addExtraPOIStatesRegistration(event -> {
-            Envelope.LOGGER.info("Adding {} to Pigeonhole POI ", pigeonholes.blocks);
             pigeonholes.blocks.forEach((w, block) -> {
                 event.addBlock(Envelope.PoiTypes.PIGEONHOLE, block);
-                Envelope.LOGGER.info("Adding {} to Pigeonhole POI", block);
+                Envelope.LOGGER.info("Registered '{}' as '{}' POI.", block, Envelope.PoiTypes.PIGEONHOLE.location());
             });
         });
     }
