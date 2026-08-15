@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.integration.wood_good;
+package io.github.mortuusars.envelope.integration.every_compat;
 
 import net.mehvahdjukaar.every_compat.api.EveryCompatAPI;
 
