@@ -2,6 +2,7 @@
 
 ## 0.7.5 - 2026-08-15
 - Added Every Compat (Wood Good) support for pigeonholes (implemented by [_**Dadamalda**_](https://github.com/DadamaldaDad))
+- Updated localization files.
 
 ## 0.7.4 - 2026-08-10
 - Fixed item dupe related to packages. Containers are hard.
