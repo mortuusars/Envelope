@@ -54,17 +54,13 @@ public class EnvelopeModule extends EveryCompatModule {
               .build();
 
         this.addEntry(pigeonholes);
-    }
 
-    @Override
-    public void onModInit() {
-        super.onModInit();
-        Envelope.LOGGER.info("Every compat Mod init"); // not called
+        Envelope.LOGGER.info("Every compat Mod init");
         RegHelper.addExtraPOIStatesRegistration(event -> {
-            Envelope.LOGGER.info("Adding {} to Pigeonhole POI ", pigeonholes.blocks); // not called
+            Envelope.LOGGER.info("Adding {} to Pigeonhole POI ", pigeonholes.blocks);
             pigeonholes.blocks.forEach((w, block) -> {
                 event.addBlock(Envelope.PoiTypes.PIGEONHOLE, block);
-                Envelope.LOGGER.info("Adding {} to Pigeonhole POI", block); // not called
+                Envelope.LOGGER.info("Adding {} to Pigeonhole POI", block);
             });
         });
     }
