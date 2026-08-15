@@ -53,11 +53,6 @@ public class EnvelopeModule extends EveryCompatModule {
     @Override
     public void onModInit() {
         super.onModInit();
-        RegHelper.addExtraBEBlockStatesRegistration(event -> {
-            pigeonholes.blocks.forEach((w, block) -> {
-                event.addBlocks(Envelope.BlockEntityTypes.PIGEONHOLE.get(), block);
-            });
-        });
         RegHelper.addExtraPOIStatesRegistration(event -> {
             pigeonholes.blocks.forEach((w, block) -> {
                 event.addBlock(Envelope.PoiTypes.PIGEONHOLE, block);
