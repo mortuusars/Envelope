@@ -11,6 +11,8 @@
   "block.envelope.crimson_pigeonhole": "真紅の鳩小屋",
   "block.envelope.warped_pigeonhole": "歪んだ鳩小屋",
 
+  "block_type.envelope.pigeonhole": "%sの鳩小屋",
+
   "block.envelope.mailbox": "郵便箱",
   "block.envelope.paper_box": "ダンボール",
   "block.envelope.package": "小包",

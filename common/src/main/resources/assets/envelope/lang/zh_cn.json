@@ -11,6 +11,8 @@
   "block.envelope.crimson_pigeonhole": "绯红木鸽舍",
   "block.envelope.warped_pigeonhole": "诡异木鸽舍",
 
+  "block_type.envelope.pigeonhole": "%s木鸽舍",
+
   "block.envelope.mailbox": "邮箱",
   "block.envelope.paper_box": "纸箱",
   "block.envelope.package": "包裹",

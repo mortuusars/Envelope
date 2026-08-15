@@ -24,6 +24,10 @@ dependencies {
 
     modCompileOnly("dev.ryanhcode.sable:sable-common-${minecraft_version}:${sable_version}")
 
+    // Every Compat
+    modCompileOnly("net.mehvahdjukaar:everycomp-fabric:${everycomp_version}") { transitive = false }
+    modCompileOnly("net.mehvahdjukaar:moonlight-fabric:${moonlight_version}") { transitive = false }
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

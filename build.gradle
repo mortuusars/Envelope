@@ -124,6 +124,11 @@ subprojects {
             name = "TerraformersMC"
             url = "https://maven.terraformersmc.com/"
         }
+
+        // Every Compat
+        maven {
+            url "https://registry.somethingcatchy.net/repository/maven-public/"
+        }
     }
 
     loom {
