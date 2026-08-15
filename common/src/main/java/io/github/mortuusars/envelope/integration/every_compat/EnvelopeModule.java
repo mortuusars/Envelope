@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import net.mehvahdjukaar.every_compat.api.SimpleEntrySet;
 import net.mehvahdjukaar.every_compat.api.TabAddMode;
+import net.mehvahdjukaar.every_compat.api.TextureInfo;
 import net.mehvahdjukaar.every_compat.modules.EveryCompatModule;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.moonlight.api.resources.SimpleTagBuilder;
@@ -38,10 +39,10 @@ public class EnvelopeModule extends EveryCompatModule {
                     Envelope.resource("block/oak_pigeonhole_front"),
                     Envelope.resource("block/pigeonhole_front_everycompat_mask")
               )
-              .addTextureM(
-                    Envelope.resource("block/oak_pigeonhole_front_waste"),
-                    Envelope.resource("block/pigeonhole_front_waste_everycompat_mask")
-              )
+              .addTexture(TextureInfo.of(Envelope.resource("block/oak_pigeonhole_front"))
+                    .mask(Envelope.resource("block/pigeonhole_front_everycompat_mask"))
+                    .overlay(Envelope.resource("block/pigeonhole_front_waste_everycompat_overlay"))
+                    .customTexture("block/oak_pigeonhole_front_waste"))
               .addTexture(Envelope.resource("block/oak_pigeonhole_end"))
               .addTag(BlockTags.MINEABLE_WITH_AXE, Registries.BLOCK)
               .addTag(BlockTags.DOES_NOT_BLOCK_HOPPERS, Registries.BLOCK)
