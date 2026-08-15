@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.advancements.critereon.MailDeliveredTrigger
 import io.github.mortuusars.envelope.advancements.predicate.ItemOccludingBlockPredicate;
 import io.github.mortuusars.envelope.advancements.predicate.ItemPackagePredicate;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
+import io.github.mortuusars.envelope.integration.wood_good.EveryCompatIntegration;
 import io.github.mortuusars.envelope.util.bugger.Bugger;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
@@ -99,6 +100,10 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
+
+        if(Platform.isModLoaded("everycomp")) {
+            EveryCompatIntegration.init();
+        }
     }
 
     /**

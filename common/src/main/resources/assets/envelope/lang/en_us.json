@@ -17,6 +17,8 @@
   "block.envelope.sealed_package": "Sealed Package",
   "block.envelope.letter": "Letter",
 
+  "block_type.envelope.pigeonhole": "%s Pigeonhole",
+
   "item.envelope.oak_pigeonhole": "Oak Pigeonhole",
   "item.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
   "item.envelope.birch_pigeonhole": "Birch Pigeonhole",

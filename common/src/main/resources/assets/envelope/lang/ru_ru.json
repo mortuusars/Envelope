@@ -11,6 +11,8 @@
   "block.envelope.crimson_pigeonhole": "Багровая голубятня",
   "block.envelope.warped_pigeonhole": "Искажённая голубятня",
 
+  "block_type.envelope.pigeonhole": "%s голубятня",
+
   "block.envelope.mailbox": "Почтовый ящик",
   "block.envelope.paper_box": "Картонная коробка",
   "block.envelope.package": "Посылка",
