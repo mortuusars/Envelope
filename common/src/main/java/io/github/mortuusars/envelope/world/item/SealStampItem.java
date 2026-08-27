@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.item;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
+import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -10,13 +11,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,9 +62,13 @@ public class SealStampItem extends Item implements ApplicatorItem {
     }
 
     @Override
-    public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
-        return hovered.has(Envelope.DataComponents.SEAL)
-              || (hovered.getItem() instanceof Sealable sealable && sealable.canSeal(level, hovered));
+    public boolean shouldRenderSlotTooltipWhileCarrying(Player player, AbstractContainerMenu menu, Slot slot, ItemStack carried) {
+        if (!slot.allowModification(player)) {
+            return false;
+        }
+
+        return slot.getItem().has(Envelope.DataComponents.SEAL)
+                || (slot.getItem().getItem() instanceof Sealable sealable && sealable.canSeal(player.level(), slot.getItem()));
     }
 
     @Override

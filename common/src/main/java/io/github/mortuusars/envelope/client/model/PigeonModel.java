@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.client.model;
 
 import com.google.common.collect.ImmutableList;
-import io.github.mortuusars.envelope.client.util.Minecrft;
-import io.github.mortuusars.envelope.util.EasingFunction;
+import io.github.mortuusars.mortaar.client.Minecrft;
+import io.github.mortuusars.mortaar.util.Easing;
 import net.minecraft.Optionull;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -156,7 +156,7 @@ public class PigeonModel extends AgeableListModel<Pigeon> {
                 if (anim > 1) {
                     anim = 2 - anim;
                 }
-                anim = ((float) EasingFunction.EASE_IN_OUT_QUAD.ease(anim));
+                anim = ((float) Easing.IN_OUT_QUAD.ease(anim));
                 body.xRot = anim * 0.05f;
                 head.xRot += -anim * 0.025f;
                 head.z -= 0.5F * (anim);

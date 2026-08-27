@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.network.handler;
 
 import io.github.mortuusars.envelope.client.gui.screen.*;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.network.packet.clientbound.*;
 import io.github.mortuusars.envelope.world.item.LetterAndQuillItem;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;

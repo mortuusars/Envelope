@@ -3,8 +3,8 @@ package io.github.mortuusars.envelope.network.packet.clientbound;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.handler.ClientPacketsHandler;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.util.EnvelopeStreamCodecs;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
+import io.github.mortuusars.mortaar.network.codec.StreamCodecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,7 +24,7 @@ public record OpenMailboxPlacingScreenS2CP(InteractionHand hand,
 
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenMailboxPlacingScreenS2CP> STREAM_CODEC = StreamCodec.composite(
           ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), OpenMailboxPlacingScreenS2CP::hand,
-          EnvelopeStreamCodecs.BLOCK_HIT_RESULT, OpenMailboxPlacingScreenS2CP::hitResult,
+          StreamCodecs.BLOCK_HIT_RESULT, OpenMailboxPlacingScreenS2CP::hitResult,
           AllAddresses.STREAM_CODEC, OpenMailboxPlacingScreenS2CP::knownAddresses,
           OpenMailboxPlacingScreenS2CP::new
     );

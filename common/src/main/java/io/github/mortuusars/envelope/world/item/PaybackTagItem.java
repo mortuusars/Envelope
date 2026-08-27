@@ -5,11 +5,13 @@ import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
+import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -34,6 +36,16 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
     }
 
     @Override
+    public boolean shouldRenderSlotTooltipWhileCarrying(Player player, AbstractContainerMenu menu, Slot slot, ItemStack carried) {
+        if (!slot.allowModification(player)) {
+            return false;
+        }
+
+        return slot.getItem().is(Envelope.Tags.Items.MAILABLE)
+              && (carried.has(Envelope.DataComponents.PAYBACK_TAG_CONTENTS) || slot.getItem().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST));
+    }
+
+    @Override
     public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
         if (action != ClickAction.SECONDARY) return false;
         if (!slot.allowModification(player)) return false;
@@ -45,23 +57,25 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
 
         if (request != null) {
             if (stack.getCount() < target.getCount()) {
-                player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 1, 1);
+                player.playSound(SoundEvents.COMPARATOR_CLICK, 1, 1);
                 return true;
             }
 
             if (request.equals(currentRequest)) {
-                return true; // do nothing
+                player.playSound(SoundEvents.COMPARATOR_CLICK, 1, 1);
+                return true;
             }
             target.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
         } else {
             if (currentRequest == null) {
-                return true; // do nothing
+                player.playSound(SoundEvents.COMPARATOR_CLICK, 1, 1);
+                return true;
             }
             target.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
         }
 
         slot.setChanged();
-        if (request != null) {
+        if (request != null && !player.isCreative()) {
             stack.shrink(target.getCount());
         }
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
@@ -98,10 +112,5 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
         }
 
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
-    }
-
-    @Override
-    public boolean shouldRenderTooltipWhileCarrying(Level level, ItemStack carried, ItemStack hovered) {
-        return true;
     }
 }

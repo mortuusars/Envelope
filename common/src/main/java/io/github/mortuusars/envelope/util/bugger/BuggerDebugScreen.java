@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.util.bugger;
 
 import com.google.common.base.Strings;
 import com.mojang.blaze3d.platform.InputConstants;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.util.bugger.page.BuggerPage;
 import io.github.mortuusars.envelope.util.bugger.page.DataPage;
 import io.github.mortuusars.envelope.util.bugger.page.LogPage;

@@ -2,9 +2,9 @@ package io.github.mortuusars.envelope.network.packet.serverbound;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.util.EnvelopeStreamCodecs;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.item.MailboxBlockItem;
+import io.github.mortuusars.mortaar.network.codec.StreamCodecs;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -25,7 +25,7 @@ public record MailboxPlaceC2SP(InteractionHand hand, String address, BlockHitRes
     public static final StreamCodec<FriendlyByteBuf, MailboxPlaceC2SP> STREAM_CODEC = StreamCodec.composite(
           ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal), MailboxPlaceC2SP::hand,
           ByteBufCodecs.STRING_UTF8, MailboxPlaceC2SP::address,
-          EnvelopeStreamCodecs.BLOCK_HIT_RESULT, MailboxPlaceC2SP::hitResult,
+          StreamCodecs.BLOCK_HIT_RESULT, MailboxPlaceC2SP::hitResult,
           MailboxPlaceC2SP::new
     );
 

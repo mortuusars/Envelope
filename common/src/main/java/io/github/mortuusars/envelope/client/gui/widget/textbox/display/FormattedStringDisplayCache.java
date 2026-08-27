@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.client.gui.widget.textbox.display;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.Char;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedStringEditor;
-import io.github.mortuusars.envelope.client.util.Pos2i;
+import io.github.mortuusars.mortaar.util.Pos2i;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.Rect2i;
 

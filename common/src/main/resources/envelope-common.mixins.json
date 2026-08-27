@@ -5,8 +5,7 @@
   "minVersion": "0.8",
   "plugin": "io.github.mortuusars.envelope.mixin.EnvelopeMixinConfigPlugin",
   "client": [
-    "EditBoxMixin",
-    "applicator_carrying_tooltip.AbstractContainerScreenMixin",
+    "fix_edit_box.EditBoxMixin",
     "bugger.EntityRendererMixin",
     "bugger.KeyboardHandlerMixin",
     "bugger.MouseHandlerMixin",

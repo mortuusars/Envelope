@@ -1,7 +1,7 @@
-package io.github.mortuusars.envelope.mixin;
+package io.github.mortuusars.envelope.mixin.fix_edit_box;
 
 import io.github.mortuusars.envelope.client.gui.screen.AddressTagScreen;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;

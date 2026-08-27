@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.util.bugger.data;
 
 import com.mojang.serialization.Codec;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 

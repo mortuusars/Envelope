@@ -12,8 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -226,44 +224,6 @@ public final class Mail {
               .toList();
 
         return Stream.concat(packages.stream(), packedPackages.stream()).toList();
-
-//        Container container = ContainerUtils.compact(items);
-//
-//        for (int i = 0; i < container.getContainerSize(); i += PackageContents.SLOTS) {
-//            List<ItemStack> contents = new ArrayList<>();
-//            for (int slot = 0; slot < PackageContents.SLOTS; slot++) {
-//                int index = i + slot;
-//                contents.add()
-//
-//            }
-//
-//            ItemStack stack = container.getItem(i);
-//
-//
-//        }
-//
-//
-//        SimpleContainer container = new SimpleContainer(PackageContents.SLOTS);
-//
-//        while (!items.isEmpty()) {
-//            SimpleContainer finalContainer = container;
-//
-//            items.removeIf(stack -> {
-//                if (stack.getItem() instanceof PackageItem) {
-//                    packages.add(Mail.of(stack).apply(builder).get());
-//                    return true;
-//                }
-//                return finalContainer.addItem(stack).isEmpty();
-//            });
-//
-//            if (!container.isEmpty()) {
-//                ItemStack pkg = Mail.createPackage(new PackageContents(container)).apply(builder).get();
-//                packages.add(pkg);
-//                container = new SimpleContainer(PackageContents.SLOTS);
-//            }
-//        }
-
-//        return packages;
     }
 
     public static MailBuilder<?> createPaybackBox(PaybackSubject subject) {

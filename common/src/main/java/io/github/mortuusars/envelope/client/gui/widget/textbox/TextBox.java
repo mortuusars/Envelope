@@ -9,7 +9,7 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.display.Line;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedStringEditor;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.Formatting;
-import io.github.mortuusars.envelope.client.util.Pos2i;
+import io.github.mortuusars.mortaar.util.Pos2i;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

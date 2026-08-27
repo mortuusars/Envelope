@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.integration.jei.extensions;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;

@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.util.bugger;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;

@@ -1,5 +1,11 @@
 # Changelog
 
+## UNRELEASED
+- Small improvements to applicator items (Address Tag, Payback Tag and Seal Stamp) r-click application behavior.
+- Bundled Mortaar library with the mod
+  - Mortaar is a library mod that will be used to aid in mod development and reduce code duplication
+  - As a player, you will not see any difference, apart from an additional mod in the mod menu
+
 ## 0.7.5 - 2026-08-15
 - Added Every Compat (Wood Good) support for pigeonholes (implemented by [_**Dadamalda**_](https://github.com/DadamaldaDad))
 - Updated localization files.

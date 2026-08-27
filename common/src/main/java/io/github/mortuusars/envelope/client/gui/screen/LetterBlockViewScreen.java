@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.client.gui.screen;
 
-import io.github.mortuusars.envelope.client.util.Minecrft;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.world.block.LetterBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
