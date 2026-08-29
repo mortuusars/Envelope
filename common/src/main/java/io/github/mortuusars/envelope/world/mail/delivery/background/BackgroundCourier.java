@@ -10,6 +10,7 @@ import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
 import net.minecraft.server.level.ServerLevel;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.Optional;
 public class BackgroundCourier implements Courier {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(i -> i.group(
           SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::getSpawnableEntityData),
-          CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::getOrigin),
+          CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::getCourierOrigin),
           Delivery.CODEC.fieldOf("delivery").forGetter(BackgroundCourier::getDelivery)
     ).apply(i, BackgroundCourier::new));
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -38,7 +39,7 @@ public class BackgroundCourier implements Courier {
     }
 
     @Override
-    public CourierOrigin getOrigin() {
+    public @NotNull CourierOrigin getCourierOrigin() {
         return origin;
     }
 
@@ -71,11 +72,11 @@ public class BackgroundCourier implements Courier {
     public void endDelivery(ServerLevel level, Delivery delivery) {
         setRemoved();
 
-        if (getOrigin().isRegular()) {
+        if (getCourierOrigin().isRegular()) {
             BackgroundDelivery background = MailService.of(level).getBackgroundDelivery();
-            background.addFinishedCourier(new FinishedBackgroundCourier(getSpawnableEntityData(), getOrigin().getPos(), level.getGameTime()));
+            background.addFinishedCourier(new FinishedBackgroundCourier(getSpawnableEntityData(), getCourierOrigin().getPos(), level.getGameTime()));
             if (!delivery.getMail().isEmpty()) {
-                background.addDroppedMail(new SpawnableItem(delivery.getMail(), getOrigin().getPos()));
+                background.addDroppedMail(new SpawnableItem(delivery.getMail(), getCourierOrigin().getPos()));
             }
         } else if (!delivery.getMail().isEmpty()) {
             delivery.getRoute().getSenderPos().ifPresentOrElse(

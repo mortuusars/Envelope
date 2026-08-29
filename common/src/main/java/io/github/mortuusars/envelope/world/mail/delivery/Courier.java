@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.world.mail.dropoff.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -29,7 +30,8 @@ public interface Courier {
 
     Optional<Delivery> getCurrentDelivery();
 
-    CourierOrigin getOrigin();
+    @NotNull
+    CourierOrigin getCourierOrigin();
 
     default boolean isDelivering() {
         return getCurrentDelivery().isPresent();
@@ -55,7 +57,7 @@ public interface Courier {
                 delivery.end();
                 endDelivery(level, delivery);
                 if (Bugger.isEnabled()) {
-                    String type = getOrigin().isService() ? "Service delivery" : "Delivery";
+                    String type = getCourierOrigin().isService() ? "Service delivery" : "Delivery";
                     LOGGER.info("{} '{} > {}' is finished.", type, delivery.getSender(), delivery.getRecipient());
                 }
             } else {
@@ -152,7 +154,7 @@ public interface Courier {
             return true;
         }
 
-        if (getOrigin().isService() && shouldTerminateServiceDeliveryEarly(level, delivery)) {
+        if (getCourierOrigin().isService() && shouldTerminateServiceDeliveryEarly(level, delivery)) {
             LOGGER.debug("Terminating service delivery [{}] early.", delivery.getId());
             delivery.beginPhase(DeliveryPhase.FINISHED);
             return true;

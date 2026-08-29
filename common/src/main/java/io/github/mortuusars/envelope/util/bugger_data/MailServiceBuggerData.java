@@ -62,7 +62,7 @@ public class MailServiceBuggerData extends NbtData {
               ChatFormatting.GREEN + delivery.getRecipient().format().withIcon().toString() + ChatFormatting.RESET +
 
               ChatFormatting.GRAY +
-              " | " + (courier.getOrigin().isService() ? "Service" : "Regular") +
+              " | " + (courier.getCourierOrigin().isService() ? "Service" : "Regular") +
               " | " + (Mail.isReturned(delivery.getMail()) ? "← " : "") + "✉ " + (!delivery.getMail().isEmpty() ? delivery.getMail().getHoverName().getString() : "Empty") +
               " | ↔ " + delivery.getRoute().getDistance(mailService.getLevel()) +
               " | ⌚" + delivery.getRoute().getFullTravelDuration().seconds() + "s" +

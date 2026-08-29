@@ -7,7 +7,7 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
 import org.slf4j.Logger;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public class DeliveryManager {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -24,17 +24,17 @@ public class DeliveryManager {
 
     // --
 
-    public void start(Pigeon pigeon, DeliveryDraft draft) {
-        start(draft, pigeon::startDelivery);
+    public void start(PhysicalCourier courier, DeliveryDraft draft) {
+        start(draft, courier::startDelivery);
     }
 
     public void startService(DeliveryDraft draft) {
         start(draft, delivery -> Pigeon.spawnServiceCourier(getMailService().getLevel(), delivery));
     }
 
-    public void start(DeliveryDraft draft, Function<Delivery, Courier> courier) {
+    public void start(DeliveryDraft draft, Consumer<Delivery> courier) {
         Delivery delivery = createDelivery(draft);
-        courier.apply(delivery);
+        courier.accept(delivery);
         LOGGER.debug("Started delivery: {}", delivery);
     }
 

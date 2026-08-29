@@ -4,10 +4,12 @@ import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactory
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.*;
+import io.github.mortuusars.envelope.client.model.BatBackpackModel;
 import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.CharredPigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
+import io.github.mortuusars.envelope.client.renderer.entity.layer.BatBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
@@ -36,6 +38,7 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(PigeonHatLayer.MODEL_LAYER, PigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(CharredPigeonRenderer.MODEL_LAYER, CharredPigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(CharredPigeonBackpackLayer.MODEL_LAYER, CharredPigeonModel::createLayerDefinition);
+        EntityModelLayerRegistry.registerModelLayer(BatBackpackLayer.MODEL_LAYER, BatBackpackModel::createLayerDefinition);
 
         BlockRenderLayerMap.INSTANCE.putBlock(Envelope.Blocks.LETTER.get(), RenderType.cutout());
 

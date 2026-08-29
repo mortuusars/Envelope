@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -80,7 +81,7 @@ public class CourierDeliveryTests extends BuggerTests {
         }
 
         @Override
-        public CourierOrigin getOrigin() {
+        public @NotNull CourierOrigin getCourierOrigin() {
             return CourierOrigin.service();
         }
 

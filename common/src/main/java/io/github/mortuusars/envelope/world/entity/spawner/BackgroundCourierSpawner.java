@@ -16,7 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -64,7 +63,7 @@ public class BackgroundCourierSpawner extends Spawner {
     }
 
     protected boolean canSpawn(BackgroundCourier courier) {
-        if (courier.getOrigin().isService()
+        if (courier.getCourierOrigin().isService()
               && courier.getDelivery().getMail().isEmpty()
               && !courier.getDelivery().getPhase().isOnRecipientSide()) {
             return false; // Don't spawn service couriers when it doesn't make sense

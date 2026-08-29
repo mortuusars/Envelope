@@ -13,6 +13,7 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
+import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -233,14 +234,14 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     // -- Delivery
 
-    public boolean tryStartDelivery(Pigeon pigeon) {
-        if (!MailService.operatesIn(pigeon.level())) {
+    public boolean tryStartDelivery(PhysicalCourier courier) {
+        if (!MailService.operatesIn(courier.level())) {
             return false;
         }
 
-        ServerLevel level = ((ServerLevel) pigeon.level());
+        ServerLevel level = ((ServerLevel) courier.level());
 
-        if (pigeon.isDelivering()) return false;
+        if (courier.isDelivering()) return false;
         ItemStack mailStack = getItem(SLOT_MAIL);
         if (!isSendable(mailStack)) return false;
 
@@ -249,7 +250,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         ItemStack mail = Mail.removePreviousDeliveryData(mailStack.copyWithCount(1));
 
         MailService.of(level).getDeliveryManager()
-              .start(pigeon, Delivery.draft()
+              .start(courier, Delivery.draft()
                     .deliver(mail)
                     .from(getAddress())
                     .to(Mail.getRecipientOrUnknown(mail))
@@ -258,7 +259,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         removeItem(SLOT_MAIL, 1);
         removeItem(SLOT_FOOD, 1);
 
-        Vec3 pos = pigeon.position();
+        Vec3 pos = courier.position();
         level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
         level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
 
