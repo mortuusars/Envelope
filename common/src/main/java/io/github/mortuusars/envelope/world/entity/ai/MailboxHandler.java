@@ -2,11 +2,10 @@ package io.github.mortuusars.envelope.world.entity.ai;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerData;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
-import io.github.mortuusars.mortaar.bugger.Bugger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -70,7 +69,7 @@ public class MailboxHandler {
             if (!isMailboxValid(level, pigeon.blockPosition())) {
                 setTargetPos(null);
             }
-            EnvelopeBuggerData.PIGEON_MAILBOX_HANDLER.send(pigeon.getId(), this);
+            Envelope.BuggerData.PIGEON_MAILBOX_HANDLER.send(pigeon.getId(), this);
         }
     }
 

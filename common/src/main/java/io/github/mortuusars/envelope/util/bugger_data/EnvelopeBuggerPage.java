@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.util.bugger_data;
 
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.mortaar.bugger.screen.page.BuggerScreenPage;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -16,7 +17,7 @@ public class EnvelopeBuggerPage implements BuggerScreenPage {
 
     @Override
     public List<String> getLeftLines() {
-        return EnvelopeBuggerData.MAIL_SERVICE.get()
+        return Envelope.BuggerData.MAIL_SERVICE.get()
               .map(tag -> {
 
                   List<String> lines = new ArrayList<>(List.of(

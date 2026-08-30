@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.mortaar.Platform;
-import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.inventory.PaybackPackageMenu;
@@ -56,7 +55,7 @@ public class PaybackPackageItem extends Item {
             return;
         }
 
-        long remainingTicks = subject.expiresAt() - Minecrft.level().getGameTime();
+        long remainingTicks = subject.expiresAt() - Platform.getServer().map(s -> s.overworld().getGameTime()).orElse(0L);
         if (remainingTicks < 1) {
             components.add(Component.translatable("gui.envelope.payback.expired").withColor(Colors.TOOLTIP_RED));
         } else {

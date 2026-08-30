@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Ticks;
-import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerData;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
@@ -775,7 +774,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
             setDelivering(getCurrentDelivery().isPresent());
             setHasMail(delivery != null && !delivery.getMail().isEmpty());
 
-            EnvelopeBuggerData.PIGEON_DELIVERY.send(getId(), Optional.ofNullable(delivery));
+            Envelope.BuggerData.PIGEON_DELIVERY.send(getId(), Optional.ofNullable(delivery));
         }
     }
 

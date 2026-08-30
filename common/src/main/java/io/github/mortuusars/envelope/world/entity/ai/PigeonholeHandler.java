@@ -7,7 +7,6 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.integration.sable.ContraptionTargets;
 import io.github.mortuusars.envelope.util.Ticks;
-import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerData;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -145,7 +144,7 @@ public class PigeonholeHandler {
                 if (getTargetPos() != null && !pigeon.isDelivering() && !isPigeonholeValid(level, pigeon.blockPosition())) {
                     setTargetPos(null);
                 }
-                EnvelopeBuggerData.PIGEON_PIGEONHOLE_HANDLER.send(pigeon.getId(), this);
+                Envelope.BuggerData.PIGEON_PIGEONHOLE_HANDLER.send(pigeon.getId(), this);
             }
         }
     }

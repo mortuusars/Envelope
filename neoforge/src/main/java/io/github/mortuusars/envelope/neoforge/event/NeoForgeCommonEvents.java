@@ -4,17 +4,13 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.EnvelopeCommand;
 import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
-import io.github.mortuusars.envelope.neoforge.RegisterImpl;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.StatFormatter;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -33,18 +29,11 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
-import java.util.Map;
-
 @EventBusSubscriber(modid = Envelope.ID)
 public class NeoForgeCommonEvents {
     @SubscribeEvent
     public static void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            CommonEvents.commonSetup();
-            for (Map.Entry<ResourceLocation, StatFormatter> entry : RegisterImpl.STATS.entrySet()) {
-                Stats.CUSTOM.get(entry.getKey(), entry.getValue());
-            }
-        });
+        event.enqueueWork(CommonEvents::commonSetup);
     }
 
     @SubscribeEvent

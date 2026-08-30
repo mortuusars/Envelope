@@ -12,10 +12,13 @@ import io.github.mortuusars.envelope.integration.Mods;
 import io.github.mortuusars.envelope.integration.every_compat.EveryCompatIntegration;
 import io.github.mortuusars.envelope.network.packet.clientbound.*;
 import io.github.mortuusars.envelope.network.packet.serverbound.*;
+import io.github.mortuusars.envelope.util.bugger_data.MailServiceBuggerData;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
+import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
+import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
@@ -35,9 +38,14 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import io.github.mortuusars.mortaar.Register;
+import io.github.mortuusars.mortaar.Registrar;
+import io.github.mortuusars.mortaar.bugger.data.EntityData;
+import io.github.mortuusars.mortaar.bugger.data.OptionalEntityData;
 import net.minecraft.advancements.critereon.ItemSubPredicate;
 import net.minecraft.advancements.critereon.PlayerTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -87,6 +95,8 @@ public class Envelope {
     public static final String ID = "envelope";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    public static final Registrar REGISTRAR = Register.registrar(ID);
+
     public static void init() {
         Blocks.init();
         BlockEntityTypes.init();
@@ -103,25 +113,26 @@ public class Envelope {
         RecipeSerializers.init();
         SoundEvents.init();
         ArgumentTypes.init();
+        BuggerData.init();
 
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundMailboxMenuInboxActionPacket.TYPE, ServerboundMailboxMenuInboxActionPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundLetterEditPacket.TYPE, ServerboundLetterEditPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundLetterViewScreenClosedPacket.TYPE, ServerboundLetterViewScreenClosedPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundAddressTagApplyPacket.TYPE, ServerboundAddressTagApplyPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundPackingMenuPresetAddressPacket.TYPE, ServerboundPackingMenuPresetAddressPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundMailboxPlacePacket.TYPE, ServerboundMailboxPlacePacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundMailboxAddressTagApplyPacket.TYPE, ServerboundMailboxAddressTagApplyPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundPaybackTagMenuSetSlotPacket.TYPE, ServerboundPaybackTagMenuSetSlotPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundMailboxMenuInboxActionPacket.TYPE, ServerboundMailboxMenuInboxActionPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundLetterEditPacket.TYPE, ServerboundLetterEditPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundLetterViewScreenClosedPacket.TYPE, ServerboundLetterViewScreenClosedPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundAddressTagApplyPacket.TYPE, ServerboundAddressTagApplyPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundPackingMenuPresetAddressPacket.TYPE, ServerboundPackingMenuPresetAddressPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundMailboxPlacePacket.TYPE, ServerboundMailboxPlacePacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundMailboxAddressTagApplyPacket.TYPE, ServerboundMailboxAddressTagApplyPacket.STREAM_CODEC);
+        Register.serverboundPacket(ServerboundPaybackTagMenuSetSlotPacket.TYPE, ServerboundPaybackTagMenuSetSlotPacket.STREAM_CODEC);
 
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundMailboxHasNewMailPacket.TYPE, ClientboundMailboxHasNewMailPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundMailboxMenuSetMailPacket.TYPE, ClientboundMailboxMenuSetMailPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundMailboxMenuMailRemovedPacket.TYPE, ClientboundMailboxMenuMailRemovedPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenLetterEditScreenPacket.TYPE, ClientboundOpenLetterEditScreenPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenLetterBlockViewScreenPacket.TYPE, ClientboundOpenLetterBlockViewScreenPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenLetterViewScreenPacket.TYPE, ClientboundOpenLetterViewScreenPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenAddressTagScreenPacket.TYPE, ClientboundOpenAddressTagScreenPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenMailboxAddressTagScreenPacket.TYPE, ClientboundOpenMailboxAddressTagScreenPacket.STREAM_CODEC);
-        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenMailboxPlacingScreenPacket.TYPE, ClientboundOpenMailboxPlacingScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundMailboxHasNewMailPacket.TYPE, ClientboundMailboxHasNewMailPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundMailboxMenuSetMailPacket.TYPE, ClientboundMailboxMenuSetMailPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundMailboxMenuMailRemovedPacket.TYPE, ClientboundMailboxMenuMailRemovedPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundOpenLetterEditScreenPacket.TYPE, ClientboundOpenLetterEditScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundOpenLetterBlockViewScreenPacket.TYPE, ClientboundOpenLetterBlockViewScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundOpenLetterViewScreenPacket.TYPE, ClientboundOpenLetterViewScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundOpenAddressTagScreenPacket.TYPE, ClientboundOpenAddressTagScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundOpenMailboxAddressTagScreenPacket.TYPE, ClientboundOpenMailboxAddressTagScreenPacket.STREAM_CODEC);
+        Register.clientboundPacket(ClientboundOpenMailboxPlacingScreenPacket.TYPE, ClientboundOpenMailboxPlacingScreenPacket.STREAM_CODEC);
 
         if (Mods.EVERY_COMPAT.isLoaded()) {
             EveryCompatIntegration.init();
@@ -164,13 +175,13 @@ public class Envelope {
         public static final Supplier<PigeonholeBlock> CRIMSON_PIGEONHOLE = pigeonhole("crimson", net.minecraft.world.level.block.Blocks.CRIMSON_PLANKS.defaultMapColor());
         public static final Supplier<PigeonholeBlock> WARPED_PIGEONHOLE = pigeonhole("warped", net.minecraft.world.level.block.Blocks.WARPED_PLANKS.defaultMapColor());
 
-        public static final Supplier<MailboxBlock> MAILBOX = Register.block("mailbox",
+        public static final Supplier<MailboxBlock> MAILBOX = REGISTRAR.block("mailbox",
               () -> new MailboxBlock(BlockBehaviour.Properties.of()
                     .strength(4f)
                     .sound(SoundType.WOOD)
                     .mapColor(MapColor.WOOD)));
 
-        public static final Supplier<PaperBoxBlock> PAPER_BOX = Register.block("paper_box",
+        public static final Supplier<PaperBoxBlock> PAPER_BOX = REGISTRAR.block("paper_box",
               () -> new PaperBoxBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
                     .ignitedByLava()
@@ -179,7 +190,7 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
               ));
 
-        public static final Supplier<PackageBlock> PACKAGE = Register.block("package",
+        public static final Supplier<PackageBlock> PACKAGE = REGISTRAR.block("package",
               () -> new PackageBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
                     .ignitedByLava()
@@ -188,7 +199,7 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
 
-        public static final Supplier<PackageBlock> SEALED_PACKAGE = Register.block("sealed_package",
+        public static final Supplier<PackageBlock> SEALED_PACKAGE = REGISTRAR.block("sealed_package",
               () -> new PackageBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
                     .ignitedByLava()
@@ -197,7 +208,7 @@ public class Envelope {
                     .mapColor(MapColor.SAND)
                     .noOcclusion()));
 
-        public static final Supplier<LetterBlock> LETTER = Register.block("letter",
+        public static final Supplier<LetterBlock> LETTER = REGISTRAR.block("letter",
               () -> new LetterBlock(BlockBehaviour.Properties.of()
                     .pushReaction(PushReaction.DESTROY)
                     .sound(SoundTypes.PAPER)
@@ -208,7 +219,7 @@ public class Envelope {
 
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
-            Supplier<PigeonholeBlock> block = Register.block(id,
+            Supplier<PigeonholeBlock> block = REGISTRAR.block(id,
                   () -> new PigeonholeBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BEEHIVE)
                         .strength(2f)
                         .mapColor(color)));
@@ -222,19 +233,19 @@ public class Envelope {
 
     public static class BlockEntityTypes {
         public static final Supplier<BlockEntityType<MailboxBlockEntity>> MAILBOX =
-              Register.blockEntityType("mailbox", () -> Register.newBlockEntityType(
+              REGISTRAR.blockEntityType("mailbox", () -> REGISTRAR.newBlockEntityType(
                     MailboxBlockEntity::new, Blocks.MAILBOX.get()));
 
         public static final Supplier<BlockEntityType<PigeonholeBlockEntity>> PIGEONHOLE =
-              Register.blockEntityType("pigeonhole", () -> Register.newBlockEntityType(
+              REGISTRAR.blockEntityType("pigeonhole", () -> REGISTRAR.newBlockEntityType(
                     PigeonholeBlockEntity::new, getPigeonholeBlocks()));
 
         public static final Supplier<BlockEntityType<PackageBlockEntity>> PACKAGE =
-              Register.blockEntityType("package", () -> Register.newBlockEntityType(
+              REGISTRAR.blockEntityType("package", () -> REGISTRAR.newBlockEntityType(
                     PackageBlockEntity::new, Blocks.PACKAGE.get(), Blocks.SEALED_PACKAGE.get()));
 
         public static final Supplier<BlockEntityType<LetterBlockEntity>> LETTER =
-              Register.blockEntityType("letter", () -> Register.newBlockEntityType(
+              REGISTRAR.blockEntityType("letter", () -> REGISTRAR.newBlockEntityType(
                     LetterBlockEntity::new, Blocks.LETTER.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
@@ -253,8 +264,8 @@ public class Envelope {
               ResourceKey.create(net.minecraft.core.registries.Registries.POINT_OF_INTEREST_TYPE, resource("mailbox"));
 
         static void init() {
-            Register.poiType(PIGEONHOLE, 0, 1, PoiTypes::getPigeonholePoiBlockStates);
-            Register.poiType(MAILBOX, 0, 1, PoiTypes::getMailboxPoiBlockStates);
+            REGISTRAR.poiType(PIGEONHOLE, 0, 1, PoiTypes::getPigeonholePoiBlockStates);
+            REGISTRAR.poiType(MAILBOX, 0, 1, PoiTypes::getMailboxPoiBlockStates);
         }
 
         private static Set<BlockState> getPigeonholePoiBlockStates() {
@@ -285,42 +296,42 @@ public class Envelope {
         public static final Supplier<BlockItem> CRIMSON_PIGEONHOLE = pigeonhole("crimson", Blocks.CRIMSON_PIGEONHOLE);
         public static final Supplier<BlockItem> WARPED_PIGEONHOLE = pigeonhole("warped", Blocks.WARPED_PIGEONHOLE);
 
-        public static final Supplier<MailboxBlockItem> MAILBOX = Register.item("mailbox",
+        public static final Supplier<MailboxBlockItem> MAILBOX = REGISTRAR.item("mailbox",
               () -> new MailboxBlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
 
-        public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = Register.item("letter_and_quill",
+        public static final Supplier<LetterAndQuillItem> LETTER_AND_QUILL = REGISTRAR.item("letter_and_quill",
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
-        public static final Supplier<LetterItem> LETTER = Register.item("letter",
+        public static final Supplier<LetterItem> LETTER = REGISTRAR.item("letter",
               () -> new LetterItem(Blocks.LETTER.get(), new Item.Properties()));
-        public static final Supplier<SealedLetterItem> SEALED_LETTER = Register.item("sealed_letter",
+        public static final Supplier<SealedLetterItem> SEALED_LETTER = REGISTRAR.item("sealed_letter",
               () -> new SealedLetterItem(new Item.Properties()));
 
-        public static final Supplier<PaperBoxItem> PAPER_BOX = Register.item("paper_box",
+        public static final Supplier<PaperBoxItem> PAPER_BOX = REGISTRAR.item("paper_box",
               () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
-        public static final Supplier<PackageItem> PACKAGE = Register.item("package",
+        public static final Supplier<PackageItem> PACKAGE = REGISTRAR.item("package",
               () -> new PackageItem(Blocks.PACKAGE.get(), new Item.Properties().stacksTo(1)));
-        public static final Supplier<SealedPackageItem> SEALED_PACKAGE = Register.item("sealed_package",
+        public static final Supplier<SealedPackageItem> SEALED_PACKAGE = REGISTRAR.item("sealed_package",
               () -> new SealedPackageItem(Blocks.SEALED_PACKAGE.get(), new Item.Properties().stacksTo(1)));
 
-        public static final Supplier<PaybackTagItem> PAYBACK_TAG = Register.item("payback_tag",
+        public static final Supplier<PaybackTagItem> PAYBACK_TAG = REGISTRAR.item("payback_tag",
               () -> new PaybackTagItem(new Item.Properties()));
-        public static final Supplier<PaybackBoxItem> PAYBACK_BOX = Register.item("payback_box",
+        public static final Supplier<PaybackBoxItem> PAYBACK_BOX = REGISTRAR.item("payback_box",
               () -> new PaybackBoxItem(new Item.Properties().stacksTo(1)));
-        public static final Supplier<PaybackPackageItem> PAYBACK_PACKAGE = Register.item("payback_package",
+        public static final Supplier<PaybackPackageItem> PAYBACK_PACKAGE = REGISTRAR.item("payback_package",
               () -> new PaybackPackageItem(new Item.Properties().stacksTo(1)));
 
-        public static final Supplier<AddressTagItem> ADDRESS_TAG = Register.item("address_tag",
+        public static final Supplier<AddressTagItem> ADDRESS_TAG = REGISTRAR.item("address_tag",
               () -> new AddressTagItem(new Item.Properties()));
-        public static final Supplier<SealStampItem> SEAL_STAMP = Register.item("seal_stamp",
+        public static final Supplier<SealStampItem> SEAL_STAMP = REGISTRAR.item("seal_stamp",
               () -> new SealStampItem(new Item.Properties().stacksTo(1)));
 
-        public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = Register.item("pigeon_spawn_egg",
+        public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = REGISTRAR.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
-        public static final Supplier<SpawnEggItem> CHARRED_PIGEON_SPAWN_EGG = Register.item("charred_pigeon_spawn_egg",
+        public static final Supplier<SpawnEggItem> CHARRED_PIGEON_SPAWN_EGG = REGISTRAR.item("charred_pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.CHARRED_PIGEON.get(), 0x2B2223, 0xE85F00, new Item.Properties()));
 
         private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
-            Supplier<BlockItem> item = Register.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
+            Supplier<BlockItem> item = REGISTRAR.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
             PIGEONHOLES.add(item);
             return item;
         }
@@ -330,66 +341,66 @@ public class Envelope {
     }
 
     public static class DataComponents {
-        public static final DataComponentType<Address> ADDRESS = Register.dataComponentType("address", b ->
+        public static final DataComponentType<Address> ADDRESS = REGISTRAR.dataComponentType("address", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
         // -- Mail
 
-        public static final DataComponentType<Id> MAIL_ID = Register.dataComponentType("mail_id", b ->
+        public static final DataComponentType<Id> MAIL_ID = REGISTRAR.dataComponentType("mail_id", b ->
               b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
         /**
          * Only for display purposes. Shouldn't be used delivery in logic.
          */
-        public static final DataComponentType<Address> MAIL_SENDER = Register.dataComponentType("mail_sender", b ->
+        public static final DataComponentType<Address> MAIL_SENDER = REGISTRAR.dataComponentType("mail_sender", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<Address> MAIL_RECIPIENT = Register.dataComponentType("mail_recipient", b ->
+        public static final DataComponentType<Address> MAIL_RECIPIENT = REGISTRAR.dataComponentType("mail_recipient", b ->
               b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_REQUEST = Register.dataComponentType("mail_payback_request",
+        public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_REQUEST = REGISTRAR.dataComponentType("mail_payback_request",
               b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = Register.dataComponentType("mail_delivery_log", b ->
+        public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = REGISTRAR.dataComponentType("mail_delivery_log", b ->
               b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
-        public static final DataComponentType<Unit> MAIL_RETURNED = Register.dataComponentType("mail_returned", b ->
+        public static final DataComponentType<Unit> MAIL_RETURNED = REGISTRAR.dataComponentType("mail_returned", b ->
               b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
 
         // -- Letter
 
         public static final DataComponentType<LetterAndQuillContent> LETTER_AND_QUILL_CONTENT =
-              Register.dataComponentType("letter_and_quill_content", b ->
+              REGISTRAR.dataComponentType("letter_and_quill_content", b ->
                     b.persistent(LetterAndQuillContent.CODEC).networkSynchronized(LetterAndQuillContent.STREAM_CODEC));
         public static final DataComponentType<LetterContent> LETTER_CONTENT =
-              Register.dataComponentType("letter_content", b ->
+              REGISTRAR.dataComponentType("letter_content", b ->
                     b.persistent(LetterContent.CODEC).networkSynchronized(LetterContent.STREAM_CODEC).cacheEncoding());
         public static final DataComponentType<Unit> LETTER_TATTERED =
-              Register.dataComponentType("letter_tattered", b ->
+              REGISTRAR.dataComponentType("letter_tattered", b ->
                     b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
 
         // -- Package
 
-        public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = Register.dataComponentType("package_contents",
+        public static final DataComponentType<PackageContents> PACKAGE_CONTENTS = REGISTRAR.dataComponentType("package_contents",
               b -> b.persistent(PackageContents.CODEC).networkSynchronized(PackageContents.STREAM_CODEC));
-        public static final DataComponentType<Integer> PACKAGE_EXPERIENCE = Register.dataComponentType("package_experience",
+        public static final DataComponentType<Integer> PACKAGE_EXPERIENCE = REGISTRAR.dataComponentType("package_experience",
               b -> b.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT));
 
         // -- Seal
 
-        public static final DataComponentType<Seal> SEAL = Register.dataComponentType("seal",
+        public static final DataComponentType<Seal> SEAL = REGISTRAR.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_DIE = Register.dataComponentType("seal_stamp_die",
+        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_DIE = REGISTRAR.dataComponentType("seal_stamp_die",
               b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
         @Deprecated(forRemoval = true)
-        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = Register.dataComponentType("seal_stamp_impression",
+        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = REGISTRAR.dataComponentType("seal_stamp_impression",
               b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
 
         // -- Payback
 
-        public static final DataComponentType<PaybackRequest> PAYBACK_TAG_CONTENTS = Register.dataComponentType("payback_tag_contents",
+        public static final DataComponentType<PaybackRequest> PAYBACK_TAG_CONTENTS = REGISTRAR.dataComponentType("payback_tag_contents",
               b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = Register.dataComponentType("payback_subject",
+        public static final DataComponentType<PaybackSubject> PAYBACK_SUBJECT = REGISTRAR.dataComponentType("payback_subject",
               b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC).cacheEncoding());
 
         // -- Misc
 
-        public static final DataComponentType<List<Occupant>> PIGEONS = Register.dataComponentType("pigeons", b ->
+        public static final DataComponentType<List<Occupant>> PIGEONS = REGISTRAR.dataComponentType("pigeons", b ->
               b.persistent(Occupant.LIST_CODEC).networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());
 
         static void init() {
@@ -397,14 +408,14 @@ public class Envelope {
     }
 
     public static class EntityTypes {
-        public static final Supplier<EntityType<Pigeon>> PIGEON = Register.entityType("pigeon",
+        public static final Supplier<EntityType<Pigeon>> PIGEON = REGISTRAR.entityType("pigeon",
               Pigeon::new, MobCategory.CREATURE, true, builder -> builder
                     .sized(0.65F, 0.85F)
                     .eyeHeight(0.59375F)
                     .passengerAttachments(0.4625F)
                     .clientTrackingRange(8));
 
-        public static final Supplier<EntityType<CharredPigeon>> CHARRED_PIGEON = Register.entityType("charred_pigeon",
+        public static final Supplier<EntityType<CharredPigeon>> CHARRED_PIGEON = REGISTRAR.entityType("charred_pigeon",
               CharredPigeon::new, MobCategory.MONSTER, true, builder -> builder
                     .sized(0.65F, 0.85F)
                     .eyeHeight(0.59375F)
@@ -418,7 +429,7 @@ public class Envelope {
 
     public static class EntityDataSerializers {
         public static final Supplier<EntityDataSerializer<Holder<PigeonVariant>>> PIGEON_VARIANT =
-              Register.entityDataSerializer("pigeon_variant", EntityDataSerializer.forValueType(PigeonVariant.STREAM_CODEC));
+              REGISTRAR.entityDataSerializer("pigeon_variant", EntityDataSerializer.forValueType(PigeonVariant.STREAM_CODEC));
 
         static void init() {
         }
@@ -426,27 +437,27 @@ public class Envelope {
 
     public static class MenuTypes {
         public static final Supplier<MenuType<MailboxMenu>> MAILBOX =
-              Register.menuType("mailbox", MailboxMenu::fromNetwork);
+              REGISTRAR.menuType("mailbox", MailboxMenu::fromNetwork);
 
         public static final Supplier<MenuType<PackingMenu>> PACKING =
-              Register.menuType("packing", PackingMenu::fromNetwork);
+              REGISTRAR.menuType("packing", PackingMenu::fromNetwork);
         public static final Supplier<MenuType<PackageMenu>> PACKAGE =
-              Register.menuType("package", PackageMenu::fromNetwork);
+              REGISTRAR.menuType("package", PackageMenu::fromNetwork);
 
         public static final Supplier<MenuType<PaybackPackingMenu>> PAYBACK_PACKING =
-              Register.menuType("payback_packing", PaybackPackingMenu::fromNetwork);
+              REGISTRAR.menuType("payback_packing", PaybackPackingMenu::fromNetwork);
         public static final Supplier<MenuType<PaybackPackageMenu>> PAYBACK_PACKAGE =
-              Register.menuType("payback_package", PaybackPackageMenu::fromNetwork);
+              REGISTRAR.menuType("payback_package", PaybackPackageMenu::fromNetwork);
 
         public static final Supplier<MenuType<PaybackTagMenu>> PAYBACK_TAG =
-              Register.menuType("payback_tag", PaybackTagMenu::fromNetwork);
+              REGISTRAR.menuType("payback_tag", PaybackTagMenu::fromNetwork);
 
         static void init() {
         }
     }
 
     public static class RecipeTypes {
-        public static final Supplier<RecipeType<MailRecipe>> MAILING = Register.recipeType("mailing",
+        public static final Supplier<RecipeType<MailRecipe>> MAILING = REGISTRAR.recipeType("mailing",
               () -> new RecipeType<>() {
                   @Override
                   public String toString() {
@@ -459,18 +470,18 @@ public class Envelope {
     }
 
     public static class RecipeSerializers {
-        public static final Supplier<RecipeSerializer<LetterCloningRecipe>> LETTER_CLONING = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<LetterCloningRecipe>> LETTER_CLONING = REGISTRAR.recipeSerializer(
               "crafting_special_letter_cloning", () -> new SimpleCraftingRecipeSerializer<>(LetterCloningRecipe::new));
-        public static final Supplier<RecipeSerializer<AddressTagApplicationRecipe>> ADDRESS_TAG_APPLICATION = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<AddressTagApplicationRecipe>> ADDRESS_TAG_APPLICATION = REGISTRAR.recipeSerializer(
               "crafting_special_address_tag_application", () -> new SimpleCraftingRecipeSerializer<>(AddressTagApplicationRecipe::new));
-        public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = REGISTRAR.recipeSerializer(
               "crafting_special_payback_tag_application", () -> new SimpleCraftingRecipeSerializer<>(PaybackTagApplicationRecipe::new));
 
-        public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = REGISTRAR.recipeSerializer(
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));
-        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_LETTER_BROADCASTING = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<MailLetterBroadcastingRecipe>> MAIL_LETTER_BROADCASTING = REGISTRAR.recipeSerializer(
               "mail_letter_broadcasting", MailLetterBroadcastingRecipe.Serializer::new);
-        public static final Supplier<RecipeSerializer<MailPaybackRequestCancelingRecipe>> MAIL_PAYBACK_REQUEST_CANCELING = Register.recipeSerializer(
+        public static final Supplier<RecipeSerializer<MailPaybackRequestCancelingRecipe>> MAIL_PAYBACK_REQUEST_CANCELING = REGISTRAR.recipeSerializer(
               "mail_payback_request_canceling", MailPaybackRequestCancelingRecipe.Serializer::new);
 
         static void init() {
@@ -512,7 +523,7 @@ public class Envelope {
             Preconditions.checkState(category != null && !category.isEmpty(), "'category' should not be empty.");
             Preconditions.checkState(key != null && !key.isEmpty(), "'key' should not be empty.");
             String path = category + "." + key;
-            return Register.soundEvent(path, () -> SoundEvent.createVariableRangeEvent(Envelope.resource(path)));
+            return REGISTRAR.soundEvent(path, () -> SoundEvent.createVariableRangeEvent(Envelope.resource(path)));
         }
 
         static void init() {
@@ -530,39 +541,39 @@ public class Envelope {
 
     public static class Stats {
         public static final Supplier<ResourceLocation> INTERACT_WITH_MAILBOX =
-              Register.stat(resource("interact_with_mailbox"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("interact_with_mailbox"), StatFormatter.DEFAULT);
         public static final Supplier<ResourceLocation> MAIL_DELIVERIES =
-              Register.stat(resource("mail_deliveries"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("mail_deliveries"), StatFormatter.DEFAULT);
         public static final Supplier<ResourceLocation> SEALS_APPLIED =
-              Register.stat(resource("seals_applied"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("seals_applied"), StatFormatter.DEFAULT);
         public static final Supplier<ResourceLocation> SEALS_BROKEN =
-              Register.stat(resource("seals_broken"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("seals_broken"), StatFormatter.DEFAULT);
         public static final Supplier<ResourceLocation> LETTERS_FOLDED =
-              Register.stat(resource("letters_folded"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("letters_folded"), StatFormatter.DEFAULT);
         public static final Supplier<ResourceLocation> PACKAGES_CREATED =
-              Register.stat(resource("packages_created"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("packages_created"), StatFormatter.DEFAULT);
         public static final Supplier<ResourceLocation> PACKAGES_OPENED =
-              Register.stat(resource("packages_opened"), StatFormatter.DEFAULT);
+              REGISTRAR.stat(resource("packages_opened"), StatFormatter.DEFAULT);
 
         public static void init() {
         }
     }
 
     public static class CriteriaTriggers {
-        public static Supplier<MailDeliveredTrigger> MAIL_DELIVERED = Register.criterionTrigger("mail_delivered", MailDeliveredTrigger::new);
-        public static Supplier<BreakPaperBoxWhenFallingTrigger> BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER = Register.criterionTrigger("break_paper_box_when_falling", BreakPaperBoxWhenFallingTrigger::new);
-        public static Supplier<PlayerTrigger> SMOKE_PIGEONHOLE = Register.criterionTrigger("smoke_pigeonhole", PlayerTrigger::new);
-        public static Supplier<PlayerTrigger> SCOOP_DIAMOND = Register.criterionTrigger("scoop_diamond", PlayerTrigger::new);
-        public static Supplier<PlayerTrigger> SPAWN_ARCHIMEDES = Register.criterionTrigger("spawn_archimedes", PlayerTrigger::new);
+        public static Supplier<MailDeliveredTrigger> MAIL_DELIVERED = REGISTRAR.criterionTrigger("mail_delivered", MailDeliveredTrigger::new);
+        public static Supplier<BreakPaperBoxWhenFallingTrigger> BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER = REGISTRAR.criterionTrigger("break_paper_box_when_falling", BreakPaperBoxWhenFallingTrigger::new);
+        public static Supplier<PlayerTrigger> SMOKE_PIGEONHOLE = REGISTRAR.criterionTrigger("smoke_pigeonhole", PlayerTrigger::new);
+        public static Supplier<PlayerTrigger> SCOOP_DIAMOND = REGISTRAR.criterionTrigger("scoop_diamond", PlayerTrigger::new);
+        public static Supplier<PlayerTrigger> SPAWN_ARCHIMEDES = REGISTRAR.criterionTrigger("spawn_archimedes", PlayerTrigger::new);
 
         public static void init() {
         }
     }
 
     public static class ItemSubPredicates {
-        public static Supplier<ItemSubPredicate.Type<ItemPackagePredicate>> PACKAGE_CONTENTS = Register.itemSubPredicate("package_contents",
+        public static Supplier<ItemSubPredicate.Type<ItemPackagePredicate>> PACKAGE_CONTENTS = REGISTRAR.itemSubPredicate("package_contents",
               () -> new ItemSubPredicate.Type<>(ItemPackagePredicate.CODEC));
-        public static Supplier<ItemSubPredicate.Type<ItemOccludingBlockPredicate>> OCCLUDING_BLOCK = Register.itemSubPredicate("occluding_block",
+        public static Supplier<ItemSubPredicate.Type<ItemOccludingBlockPredicate>> OCCLUDING_BLOCK = REGISTRAR.itemSubPredicate("occluding_block",
               () -> new ItemSubPredicate.Type<>(ItemOccludingBlockPredicate.CODEC));
 
         public static void init() {
@@ -704,7 +715,7 @@ public class Envelope {
 
     public static class ArgumentTypes {
         public static final Supplier<ArgumentTypeInfo<AddressArgument, SingletonArgumentInfo<AddressArgument>.Template>> ADDRESS =
-              Register.commandArgumentType("address", AddressArgument.class, SingletonArgumentInfo.contextFree(AddressArgument::all));
+              REGISTRAR.commandArgumentType("address", AddressArgument.class, SingletonArgumentInfo.contextFree(AddressArgument::all));
 
         public static void init() {
         }
@@ -721,5 +732,36 @@ public class Envelope {
               ResourceKey.createRegistryKey(resource("seal_material"));
         public static final ResourceKey<Registry<SealSymbol>> SEAL_SYMBOL =
               ResourceKey.createRegistryKey(resource("seal_symbol"));
+    }
+
+    public static class BuggerData {
+        public static final MailServiceBuggerData MAIL_SERVICE = new MailServiceBuggerData();
+
+        public static final EntityData<PigeonholeHandler> PIGEON_PIGEONHOLE_HANDLER =
+              new EntityData<>(resource("pigeon_pigeonhole_handler"), PigeonholeHandler.CODEC)
+                    .handle(((entity, handler) -> {
+                        if (entity instanceof Pigeon pigeon) {
+                            pigeon.setPigeonholeHandler(handler);
+                        }
+                    }));
+
+        public static final EntityData<MailboxHandler> PIGEON_MAILBOX_HANDLER =
+              new EntityData<>(resource("pigeon_mailbox_handler"), MailboxHandler.CODEC)
+                    .handle(((entity, handler) -> {
+                        if (entity instanceof Pigeon pigeon) {
+                            pigeon.setMailboxHandler(handler);
+                        }
+                    }));
+
+        public static final OptionalEntityData<Delivery> PIGEON_DELIVERY =
+              new OptionalEntityData<>(resource("pigeon_delivery"), Delivery.CODEC)
+                    .handle((entity, delivery) -> {
+                        if (entity instanceof Pigeon pigeon) {
+                            pigeon.setDelivery(delivery.orElse(null));
+                        }
+                    });
+
+        public static void init() {
+        }
     }
 }
