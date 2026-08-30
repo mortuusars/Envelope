@@ -1,9 +1,9 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.block.PaperBoxBlock;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
+import io.github.mortuusars.mortaar.Platform;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -47,8 +47,7 @@ public class PaperBoxItem extends BlockItem {
         if (player instanceof ServerPlayer serverPlayer) {
             SimpleMenuProvider menuProvider = new SimpleMenuProvider((id, inventory, pl) ->
                   new PackingMenu(id, inventory, hand), stack.getHoverName());
-            Platform.openMenu(serverPlayer, menuProvider, buffer ->
-                  buffer.writeEnum(hand));
+            Platform.openMenu(serverPlayer, menuProvider, buffer -> buffer.writeEnum(hand));
         }
 
         player.level().playSound(player, player, Envelope.SoundEvents.PAPER_USE.get(), SoundSource.PLAYERS, 0.6f, 0.95f);

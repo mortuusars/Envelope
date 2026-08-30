@@ -3,17 +3,15 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.Platform;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.MailboxHasNewMailS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundMailboxHasNewMailPacket;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
-import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.SimpleBlockAddressGenerator;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
+import io.github.mortuusars.mortaar.Platform;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -287,7 +285,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public void onMailAdded(ItemStack mail) {
         if (level instanceof ServerLevel serverLevel) {
             MailboxMenu.playersWithMenu(serverLevel, getAddress())
-                  .forEach(player -> Packets.sendToClient(MailboxHasNewMailS2CP.INSTANCE, player));
+                  .forEach(ClientboundMailboxHasNewMailPacket.INSTANCE::sendToClient);
         }
     }
 

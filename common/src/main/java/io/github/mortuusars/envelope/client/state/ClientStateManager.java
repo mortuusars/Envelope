@@ -1,16 +1,5 @@
 package io.github.mortuusars.envelope.client.state;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.Platform;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public class ClientStateManager {
     /*
     //TODO: Rework for individual states. Use gameDir instead of configDir.

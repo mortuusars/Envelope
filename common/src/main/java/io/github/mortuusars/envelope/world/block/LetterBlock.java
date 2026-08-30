@@ -1,9 +1,7 @@
 package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterBlockViewScreenS2CP;
-import io.github.mortuusars.envelope.util.VoxelShapeUtils;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenLetterBlockViewScreenPacket;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,7 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
@@ -150,7 +147,7 @@ public class LetterBlock extends Block implements EntityBlock {
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof LetterBlockEntity blockEntity
               && player instanceof ServerPlayer serverPlayer) {
-            Packets.sendToClient(new OpenLetterBlockViewScreenS2CP(blockEntity.getLetter(player), pos), serverPlayer);
+            new ClientboundOpenLetterBlockViewScreenPacket(blockEntity.getLetter(player), pos).sendToClient(serverPlayer);
         }
         level.playSound(player, player, Envelope.SoundEvents.PAPER_CRACKLE.get(), SoundSource.PLAYERS, 1, 1);
         return InteractionResult.SUCCESS_NO_ITEM_USED;

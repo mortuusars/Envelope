@@ -3,8 +3,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.MailboxAddressTagApplyC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundMailboxAddressTagApplyPacket;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -45,7 +44,7 @@ public class MailboxChangeAddressScreen extends AbstractMailboxAddressScreen {
         if (Config.Server.MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST.get() > 0) {
             player.level().playSound(player, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS);
         }
-        Packets.sendToServer(new MailboxAddressTagApplyC2SP(hand, getCurrentAddressId().trim(), pos));
+        new ServerboundMailboxAddressTagApplyPacket(hand, getCurrentAddressId().trim(), pos).sendToServer();
     }
 
     @Override

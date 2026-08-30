@@ -8,8 +8,7 @@ import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.AddressTagApplyC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundAddressTagApplyPacket;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.mortaar.client.gui.Sprites;
 import net.minecraft.client.Minecraft;
@@ -168,7 +167,7 @@ public class AddressTagScreen extends Screen {
         if (!isCurrentIdSameAsExistingAddress()) {
             Minecrft.get().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f));
             int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-            Packets.sendToServer(new AddressTagApplyC2SP(slot, getOrCreateAddressFromCurrentValue()));
+            new ServerboundAddressTagApplyPacket(slot, getOrCreateAddressFromCurrentValue()).sendToServer();
         }
         close();
         return true;

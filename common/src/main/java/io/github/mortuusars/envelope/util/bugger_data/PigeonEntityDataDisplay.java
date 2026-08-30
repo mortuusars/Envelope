@@ -1,18 +1,18 @@
 package io.github.mortuusars.envelope.util.bugger_data;
 
-import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
+import io.github.mortuusars.mortaar.bugger.screen.BuggerEntityOverhead;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
 
-public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityDataDisplay {
+public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityOverheadDisplay {
     @Override
     public void addLines(Entity entity, ArrayList<Component> lines) {
         if (!(entity instanceof Pigeon pigeon)) return;

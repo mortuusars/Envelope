@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.github.mortuusars.envelope.advancements.critereon.BreakPaperBoxWhenFallingTrigger;
 import io.github.mortuusars.envelope.advancements.critereon.MailDeliveredTrigger;
 import io.github.mortuusars.envelope.advancements.predicate.ItemOccludingBlockPredicate;
@@ -9,7 +10,8 @@ import io.github.mortuusars.envelope.advancements.predicate.ItemPackagePredicate
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.integration.Mods;
 import io.github.mortuusars.envelope.integration.every_compat.EveryCompatIntegration;
-import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.network.packet.clientbound.*;
+import io.github.mortuusars.envelope.network.packet.serverbound.*;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
@@ -33,6 +35,8 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
+import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.advancements.critereon.ItemSubPredicate;
 import net.minecraft.advancements.critereon.PlayerTrigger;
@@ -84,8 +88,6 @@ public class Envelope {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static void init() {
-        Bugger.enabler = () -> Config.Server.SPEC.isLoaded() && Config.Server.DEBUG.get();
-
         Blocks.init();
         BlockEntityTypes.init();
         PoiTypes.init();
@@ -102,6 +104,25 @@ public class Envelope {
         SoundEvents.init();
         ArgumentTypes.init();
 
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundMailboxMenuInboxActionPacket.TYPE, ServerboundMailboxMenuInboxActionPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundLetterEditPacket.TYPE, ServerboundLetterEditPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundLetterViewScreenClosedPacket.TYPE, ServerboundLetterViewScreenClosedPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundAddressTagApplyPacket.TYPE, ServerboundAddressTagApplyPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundPackingMenuPresetAddressPacket.TYPE, ServerboundPackingMenuPresetAddressPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundMailboxPlacePacket.TYPE, ServerboundMailboxPlacePacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundMailboxAddressTagApplyPacket.TYPE, ServerboundMailboxAddressTagApplyPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.serverboundPacket(ServerboundPaybackTagMenuSetSlotPacket.TYPE, ServerboundPaybackTagMenuSetSlotPacket.STREAM_CODEC);
+
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundMailboxHasNewMailPacket.TYPE, ClientboundMailboxHasNewMailPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundMailboxMenuSetMailPacket.TYPE, ClientboundMailboxMenuSetMailPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundMailboxMenuMailRemovedPacket.TYPE, ClientboundMailboxMenuMailRemovedPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenLetterEditScreenPacket.TYPE, ClientboundOpenLetterEditScreenPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenLetterBlockViewScreenPacket.TYPE, ClientboundOpenLetterBlockViewScreenPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenLetterViewScreenPacket.TYPE, ClientboundOpenLetterViewScreenPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenAddressTagScreenPacket.TYPE, ClientboundOpenAddressTagScreenPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenMailboxAddressTagScreenPacket.TYPE, ClientboundOpenMailboxAddressTagScreenPacket.STREAM_CODEC);
+        io.github.mortuusars.mortaar.Register.clientboundPacket(ClientboundOpenMailboxPlacingScreenPacket.TYPE, ClientboundOpenMailboxPlacingScreenPacket.STREAM_CODEC);
+
         if (Mods.EVERY_COMPAT.isLoaded()) {
             EveryCompatIntegration.init();
         }
@@ -116,6 +137,16 @@ public class Envelope {
 
     public static boolean debug() {
         return Config.Server.DEBUG.get();
+    }
+
+    @ExpectPlatform
+    public static void registerServiceDropOffHandlers() {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static MailDropOffResult postHandleMailDropOffEvent(MailDropOffContext context) {
+        throw new AssertionError();
     }
 
     public static class Blocks {

@@ -5,20 +5,12 @@ import io.github.mortuusars.envelope.command.EnvelopeCommand;
 import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.neoforge.RegisterImpl;
-import io.github.mortuusars.envelope.network.neoforge.PacketsImpl;
-import io.github.mortuusars.envelope.network.packet.C2SPackets;
-import io.github.mortuusars.envelope.network.packet.CommonPackets;
-import io.github.mortuusars.envelope.network.packet.Packet;
-import io.github.mortuusars.envelope.network.packet.S2CPackets;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.StatFormatter;
@@ -39,8 +31,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.Map;
@@ -55,27 +45,6 @@ public class NeoForgeCommonEvents {
                 Stats.CUSTOM.get(entry.getKey(), entry.getValue());
             }
         });
-    }
-
-    @SuppressWarnings("unchecked")
-    @SubscribeEvent
-    public static void registerPackets(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1");
-        // This monstrosity is to avoid having to define packets for forge and fabric separately.
-        for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : S2CPackets.getDefinitions()) {
-            registrar.playToClient((CustomPacketPayload.Type<Packet>) definition.type(),
-                  (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
-        }
-
-        for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : C2SPackets.getDefinitions()) {
-            registrar.playToServer((CustomPacketPayload.Type<Packet>) definition.type(),
-                  (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
-        }
-
-        for (CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> definition : CommonPackets.getDefinitions()) {
-            registrar.playBidirectional((CustomPacketPayload.Type<Packet>) definition.type(),
-                  (StreamCodec<FriendlyByteBuf, Packet>) definition.codec(), PacketsImpl::handle);
-        }
     }
 
     @SubscribeEvent

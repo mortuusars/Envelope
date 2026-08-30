@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.mixin.jei;
 
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.PackingMenuPresetAddressC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundPackingMenuPresetAddressPacket;
 import io.github.mortuusars.envelope.world.inventory.PackingMenu;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -35,7 +34,7 @@ public abstract class BasicRecipeTransferHandlerMixin<C extends AbstractContaine
 
         if (container instanceof PackingMenu packingMenu && actualRecipe instanceof MailRecipe mailRecipe) {
             packingMenu.presetAddress(mailRecipe.getAddress());
-            Packets.sendToServer(new PackingMenuPresetAddressC2SP(Optional.ofNullable(mailRecipe.getAddress())));
+            new ServerboundPackingMenuPresetAddressPacket(Optional.ofNullable(mailRecipe.getAddress())).sendToServer();
         }
     }
 }

@@ -6,9 +6,9 @@ import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenAddressTagScreenS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenAddressTagScreenPacket;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.mortaar.network.Packets;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -115,7 +115,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
             AllAddresses knownAddresses = MailService.of(serverPlayer.serverLevel()).getKnownAddresses();
-            Packets.sendToClient(new OpenAddressTagScreenS2CP(usedHand, knownAddresses), serverPlayer);
+            new ClientboundOpenAddressTagScreenPacket(usedHand, knownAddresses).sendToClient(serverPlayer);
             player.getCooldowns().addCooldown(this, 6);
         }
 

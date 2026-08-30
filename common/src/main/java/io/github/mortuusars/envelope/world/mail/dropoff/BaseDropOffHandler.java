@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.world.mail.dropoff;
 
-import io.github.mortuusars.envelope.Platform;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.type.CustomAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.UnknownAddress;
@@ -16,7 +16,7 @@ public class BaseDropOffHandler implements MailDropOffHandler {
             return MailDropOffResult.returned(context.getMail(), DeliveryRecord.Message.RECIPIENT_IS_UNKNOWN);
         }
 
-        MailDropOffResult eventResult = Platform.postHandleMailDropOffEvent(context);
+        MailDropOffResult eventResult = Envelope.postHandleMailDropOffEvent(context);
         if (eventResult.isHandled()) {
             return eventResult;
         }

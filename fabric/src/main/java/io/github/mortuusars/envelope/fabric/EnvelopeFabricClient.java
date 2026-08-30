@@ -13,7 +13,6 @@ import io.github.mortuusars.envelope.client.renderer.entity.layer.BatBackpackLay
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
-import io.github.mortuusars.envelope.network.fabric.FabricS2CPacketHandler;
 import io.github.mortuusars.envelope.world.item.Sealable;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -52,7 +51,5 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKING.get(), PaybackPackingScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackageScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);
-
-        FabricS2CPacketHandler.register();
     }
 }

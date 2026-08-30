@@ -2,7 +2,6 @@ package io.github.mortuusars.envelope.world.item.component.mail.log;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.item.component.mail.log.record.ArrivedRecord;
@@ -10,6 +9,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.record.Messag
 import io.github.mortuusars.envelope.world.item.component.mail.log.record.ReturnedRecord;
 import io.github.mortuusars.envelope.world.item.component.mail.log.record.SentRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.mortaar.Platform;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

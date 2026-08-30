@@ -9,8 +9,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.mortaar.client.Minecrft;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.MailboxMenuInboxActionC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundMailboxMenuInboxActionPacket;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.mortaar.client.gui.Sprites;
 import net.minecraft.ChatFormatting;
@@ -431,7 +430,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
             if (getMenu().doMailAction(Minecrft.player(), index, action)) {
                 Minecrft.player().playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1, 1);
-                Packets.sendToServer(new MailboxMenuInboxActionC2SP(index, action));
+                new ServerboundMailboxMenuInboxActionPacket(index, action).sendToServer();
             }
         }
 

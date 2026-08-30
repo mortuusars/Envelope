@@ -2,8 +2,7 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenLetterViewScreenS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenLetterViewScreenPacket;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import net.minecraft.core.particles.ParticleTypes;
@@ -61,7 +60,7 @@ public class LetterItem extends BlockItem implements Sealable {
         player.getCooldowns().addCooldown(this, 5);
 
         if (player instanceof ServerPlayer serverPlayer) {
-            Packets.sendToClient(new OpenLetterViewScreenS2CP(usedHand), serverPlayer);
+            new ClientboundOpenLetterViewScreenPacket(usedHand).sendToClient(serverPlayer);
         }
 
         level.playSound(player, player, Envelope.SoundEvents.PAPER_CRACKLE.get(), SoundSource.PLAYERS, 1, 1);

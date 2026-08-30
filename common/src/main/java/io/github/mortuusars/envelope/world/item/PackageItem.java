@@ -2,10 +2,10 @@ package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.inventory.PackageMenu;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.mortaar.Platform;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;

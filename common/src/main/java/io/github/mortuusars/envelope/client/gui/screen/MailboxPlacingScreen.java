@@ -2,8 +2,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.mortaar.client.Minecrft;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.MailboxPlaceC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundMailboxPlacePacket;
 import io.github.mortuusars.envelope.world.item.MailboxBlockItem;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import net.minecraft.client.player.LocalPlayer;
@@ -48,7 +47,7 @@ public class MailboxPlacingScreen extends AbstractMailboxAddressScreen {
                 player.level().playSound(player, hitResult.getBlockPos(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS);
             }
 
-            Packets.sendToServer(new MailboxPlaceC2SP(hand, getCurrentAddressId().trim(), hitResult));
+            new ServerboundMailboxPlacePacket(hand, getCurrentAddressId().trim(), hitResult).sendToServer();
         }
     }
 

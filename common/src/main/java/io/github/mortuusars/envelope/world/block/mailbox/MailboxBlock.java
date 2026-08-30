@@ -6,8 +6,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxAddressTagScreenS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenMailboxAddressTagScreenPacket;
 import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
@@ -194,7 +193,7 @@ public class MailboxBlock extends BaseEntityBlock {
         if (stack.getItem() instanceof AddressTagItem) {
             if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
                 AllAddresses knownAddresses = serverPlayer.serverLevel().getEnvelopeMailService().getKnownAddresses();
-                Packets.sendToClient(new OpenMailboxAddressTagScreenS2CP(hand, knownAddresses, pos, blockEntity.getAddress()), serverPlayer);
+                new ClientboundOpenMailboxAddressTagScreenPacket(hand, knownAddresses, pos, blockEntity.getAddress()).sendToClient(serverPlayer);
             }
             return ItemInteractionResult.SUCCESS;
         }

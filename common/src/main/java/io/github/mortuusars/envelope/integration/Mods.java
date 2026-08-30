@@ -1,6 +1,6 @@
 package io.github.mortuusars.envelope.integration;
 
-import io.github.mortuusars.envelope.Platform;
+import io.github.mortuusars.mortaar.Platform;
 
 public class Mods {
     public static final Mod SABLE = new Mod("sable");

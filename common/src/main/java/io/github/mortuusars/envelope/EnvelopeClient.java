@@ -2,9 +2,6 @@ package io.github.mortuusars.envelope;
 
 import io.github.mortuusars.envelope.client.gui.tooltip.*;
 import io.github.mortuusars.envelope.client.renderer.SealRenderer;
-import io.github.mortuusars.mortaar.client.Minecrft;
-import io.github.mortuusars.envelope.util.bugger.BuggerDebugScreen;
-import io.github.mortuusars.envelope.util.bugger.BuggerEntityOverhead;
 import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.*;
@@ -14,6 +11,8 @@ import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
 import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
+import io.github.mortuusars.mortaar.bugger.screen.BuggerEntityOverhead;
+import io.github.mortuusars.mortaar.bugger.screen.BuggerScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -36,7 +35,7 @@ public class EnvelopeClient {
     private static final SealRenderer sealRenderer = new SealRenderer();
 
     public static void init() {
-        BuggerDebugScreen.addPage(new EnvelopeBuggerPage());
+        BuggerScreen.addPage(new EnvelopeBuggerPage());
         BuggerEntityOverhead.addData(new PigeonEntityDataDisplay());
         ItemModelOverrides.register();
     }

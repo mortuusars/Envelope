@@ -1,8 +1,7 @@
 package io.github.mortuusars.envelope.integration.jei.util;
 
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.PaybackTagMenuSetSlotC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundPaybackTagMenuSetSlotPacket;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
@@ -42,7 +41,7 @@ public class PaybackTagGhostIngredientHandler implements IGhostIngredientHandler
                 public void accept(I ingredient) {
                     if (ingredient instanceof ItemStack stackIngredient) {
                         slot.setByPlayer(stackIngredient);
-                        Packets.sendToServer(new PaybackTagMenuSetSlotC2SP(slot.index, stackIngredient));
+                        new ServerboundPaybackTagMenuSetSlotPacket(slot.index, stackIngredient).sendToServer();
                     }
                 }
             });

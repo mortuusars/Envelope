@@ -5,42 +5,27 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.bugger.test.BuggerTests;
-import io.github.mortuusars.envelope.util.bugger.test.TestResults;
-import io.github.mortuusars.envelope.util.bugger.test.cases.CourierDeliveryTests;
-import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingRecipeTests;
-import io.github.mortuusars.envelope.util.bugger.test.cases.MailCraftingTests;
-import io.github.mortuusars.envelope.util.bugger.test.cases.StackIngredientTests;
-import io.github.mortuusars.envelope.world.item.component.LetterContent;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
+import io.github.mortuusars.envelope.util.bugger_data.cases.CourierDeliveryTests;
+import io.github.mortuusars.envelope.util.bugger_data.cases.MailCraftingRecipeTests;
+import io.github.mortuusars.envelope.util.bugger_data.cases.MailCraftingTests;
+import io.github.mortuusars.envelope.util.bugger_data.cases.StackIngredientTests;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.mortaar.bugger.test.TestResults;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceOrTagKeyArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.commands.LocateCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.Structure;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {

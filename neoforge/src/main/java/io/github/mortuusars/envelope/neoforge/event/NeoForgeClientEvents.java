@@ -37,13 +37,10 @@ public class NeoForgeClientEvents {
     @SubscribeEvent
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {
         event.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
-
         event.register(Envelope.MenuTypes.PACKING.get(), PackingScreen::new);
         event.register(Envelope.MenuTypes.PACKAGE.get(), PackageScreen::new);
-
         event.register(Envelope.MenuTypes.PAYBACK_PACKING.get(), PaybackPackingScreen::new);
         event.register(Envelope.MenuTypes.PAYBACK_PACKAGE.get(), PaybackPackageScreen::new);
-
         event.register(Envelope.MenuTypes.PAYBACK_TAG.get(), PaybackTagScreen::new);
     }
 

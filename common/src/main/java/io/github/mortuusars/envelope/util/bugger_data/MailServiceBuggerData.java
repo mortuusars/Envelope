@@ -2,13 +2,13 @@ package io.github.mortuusars.envelope.util.bugger_data;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
-import io.github.mortuusars.envelope.util.bugger.data.NbtData;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.mortaar.bugger.data.NbtData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

@@ -6,8 +6,7 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.TextBox;
 import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedString;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.JeiCompatibleScreen;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.serverbound.LetterEditC2SP;
+import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundLetterEditPacket;
 import io.github.mortuusars.envelope.util.ItemAndStack;
 import io.github.mortuusars.envelope.world.item.LetterAndQuillItem;
 import io.github.mortuusars.mortaar.client.gui.Sprites;
@@ -145,7 +144,7 @@ public class LetterEditScreen extends Screen implements JeiCompatibleScreen {
         String text = textBox.getEditor().getText().toString();
 
         int slot = this.hand == InteractionHand.MAIN_HAND ? Minecrft.player().getInventory().selected : Inventory.SLOT_OFFHAND;
-        Packets.sendToServer(new LetterEditC2SP(slot, text, fold));
+        new ServerboundLetterEditPacket(slot, text, fold).sendToServer();
     }
 
     // --

@@ -1,9 +1,8 @@
 package io.github.mortuusars.envelope.world.inventory;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuMailRemovedS2CP;
-import io.github.mortuusars.envelope.network.packet.clientbound.MailboxMenuSetMailS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundMailboxMenuMailRemovedPacket;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundMailboxMenuSetMailPacket;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -276,7 +275,7 @@ public class MailboxMenu extends AbstractContainerMenu {
         if (id == REFRESH_MAIL_BUTTON_ID && player instanceof ServerPlayer serverPlayer) {
             List<ItemStack> mail = getBlockEntity().getAllMail();
             setMail(mail);
-            Packets.sendToClient(new MailboxMenuSetMailS2CP(mail), serverPlayer);
+            new ClientboundMailboxMenuSetMailPacket(mail).sendToClient(serverPlayer);
             return true;
         }
 
@@ -296,7 +295,7 @@ public class MailboxMenu extends AbstractContainerMenu {
     public void onMailRemoved(Id id) {
         getMail().removeIf(m -> id.equals(Mail.getId(m)));
         if (player instanceof ServerPlayer serverPlayer) {
-            Packets.sendToClient(new MailboxMenuMailRemovedS2CP(id), serverPlayer);
+            new ClientboundMailboxMenuMailRemovedPacket(id).sendToClient(serverPlayer);
         }
     }
 

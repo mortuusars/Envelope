@@ -1,10 +1,10 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.Platform;
 import io.github.mortuusars.envelope.world.block.PigeonholeBlock;
 import io.github.mortuusars.envelope.world.inventory.PaybackTagMenu;
 import io.github.mortuusars.envelope.world.item.component.PaybackRequest;
+import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;

@@ -11,10 +11,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class EnvelopeMixinPlugin implements IMixinConfigPlugin {
-
-    private static final Map<String, Supplier<Boolean>> CONDITIONS = ImmutableMap.of(
-
-    );
+    private static final Map<String, Supplier<Boolean>> CONDITIONS = ImmutableMap.of();
 
     @Override
     public void onLoad(String mixinPackage) {

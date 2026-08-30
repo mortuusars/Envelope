@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.entity;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.mortaar.bugger.Bugger;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;

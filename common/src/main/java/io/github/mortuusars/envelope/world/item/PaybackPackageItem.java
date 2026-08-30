@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.Platform;
+import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.GameTime;

@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.item;
 
-import io.github.mortuusars.envelope.network.Packets;
-import io.github.mortuusars.envelope.network.packet.clientbound.OpenMailboxPlacingScreenS2CP;
+import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenMailboxPlacingScreenPacket;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,9 +34,8 @@ public class MailboxBlockItem extends BlockItem {
             if (blockPlaceContext.getPlayer() instanceof ServerPlayer serverPlayer) {
                 var hitResult = new BlockHitResult(context.getClickLocation(),
                       context.getClickedFace(), context.getClickedPos(), context.isInside());
-                var packet = new OpenMailboxPlacingScreenS2CP(context.getHand(), hitResult,
-                      MailService.of(serverPlayer.serverLevel()).getKnownAddresses());
-                Packets.sendToClient(packet, serverPlayer);
+                new ClientboundOpenMailboxPlacingScreenPacket(context.getHand(), hitResult,
+                      MailService.of(serverPlayer.serverLevel()).getKnownAddresses()).sendToClient(serverPlayer);
             }
 
             context.getLevel().playSound(context.getPlayer(), context.getClickedPos(),

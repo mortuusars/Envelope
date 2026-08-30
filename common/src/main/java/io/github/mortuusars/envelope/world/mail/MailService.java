@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.Platform;
-import io.github.mortuusars.envelope.util.bugger.Bugger;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerData;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryManager;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundDelivery;
@@ -153,7 +153,7 @@ public class MailService {
         getPaybackDepartment().tick();
         getServiceAddresses().tick();
 
-        if (level.getGameTime() % 20 == 0) Bugger.MAIL_SERVICE.collectAndSendData(this);
+        if (level.getGameTime() % 20 == 0) EnvelopeBuggerData.MAIL_SERVICE.collectAndSendData(this);
     }
 
     // --
@@ -215,6 +215,6 @@ public class MailService {
     // --
 
     public static void init() {
-        Platform.registerServiceDropOffHandlers();
+        Envelope.registerServiceDropOffHandlers();
     }
 }

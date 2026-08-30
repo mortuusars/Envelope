@@ -6,8 +6,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.EnvelopeCommand;
 import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
-import io.github.mortuusars.envelope.network.fabric.FabricC2SPackets;
-import io.github.mortuusars.envelope.network.fabric.FabricS2CPackets;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
@@ -82,13 +80,6 @@ public class EnvelopeFabric implements ModInitializer {
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            PlatformImpl.server = server;
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            PlatformImpl.server = null;
-        });
-
         ServerTickEvents.END_SERVER_TICK.register(ServerEvents::serverTick);
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -122,9 +113,6 @@ public class EnvelopeFabric implements ModInitializer {
         ServerLivingEntityEvents.AFTER_DEATH.register(CommonEvents::livingDeath);
 
         LootTableEvents.MODIFY.register(EnvelopeFabric::modifyLoot);
-
-        FabricC2SPackets.register();
-        FabricS2CPackets.register();
     }
 
     private static void modifyLoot(ResourceKey<LootTable> tableKey, LootTable.Builder builder,
