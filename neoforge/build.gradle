@@ -42,7 +42,7 @@ dependencies {
 
     modLocalRuntime("maven.modrinth:jade:${jade_version}+neoforge") { transitive = false }
     modLocalRuntime("maven.modrinth:better-advancements:FjTYILOi")
-//    modLocalRuntime("curse.maven:embeddium-908741:6118392")
+    modLocalRuntime("curse.maven:embeddium-908741:6118392")
     modLocalRuntime("maven.modrinth:simplefog:ywT5urX0")
     modLocalRuntime("maven.modrinth:cloth-config:izKINKFg")
     //modLocalRuntime("maven.modrinth:sodium:${sodium_version}-neoforge") // Doesn't want to work
@@ -58,17 +58,17 @@ dependencies {
     modLocalRuntime("maven.modrinth:c2me-neoforge:0.3.0+alpha.0.91+1.21.1")
 
     // Create
-    modLocalRuntime("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-    modLocalRuntime("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
-    modLocalRuntime("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
-    modLocalRuntime("com.tterrag.registrate:Registrate:${registrate_version}")
+    // modLocalRuntime("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    // modLocalRuntime("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
+    // modLocalRuntime("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    // modLocalRuntime("com.tterrag.registrate:Registrate:${registrate_version}")
 
     // Sable + Aeronautics
-    localRuntime("foundry.veil:veil-neoforge-${project.minecraft_version}:4.1.2")
-    modLocalRuntime("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
-    modLocalRuntime("dev.simulated_team.simulated:simulated-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
-    modLocalRuntime("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
-    modLocalRuntime("dev.ryanhcode.offroad:offroad-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+    // localRuntime("foundry.veil:veil-neoforge-${project.minecraft_version}:4.1.2")
+    // modLocalRuntime("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
+    // modLocalRuntime("dev.simulated_team.simulated:simulated-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+    // modLocalRuntime("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
+    // modLocalRuntime("dev.ryanhcode.offroad:offroad-neoforge-${minecraft_version}:${create_aeronautics_version}")  { transitive false }
 
     modLocalRuntime("org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1")
 
