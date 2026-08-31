@@ -191,7 +191,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
               * (double) Minecrft.get().getWindow().getGuiScaledHeight()
               / (double) Minecrft.get().getWindow().getScreenHeight());
 
-        if (slot.isActive() && slot.getContainerSlot() == MailboxBlockEntity.SLOT_MAIL
+        if (slot.isActive() && slot.index == MailboxBlockEntity.SLOT_MAIL
               && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
             guiGraphics.fillGradient(RenderType.guiOverlay(), slot.x - 1, slot.y - 1,
                   slot.x + 17, slot.y, 0x80FFFFFF, 0x80FFFFFF, 0);

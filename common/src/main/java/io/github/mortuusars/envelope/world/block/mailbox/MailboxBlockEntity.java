@@ -195,7 +195,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     }
 
     public boolean isSendable(ItemStack stack) {
-        return !stack.isEmpty() && stack.is(Envelope.Tags.Items.MAILABLE) && stack.has(Envelope.DataComponents.MAIL_RECIPIENT);
+        return !stack.isEmpty() && stack.is(Envelope.Tags.Items.MAILABLE) && stack.has(Envelope.DataComponents.MAIL_ADDRESS_TAG);
     }
 
     public boolean isAvailableForPickup() {

@@ -25,13 +25,13 @@ public class AddressTagApplicationRecipeExtension implements ICraftingCategoryEx
               .orElse(List.of());
 
         ItemStack tag = new ItemStack(Envelope.Items.ADDRESS_TAG.get());
-        tag.set(Envelope.DataComponents.ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE));
+        tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE));
         List<ItemStack> tagItems = List.of(tag);
 
         List<ItemStack> resultItems = mailableItems.stream()
               .map(stack -> {
                   ItemStack result = stack.copy();
-                  Mail.setRecipient(result, tag.get(Envelope.DataComponents.ADDRESS));
+                  Mail.setRecipient(result, tag.get(Envelope.DataComponents.ADDRESS_TAG_ADDRESS));
                   return result;
               })
               .toList();

@@ -54,7 +54,7 @@ public class AddressTagScreen extends Screen {
         this.hand = hand;
         this.tag = Minecrft.player().getItemInHand(hand).copy(); // Copying to not cause client/server desync if edits are canceled.
         this.knownAddresses = knownAddresses;
-        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS));
+        this.existingAddress = Optional.ofNullable(tag.get(Envelope.DataComponents.ADDRESS_TAG_ADDRESS));
     }
 
     @Override
@@ -140,8 +140,8 @@ public class AddressTagScreen extends Screen {
 
     protected void updateItem() {
         getOrCreateAddressFromCurrentValue().ifPresentOrElse(
-              value -> tag.set(Envelope.DataComponents.ADDRESS, value),
-              () -> tag.remove(Envelope.DataComponents.ADDRESS));
+              value -> tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, value),
+              () -> tag.remove(Envelope.DataComponents.ADDRESS_TAG_ADDRESS));
     }
 
     // -- Events

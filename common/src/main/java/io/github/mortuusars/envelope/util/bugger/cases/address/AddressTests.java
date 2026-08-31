@@ -1,16 +1,18 @@
-package io.github.mortuusars.envelope.world.mail.address;
+package io.github.mortuusars.envelope.util.bugger.cases.address;
 
-import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
-import org.junit.jupiter.api.Test;
+import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
+import net.minecraft.server.MinecraftServer;
 
-import java.util.Map;
+class AddressTests extends BuggerTests {
+    private final MinecraftServer server;
 
-import static org.junit.jupiter.api.Assertions.*;
+    public AddressTests(MinecraftServer server) {
+        this.server = server;
+    }
 
-class AddressTests {
-    @Test
-    void addressesAreValid() {
+    /* Needs to be adapted to bugger test system (and bugger test system need to be improved as well)
+    boolean addressesAreValid() {
+        add(new Test("AddressTests_AddressesAreValid", this::addressesAreValid));
         assertThrows(IllegalArgumentException.class, () -> new BlockAddress(""));
         assertThrows(IllegalArgumentException.class, () -> new BlockAddress(" "));
         assertThrows(IllegalArgumentException.class, () -> new BlockAddress("too-long".repeat(30)));
@@ -69,5 +71,5 @@ class AddressTests {
 
         assertEquals(64, map.get(new PlayerAddress("villager")));
         assertEquals(42, map.get(new BlockAddress("dev")));
-    }
+    }*/
 }

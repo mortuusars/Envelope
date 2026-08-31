@@ -71,7 +71,7 @@ public class PaybackDepartment {
     }
 
     protected long calculateExpireTick(ItemStack subject) {
-        PaybackDuration duration = subject.getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, PaybackRequest.createDefault())
+        PaybackDuration duration = subject.getOrDefault(Envelope.DataComponents.MAIL_PAYBACK_TAG, PaybackRequest.createDefault())
               .duration();
         return getMailService().getGameTime() + duration.getTicks();
     }
@@ -143,7 +143,7 @@ public class PaybackDepartment {
     // --
 
     public boolean tryHandleDelivery(Delivery delivery) {
-        if (delivery.getMail().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST)) {
+        if (delivery.getMail().has(Envelope.DataComponents.MAIL_PAYBACK_TAG)) {
             handlePaybackSubject(delivery);
             return true;
         }
@@ -192,7 +192,7 @@ public class PaybackDepartment {
     // -- Payback Subject
 
     protected void handlePaybackSubject(Delivery subjectDelivery) {
-        Preconditions.checkArgument(subjectDelivery.getMail().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST));
+        Preconditions.checkArgument(subjectDelivery.getMail().has(Envelope.DataComponents.MAIL_PAYBACK_TAG));
 
         ItemStack subject = subjectDelivery.getMail();
 

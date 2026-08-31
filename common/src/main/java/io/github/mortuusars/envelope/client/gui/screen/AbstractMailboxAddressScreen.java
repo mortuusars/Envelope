@@ -46,7 +46,7 @@ public abstract class AbstractMailboxAddressScreen extends AddressTagScreen {
     protected String getInitialAddressValue() {
         return existingAddress
               .map(Address::getString)
-              .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS))
+              .orElseGet(() -> Optional.ofNullable(player.getItemInHand(hand).get(Envelope.DataComponents.ADDRESS_TAG_ADDRESS))
                     .map(Address::getString)
                     .orElse(""));
     }

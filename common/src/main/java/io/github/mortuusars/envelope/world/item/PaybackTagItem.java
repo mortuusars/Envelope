@@ -42,7 +42,7 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
         }
 
         return slot.getItem().is(Envelope.Tags.Items.MAILABLE)
-              && (carried.has(Envelope.DataComponents.PAYBACK_TAG_CONTENTS) || slot.getItem().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST));
+              && (carried.has(Envelope.DataComponents.PAYBACK_TAG_CONTENTS) || slot.getItem().has(Envelope.DataComponents.MAIL_PAYBACK_TAG));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
         if (!target.is(Envelope.Tags.Items.MAILABLE)) return false;
 
         @Nullable PaybackRequest request = stack.get(Envelope.DataComponents.PAYBACK_TAG_CONTENTS);
-        @Nullable PaybackRequest currentRequest = target.get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+        @Nullable PaybackRequest currentRequest = target.get(Envelope.DataComponents.MAIL_PAYBACK_TAG);
 
         if (request != null) {
             if (stack.getCount() < target.getCount()) {
@@ -65,13 +65,13 @@ public class PaybackTagItem extends Item implements ApplicatorItem {
                 player.playSound(SoundEvents.COMPARATOR_CLICK, 1, 1);
                 return true;
             }
-            target.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
+            target.set(Envelope.DataComponents.MAIL_PAYBACK_TAG, request);
         } else {
             if (currentRequest == null) {
                 player.playSound(SoundEvents.COMPARATOR_CLICK, 1, 1);
                 return true;
             }
-            target.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+            target.remove(Envelope.DataComponents.MAIL_PAYBACK_TAG);
         }
 
         slot.setChanged();

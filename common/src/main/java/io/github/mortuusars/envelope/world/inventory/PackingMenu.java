@@ -120,7 +120,7 @@ public class PackingMenu extends AbstractInHandContainerMenu {
     protected @NotNull ItemStack createPackingResult() {
         ItemStack result = new ItemStack(Envelope.Items.PACKAGE.get());
         result.set(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(getContainer()));
-        result.set(Envelope.DataComponents.MAIL_RECIPIENT, presetAddress);
+        result.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, presetAddress);
         return result;
     }
 

@@ -65,7 +65,7 @@ public record GameplayEquipmentLootProvider(HolderLookup.Provider registries) im
 
     private LootPoolSingletonContainer.Builder<?> recipePackage(ResourceKey<ServiceAddressDefinition> address, ItemStack... ingredients) {
         return LootItem.lootTableItem(Envelope.Items.PACKAGE.get())
-              .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.MAIL_RECIPIENT, ServiceAddress.getOrThrow(registries, address)))
+              .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.MAIL_ADDRESS_TAG, ServiceAddress.getOrThrow(registries, address)))
               .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.PACKAGE_CONTENTS, new PackageContents(Arrays.stream(ingredients).toList())));
     }
 }

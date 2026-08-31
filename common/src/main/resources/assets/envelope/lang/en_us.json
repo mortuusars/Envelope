@@ -109,14 +109,14 @@
 
   "gui.envelope.mail.sender": "Sender",
   "gui.envelope.mail.recipient": "Recipient",
-  "gui.envelope.mail.from": "From",
+  "gui.envelope.mail.from": "From: %s",
+  "gui.envelope.mail.to": "To: %s",
 
   "gui.envelope.delivery_log": "§7Delivery Log",
   "gui.envelope.delivery_log.record.sent": " §7Sent from %s %s",
   "gui.envelope.delivery_log.record.arrived": " §7Arrived to %s %s",
   "gui.envelope.delivery_log.record.returned": " §7Returned: %s",
   "gui.envelope.delivery_log.record.message": " %s",
-
 
   "gui.envelope.delivery_log.message.unable_to_reach": "Unable To Reach",
   "gui.envelope.delivery_log.message.recipient_unknown": "Recipient Is Unknown",

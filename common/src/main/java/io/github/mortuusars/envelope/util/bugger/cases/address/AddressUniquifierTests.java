@@ -1,15 +1,15 @@
-package io.github.mortuusars.envelope.world.mail.address;
+package io.github.mortuusars.envelope.util.bugger.cases.address;
 
-import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
-import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
-import org.junit.jupiter.api.Test;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
+import net.minecraft.server.MinecraftServer;
 
 public class AddressUniquifierTests {
+    private final MinecraftServer server;
+
+    public AddressUniquifierTests(MinecraftServer server) {
+        this.server = server;
+    }
+
+    /* Needs to be adapted to bugger test system (and bugger test system need to be improved as well)
     @Test
     void returnsSameWhenAlreadyUnique() {
         assertEquals("Free", uniquify("Free"));
@@ -45,5 +45,5 @@ public class AddressUniquifierTests {
               Set.of("Addrtoo", "Addrtoolon9", "Addrtsdas", "sssdaasd4").stream().map(PlayerAddress::new).collect(Collectors.toSet()),
               Set.of());
         return new AddressUniquifier(addresses);
-    }
+    }*/
 }

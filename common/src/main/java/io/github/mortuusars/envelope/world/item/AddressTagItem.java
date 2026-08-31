@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenAddressTagScreenPacket;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.mortaar.network.Packets;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +38,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
+        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS_TAG_ADDRESS);
         if (address != null) {
             tooltipComponents.add(address.format()
                   .withIcon()
@@ -56,7 +55,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
         }
 
         return slot.getItem().is(Envelope.Tags.Items.MAILABLE)
-            && (carried.has(Envelope.DataComponents.ADDRESS) || slot.getItem().has(Envelope.DataComponents.MAIL_RECIPIENT));
+            && (carried.has(Envelope.DataComponents.ADDRESS_TAG_ADDRESS) || slot.getItem().has(Envelope.DataComponents.MAIL_ADDRESS_TAG));
     }
 
     @Override
@@ -69,7 +68,7 @@ public class AddressTagItem extends Item implements ApplicatorItem {
             return false;
         }
 
-        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS);
+        @Nullable Address address = stack.get(Envelope.DataComponents.ADDRESS_TAG_ADDRESS);
         @Nullable Address recipient = Mail.getRecipient(target).orElse(null);
         if (Objects.equals(address, recipient)) {
             player.playSound(SoundEvents.COMPARATOR_CLICK, 1, 1);

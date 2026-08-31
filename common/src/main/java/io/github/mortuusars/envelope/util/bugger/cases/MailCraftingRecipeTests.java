@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.util.bugger_data.cases;
+package io.github.mortuusars.envelope.util.bugger.cases;
 
 import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
 import io.github.mortuusars.mortaar.bugger.test.Test;

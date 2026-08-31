@@ -1,8 +1,9 @@
-package io.github.mortuusars.envelope.util.bugger_data.cases;
+package io.github.mortuusars.envelope.util.bugger.cases;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
 import io.github.mortuusars.mortaar.bugger.test.Test;
 import io.github.mortuusars.envelope.world.inventory.StackIngredient;
@@ -79,17 +80,17 @@ public class StackIngredientTests extends BuggerTests {
     private void componentMatching() {
         StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3,
               DataComponentPredicate.builder()
-                    .expect(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress())
+                    .expect(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(server.overworld()).getAddress()).immutable())
                     .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
                     .build());
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
-        stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
+        stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(server.overworld()).getAddress()).immutable());
         stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
         add("StackIngredient_ComponentMatches", Test.isTrue(() -> ingredient.test(stack)));
 
         ItemStack stack2 = stack.copy();
-        stack2.remove(Envelope.DataComponents.MAIL_SENDER);
+        stack2.remove(Envelope.DataComponents.MAIL_DELIVERY_INFO);
         add("StackIngredient_ComponentMatches_failsWhenMissing", Test.isFalse(() -> ingredient.test(stack2)));
     }
 
@@ -122,8 +123,8 @@ public class StackIngredientTests extends BuggerTests {
               Test.isTrue(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-                  stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
-                  stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new BlockAddress("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(server.overworld()).getAddress()).immutable());
+                  stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
                   return decodeFromJson(json).test(stack);
               }));
     }
@@ -151,8 +152,9 @@ public class StackIngredientTests extends BuggerTests {
               Test.isTrue(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-                  stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
-                  stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new BlockAddress("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(server.overworld()).getAddress()).immutable());
+//                  stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
+                  stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
                   return decodeFromJson(json).test(stack);
               }));
 
@@ -160,7 +162,7 @@ public class StackIngredientTests extends BuggerTests {
               Test.isFalse(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-                  stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
+                  stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(server.overworld()).getAddress()).immutable());
                   return decodeFromJson(json).test(stack);
               }));
 
@@ -168,8 +170,8 @@ public class StackIngredientTests extends BuggerTests {
               Test.isFalse(() -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
                   stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
-                  stack.set(Envelope.DataComponents.MAIL_SENDER, MailService.of(server.overworld()).getAddress());
-                  stack.set(Envelope.DataComponents.MAIL_RECIPIENT, new BlockAddress("Mortuusars Laboratory"));
+                  stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(server.overworld()).getAddress()).immutable());
+                  stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
                   stack.set(Envelope.DataComponents.MAIL_ID, Id.createUnsafe(123));
                   return decodeFromJson(json).test(stack);
               }));

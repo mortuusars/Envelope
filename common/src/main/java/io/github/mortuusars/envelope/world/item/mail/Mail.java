@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.ContainerUtils;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.*;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -11,7 +12,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -37,11 +37,11 @@ public final class Mail {
     // -- Address
 
     public static Optional<Address> getSender(ItemStack stack) {
-        return Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_SENDER));
+        return DeliveryInfo.of(stack).sender();
     }
 
     public static @NotNull Address getSenderOrElse(ItemStack stack, Address orElse) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_SENDER, orElse);
+        return getSender(stack).orElse(orElse);
     }
 
     public static @NotNull Address getSenderOrUnknown(ItemStack stack) {
@@ -49,15 +49,15 @@ public final class Mail {
     }
 
     public static void setSender(@NotNull ItemStack stack, @Nullable Address sender) {
-        stack.set(Envelope.DataComponents.MAIL_SENDER, sender);
+        DeliveryInfo.of(stack).mutable().sender(sender).immutableApplyTo(stack);
     }
 
     public static Optional<Address> getRecipient(ItemStack stack) {
-        return Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_RECIPIENT));
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_ADDRESS_TAG));
     }
 
     public static @NotNull Address getRecipientOrElse(ItemStack stack, Address orElse) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_RECIPIENT, orElse);
+        return stack.getOrDefault(Envelope.DataComponents.MAIL_ADDRESS_TAG, orElse);
     }
 
     public static @NotNull Address getRecipientOrUnknown(ItemStack stack) {
@@ -65,7 +65,7 @@ public final class Mail {
     }
 
     public static ItemStack setRecipient(@NotNull ItemStack stack, @Nullable Address recipient) {
-        stack.set(Envelope.DataComponents.MAIL_RECIPIENT, recipient);
+        stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, recipient);
         return stack;
     }
 
@@ -91,18 +91,18 @@ public final class Mail {
     // -- Payback
 
     public static ItemStack setPaybackRequest(@NotNull ItemStack stack, @Nullable PaybackRequest request) {
-        stack.set(Envelope.DataComponents.MAIL_PAYBACK_REQUEST, request);
+        stack.set(Envelope.DataComponents.MAIL_PAYBACK_TAG, request);
         return stack;
     }
 
     // -- Returned
 
     public static boolean isReturned(ItemStack stack) {
-        return stack.has(Envelope.DataComponents.MAIL_RETURNED);
+        return DeliveryInfo.of(stack).isReturned();
     }
 
     public static ItemStack setReturned(ItemStack stack, boolean returned) {
-        stack.set(Envelope.DataComponents.MAIL_RETURNED, returned ? Unit.INSTANCE : null);
+        DeliveryInfo.of(stack).mutable().returned(returned).immutableApplyTo(stack);
         return stack;
     }
 
@@ -122,22 +122,19 @@ public final class Mail {
     // -- Log
 
     public static DeliveryLog getLog(ItemStack stack) {
-        return stack.getOrDefault(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY);
+        return DeliveryInfo.of(stack).log();
     }
 
     public static ItemStack setLog(ItemStack stack, DeliveryLog log) {
-        stack.set(Envelope.DataComponents.MAIL_DELIVERY_LOG, log);
-        return stack;
+        return DeliveryInfo.of(stack).mutable().setLog(log).immutableApplyTo(stack);
     }
 
     public static ItemStack writeToLog(ItemStack stack, DeliveryRecord record) {
-        stack.update(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY, log -> log.append(record));
-        return stack;
+        return DeliveryInfo.of(stack).mutable().updateLog(log -> log.append(record)).immutableApplyTo(stack);
     }
 
     public static ItemStack writeToLog(ItemStack stack, DeliveryRecord... records) {
-        stack.update(Envelope.DataComponents.MAIL_DELIVERY_LOG, DeliveryLog.EMPTY, log -> log.append(records));
-        return stack;
+        return DeliveryInfo.of(stack).mutable().updateLog(log -> log.append(records)).immutableApplyTo(stack);
     }
 
     // --
@@ -146,9 +143,7 @@ public final class Mail {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 
         mail.remove(Envelope.DataComponents.MAIL_ID);
-        mail.remove(Envelope.DataComponents.MAIL_SENDER);
-        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_LOG);
-        mail.remove(Envelope.DataComponents.MAIL_RETURNED);
+        mail.remove(Envelope.DataComponents.MAIL_DELIVERY_INFO);
 
         return mail;
     }
@@ -156,8 +151,8 @@ public final class Mail {
     public static ItemStack removeAllDeliveryData(ItemStack mail) {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 
-        mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
-        mail.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+        mail.remove(Envelope.DataComponents.MAIL_ADDRESS_TAG);
+        mail.remove(Envelope.DataComponents.MAIL_PAYBACK_TAG);
         return removePreviousDeliveryData(mail);
     }
 
@@ -165,8 +160,9 @@ public final class Mail {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 
         if (!isReturned(mail)) {
-            mail.remove(Envelope.DataComponents.MAIL_RECIPIENT);
-            mail.remove(Envelope.DataComponents.MAIL_PAYBACK_REQUEST);
+            DeliveryInfo.of(mail).mutable().recipient(mail.get(Envelope.DataComponents.MAIL_ADDRESS_TAG)).immutableApplyTo(mail);
+            mail.remove(Envelope.DataComponents.MAIL_ADDRESS_TAG);
+            mail.remove(Envelope.DataComponents.MAIL_PAYBACK_TAG);
         }
 
         return mail;

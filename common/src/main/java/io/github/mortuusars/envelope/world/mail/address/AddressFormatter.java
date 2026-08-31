@@ -16,7 +16,7 @@ import java.util.function.Function;
 public class AddressFormatter {
     protected final Address address;
     protected boolean icon = false;
-    protected String iconSeparator = " ";
+    protected String iconSeparator = EnvelopeSymbols.SMALL_SPACE;
     protected Either<ChatFormatting, Style> iconStyle = Either.right(Style.EMPTY);
     protected Either<ChatFormatting, Style> textStyle = Either.right(Style.EMPTY);
     protected int maxLength = Integer.MAX_VALUE;

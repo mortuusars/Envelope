@@ -1,6 +1,12 @@
 # Changelog
 
 ## UNRELEASED
+- Original recipient of the delivered mail is now shown in the tooltip (To: <address>)
+- Item components:
+  - `envelope:address` has been replaced with `envelope:address_tag_address`
+  - `envelope:mail_recipient` has been replaced with `envelope:mail_address_tag`
+  - `envelope:mail_payback_request` has been replaced with `envelope:mail_payback_tag`
+  - `envelope:mail_sender`, `envelope:mail_delivery_log` and `envelope:mail_returned` have been replaced with a single `envelope:mail_delivery_info` component
 - Added `/envelope broadcast` command
 - `/envelope send` command now fails when recipient is not found
 - Fixed mail not delivering to the player address in some cases when letter casing in address definition didn't match player name exactly    

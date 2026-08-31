@@ -30,7 +30,7 @@ public class AddressTagApplicationRecipe extends CustomRecipe {
             if (stack.is(Envelope.Tags.Items.MAILABLE)) {
                 targets++;
             } else {
-                if (!(stack.getItem() instanceof AddressTagItem) || !stack.has(Envelope.DataComponents.ADDRESS)) {
+                if (!(stack.getItem() instanceof AddressTagItem) || !stack.has(Envelope.DataComponents.ADDRESS_TAG_ADDRESS)) {
                     return false;
                 }
 
@@ -67,7 +67,7 @@ public class AddressTagApplicationRecipe extends CustomRecipe {
         }
 
         ItemStack result = target.copyWithCount(1);
-        Mail.setRecipient(result, tag.get(Envelope.DataComponents.ADDRESS));
+        Mail.setRecipient(result, tag.get(Envelope.DataComponents.ADDRESS_TAG_ADDRESS));
         return result;
     }
 

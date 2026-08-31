@@ -12,7 +12,7 @@ import io.github.mortuusars.envelope.integration.Mods;
 import io.github.mortuusars.envelope.integration.every_compat.EveryCompatIntegration;
 import io.github.mortuusars.envelope.network.packet.clientbound.*;
 import io.github.mortuusars.envelope.network.packet.serverbound.*;
-import io.github.mortuusars.envelope.util.bugger_data.MailServiceBuggerData;
+import io.github.mortuusars.envelope.util.bugger.data.MailServiceBuggerData;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
@@ -21,7 +21,7 @@ import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.inventory.*;
 import io.github.mortuusars.envelope.world.item.*;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
@@ -342,26 +342,22 @@ public class Envelope {
     }
 
     public static class DataComponents {
-        public static final DataComponentType<Address> ADDRESS = REGISTRAR.dataComponentType("address", b ->
-              b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
+        public static final DataComponentType<Address> ADDRESS_TAG_ADDRESS = REGISTRAR.dataComponentType("address_tag_address",
+              b -> b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
 
         // -- Mail
 
+        public static final DataComponentType<Address> MAIL_ADDRESS_TAG = REGISTRAR.dataComponentType("mail_address_tag",
+              b -> b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
+
+        public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_TAG = REGISTRAR.dataComponentType("mail_payback_tag",
+              b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC).cacheEncoding());
+
+        public static final DataComponentType<DeliveryInfo> MAIL_DELIVERY_INFO = REGISTRAR.dataComponentType("mail_delivery_info",
+              b -> b.persistent(DeliveryInfo.CODEC).networkSynchronized(DeliveryInfo.STREAM_CODEC));
+
         public static final DataComponentType<Id> MAIL_ID = REGISTRAR.dataComponentType("mail_id", b ->
               b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
-        /**
-         * Only for display purposes. Shouldn't be used delivery in logic.
-         */
-        public static final DataComponentType<Address> MAIL_SENDER = REGISTRAR.dataComponentType("mail_sender", b ->
-              b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<Address> MAIL_RECIPIENT = REGISTRAR.dataComponentType("mail_recipient", b ->
-              b.persistent(Address.CODEC).networkSynchronized(Address.STREAM_CODEC));
-        public static final DataComponentType<PaybackRequest> MAIL_PAYBACK_REQUEST = REGISTRAR.dataComponentType("mail_payback_request",
-              b -> b.persistent(PaybackRequest.CODEC).networkSynchronized(PaybackRequest.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<DeliveryLog> MAIL_DELIVERY_LOG = REGISTRAR.dataComponentType("mail_delivery_log", b ->
-              b.persistent(DeliveryLog.CODEC).networkSynchronized(DeliveryLog.STREAM_CODEC));
-        public static final DataComponentType<Unit> MAIL_RETURNED = REGISTRAR.dataComponentType("mail_returned", b ->
-              b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
 
         // -- Letter
 

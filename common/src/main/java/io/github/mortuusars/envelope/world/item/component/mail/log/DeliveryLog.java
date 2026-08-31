@@ -22,12 +22,30 @@ public record DeliveryLog(List<DeliveryRecord> records) {
     public DeliveryLog append(DeliveryRecord record) {
         List<DeliveryRecord> records = new ArrayList<>(this.records);
         records.add(record);
+        while (records.size() > 64) {
+            records.removeFirst();
+        }
         return new DeliveryLog(records);
     }
 
     public DeliveryLog append(DeliveryRecord... list) {
         List<DeliveryRecord> records = new ArrayList<>(this.records);
         records.addAll(Arrays.asList(list));
+        while (records.size() > 64) {
+            records.removeFirst();
+        }
         return new DeliveryLog(records);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        DeliveryLog that = (DeliveryLog) object;
+        return Objects.equals(records, that.records);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(records);
     }
 }

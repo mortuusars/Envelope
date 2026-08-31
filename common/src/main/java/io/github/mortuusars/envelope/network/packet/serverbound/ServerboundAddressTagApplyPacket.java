@@ -43,8 +43,8 @@ public record ServerboundAddressTagApplyPacket(int slot, Optional<Address> addre
 
         if (tag.getItem() instanceof AddressTagItem) {
             address.ifPresentOrElse(
-                    value -> tag.set(Envelope.DataComponents.ADDRESS, value),
-                    () -> tag.remove(Envelope.DataComponents.ADDRESS));
+                    value -> tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, value),
+                    () -> tag.remove(Envelope.DataComponents.ADDRESS_TAG_ADDRESS));
             return true;
         }
 

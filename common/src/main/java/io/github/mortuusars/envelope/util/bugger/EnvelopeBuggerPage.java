@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.util.bugger_data;
+package io.github.mortuusars.envelope.util.bugger;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.mortaar.bugger.screen.page.BuggerScreenPage;

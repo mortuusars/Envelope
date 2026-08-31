@@ -200,7 +200,7 @@ public class MailboxBlock extends BaseEntityBlock {
 
         if (player.isCreative()
               && stack.is(Envelope.Tags.Items.MAILABLE)
-              && stack.get(Envelope.DataComponents.MAIL_RECIPIENT) instanceof BlockAddress address
+              && stack.get(Envelope.DataComponents.MAIL_ADDRESS_TAG) instanceof BlockAddress address
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(address)) {
             if (level instanceof ServerLevel) {

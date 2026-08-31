@@ -43,7 +43,7 @@ public class PaybackBoxItem extends Item {
 
     public boolean openPackingGui(Player player, InteractionHand hand, ItemStack stack) {
         @Nullable PaybackSubject subject = stack.get(Envelope.DataComponents.PAYBACK_SUBJECT);
-        if (subject == null || subject.mail().isEmpty() || !subject.mail().has(Envelope.DataComponents.MAIL_PAYBACK_REQUEST)) {
+        if (subject == null || subject.mail().isEmpty() || !subject.mail().has(Envelope.DataComponents.MAIL_PAYBACK_TAG)) {
             return false;
         }
 

@@ -2,10 +2,10 @@ package io.github.mortuusars.envelope;
 
 import io.github.mortuusars.envelope.client.gui.tooltip.*;
 import io.github.mortuusars.envelope.client.renderer.SealRenderer;
-import io.github.mortuusars.envelope.util.bugger_data.EnvelopeBuggerPage;
-import io.github.mortuusars.envelope.util.bugger_data.PigeonEntityDataDisplay;
+import io.github.mortuusars.envelope.util.bugger.EnvelopeBuggerPage;
+import io.github.mortuusars.envelope.util.bugger.PigeonEntityDataDisplay;
 import io.github.mortuusars.envelope.world.item.component.*;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
+import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -112,8 +112,8 @@ public class EnvelopeClient {
             if (stack.is(Envelope.Tags.Items.MAILABLE)) {
                 return CompositeTooltip.of(
                       original,
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_RECIPIENT)).map(MailAddressTagTooltip::new),
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_PAYBACK_REQUEST))
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_ADDRESS_TAG)).map(MailAddressTagTooltip::new),
+                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_PAYBACK_TAG))
                 );
             }
 
@@ -122,19 +122,26 @@ public class EnvelopeClient {
 
         public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
                                               Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
-            Mail.getSender(stack).ifPresent(sender -> {
-                DeliveryLog deliveryLog = Mail.getLog(stack);
-                if (Screen.hasShiftDown() && !deliveryLog.isEmpty()) {
+            DeliveryInfo deliveryInfo = DeliveryInfo.of(stack);
+            if (!deliveryInfo.isEmpty()) {
+
+                if (Screen.hasShiftDown() && !deliveryInfo.log().isEmpty()) {
                     consumer.accept(Component.translatable("gui.envelope.delivery_log"));
-                    for (DeliveryRecord record : deliveryLog.records()) {
+                    for (DeliveryRecord record : deliveryInfo.log().records()) {
                         consumer.accept(record.getDisplayComponent());
                     }
                 } else {
-                    consumer.accept(Component.translatable("gui.envelope.mail.from").withStyle(ChatFormatting.GRAY)
-                          .append(": ").withStyle(ChatFormatting.GRAY)
-                          .append(sender.format().asNeutral().toComponent()));
+                    deliveryInfo.sender().ifPresent(sender -> {
+                        consumer.accept(Component.translatable("gui.envelope.mail.from", sender.format().asSender().toComponent())
+                              .withStyle(ChatFormatting.GRAY));
+                    });
+
+                    deliveryInfo.recipient().ifPresent(recipient -> {
+                        consumer.accept(Component.translatable("gui.envelope.mail.to", recipient.format().asRecipient().toComponent())
+                              .withStyle(ChatFormatting.GRAY));
+                    });
                 }
-            });
+            }
 
             if (tooltipFlag.isAdvanced()) {
                 Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {

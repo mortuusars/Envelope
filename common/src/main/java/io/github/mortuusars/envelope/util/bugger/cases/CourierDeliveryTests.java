@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.util.bugger_data.cases;
+package io.github.mortuusars.envelope.util.bugger.cases;
 
 import com.mojang.serialization.DataResult;
 import io.github.mortuusars.envelope.world.mail.delivery.*;

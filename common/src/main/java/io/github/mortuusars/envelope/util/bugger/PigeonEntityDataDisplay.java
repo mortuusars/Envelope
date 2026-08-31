@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.util.bugger_data;
+package io.github.mortuusars.envelope.util.bugger;
 
 import io.github.mortuusars.envelope.world.GameTime;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
