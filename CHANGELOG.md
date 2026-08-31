@@ -1,7 +1,9 @@
 # Changelog
 
 ## UNRELEASED
-- Small improvements to applicator items (Address Tag, Payback Tag and Seal Stamp) r-click application behavior.
+- `/envelope send` command now fails when recipient is not found.
+- Fixed mail not delivering to the player address in some cases when letter casing in address definition didn't match player name exactly    
+- Small improvements to applicator items (Address Tag, Payback Tag and Seal Stamp) r-click application behavior
 - Bundled Mortaar library with the mod
   - Mortaar is a library mod that will be used to aid in mod development and reduce code duplication
   - As a player, you will not see any difference, apart from an additional mod in the mod menu

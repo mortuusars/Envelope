@@ -81,7 +81,7 @@ public class KnownPlayers extends SavedData {
     }
 
     public Optional<BlockAddress> getDefaultAddressOf(PlayerAddress playerAddress) {
-        return getDataOf(playerAddress.getString()).flatMap(PlayerData::getDefaultAddress);
+        return Optional.ofNullable(getDefaultAddresses().get(playerAddress));
     }
 
     public void setDefaultAddress(Player player, BlockAddress address) {

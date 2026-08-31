@@ -61,12 +61,17 @@ public class EnvelopeCommand {
 
         if (mail.isEmpty()) {
             context.getSource().sendFailure(Component.literal("Cannot send: mail is empty."));
-            return 0;
+            return 1;
         }
 
         if (recipient.equals(Address.UNKNOWN)) {
             context.getSource().sendFailure(Component.literal("Cannot send: recipient is not defined."));
-            return 0;
+            return 2;
+        }
+
+        if (recipient.resolve(level.getEnvelopeMailService()).equals(Address.UNKNOWN)) {
+            context.getSource().sendFailure(Component.literal("Cannot send: recipient not found."));
+            return 3;
         }
 
         MailService.of(level).getDeliveryManager()
