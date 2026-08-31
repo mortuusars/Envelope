@@ -1,7 +1,8 @@
 # Changelog
 
 ## UNRELEASED
-- `/envelope send` command now fails when recipient is not found.
+- Added `/envelope broadcast` command
+- `/envelope send` command now fails when recipient is not found
 - Fixed mail not delivering to the player address in some cases when letter casing in address definition didn't match player name exactly    
 - Small improvements to applicator items (Address Tag, Payback Tag and Seal Stamp) r-click application behavior
 - Bundled Mortaar library with the mod

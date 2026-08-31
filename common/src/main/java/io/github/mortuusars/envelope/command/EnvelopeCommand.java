@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.command.suggestion.AddressSuggestions;
 import io.github.mortuusars.envelope.util.Colors;
@@ -37,6 +38,13 @@ public class EnvelopeCommand {
                           .executes(c -> sendMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
                           .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
                                 .executes(c -> sendMail(c,
+                                      ItemArgument.getItem(c, "mail"),
+                                      parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))))
+              .then(Commands.literal("broadcast")
+                    .then(Commands.argument("mail", ItemArgument.item(context))
+                          .executes(c -> broadcastMail(c, ItemArgument.getItem(c, "mail"), Address.UNKNOWN))
+                          .then(Commands.argument("sender", CompoundTagArgument.compoundTag())
+                                .executes(c -> broadcastMail(c,
                                       ItemArgument.getItem(c, "mail"),
                                       parseAddress(c, CompoundTagArgument.getCompoundTag(c, "sender")))))))
               .then(Commands.literal("mailbox")
@@ -81,6 +89,36 @@ public class EnvelopeCommand {
                     .to(recipient));
 
         Component message = Component.literal("Mail sent to ").append(recipient.format().asRecipient().toComponent());
+        context.getSource().sendSuccess(() -> message, true);
+
+        return 0;
+    }
+
+    private static int broadcastMail(CommandContext<CommandSourceStack> context, ItemInput item, Address sender) throws CommandSyntaxException {
+        ServerLevel level = context.getSource().getLevel();
+        MailService service = level.getEnvelopeMailService();
+        ItemStack mail = item.createItemStack(1, false);
+
+        Map<PlayerAddress, BlockAddress> defaultAddresses = service.getKnownPlayers().getDefaultAddresses();
+
+        if (defaultAddresses.isEmpty()) {
+            context.getSource().sendFailure(Component.literal("Cannot broadcast: no recipients."));
+            return 1;
+        }
+
+        int count = 0;
+
+        for (Map.Entry<PlayerAddress, BlockAddress> entry : defaultAddresses.entrySet()) {
+            ItemStack broadcastedMail = Mail.setRecipient(mail.copy(), entry.getKey());
+            MailService.of(level).getDeliveryManager()
+                  .startService(Delivery.draft()
+                        .deliver(broadcastedMail)
+                        .from(sender)
+                        .to(entry.getKey()));
+            count++;
+        }
+
+        Component message = Component.literal("Broadcasted mail to " + count + " recipient(s)");
         context.getSource().sendSuccess(() -> message, true);
 
         return 0;
