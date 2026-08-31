@@ -23,8 +23,8 @@ import java.util.*;
  */
 public class DeliveryRoute {
     public static final Codec<DeliveryRoute> CODEC = RecordCodecBuilder.create(i -> i.group(
-          AddressLocation.CODEC.fieldOf("sender_location").forGetter(DeliveryRoute::getSenderLocation),
-          AddressLocation.CODEC.fieldOf("recipient_location").forGetter(DeliveryRoute::getRecipientLocation),
+          AddressLocation.CODEC.optionalFieldOf("sender_location", AddressLocation.DEFAULT).forGetter(DeliveryRoute::getSenderLocation),
+          AddressLocation.CODEC.optionalFieldOf("recipient_location", AddressLocation.DEFAULT).forGetter(DeliveryRoute::getRecipientLocation),
           BlockPos.CODEC.optionalFieldOf("sender_pos").forGetter(DeliveryRoute::getSenderPos),
           BlockPos.CODEC.optionalFieldOf("sender_ascend_pos").forGetter(DeliveryRoute::getSenderAscendPos),
           TravelDuration.CODEC.optionalFieldOf("sender_to_hub_duration", TravelDuration.DEFAULT).forGetter(DeliveryRoute::getSenderToHubDuration),

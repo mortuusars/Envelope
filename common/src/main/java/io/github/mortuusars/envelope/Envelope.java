@@ -39,6 +39,7 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
@@ -745,19 +746,19 @@ public class Envelope {
                         }
                     }));
 
-        public static final EntityData<MailboxHandler> PIGEON_MAILBOX_HANDLER =
-              new EntityData<>(resource("pigeon_mailbox_handler"), MailboxHandler.CODEC)
+        public static final EntityData<MailboxHandler> COURIER_MAILBOX_HANDLER =
+              new EntityData<>(resource("courier_mailbox_handler"), MailboxHandler.CODEC)
                     .handle(((entity, handler) -> {
-                        if (entity instanceof Pigeon pigeon) {
-                            pigeon.setMailboxHandler(handler);
+                        if (entity instanceof PhysicalCourier courier) {
+                            courier.setMailboxHandler(handler);
                         }
                     }));
 
-        public static final OptionalEntityData<Delivery> PIGEON_DELIVERY =
-              new OptionalEntityData<>(resource("pigeon_delivery"), Delivery.CODEC)
+        public static final OptionalEntityData<Delivery> COURIER_DELIVERY =
+              new OptionalEntityData<>(resource("courier_delivery"), Delivery.CODEC)
                     .handle((entity, delivery) -> {
-                        if (entity instanceof Pigeon pigeon) {
-                            pigeon.setDelivery(delivery.orElse(null));
+                        if (entity instanceof PhysicalCourier courier) {
+                            courier.setDelivery(delivery.orElse(null));
                         }
                     });
 

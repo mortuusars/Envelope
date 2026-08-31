@@ -69,7 +69,7 @@ public class MailboxHandler {
             if (!isMailboxValid(level, pigeon.blockPosition())) {
                 setTargetPos(null);
             }
-            Envelope.BuggerData.PIGEON_MAILBOX_HANDLER.send(pigeon.getId(), this);
+            Envelope.BuggerData.COURIER_MAILBOX_HANDLER.send(pigeon.getId(), this);
         }
     }
 

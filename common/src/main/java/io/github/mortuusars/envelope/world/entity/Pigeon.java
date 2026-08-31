@@ -16,6 +16,7 @@ import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecor
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.delivery.*;
+import io.github.mortuusars.mortaar.bugger.Bugger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -665,9 +666,8 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return mailboxHandler;
     }
 
-    public Pigeon setMailboxHandler(MailboxHandler mailboxHandler) {
+    public void setMailboxHandler(MailboxHandler mailboxHandler) {
         this.mailboxHandler = mailboxHandler;
-        return this;
     }
 
     // -- Sound
@@ -745,18 +745,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return !isLeashed() && !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
     }
 
-    //    public Courier startDelivery(Delivery delivery) {
-//        if (this.delivery != null && this.delivery != delivery) {
-//            LOGGER.warn("Starting new delivery when pigeon is already delivering. This might be an error.");
-//        }
-//        if (origin == null || !origin.isService()) {
-//            setOrigin(CourierOrigin.regular(blockPosition()));
-//        }
-//        stopRiding();
-//        setDelivery(delivery);
-//        return this;
-//    }
-
     public Optional<Delivery> getCurrentDelivery() {
         return Optional.ofNullable(delivery);
     }
@@ -767,14 +755,16 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         }
         this.delivery = delivery;
         onDeliveryChanged();
+
+        if (!level().isClientSide() && Bugger.isEnabled()) {
+            Envelope.BuggerData.COURIER_DELIVERY.send(getId(), Optional.ofNullable(delivery));
+        }
     }
 
     public void onDeliveryChanged() {
         if (!level().isClientSide()) {
             setDelivering(getCurrentDelivery().isPresent());
             setHasMail(delivery != null && !delivery.getMail().isEmpty());
-
-            Envelope.BuggerData.PIGEON_DELIVERY.send(getId(), Optional.ofNullable(delivery));
         }
     }
 

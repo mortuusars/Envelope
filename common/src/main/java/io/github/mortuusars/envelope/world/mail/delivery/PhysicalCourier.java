@@ -22,12 +22,20 @@ import net.minecraft.world.phys.Vec3;
 
 public interface PhysicalCourier extends Courier {
     Level level();
+
     Vec3 position();
+
     BlockPos blockPosition();
+
     PathNavigation getNavigation();
-    MailboxHandler getMailboxHandler();
+
     SpawnableEntityData toSpawnableCourierData();
+
     void setOrigin(CourierOrigin origin);
+
+    MailboxHandler getMailboxHandler();
+
+    void setMailboxHandler(MailboxHandler mailboxHandler);
 
     void setDelivery(Delivery delivery);
 
