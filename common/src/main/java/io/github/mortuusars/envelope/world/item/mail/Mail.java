@@ -25,7 +25,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.SeededContainerLoot;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public final class Mail {
@@ -73,25 +71,6 @@ public final class Mail {
 
     public static ItemStack setRecipient(@NotNull ItemStack stack, @Nullable Address recipient) {
         stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, recipient);
-        return stack;
-    }
-
-    // -- Id
-
-    public static boolean hasId(ItemStack stack) {
-        return stack.has(Envelope.DataComponents.MAIL_ID);
-    }
-
-    public static @Nullable Id getId(ItemStack stack) {
-        return stack.get(Envelope.DataComponents.MAIL_ID);
-    }
-
-    public static Id getOrCreateId(ItemStack stack, Level level) {
-        return stack.update(Envelope.DataComponents.MAIL_ID, Id.create(level), UnaryOperator.identity());
-    }
-
-    public static ItemStack setId(ItemStack stack, Id id) {
-        stack.set(Envelope.DataComponents.MAIL_ID, id);
         return stack;
     }
 
@@ -149,7 +128,6 @@ public final class Mail {
     public static ItemStack removePreviousDeliveryData(ItemStack mail) {
         if (mail.isEmpty()) return ItemStack.EMPTY;
 
-        mail.remove(Envelope.DataComponents.MAIL_ID);
         mail.remove(Envelope.DataComponents.MAIL_DELIVERY_INFO);
 
         return mail;
@@ -287,12 +265,6 @@ public final class Mail {
                           .withStyle(ChatFormatting.GRAY));
                 });
             }
-        }
-
-        if (tooltipFlag.isAdvanced()) {
-            Optional.ofNullable(getId(stack)).ifPresent(id -> {
-                consumer.accept(Component.literal("Mail Id: " + id).withStyle(ChatFormatting.DARK_GRAY));
-            });
         }
     }
 }

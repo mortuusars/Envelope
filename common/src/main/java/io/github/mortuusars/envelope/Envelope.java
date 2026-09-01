@@ -356,9 +356,6 @@ public class Envelope {
         public static final DataComponentType<DeliveryInfo> MAIL_DELIVERY_INFO = REGISTRAR.dataComponentType("mail_delivery_info",
               b -> b.persistent(DeliveryInfo.CODEC).networkSynchronized(DeliveryInfo.STREAM_CODEC));
 
-        public static final DataComponentType<Id> MAIL_ID = REGISTRAR.dataComponentType("mail_id", b ->
-              b.persistent(Id.CODEC).networkSynchronized(Id.STREAM_CODEC));
-
         // -- Letter
 
         public static final DataComponentType<LetterAndQuillContent> LETTER_AND_QUILL_CONTENT =

@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.mail.dropoff;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.world.block.mailbox.Inbox;
 import io.github.mortuusars.envelope.world.block.mailbox.InboxStorage;
-import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
@@ -42,7 +41,6 @@ public class BlockDropOffHandler implements MailDropOffHandler {
 
                   ItemStack deliveredMail = Mail.asDelivered(mail.copyWithCount(1));
                   Mail.writeToLog(deliveredMail, DeliveryRecord.arrivedTo(address));
-                  Mail.setId(deliveredMail, Id.create(context.getService().getLevel()));
 
                   if (inbox.addMail(deliveredMail)) {
                       inbox.onMailInserted(deliveredMail);

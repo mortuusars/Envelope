@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.item.component.Id;
+import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenMailboxAddressTagScreenPacket;
@@ -18,6 +18,7 @@ import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +32,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -203,16 +205,41 @@ public class MailboxBlock extends BaseEntityBlock {
               && stack.get(Envelope.DataComponents.MAIL_ADDRESS_TAG) instanceof BlockAddress address
               && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.getAddress().equals(address)) {
-            if (level instanceof ServerLevel) {
-                ItemStack mail = Mail.of(stack.copyWithCount(1))
+            if (!level.isClientSide()) {
+                ItemStack mail = Mail.asDelivered(Mail.of(stack.copyWithCount(1))
                       .writeToLog(DeliveryRecord.sentFrom(new PlayerAddress(player)))
                       .writeToLog(DeliveryRecord.arrivedTo(address))
                       .sender(new PlayerAddress(player))
-                      .id(Id.create(level))
-                      .get();
+                      .get());
+
                 if (blockEntity.addMail(mail)) {
                     player.getItemInHand(hand).shrink(1);
                     blockEntity.onMailInserted(mail);
+                }
+            }
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        if (player.isCreative()
+              && stack.is(Items.DEBUG_STICK)
+              && level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity) {
+            if (!level.isClientSide()) {
+                if (blockEntity.getAllMail().size() > 64) {
+                    blockEntity.clearMail();
+                } else {
+                    for (int i = 0; i < 12; i++) {
+                        ItemStack mail = Mail.asDelivered(Mail.createLetter(LetterContent.EMPTY)
+                              .sender(new BlockAddress("Address " + i))
+                              .recipient(blockEntity.getAddress())
+                              .writeToLog(DeliveryRecord.sentFrom(new PlayerAddress(player)))
+                              .writeToLog(DeliveryRecord.arrivedTo(blockEntity.getAddress()))
+                              .set(DataComponents.ITEM_NAME, Component.literal("Letter " + i))
+                              .get());
+
+                        if (blockEntity.addMail(mail)) {
+                            blockEntity.onMailInserted(mail);
+                        }
+                    }
                 }
             }
             return ItemInteractionResult.SUCCESS;

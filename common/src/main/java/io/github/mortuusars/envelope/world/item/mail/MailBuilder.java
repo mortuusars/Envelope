@@ -1,7 +1,6 @@
 package io.github.mortuusars.envelope.world.item.mail;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.world.item.component.Id;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -32,11 +31,6 @@ public class MailBuilder<T extends MailBuilder<T>> implements DataComponentHolde
     @SuppressWarnings("unchecked")
     T self() {
         return (T) this;
-    }
-
-    public T id(Id id) {
-        Mail.setId(item, id);
-        return self();
     }
 
     public T sender(Address sender) {

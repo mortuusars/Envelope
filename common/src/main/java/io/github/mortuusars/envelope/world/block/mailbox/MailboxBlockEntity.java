@@ -292,10 +292,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     public void onMailRemoved(int slot, ItemStack mail) {
         if (level instanceof ServerLevel serverLevel) {
-            Optional.ofNullable(Mail.getId(mail)).ifPresent(id -> {
-                MailboxMenu.executeForPlayersWithMenu(serverLevel, getAddress(),
-                      (player, menu) -> menu.onMailRemoved(id));
-            });
+            MailboxMenu.executeForPlayersWithMenu(serverLevel, getAddress(), (player, menu) -> menu.onMailRemoved(slot));
         }
     }
 

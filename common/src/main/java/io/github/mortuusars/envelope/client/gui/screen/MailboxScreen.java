@@ -65,7 +65,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected Component sendLabel = Component.translatable("gui.envelope.mailbox.send");
 
     @Nullable
-    protected ItemStack hoveredMail;
+    protected MailboxMenu.MailInSlot hoveredMail;
 
     protected ImageButton addressButton;
     protected ImageButton addressAttentionButton;
@@ -219,7 +219,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         // Right
         guiGraphics.blit(TEXTURE, leftPos + addressBarX + addressBarWidth - 5, topPos - 15, 303, imageHeight, 5, 15, 512, 256);
 
-        List<ItemStack> mail = getMenu().getMail();
+        List<MailboxMenu.MailInSlot> mail = getMenu().getMail();
 
         if (!mail.isEmpty()) {
             scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
@@ -227,14 +227,14 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
                 int index = i + scroll;
 
-                ItemStack item = mail.get(index);
+                MailboxMenu.MailInSlot mailInSlot = mail.get(index);
                 int x = 8;
                 int y = 18 + 18 * i;
                 boolean isHovering = isHovering(x + 1, y + 1, 115, 16, mouseX, mouseY);
                 if (isHovering) {
-                    hoveredMail = item;
+                    hoveredMail = mailInSlot;
                 }
-                renderMailButton(guiGraphics, partialTick, mouseX, mouseY, item, leftPos + x, topPos + y);
+                renderMailButton(guiGraphics, partialTick, mouseX, mouseY, mailInSlot, leftPos + x, topPos + y);
             }
         } else if (this.hashCode() % 20 == 0) {
             // Sad face
@@ -272,8 +272,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
 
-    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, ItemStack mail, int x, int y) {
-        boolean isHovered = hoveredMail == mail;
+    protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, MailboxMenu.MailInSlot mailInSlot, int x, int y) {
+        boolean isHovered = hoveredMail == mailInSlot;
+        ItemStack mail = mailInSlot.mail();
 
         guiGraphics.blitSprite(REGULAR_MAIL_BUTTON_SPRITES.get(true, isHovered), x, y, 0, 117, 18);
 
@@ -336,21 +337,23 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         }
     }
 
-    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, ItemStack hoveredMail) {
+    protected void renderMailTooltip(GuiGraphics guiGraphics, int x, int y, MailboxMenu.MailInSlot hoveredMail) {
+        ItemStack mail = hoveredMail.mail();
+
         if (x >= leftPos + 8 && x < leftPos + 28) {
-            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(hoveredMail), hoveredMail.getTooltipImage(), x, y);
+            guiGraphics.renderTooltip(font, getTooltipFromContainerItem(mail), mail.getTooltipImage(), x, y);
             return;
         }
 
         if (x >= leftPos + 31 && x < leftPos + 41) {
-            guiGraphics.renderTooltip(font, getDisplayedIconName(hoveredMail), x, y);
+            guiGraphics.renderTooltip(font, getDisplayedIconName(mail), x, y);
             return;
         }
 
         List<Component> tooltip = new ArrayList<>();
 
         // Show full sender address if it doesn't fit on the widget
-        Address sender = getDisplayedSender(hoveredMail);
+        Address sender = getDisplayedSender(mail);
         if (font.width(sender.getString()) > 76) {
             tooltip.add(sender.format()
                   .withIcon()
@@ -359,7 +362,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                   .toComponent());
         }
 
-        DeliveryLog deliveryLog = Mail.getLog(hoveredMail);
+        DeliveryLog deliveryLog = Mail.getLog(mail);
         if (!deliveryLog.isEmpty()) {
             tooltip.add(Component.translatable("gui.envelope.delivery_log"));
             for (DeliveryRecord record : deliveryLog.records()) {

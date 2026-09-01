@@ -1,8 +1,6 @@
 package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.google.common.base.Preconditions;
-import io.github.mortuusars.envelope.world.item.component.Id;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -36,10 +34,9 @@ public interface Inbox {
     // --
 
     default boolean addMailNoUpdate(int slot, ItemStack mail) {
-        Preconditions.checkArgument(!mail.isEmpty(), "Inbox can only store non-empty mail.");
-        Preconditions.checkArgument(mail.getCount() == 1, "Inbox can only store mail with stack size of 1. Got: " + mail.getCount());
-        Preconditions.checkArgument(Mail.hasId(mail), "Inbox can only store mail with 'envelope:mail_id' component.");
         Preconditions.checkArgument(slot >= 0, "Slot index should be larger or equal to 0. Got: " + slot);
+        Preconditions.checkArgument(!mail.isEmpty(), "Inbox cannot store empty mail.");
+        Preconditions.checkArgument(mail.getCount() == 1, "Inbox can only store mail with stack size of 1. Got: " + mail.getCount());
         int size = getAllMail().size();
         if (size < getInboxCapacity()) {
             if (slot > size) {
@@ -85,16 +82,6 @@ public interface Inbox {
 
     default ItemStack removeMailNoUpdate() {
         return removeMailNoUpdate(0);
-    }
-
-    default ItemStack removeMail(Id id) {
-        for (int i = 0; i < getAllMail().size(); i++) {
-            ItemStack mail = getAllMail().get(i);
-            if (id.equals(Mail.getId(mail))) {
-                return removeMail(i);
-            }
-        }
-        return ItemStack.EMPTY;
     }
 
     default ItemStack removeMail(int slot) {
