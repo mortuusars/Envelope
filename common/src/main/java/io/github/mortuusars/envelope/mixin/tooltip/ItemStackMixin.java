@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.mixin.tooltip;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.mortuusars.envelope.EnvelopeClient;
+import io.github.mortuusars.envelope.world.item.mail.Mail;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 public abstract class ItemStackMixin implements DataComponentHolder {
     @ModifyReturnValue(method = "getTooltipImage", at = @At("RETURN"))
     private Optional<TooltipComponent> getTooltipImage(Optional<TooltipComponent> original) {
-        return EnvelopeClient.TooltipComponents.modifyTooltipImage(((ItemStack) (Object) this), original);
+        return Mail.modifyTooltipImage(((ItemStack) (Object) this), original);
     }
 
     @SuppressWarnings("LocalMayUseName") // Using variable names can cause crashes on fabric.
@@ -34,6 +34,6 @@ public abstract class ItemStackMixin implements DataComponentHolder {
           target = "Lnet/minecraft/world/item/ItemStack;addToTooltip(Lnet/minecraft/core/component/DataComponentType;Lnet/minecraft/world/item/Item$TooltipContext;Ljava/util/function/Consumer;Lnet/minecraft/world/item/TooltipFlag;)V"))
     private void appendHoverText(Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipFlag,
                                  CallbackInfoReturnable<List<Component>> cir, @Local Consumer<Component> consumer) {
-        EnvelopeClient.TooltipComponents.appendTooltipLines(((ItemStack) (Object) this), consumer, tooltipContext, player, tooltipFlag);
+        Mail.appendTooltipLines(((ItemStack) (Object) this), consumer, tooltipContext, player, tooltipFlag);
     }
 }

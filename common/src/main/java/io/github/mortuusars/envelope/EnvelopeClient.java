@@ -4,40 +4,34 @@ import io.github.mortuusars.envelope.client.gui.tooltip.*;
 import io.github.mortuusars.envelope.client.renderer.SealRenderer;
 import io.github.mortuusars.envelope.util.bugger.EnvelopeBuggerPage;
 import io.github.mortuusars.envelope.util.bugger.PigeonEntityDataDisplay;
+import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltip;
 import io.github.mortuusars.envelope.world.item.component.*;
-import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.item.tooltip.CompositeTooltip;
 import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
 import io.github.mortuusars.mortaar.bugger.screen.BuggerEntityOverhead;
 import io.github.mortuusars.mortaar.bugger.screen.BuggerScreen;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import io.github.mortuusars.mortaar.client.gui.tooltip.Tooltips;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Consumer;
 
 public class EnvelopeClient {
     private static final SealRenderer sealRenderer = new SealRenderer();
 
     public static void init() {
+        ItemModelOverrides.register();
+
+        Tooltips.register(MailAddressTagTooltip.class, mailAddress -> new MailAddressTagTooltipComponent(mailAddress.address()));
+        Tooltips.register(PackageContents.class, PackageTooltipComponent::new);
+        Tooltips.register(PaybackRequest.class, PaybackRequestTooltipComponent::new);
+        Tooltips.register(Seal.class, SealTooltipComponent::new);
+        Tooltips.register(SealDieTooltip.class, sealDie -> new SealDieTooltipComponent(sealDie.impression()));
+
         BuggerScreen.addPage(new EnvelopeBuggerPage());
         BuggerEntityOverhead.addData(new PigeonEntityDataDisplay());
-        ItemModelOverrides.register();
     }
 
     public static SealRenderer getSealRenderer() {
@@ -89,65 +83,6 @@ public class EnvelopeClient {
                   ? request.duration()
                   : PaybackDuration.MEDIUM;
             return duration.ordinal() / 10f; // 0.0, 0.1, 0.2, etc.
-        }
-    }
-
-    public static class TooltipComponents {
-        public static ClientTooltipComponent create(TooltipComponent component) {
-            return switch (component) {
-                case MailAddressTagTooltip mailAddress -> new MailAddressTagTooltipComponent(mailAddress.address());
-                case PackageContents packageContents -> new PackageTooltipComponent(packageContents);
-                case PaybackRequest paybackRequest -> new PaybackRequestTooltipComponent(paybackRequest);
-                case Seal seal -> new SealTooltipComponent(seal);
-                case io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent die ->
-                      new SealDieTooltipComponent(die.impression());
-                case CompositeTooltip composite -> new CompositeTooltipComponent(
-                      composite.components().stream().map(ClientTooltipComponent::create).toList()
-                );
-                default -> null;
-            };
-        }
-
-        public static Optional<TooltipComponent> modifyTooltipImage(ItemStack stack, Optional<TooltipComponent> original) {
-            if (stack.is(Envelope.Tags.Items.MAILABLE)) {
-                return CompositeTooltip.of(
-                      original,
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_ADDRESS_TAG)).map(MailAddressTagTooltip::new),
-                      Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_PAYBACK_TAG))
-                );
-            }
-
-            return original;
-        }
-
-        public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
-                                              Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
-            DeliveryInfo deliveryInfo = DeliveryInfo.of(stack);
-            if (!deliveryInfo.isEmpty()) {
-
-                if (Screen.hasShiftDown() && !deliveryInfo.log().isEmpty()) {
-                    consumer.accept(Component.translatable("gui.envelope.delivery_log"));
-                    for (DeliveryRecord record : deliveryInfo.log().records()) {
-                        consumer.accept(record.getDisplayComponent());
-                    }
-                } else {
-                    deliveryInfo.sender().ifPresent(sender -> {
-                        consumer.accept(Component.translatable("gui.envelope.mail.from", sender.format().asSender().toComponent())
-                              .withStyle(ChatFormatting.GRAY));
-                    });
-
-                    deliveryInfo.recipient().ifPresent(recipient -> {
-                        consumer.accept(Component.translatable("gui.envelope.mail.to", recipient.format().asRecipient().toComponent())
-                              .withStyle(ChatFormatting.GRAY));
-                    });
-                }
-            }
-
-            if (tooltipFlag.isAdvanced()) {
-                Optional.ofNullable(Mail.getId(stack)).ifPresent(id -> {
-                    consumer.accept(Component.literal("Mail Id: " + id).withStyle(ChatFormatting.DARK_GRAY));
-                });
-            }
         }
     }
 }

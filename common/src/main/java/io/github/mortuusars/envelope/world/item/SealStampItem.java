@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltipComponent;
+import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltip;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.ChatFormatting;
@@ -58,7 +58,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of(new SealDieTooltipComponent(getDie(stack)));
+        return Optional.of(new SealDieTooltip(getDie(stack)));
     }
 
     @Override

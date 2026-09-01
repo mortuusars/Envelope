@@ -7,7 +7,11 @@ import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
+import io.github.mortuusars.envelope.world.item.tooltip.MailAddressTagTooltip;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.mortaar.world.item.tooltip.CompositeTooltip;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -16,7 +20,10 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -245,5 +252,47 @@ public final class Mail {
         }
 
         return true;
+    }
+
+    public static Optional<TooltipComponent> modifyTooltipImage(ItemStack stack, Optional<TooltipComponent> original) {
+        if (stack.is(Envelope.Tags.Items.MAILABLE)) {
+            return CompositeTooltip.of(
+                  original,
+                  Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_ADDRESS_TAG)).map(MailAddressTagTooltip::new),
+                  Optional.ofNullable(stack.get(Envelope.DataComponents.MAIL_PAYBACK_TAG))
+            );
+        }
+
+        return original;
+    }
+
+    public static void appendTooltipLines(ItemStack stack, Consumer<Component> consumer,
+                                          Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
+        DeliveryInfo deliveryInfo = DeliveryInfo.of(stack);
+        if (!deliveryInfo.isEmpty()) {
+
+            if (Screen.hasShiftDown() && !deliveryInfo.log().isEmpty()) {
+                consumer.accept(Component.translatable("gui.envelope.delivery_log"));
+                for (DeliveryRecord record : deliveryInfo.log().records()) {
+                    consumer.accept(record.getDisplayComponent());
+                }
+            } else {
+                deliveryInfo.sender().ifPresent(sender -> {
+                    consumer.accept(Component.translatable("gui.envelope.mail.from", sender.format().asSender().toComponent())
+                          .withStyle(ChatFormatting.GRAY));
+                });
+
+                deliveryInfo.recipient().ifPresent(recipient -> {
+                    consumer.accept(Component.translatable("gui.envelope.mail.to", recipient.format().asRecipient().toComponent())
+                          .withStyle(ChatFormatting.GRAY));
+                });
+            }
+        }
+
+        if (tooltipFlag.isAdvanced()) {
+            Optional.ofNullable(getId(stack)).ifPresent(id -> {
+                consumer.accept(Component.literal("Mail Id: " + id).withStyle(ChatFormatting.DARK_GRAY));
+            });
+        }
     }
 }

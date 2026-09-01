@@ -5,8 +5,7 @@
   "minVersion": "0.8",
   "plugin": "io.github.mortuusars.envelope.mixin.EnvelopeMixinConfigPlugin",
   "client": [
-    "fix_edit_box.EditBoxMixin",
-    "tooltip.ClientTooltipComponentMixin"
+    "fix_edit_box.EditBoxMixin"
   ],
   "mixins": [
     "charred_pigeon_water.ThrownPotionMixin",

@@ -6,5 +6,5 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import java.util.Optional;
 
-public record SealDieTooltipComponent(Optional<Holder<SealSymbol>> impression) implements TooltipComponent {
+public record SealDieTooltip(Optional<Holder<SealSymbol>> impression) implements TooltipComponent {
 }
