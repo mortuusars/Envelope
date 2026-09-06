@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.item.component.seal;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.mortuusars.envelope.util.TintColor;
+import io.github.mortuusars.mortaar.util.color.TintColor;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 

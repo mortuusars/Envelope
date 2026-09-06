@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.client.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
+import io.github.mortuusars.mortaar.util.color.TintColor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
@@ -20,7 +21,7 @@ public class SealRenderer {
         guiGraphics.blit(materialTexture, x, y, 0, 0, 30, 30, 30, 30);
 
         // Side
-        colors.side().setShaderColor();
+        setShaderTintColor(colors.side());
         guiGraphics.blit(impressionTexture, x + 1, y + 2, 0, 0, 30, 30, 30, 30);
         guiGraphics.blit(impressionTexture, x, y + 2, 0, 0, 30, 30, 30, 30);
         guiGraphics.blit(impressionTexture, x - 1, y + 2, 0, 0, 30, 30, 30, 30);
@@ -36,15 +37,15 @@ public class SealRenderer {
         guiGraphics.blit(impressionTexture, x, y - 2, 0, 0, 30, 30, 30, 30);
 
         // Shadow
-        colors.shadow().setShaderColor();
+        setShaderTintColor(colors.shadow());
         guiGraphics.blit(impressionTexture, x, y + 1, 0, 0, 30, 30, 30, 30);
 
         // Highlight
-        colors.highlight().setShaderColor();
+        setShaderTintColor(colors.highlight());
         guiGraphics.blit(impressionTexture, x, y - 1, 0, 0, 30, 30, 30, 30);
 
         // Base
-        colors.base().setShaderColor();
+        setShaderTintColor(colors.base());
         guiGraphics.blit(impressionTexture, x, y, 0, 0, 30, 30, 30, 30);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -59,7 +60,7 @@ public class SealRenderer {
         // textureWidth parameter is negative to flip the impression texture on the X axis
 
         // Side
-        colors.side().setShaderColor();
+        setShaderTintColor(colors.side());
         guiGraphics.blit(impressionTexture, x + 1, y + 1, 0, 0, 30, 30, -30, 30);
         guiGraphics.blit(impressionTexture, x, y + 1, 0, 0, 30, 30, -30, 30);
         guiGraphics.blit(impressionTexture, x - 1, y + 1, 0, 0, 30, 30, -30, 30);
@@ -74,18 +75,22 @@ public class SealRenderer {
         guiGraphics.blit(impressionTexture, x - 1, y - 2, 0, 0, 30, 30, -30, 30);
 
         // Highlight
-        colors.highlight().setShaderColor();
+        setShaderTintColor(colors.highlight());
         guiGraphics.blit(impressionTexture, x, y + 1, 0, 0, 30, 30, -30, 30);
 
         // Shadow
-        colors.shadow().setShaderColor();
+        setShaderTintColor(colors.shadow());
         guiGraphics.blit(impressionTexture, x, y - 1, 0, 0, 30, 30, -30, 30);
 
         // Base
-        colors.base().setShaderColor();
+        setShaderTintColor(colors.base());
         guiGraphics.blit(impressionTexture, x, y, 0, 0, 30, 30, -30, 30);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
+    }
+
+    public static void setShaderTintColor(TintColor color) {
+        RenderSystem.setShaderColor(color.r(), color.g(), color.b(), color.a());
     }
 
     // Have you seen someone rendering textures this way? Now you have.

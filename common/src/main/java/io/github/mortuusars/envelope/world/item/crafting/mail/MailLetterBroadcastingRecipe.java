@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -14,6 +13,7 @@ import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.mortaar.serialization.Codecs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -157,7 +157,7 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
               ServiceAddress.DEFINITION_CODEC
                     .fieldOf("address")
                     .forGetter(MailLetterBroadcastingRecipe::getAddress),
-              EnvelopeCodecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
+              Codecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
                     .fieldOf("ingredients")
                     .forGetter(MailLetterBroadcastingRecipe::getIngredients)
         ).apply(i, MailLetterBroadcastingRecipe::new));

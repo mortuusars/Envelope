@@ -4,11 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.EnvelopeCodecs;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailCraftingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
+import io.github.mortuusars.mortaar.serialization.Codecs;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -28,7 +28,7 @@ public class MailRecipeSerializer<T extends MailCraftingRecipe> implements Recip
               ServiceAddress.DEFINITION_CODEC
                     .fieldOf("address")
                     .forGetter(MailCraftingRecipe::getAddress),
-              EnvelopeCodecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
+              Codecs.recipeIngredients(PackageContents.SLOTS, Envelope.RecipeTypes.MAILING.get())
                     .fieldOf("ingredients")
                     .forGetter(MailCraftingRecipe::getIngredients),
               ItemStack.STRICT_CODEC

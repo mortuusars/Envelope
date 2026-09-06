@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.item.component.seal;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.EnvelopeCodecs;
+import io.github.mortuusars.mortaar.serialization.Codecs;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -17,12 +17,11 @@ import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Function;
 
 public final class SealMaterial {
     public static final Codec<SealMaterial> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
           ResourceLocation.CODEC.fieldOf("texture").forGetter(SealMaterial::textureId),
-          EnvelopeCodecs.HEX_COLOR.fieldOf("model_tint_color").forGetter(SealMaterial::modelTintColor),
+          Codecs.HEX_COLOR.fieldOf("model_tint_color").forGetter(SealMaterial::modelTintColor),
           ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette)
     ).apply(i, SealMaterial::new));
 
