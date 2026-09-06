@@ -5,16 +5,14 @@
     "envelope:book",
     "envelope:shovel",
     "envelope:swords",
+    "envelope:skull_and_bones",
     "envelope:heart",
     "envelope:axe",
-    "envelope:skeleton_smirk",
     "envelope:apple",
-    "envelope:skeleton",
     "envelope:sword",
-    "envelope:letter",
-    "envelope:block",
+    "envelope:letter_and_quill",
+    "envelope:cube",
     "envelope:creeper",
-    "envelope:emerald",
     "envelope:hoe"
   ]
 }

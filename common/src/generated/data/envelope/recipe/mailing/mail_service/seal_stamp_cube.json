@@ -7,12 +7,12 @@
       "item": "envelope:seal_stamp"
     },
     {
-      "item": "minecraft:skeleton_skull"
+      "item": "minecraft:grass_block"
     }
   ],
   "result": {
     "components": {
-      "envelope:seal_stamp_die": "envelope:skeleton"
+      "envelope:seal_stamp_die": "envelope:cube"
     },
     "count": 1,
     "id": "envelope:seal_stamp"

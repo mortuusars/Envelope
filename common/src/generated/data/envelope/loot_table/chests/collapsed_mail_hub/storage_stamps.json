@@ -64,7 +64,7 @@
           "functions": [
             {
               "components": {
-                "envelope:seal_stamp_die": "envelope:letter"
+                "envelope:seal_stamp_die": "envelope:letter_and_quill"
               },
               "function": "minecraft:set_components"
             }

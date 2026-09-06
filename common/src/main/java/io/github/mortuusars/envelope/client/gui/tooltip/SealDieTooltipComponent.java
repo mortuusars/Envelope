@@ -7,8 +7,8 @@ import io.github.mortuusars.envelope.world.item.component.seal.ShadingPalette;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.EitherHolder;
 
 import java.util.Optional;
 
@@ -19,12 +19,13 @@ public class SealDieTooltipComponent implements ClientTooltipComponent {
         this.symbol = symbol;
     }
 
-    public SealDieTooltipComponent(Optional<Holder<SealSymbol>> symbolHolder) {
+    public SealDieTooltipComponent(Optional<EitherHolder<SealSymbol>> symbolHolder) {
         this(getSymbol(symbolHolder));
     }
 
-    private static SealSymbol getSymbol(Optional<Holder<SealSymbol>> symbolHolder) {
+    private static SealSymbol getSymbol(Optional<EitherHolder<SealSymbol>> symbolHolder) {
         return symbolHolder
+              .flatMap(eitherHolder -> eitherHolder.unwrap(Minecrft.registryAccess()))
               .orElseGet(() -> {
                   ResourceKey<SealSymbol> key = SealSymbol.firstCharOrDefault(Minecrft.player());
                   return SealSymbol.getOrThrow(Minecrft.registryAccess(), key);

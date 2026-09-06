@@ -70,6 +70,7 @@ public class EnvelopeFabric implements ModInitializer {
             event.accept(Envelope.Items.ADDRESS_TAG.get());
             event.accept(Envelope.Items.PAYBACK_TAG.get());
             event.accept(Envelope.Items.SEAL_STAMP.get());
+            Envelope.Items.COLORED_SEAL_STAMPS.values().forEach(stamp -> event.accept(stamp.get()));
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(event -> {

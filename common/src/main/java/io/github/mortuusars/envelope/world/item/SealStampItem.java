@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.world.item.component.seal.*;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
@@ -15,6 +15,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.EitherHolder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -29,25 +30,34 @@ public class SealStampItem extends Item implements ApplicatorItem {
         super(properties);
     }
 
-    @SuppressWarnings("removal")
-    public Optional<Holder<SealSymbol>> getDie(ItemStack stack) {
-        if (stack.has(Envelope.DataComponents.SEAL_STAMP_IMPRESSION)) {
-            stack.set(Envelope.DataComponents.SEAL_STAMP_DIE, stack.remove(Envelope.DataComponents.SEAL_STAMP_IMPRESSION));
-        }
+    public Optional<EitherHolder<SealMaterial>> getMaterial(ItemStack stack) {
+        return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL));
+    }
+
+    public Holder<SealMaterial> getMaterialOrDefault(ItemStack stack, HolderLookup.Provider registries) {
+        return getMaterial(stack)
+              .flatMap(eitherHolder -> eitherHolder.unwrap(registries))
+              .orElseGet(() -> SealMaterial.getOrThrow(registries, SealMaterial.WAX));
+    }
+
+    public Optional<EitherHolder<SealSymbol>> getDie(ItemStack stack) {
         return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_DIE));
     }
 
-    public Holder<SealSymbol> getDieOrDefault(ItemStack stack, RegistryAccess registryAccess, @Nullable Player player) {
-        return getDie(stack).orElseGet(() ->
-              SealSymbol.getOrThrow(registryAccess, SealSymbol.firstCharOrDefault(player)));
+    public Holder<SealSymbol> getDieOrDefault(ItemStack stack, HolderLookup.Provider registries, @Nullable Player player) {
+        return getDie(stack)
+              .flatMap(eitherHolder -> eitherHolder.unwrap(registries))
+              .orElseGet(() -> SealSymbol.getOrThrow(registries, SealSymbol.firstCharOrDefault(player)));
     }
 
     // --
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
-        if (flag.isAdvanced()) {
+        HolderLookup.Provider registries = context.registries();
+        if (flag.isAdvanced() && registries != null) {
             getDie(stack)
+                  .flatMap(t -> t.unwrap(registries))
                   .flatMap(Holder::unwrapKey)
                   .ifPresent(key -> {
                       components.add(Component.literal("Die: ").withStyle(ChatFormatting.DARK_GRAY)
@@ -86,8 +96,8 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
         if (existingSeal != null && canApplyGold(stack, player)) {
-            ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.RED_WAX);
-            ResourceKey<SealMaterial> newMaterial = currentMaterial == SealMaterial.RED_WAX ? SealMaterial.GOLD : SealMaterial.RED_WAX;
+            ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.WAX);
+            ResourceKey<SealMaterial> newMaterial = currentMaterial == SealMaterial.WAX ? SealMaterial.GOLD : SealMaterial.WAX;
 
             Holder<SealMaterial> material = SealMaterial.getOrThrow(player.registryAccess(), newMaterial);
 
@@ -113,7 +123,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     public Seal createSeal(ItemStack stack, Player player) {
         return new Seal(
-              SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.RED_WAX),
+              getMaterialOrDefault(stack, player.registryAccess()),
               getDieOrDefault(stack, player.registryAccess(), player),
               player.getName());
     }

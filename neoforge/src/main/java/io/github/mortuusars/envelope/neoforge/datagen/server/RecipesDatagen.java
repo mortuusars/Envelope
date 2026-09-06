@@ -20,6 +20,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.EitherHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -166,8 +167,10 @@ public class RecipesDatagen extends RecipeProvider {
         sealStamp(output, address, Ingredient.of(ItemTags.SHOVELS), SealSymbol.SHOVEL);
         sealStamp(output, address, Ingredient.of(ItemTags.AXES), SealSymbol.AXE);
         sealStamp(output, address, Ingredient.of(ItemTags.HOES), SealSymbol.HOE);
+        sealStamp(output, address, Ingredient.of(Items.GRASS_BLOCK), SealSymbol.CUBE);
         sealStamp(output, address, Ingredient.of(Items.BOOK), SealSymbol.BOOK);
-        sealStamp(output, address, Ingredient.of(Items.SKELETON_SKULL), SealSymbol.SKELETON);
+        sealStamp(output, address, Ingredient.of(Envelope.Items.LETTER_AND_QUILL.get()), SealSymbol.LETTER_AND_QUILL);
+        sealStamp(output, address, Ingredient.of(Items.SKELETON_SKULL), SealSymbol.SKULL_AND_BONES);
     }
 
     private void automatedSupplyService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
@@ -247,7 +250,7 @@ public class RecipesDatagen extends RecipeProvider {
                   ItemStack stamp = new ItemStack(Envelope.Items.SEAL_STAMP.get());
                   HolderLookup.RegistryLookup<SealSymbol> lookup = Objects.requireNonNull(registries)
                         .lookupOrThrow(Envelope.Registries.SEAL_SYMBOL);
-                  stamp.set(Envelope.DataComponents.SEAL_STAMP_DIE, lookup.getOrThrow(impression));
+                  stamp.set(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(lookup.getOrThrow(impression)));
                   return stamp;
               }))
               .experience(1.5f)

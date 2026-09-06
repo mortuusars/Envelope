@@ -1,6 +1,18 @@
 # Changelog
 
 ## UNRELEASED
+Wax Seals
+- Added 16 colors of seals and Seal Stamps to apply them
+- Added `block` Seal Stamp mailing recipe - requires a **Grass Block**
+- Redesigned or refreshed all seal symbol textures 
+- Added seal symbols:
+  - `skull_and_bones`
+- Changed seal symbols: 
+  - `letter` -> `letter_and_quill`
+  - `block` -> `cube`
+- Removed seal symbols: `skeleton`, `skeleton_smirk`, `emerald`, `default`.
+
+
 - Added original recipient to the delivered mail tooltip (To: <address>)
 - Item components:
   - `envelope:address` has been replaced with `envelope:address_tag_address`

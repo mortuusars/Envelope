@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.EitherHolder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -111,15 +112,15 @@ public class ChestLootProvider implements LootTableSubProvider {
                     .add(LootItem.lootTableItem(Items.PAPER).setWeight(1).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 6.0F))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get()).setWeight(2).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, SealSymbol.getOrThrow(registries, SealSymbol.HEART))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.HEART)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, SealSymbol.getOrThrow(registries, SealSymbol.CREEPER))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.CREEPER)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, SealSymbol.getOrThrow(registries, SealSymbol.LETTER))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.LETTER_AND_QUILL)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, SealSymbol.getOrThrow(registries, SealSymbol.SWORDS))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.SWORDS)))))
                     .add(LootItem.lootTableItem(Envelope.Items.SEAL_STAMP.get())
-                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, SealSymbol.getOrThrow(registries, SealSymbol.VILLAGER))))
+                          .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.SEAL_STAMP_DIE, new EitherHolder<>(SealSymbol.getOrThrow(registries, SealSymbol.VILLAGER)))))
               )
         );
 

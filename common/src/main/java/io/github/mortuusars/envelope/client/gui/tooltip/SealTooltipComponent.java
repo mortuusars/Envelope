@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
 
 public class SealTooltipComponent implements ClientTooltipComponent {
@@ -37,17 +38,20 @@ public class SealTooltipComponent implements ClientTooltipComponent {
         // Signature:
         x += 34;
         y += 11;
-        int color = seal.material().value().impressionPalette().highlight().tint();
-        int outlineColor = seal.material().value().impressionPalette().shadow().tint();
+        int mainColor = FastColor.ARGB32.lerp(0.3f, seal.material().value().impressionPalette().highlight().tint(), 0xFFFFFFFF);
+        int outlineColor = FastColor.ARGB32.lerp(0.3f, seal.material().value().impressionPalette().side().tint(), 0xFF666666);
+        int shadowColor = FastColor.ARGB32.lerp(0.5f, seal.material().value().impressionPalette().shadow().tint(), 0xFF333333);
         text(seal.signature(), font, x - 1, y, outlineColor, matrix, buffer);
         text(seal.signature(), font, x - 1, y - 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x, y - 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x + 1, y - 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x + 1, y, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x + 1, y + 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x, y + 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x - 1, y + 1, outlineColor, matrix, buffer);
-        text(seal.signature(), font, x, y, color, matrix, buffer);
+
+        text(seal.signature(), font, x + 1, y + 1, shadowColor, matrix, buffer);
+
+        text(seal.signature(), font, x, y, mainColor, matrix, buffer);
     }
 
     private void text(Component text, Font font, int x, int y, int color, Matrix4f matrix, MultiBufferSource.BufferSource buffer) {

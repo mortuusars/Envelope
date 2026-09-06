@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "envelope:item/yellow_seal_stamp"
+  }
+}

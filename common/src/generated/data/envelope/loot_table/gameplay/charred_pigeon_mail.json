@@ -9,7 +9,7 @@
           "functions": [
             {
               "components": {
-                "envelope:mail_recipient": {
+                "envelope:mail_address_tag": {
                   "type": "service",
                   "definition": "envelope:mail_service"
                 }
@@ -39,7 +39,7 @@
           "functions": [
             {
               "components": {
-                "envelope:mail_recipient": {
+                "envelope:mail_address_tag": {
                   "type": "service",
                   "definition": "envelope:automated_supply_service"
                 }
@@ -85,7 +85,7 @@
           "functions": [
             {
               "components": {
-                "envelope:mail_recipient": {
+                "envelope:mail_address_tag": {
                   "type": "service",
                   "definition": "envelope:automated_supply_service"
                 }
@@ -131,7 +131,7 @@
           "functions": [
             {
               "components": {
-                "envelope:mail_recipient": {
+                "envelope:mail_address_tag": {
                   "type": "service",
                   "definition": "envelope:automated_supply_service"
                 }
@@ -177,7 +177,7 @@
           "functions": [
             {
               "components": {
-                "envelope:mail_recipient": {
+                "envelope:mail_address_tag": {
                   "type": "service",
                   "definition": "envelope:equine_assurance_bureau"
                 }

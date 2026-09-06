@@ -28,7 +28,7 @@ public class EnvelopeClient {
         Tooltips.register(PackageContents.class, PackageTooltipComponent::new);
         Tooltips.register(PaybackRequest.class, PaybackRequestTooltipComponent::new);
         Tooltips.register(Seal.class, SealTooltipComponent::new);
-        Tooltips.register(SealDieTooltip.class, sealDie -> new SealDieTooltipComponent(sealDie.impression()));
+        Tooltips.register(SealDieTooltip.class, sealDie -> new SealDieTooltipComponent(sealDie.die()));
 
         BuggerScreen.addPage(new EnvelopeBuggerPage());
         BuggerEntityOverhead.addData(new PigeonEntityDataDisplay());

@@ -52,21 +52,19 @@ public final class SealSymbol {
     public static final Map<String, ResourceKey<SealSymbol>> EMBLEMS = new HashMap<>();
 
     public static final ResourceKey<SealSymbol> APPLE = emblemKey("apple");
-    public static final ResourceKey<SealSymbol> AXE = emblemKey("axe");
-    public static final ResourceKey<SealSymbol> BLOCK = emblemKey("block");
+    public static final ResourceKey<SealSymbol> CUBE = emblemKey("cube");
     public static final ResourceKey<SealSymbol> BOOK = emblemKey("book");
     public static final ResourceKey<SealSymbol> CREEPER = emblemKey("creeper");
-    public static final ResourceKey<SealSymbol> EMERALD = emblemKey("emerald");
     public static final ResourceKey<SealSymbol> HEART = emblemKey("heart");
-    public static final ResourceKey<SealSymbol> HOE = emblemKey("hoe");
-    public static final ResourceKey<SealSymbol> LETTER = emblemKey("letter"); // Do not confuse with LETTERS
-    public static final ResourceKey<SealSymbol> PICKAXE = emblemKey("pickaxe");
+    public static final ResourceKey<SealSymbol> LETTER_AND_QUILL = emblemKey("letter_and_quill");
+    public static final ResourceKey<SealSymbol> VILLAGER = emblemKey("villager");
+    public static final ResourceKey<SealSymbol> SKULL_AND_BONES = emblemKey("skull_and_bones");
     public static final ResourceKey<SealSymbol> SHOVEL = emblemKey("shovel");
-    public static final ResourceKey<SealSymbol> SKELETON = emblemKey("skeleton");
-    public static final ResourceKey<SealSymbol> SKELETON_SMIRK = emblemKey("skeleton_smirk");
+    public static final ResourceKey<SealSymbol> PICKAXE = emblemKey("pickaxe");
+    public static final ResourceKey<SealSymbol> AXE = emblemKey("axe");
+    public static final ResourceKey<SealSymbol> HOE = emblemKey("hoe");
     public static final ResourceKey<SealSymbol> SWORD = emblemKey("sword");
     public static final ResourceKey<SealSymbol> SWORDS = emblemKey("swords");
-    public static final ResourceKey<SealSymbol> VILLAGER = emblemKey("villager");
 
     public static final ResourceKey<SealSymbol> DEFAULT = CREEPER;
 

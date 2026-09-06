@@ -5,6 +5,10 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
 import io.github.mortuusars.envelope.util.bugger.cases.CourierDeliveryTests;
 import io.github.mortuusars.envelope.util.bugger.cases.MailCraftingRecipeTests;
@@ -25,6 +29,7 @@ import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
 public class EnvelopeDebugCommand {
@@ -85,6 +90,22 @@ public class EnvelopeDebugCommand {
 
     private static int test(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
+
+        ItemStack stack1 = new ItemStack(Envelope.Items.SEALED_LETTER.get());
+        stack1.set(Envelope.DataComponents.SEAL, new Seal(
+              SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.WAX),
+              SealSymbol.getOrThrow(player.registryAccess(), SealSymbol.VILLAGER),
+              player.getDisplayName()));
+        player.addItem(stack1);
+
+        SealMaterial.WAX_COLORS.values().forEach(material -> {
+            ItemStack stack = new ItemStack(Envelope.Items.SEALED_LETTER.get());
+            stack.set(Envelope.DataComponents.SEAL, new Seal(
+                  SealMaterial.getOrThrow(player.registryAccess(), material),
+                  SealSymbol.getOrThrow(player.registryAccess(), SealSymbol.VILLAGER),
+                  player.getDisplayName()));
+            player.addItem(stack);
+        });
 
         /* Structure test
         List<BlockPos> positions = new ArrayList<>();

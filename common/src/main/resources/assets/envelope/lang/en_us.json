@@ -46,6 +46,22 @@
   "item.envelope.payback_tag": "Payback Tag",
 
   "item.envelope.seal_stamp": "Seal Stamp",
+  "item.envelope.white_seal_stamp": "White Seal Stamp",
+  "item.envelope.light_gray_seal_stamp": "Light Gray Seal Stamp",
+  "item.envelope.gray_seal_stamp": "Gray Seal Stamp",
+  "item.envelope.black_seal_stamp": "Black Seal Stamp",
+  "item.envelope.brown_seal_stamp": "Brown Seal Stamp",
+  "item.envelope.red_seal_stamp": "Red Seal Stamp",
+  "item.envelope.orange_seal_stamp": "Orange Seal Stamp",
+  "item.envelope.yellow_seal_stamp": "Yellow Seal Stamp",
+  "item.envelope.lime_seal_stamp": "Lime Seal Stamp",
+  "item.envelope.green_seal_stamp": "Green Seal Stamp",
+  "item.envelope.cyan_seal_stamp": "Cyan Seal Stamp",
+  "item.envelope.light_blue_seal_stamp": "Light Blue Seal Stamp",
+  "item.envelope.blue_seal_stamp": "Blue Seal Stamp",
+  "item.envelope.purple_seal_stamp": "Purple Seal Stamp",
+  "item.envelope.magenta_seal_stamp": "Magenta Seal Stamp",
+  "item.envelope.pink_seal_stamp": "Pink Seal Stamp",
 
   "item.envelope.mailbox": "Mailbox",
 

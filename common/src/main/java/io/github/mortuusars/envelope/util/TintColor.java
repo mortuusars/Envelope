@@ -26,6 +26,7 @@ public record TintColor(float r, float g, float b, float a) {
         return new TintColor(r, g, b, a);
     }
 
+    //TODO: move to client only code
     public void setShaderColor() {
         RenderSystem.setShaderColor(r, g ,b, a);
     }

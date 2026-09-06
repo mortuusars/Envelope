@@ -69,9 +69,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
@@ -86,6 +84,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -284,7 +283,6 @@ public class Envelope {
 
     public static class Items {
         public static final List<Supplier<BlockItem>> PIGEONHOLES = new ArrayList<>();
-
         public static final Supplier<BlockItem> OAK_PIGEONHOLE = pigeonhole("oak", Blocks.OAK_PIGEONHOLE);
         public static final Supplier<BlockItem> SPRUCE_PIGEONHOLE = pigeonhole("spruce", Blocks.SPRUCE_PIGEONHOLE);
         public static final Supplier<BlockItem> BIRCH_PIGEONHOLE = pigeonhole("birch", Blocks.BIRCH_PIGEONHOLE);
@@ -296,6 +294,14 @@ public class Envelope {
         public static final Supplier<BlockItem> BAMBOO_PIGEONHOLE = pigeonhole("bamboo", Blocks.BAMBOO_PIGEONHOLE);
         public static final Supplier<BlockItem> CRIMSON_PIGEONHOLE = pigeonhole("crimson", Blocks.CRIMSON_PIGEONHOLE);
         public static final Supplier<BlockItem> WARPED_PIGEONHOLE = pigeonhole("warped", Blocks.WARPED_PIGEONHOLE);
+
+        private static Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
+            Supplier<BlockItem> item = REGISTRAR.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
+            PIGEONHOLES.add(item);
+            return item;
+        }
+
+        // --
 
         public static final Supplier<MailboxBlockItem> MAILBOX = REGISTRAR.item("mailbox",
               () -> new MailboxBlockItem(Blocks.MAILBOX.get(), new Item.Properties()));
@@ -323,19 +329,50 @@ public class Envelope {
 
         public static final Supplier<AddressTagItem> ADDRESS_TAG = REGISTRAR.item("address_tag",
               () -> new AddressTagItem(new Item.Properties()));
+
+        public static final Map<DyeColor, Supplier<SealStampItem>> COLORED_SEAL_STAMPS = new LinkedHashMap<>();
         public static final Supplier<SealStampItem> SEAL_STAMP = REGISTRAR.item("seal_stamp",
-              () -> new SealStampItem(new Item.Properties().stacksTo(1)));
+              () -> new SealStampItem(stampProperties(SealMaterial.WAX)));
+        public static final Supplier<SealStampItem> WHITE_SEAL_STAMP = coloredStamp(DyeColor.WHITE);
+        public static final Supplier<SealStampItem> LIGHT_GRAY_SEAL_STAMP = coloredStamp(DyeColor.LIGHT_GRAY);
+        public static final Supplier<SealStampItem> GRAY_SEAL_STAMP = coloredStamp(DyeColor.GRAY);
+        public static final Supplier<SealStampItem> BLACK_SEAL_STAMP = coloredStamp(DyeColor.BLACK);
+        public static final Supplier<SealStampItem> BROWN_SEAL_STAMP = coloredStamp(DyeColor.BROWN);
+        public static final Supplier<SealStampItem> RED_SEAL_STAMP = coloredStamp(DyeColor.RED);
+        public static final Supplier<SealStampItem> ORANGE_SEAL_STAMP = coloredStamp(DyeColor.ORANGE);
+        public static final Supplier<SealStampItem> YELLOW_SEAL_STAMP = coloredStamp(DyeColor.YELLOW);
+        public static final Supplier<SealStampItem> LIME_SEAL_STAMP = coloredStamp(DyeColor.LIME);
+        public static final Supplier<SealStampItem> GREEN_SEAL_STAMP = coloredStamp(DyeColor.GREEN);
+        public static final Supplier<SealStampItem> CYAN_SEAL_STAMP = coloredStamp(DyeColor.CYAN);
+        public static final Supplier<SealStampItem> LIGHT_BLUE_SEAL_STAMP = coloredStamp(DyeColor.LIGHT_BLUE);
+        public static final Supplier<SealStampItem> BLUE_SEAL_STAMP = coloredStamp(DyeColor.BLUE);
+        public static final Supplier<SealStampItem> PURPLE_SEAL_STAMP = coloredStamp(DyeColor.PURPLE);
+        public static final Supplier<SealStampItem> MAGENTA_SEAL_STAMP = coloredStamp(DyeColor.MAGENTA);
+        public static final Supplier<SealStampItem> PINK_SEAL_STAMP = coloredStamp(DyeColor.PINK);
+
+        private static Supplier<SealStampItem> coloredStamp(DyeColor color) {
+            @Nullable ResourceKey<SealMaterial> materialKey = SealMaterial.fromDyeColor(color);
+            Preconditions.checkNotNull(materialKey,
+                  "Dye color '" + color + "' doesn't have a corresponding material, or it wasn't added to SealMaterial#WAX_COLORS map.");
+
+            Supplier<SealStampItem> item = REGISTRAR.item(color.getSerializedName() + "_seal_stamp",
+                  () -> new SealStampItem(stampProperties(materialKey)));
+            COLORED_SEAL_STAMPS.put(color, item);
+            return item;
+        }
+
+        public static Item.Properties stampProperties(ResourceKey<SealMaterial> material) {
+            return new Item.Properties()
+                  .stacksTo(1)
+                  .component(DataComponents.SEAL_STAMP_MATERIAL, new EitherHolder<>(material));
+        }
+
+        // --
 
         public static final Supplier<SpawnEggItem> PIGEON_SPAWN_EGG = REGISTRAR.item("pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
         public static final Supplier<SpawnEggItem> CHARRED_PIGEON_SPAWN_EGG = REGISTRAR.item("charred_pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.CHARRED_PIGEON.get(), 0x2B2223, 0xE85F00, new Item.Properties()));
-
-        private static @NotNull Supplier<BlockItem> pigeonhole(String type, Supplier<PigeonholeBlock> block) {
-            Supplier<BlockItem> item = REGISTRAR.item(type + "_pigeonhole", () -> new BlockItem(block.get(), new Item.Properties()));
-            PIGEONHOLES.add(item);
-            return item;
-        }
 
         static void init() {
         }
@@ -379,11 +416,10 @@ public class Envelope {
 
         public static final DataComponentType<Seal> SEAL = REGISTRAR.dataComponentType("seal",
               b -> b.persistent(Seal.CODEC).networkSynchronized(Seal.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_DIE = REGISTRAR.dataComponentType("seal_stamp_die",
-              b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
-        @Deprecated(forRemoval = true)
-        public static final DataComponentType<Holder<SealSymbol>> SEAL_STAMP_IMPRESSION = REGISTRAR.dataComponentType("seal_stamp_impression",
-              b -> b.persistent(SealSymbol.CODEC).networkSynchronized(SealSymbol.STREAM_CODEC).cacheEncoding());
+        public static final DataComponentType<EitherHolder<SealMaterial>> SEAL_STAMP_MATERIAL = REGISTRAR.dataComponentType("seal_stamp_material",
+              b -> b.persistent(EitherHolder.codec(Registries.SEAL_MATERIAL, SealMaterial.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_MATERIAL, SealMaterial.STREAM_CODEC)).cacheEncoding());
+        public static final DataComponentType<EitherHolder<SealSymbol>> SEAL_STAMP_DIE = REGISTRAR.dataComponentType("seal_stamp_die",
+              b -> b.persistent(EitherHolder.codec(Registries.SEAL_SYMBOL, SealSymbol.CODEC)).networkSynchronized(EitherHolder.streamCodec(Registries.SEAL_SYMBOL, SealSymbol.STREAM_CODEC)).cacheEncoding());
 
         // -- Payback
 

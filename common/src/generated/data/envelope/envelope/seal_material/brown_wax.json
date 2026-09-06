@@ -1,0 +1,10 @@
+{
+  "impression_palette": {
+    "base": "#FF834623",
+    "highlight": "#FFCC865C",
+    "shadow": "#FF5D2A09",
+    "side": "#FF6E3815"
+  },
+  "model_tint_color": "#FFA76641",
+  "texture": "envelope:seal/material/brown_wax"
+}

@@ -64,6 +64,7 @@ public class ModelsDatagen extends BlockStateProvider {
 
         itemModels().basicItem(Envelope.Items.ADDRESS_TAG.get());
         itemModels().basicItem(Envelope.Items.SEAL_STAMP.get());
+        Envelope.Items.COLORED_SEAL_STAMPS.values().forEach(item -> itemModels().basicItem(item.get()));
 
         itemModels().basicItem(Envelope.Items.LETTER_AND_QUILL.get())
               .override()
