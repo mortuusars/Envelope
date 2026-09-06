@@ -14,7 +14,8 @@ import java.util.List;
 
 public class LetterCloningRecipeExtension implements ICraftingCategoryExtension<LetterCloningRecipe> {
     @Override
-    public void setRecipe(RecipeHolder<LetterCloningRecipe> holder, IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+    public void setRecipe(RecipeHolder<LetterCloningRecipe> holder, IRecipeLayoutBuilder builder,
+                          ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
         List<List<ItemStack>> inputs = List.of(
               List.of(new ItemStack(Envelope.Items.LETTER.get())),
               List.of(new ItemStack(Envelope.Items.LETTER_AND_QUILL.get()))

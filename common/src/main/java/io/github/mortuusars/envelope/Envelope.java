@@ -83,7 +83,6 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootTable;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -330,34 +329,34 @@ public class Envelope {
         public static final Supplier<AddressTagItem> ADDRESS_TAG = REGISTRAR.item("address_tag",
               () -> new AddressTagItem(new Item.Properties()));
 
-        public static final Map<DyeColor, Supplier<SealStampItem>> COLORED_SEAL_STAMPS = new LinkedHashMap<>();
+        public static final Map<DyeColor, Supplier<SealStampItem>> DYED_SEAL_STAMPS = new LinkedHashMap<>();
         public static final Supplier<SealStampItem> SEAL_STAMP = REGISTRAR.item("seal_stamp",
               () -> new SealStampItem(stampProperties(SealMaterial.WAX)));
-        public static final Supplier<SealStampItem> WHITE_SEAL_STAMP = coloredStamp(DyeColor.WHITE);
-        public static final Supplier<SealStampItem> LIGHT_GRAY_SEAL_STAMP = coloredStamp(DyeColor.LIGHT_GRAY);
-        public static final Supplier<SealStampItem> GRAY_SEAL_STAMP = coloredStamp(DyeColor.GRAY);
-        public static final Supplier<SealStampItem> BLACK_SEAL_STAMP = coloredStamp(DyeColor.BLACK);
-        public static final Supplier<SealStampItem> BROWN_SEAL_STAMP = coloredStamp(DyeColor.BROWN);
-        public static final Supplier<SealStampItem> RED_SEAL_STAMP = coloredStamp(DyeColor.RED);
-        public static final Supplier<SealStampItem> ORANGE_SEAL_STAMP = coloredStamp(DyeColor.ORANGE);
-        public static final Supplier<SealStampItem> YELLOW_SEAL_STAMP = coloredStamp(DyeColor.YELLOW);
-        public static final Supplier<SealStampItem> LIME_SEAL_STAMP = coloredStamp(DyeColor.LIME);
-        public static final Supplier<SealStampItem> GREEN_SEAL_STAMP = coloredStamp(DyeColor.GREEN);
-        public static final Supplier<SealStampItem> CYAN_SEAL_STAMP = coloredStamp(DyeColor.CYAN);
-        public static final Supplier<SealStampItem> LIGHT_BLUE_SEAL_STAMP = coloredStamp(DyeColor.LIGHT_BLUE);
-        public static final Supplier<SealStampItem> BLUE_SEAL_STAMP = coloredStamp(DyeColor.BLUE);
-        public static final Supplier<SealStampItem> PURPLE_SEAL_STAMP = coloredStamp(DyeColor.PURPLE);
-        public static final Supplier<SealStampItem> MAGENTA_SEAL_STAMP = coloredStamp(DyeColor.MAGENTA);
-        public static final Supplier<SealStampItem> PINK_SEAL_STAMP = coloredStamp(DyeColor.PINK);
+        public static final Supplier<SealStampItem> WHITE_SEAL_STAMP = dyedStamp(DyeColor.WHITE);
+        public static final Supplier<SealStampItem> LIGHT_GRAY_SEAL_STAMP = dyedStamp(DyeColor.LIGHT_GRAY);
+        public static final Supplier<SealStampItem> GRAY_SEAL_STAMP = dyedStamp(DyeColor.GRAY);
+        public static final Supplier<SealStampItem> BLACK_SEAL_STAMP = dyedStamp(DyeColor.BLACK);
+        public static final Supplier<SealStampItem> BROWN_SEAL_STAMP = dyedStamp(DyeColor.BROWN);
+        public static final Supplier<SealStampItem> RED_SEAL_STAMP = dyedStamp(DyeColor.RED);
+        public static final Supplier<SealStampItem> ORANGE_SEAL_STAMP = dyedStamp(DyeColor.ORANGE);
+        public static final Supplier<SealStampItem> YELLOW_SEAL_STAMP = dyedStamp(DyeColor.YELLOW);
+        public static final Supplier<SealStampItem> LIME_SEAL_STAMP = dyedStamp(DyeColor.LIME);
+        public static final Supplier<SealStampItem> GREEN_SEAL_STAMP = dyedStamp(DyeColor.GREEN);
+        public static final Supplier<SealStampItem> CYAN_SEAL_STAMP = dyedStamp(DyeColor.CYAN);
+        public static final Supplier<SealStampItem> LIGHT_BLUE_SEAL_STAMP = dyedStamp(DyeColor.LIGHT_BLUE);
+        public static final Supplier<SealStampItem> BLUE_SEAL_STAMP = dyedStamp(DyeColor.BLUE);
+        public static final Supplier<SealStampItem> PURPLE_SEAL_STAMP = dyedStamp(DyeColor.PURPLE);
+        public static final Supplier<SealStampItem> MAGENTA_SEAL_STAMP = dyedStamp(DyeColor.MAGENTA);
+        public static final Supplier<SealStampItem> PINK_SEAL_STAMP = dyedStamp(DyeColor.PINK);
 
-        private static Supplier<SealStampItem> coloredStamp(DyeColor color) {
+        private static Supplier<SealStampItem> dyedStamp(DyeColor color) {
             @Nullable ResourceKey<SealMaterial> materialKey = SealMaterial.fromDyeColor(color);
             Preconditions.checkNotNull(materialKey,
                   "Dye color '" + color + "' doesn't have a corresponding material, or it wasn't added to SealMaterial#WAX_COLORS map.");
 
             Supplier<SealStampItem> item = REGISTRAR.item(color.getSerializedName() + "_seal_stamp",
                   () -> new SealStampItem(stampProperties(materialKey)));
-            COLORED_SEAL_STAMPS.put(color, item);
+            DYED_SEAL_STAMPS.put(color, item);
             return item;
         }
 
@@ -506,6 +505,8 @@ public class Envelope {
               "crafting_special_address_tag_application", () -> new SimpleCraftingRecipeSerializer<>(AddressTagApplicationRecipe::new));
         public static final Supplier<RecipeSerializer<PaybackTagApplicationRecipe>> PAYBACK_TAG_APPLICATION = REGISTRAR.recipeSerializer(
               "crafting_special_payback_tag_application", () -> new SimpleCraftingRecipeSerializer<>(PaybackTagApplicationRecipe::new));
+        public static final Supplier<RecipeSerializer<SealStampDyeingRecipe>> SEAL_STAMP_DYEING = REGISTRAR.recipeSerializer(
+              "crafting_special_seal_stamp_dyeing", () -> new SimpleCraftingRecipeSerializer<>(SealStampDyeingRecipe::new));
 
         public static final Supplier<RecipeSerializer<MailCraftingRecipe>> MAIL_CRAFTING = REGISTRAR.recipeSerializer(
               "mail_crafting", () -> new MailRecipeSerializer<>(MailCraftingRecipe::new));

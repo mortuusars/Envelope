@@ -52,7 +52,7 @@ public class NeoForgeCommonEvents {
             event.accept(Envelope.Items.ADDRESS_TAG.get());
             event.accept(Envelope.Items.PAYBACK_TAG.get());
             event.accept(Envelope.Items.SEAL_STAMP.get());
-            Envelope.Items.COLORED_SEAL_STAMPS.values().forEach(stamp -> event.accept(stamp.get()));
+            Envelope.Items.DYED_SEAL_STAMPS.values().forEach(stamp -> event.accept(stamp.get()));
         }
         if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
             event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());

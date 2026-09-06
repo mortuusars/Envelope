@@ -15,20 +15,20 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.EitherHolder;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class SealStampItem extends Item implements ApplicatorItem {
     public SealStampItem(Properties properties) {
         super(properties);
     }
+
+    // -- Material
 
     public Optional<EitherHolder<SealMaterial>> getMaterial(ItemStack stack) {
         return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_MATERIAL));
@@ -40,6 +40,23 @@ public class SealStampItem extends Item implements ApplicatorItem {
               .orElseGet(() -> SealMaterial.getOrThrow(registries, SealMaterial.WAX));
     }
 
+    public boolean canDyeWith(ItemStack stack, DyeColor color) {
+        if (!stack.has(Envelope.DataComponents.SEAL_STAMP_MATERIAL)) {
+            return true;
+        }
+
+        return getMaterial(stack)
+              .map(e -> !e.key().equals(SealMaterial.fromDyeColor(color)))
+              .orElse(false);
+    }
+
+    protected boolean canApplyGold(ItemStack stack, Player player) {
+        //TODO: patreon supporters
+        return false;
+    }
+
+    // -- Die
+
     public Optional<EitherHolder<SealSymbol>> getDie(ItemStack stack) {
         return Optional.ofNullable(stack.get(Envelope.DataComponents.SEAL_STAMP_DIE));
     }
@@ -48,6 +65,15 @@ public class SealStampItem extends Item implements ApplicatorItem {
         return getDie(stack)
               .flatMap(eitherHolder -> eitherHolder.unwrap(registries))
               .orElseGet(() -> SealSymbol.getOrThrow(registries, SealSymbol.firstCharOrDefault(player)));
+    }
+
+    // -- Seal
+
+    public Seal createSeal(ItemStack stack, Player player) {
+        return new Seal(
+              getMaterialOrDefault(stack, player.registryAccess()),
+              getDieOrDefault(stack, player.registryAccess(), player),
+              player.getName());
     }
 
     // --
@@ -119,17 +145,5 @@ public class SealStampItem extends Item implements ApplicatorItem {
         player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
 
         return true;
-    }
-
-    public Seal createSeal(ItemStack stack, Player player) {
-        return new Seal(
-              getMaterialOrDefault(stack, player.registryAccess()),
-              getDieOrDefault(stack, player.registryAccess(), player),
-              player.getName());
-    }
-
-    protected boolean canApplyGold(ItemStack stack, Player player) {
-        //TODO: patreon supporters
-        return false;
     }
 }

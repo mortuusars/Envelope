@@ -5,6 +5,8 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
+import io.github.mortuusars.envelope.integration.jei.extensions.SealStampDyeingRecipeRecipeExtension;
+import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeingRecipe;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
 import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
@@ -27,9 +29,10 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.registration.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.List;
 
 @JeiPlugin
@@ -95,6 +98,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
         registration.getCraftingCategory().addExtension(LetterCloningRecipe.class, new LetterCloningRecipeExtension());
         registration.getCraftingCategory().addExtension(AddressTagApplicationRecipe.class, new AddressTagApplicationRecipeExtension());
         registration.getCraftingCategory().addExtension(PaybackTagApplicationRecipe.class, new PaybackTagApplicationRecipeExtension());
+        registration.getCraftingCategory().addExtension(SealStampDyeingRecipe.class, new SealStampDyeingRecipeRecipeExtension());
     }
 
     @Override

@@ -18,7 +18,8 @@ import java.util.List;
 
 public class PaybackTagApplicationRecipeExtension implements ICraftingCategoryExtension<PaybackTagApplicationRecipe> {
     @Override
-    public void setRecipe(RecipeHolder<PaybackTagApplicationRecipe> holder, IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+    public void setRecipe(RecipeHolder<PaybackTagApplicationRecipe> holder, IRecipeLayoutBuilder builder,
+                          ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
         List<ItemStack> mailableItems = BuiltInRegistries.ITEM.getTag(Envelope.Tags.Items.MAILABLE)
               .map(named -> named.stream().map(ItemStack::new).toList())
               .orElse(List.of());

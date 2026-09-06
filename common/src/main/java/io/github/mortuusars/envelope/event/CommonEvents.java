@@ -5,17 +5,22 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.dispenser.PlaceBlockDispenseItemBehavior;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
+import io.github.mortuusars.envelope.world.item.SealStampItem;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +32,25 @@ public class CommonEvents {
         PlaceBlockDispenseItemBehavior placeBlockBehavior = new PlaceBlockDispenseItemBehavior();
         DispenserBlock.registerBehavior(Envelope.Items.PACKAGE.get(), placeBlockBehavior);
         DispenserBlock.registerBehavior(Envelope.Items.SEALED_PACKAGE.get(), placeBlockBehavior);
+
+        CauldronInteraction clearColor = (blockState, level, blockPos, player, interactionHand, stack) -> {
+            if (!(stack.getItem() instanceof SealStampItem)) {
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            }
+
+            if (!level.isClientSide()) {
+                ItemStack result = stack.transmuteCopy(Envelope.Items.SEAL_STAMP.get());
+                result.remove(Envelope.DataComponents.SEAL_STAMP_MATERIAL);
+                player.setItemInHand(interactionHand, result);
+                LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
+            }
+
+            level.playSound(player, player, SoundEvents.BOTTLE_EMPTY, SoundSource.PLAYERS, 1, 1);
+
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+        };
+        Envelope.Items.DYED_SEAL_STAMPS.values()
+              .forEach(dyedStamp -> CauldronInteraction.WATER.map().put(dyedStamp.get(), clearColor));
     }
 
     public static void levelTick(Level level) {

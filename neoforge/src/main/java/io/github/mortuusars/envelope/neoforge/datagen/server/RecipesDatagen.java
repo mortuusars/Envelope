@@ -108,6 +108,7 @@ public class RecipesDatagen extends RecipeProvider {
         SpecialRecipeBuilder.special(LetterCloningRecipe::new).save(output, Envelope.resource("letter_cloning"));
         SpecialRecipeBuilder.special(AddressTagApplicationRecipe::new).save(output, Envelope.resource("address_tag_application"));
         SpecialRecipeBuilder.special(PaybackTagApplicationRecipe::new).save(output, Envelope.resource("payback_tag_application"));
+        SpecialRecipeBuilder.special(SealStampDyeingRecipe::new).save(output, Envelope.resource("seal_stamp_dyeing"));
     }
 
     protected void pigeonhole(RecipeOutput output, ItemLike result, ItemLike planks) {
