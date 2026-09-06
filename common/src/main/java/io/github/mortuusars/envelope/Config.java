@@ -291,11 +291,17 @@ public abstract class Config {
     public static class Client {
         public static final ModConfigSpec SPEC;
 
+        public static final ModConfigSpec.BooleanValue HIDE_DEFAULT_SEAL_STAMP_DIE_TOOLTIP_OUTSIDE_OF_INVENTORY;
+
         // JEI
         public static final ModConfigSpec.BooleanValue JEI_SERVICE_ADDRESS_INGREDIENT;
 
         static {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+
+            HIDE_DEFAULT_SEAL_STAMP_DIE_TOOLTIP_OUTSIDE_OF_INVENTORY = builder
+                  .comment("When hovering over a Seal Stamp item outside of player inventory or menu (in JEI, for example) - default die (first letter of player name) will be hidden from tooltip.")
+                  .define("hide_default_seal_stamp_die_outside_of_inventory", true);
 
             {
                 builder.push("integration");

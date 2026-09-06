@@ -1,8 +1,11 @@
 package io.github.mortuusars.envelope.world.item;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltip;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
+import io.github.mortuusars.mortaar.Platform;
+import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -20,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class SealStampItem extends Item implements ApplicatorItem {
@@ -94,7 +96,11 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of(new SealDieTooltip(getDie(stack)));
+        return Optional.of((TooltipComponent) new SealDieTooltip(getDie(stack)))
+              .filter(tooltip -> !Platform.isClient()
+                    || !Config.Client.HIDE_DEFAULT_SEAL_STAMP_DIE_TOOLTIP_OUTSIDE_OF_INVENTORY.get()
+                    || stack.has(Envelope.DataComponents.SEAL_STAMP_DIE)
+                    || Client.isInInventory(stack));
     }
 
     @Override
@@ -104,7 +110,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
         }
 
         return slot.getItem().has(Envelope.DataComponents.SEAL)
-                || (slot.getItem().getItem() instanceof Sealable sealable && sealable.canSeal(player.level(), slot.getItem()));
+              || (slot.getItem().getItem() instanceof Sealable sealable && sealable.canSeal(player.level(), slot.getItem()));
     }
 
     @Override
@@ -145,5 +151,26 @@ public class SealStampItem extends Item implements ApplicatorItem {
         player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
 
         return true;
+    }
+
+    public static class Client {
+        public static boolean isInInventory(ItemStack stack) {
+            if (Minecrft.player().containerMenu instanceof AbstractContainerMenu menu) {
+                for (Slot slot : menu.slots) {
+                    if (slot.getItem() == stack) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            for (ItemStack item : Minecrft.player().getInventory().items) {
+                if (item == stack) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

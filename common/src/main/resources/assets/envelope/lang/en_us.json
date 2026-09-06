@@ -356,6 +356,7 @@
   "envelope.configuration.burning": "Burning",
   "envelope.configuration.loot": "Loot",
   "envelope.configuration.ignite_seconds": "Ignite Seconds",
+  "envelope.configuration.hide_default_seal_stamp_die_outside_of_inventory": "Hide Default Seal Die Outside Of Inventory",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

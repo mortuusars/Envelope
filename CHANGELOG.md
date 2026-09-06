@@ -12,6 +12,7 @@ Wax Seals
   - `letter` -> `letter_and_quill`
   - `block` -> `cube`
 - Removed seal symbols: `skeleton`, `skeleton_smirk`, `emerald`, `default`.
+- Default die (first letter of player name) will now show up in Seal Stamp's tooltip if outside of inventory or menu (in JEI for example) 
 
 
 - Added original recipient to the delivered mail tooltip (To: <address>)
