@@ -97,11 +97,12 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Envelope.Items.SEAL_STAMP.get(), 1)
-              .define('S', ItemTags.WOODEN_SLABS)
+              .define('P', ItemTags.PLANKS)
               .define('I', Tags.Items.INGOTS_IRON)
-              .pattern(" S ")
-              .pattern(" S ")
+              .define('H', Items.HONEYCOMB)
+              .pattern(" P ")
               .pattern(" I ")
+              .pattern(" H ")
               .unlockedBy("has_mailable", has(Envelope.Tags.Items.MAILABLE))
               .save(output);
 

@@ -3,6 +3,7 @@
 ## UNRELEASED
 Wax Seals
 - Added 16 colors of seals and Seal Stamps to apply them
+- Changed Seal Stamp recipe to require a Honeycomb and any wooden planks, instead of two wooden slabs
 - Added `block` Seal Stamp mailing recipe - requires a **Grass Block**
 - Redesigned or refreshed all seal symbol textures 
 - Added seal symbols:
