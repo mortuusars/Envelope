@@ -27,6 +27,7 @@ Wax Seals
 - Bundled Mortaar library with the mod
   - Mortaar is a library mod that will be used to aid in mod development and reduce code duplication
   - As a player, you will not see any difference, apart from an additional mod in the mod menu
+- Fixed crashing with recent JEI versions (above 19.52.0.421)
 
 ## 0.7.5 - 2026-08-15
 - Added Every Compat (Wood Good) support for pigeonholes (implemented by [_**Dadamalda**_](https://github.com/DadamaldaDad))

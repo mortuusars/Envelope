@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.integration.jei.extensions.SealStampDyeingRecipeRecipeExtension;
+import io.github.mortuusars.envelope.integration.jei.util.PackingRecipeTransferInfo;
 import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeingRecipe;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
@@ -14,10 +15,7 @@ import io.github.mortuusars.envelope.integration.jei.extensions.LetterCloningRec
 import io.github.mortuusars.envelope.integration.jei.extensions.PaybackTagApplicationRecipeExtension;
 import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientHelper;
 import io.github.mortuusars.envelope.integration.jei.ingredient.ServiceAddressIngredientRenderer;
-import io.github.mortuusars.envelope.integration.jei.util.InHandRecipeTransferInfo;
 import io.github.mortuusars.envelope.integration.jei.util.PaybackTagGhostIngredientHandler;
-import io.github.mortuusars.envelope.world.inventory.PackingMenu;
-import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.LetterCloningRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
@@ -103,9 +101,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        var transferInfo = new InHandRecipeTransferInfo<>(PackingMenu.class, EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE,
-              0, PackageContents.SLOTS, PackageContents.SLOTS, 36);
-        registration.addRecipeTransferHandler(transferInfo);
+        registration.addRecipeTransferHandler(new PackingRecipeTransferInfo());
     }
 
     @Override
