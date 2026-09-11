@@ -57,6 +57,7 @@ public class ServiceAddressIngredientRenderer implements IIngredientRenderer<Ser
         guiGraphics.drawString(font, string, x, y, mainColor, false);
     }
 
+    @SuppressWarnings("removal")
     @Override
     public @NotNull List<Component> getTooltip(ServiceAddress ingredient, TooltipFlag tooltipFlag) {
         if (tooltipFlag.isAdvanced()) {
@@ -64,7 +65,9 @@ public class ServiceAddressIngredientRenderer implements IIngredientRenderer<Ser
             return List.of(
                   ingredient.format().withIcon().toComponent(),
                   Component.literal("⌚" + EnvelopeSymbols.SMALL_SPACE)
-                        .append(GameTime.format(travelDuration, true)).withStyle(ChatFormatting.GRAY));
+                        .append(GameTime.format(travelDuration, true)).withStyle(ChatFormatting.GRAY),
+                  Component.literal(ingredient.getDefinitionHolder().unwrapKey()
+                        .map(key -> key.location().toString()).orElse("<unknown>")).withStyle(ChatFormatting.DARK_GRAY));
         } else {
             return List.of(ingredient.format().withIcon().toComponent());
         }

@@ -389,7 +389,7 @@
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
   "envelope.jei.category.mailing": "Mailing",
-  "envelope.jei.info.mail_service": "Dispatches and handles deliveries and provides other mail-related services.",
+  "envelope.jei.info.mail_service": "Dispatches and handles deliveries. Provides mail-related services.",
   "envelope.jei.info.automated_supply_service": "Contains various useful mailing recipes.",
   "envelope.jei.info.cloud_depository": "Stores items remotely and securely.\n\nSend items to deposit.\nSend %s to withdraw.\n\nDeposits and requests must be sealed for identification reasons.",
   "envelope.jei.info.cloud_depository.withdrawal_request": "When sealed and sent to %s - requests withdrawal of the last deposited item.\nIf renamed, item with the same name will be requested.",

@@ -2,7 +2,10 @@
 
 ## UNRELEASED
 
-- Updated JEI service address ingredient display
+JEI
+- Added information about service addresses and some other items
+- Address in mailing recipes is now clickable and will show usages when clicked
+- Updated how service address ingredient renders
 
 Wax Seals
 - Added 16 colors of seals and Seal Stamps to apply them

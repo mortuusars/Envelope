@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.integration.jei.category;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
@@ -11,13 +11,16 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.gui.placement.HorizontalAlignment;
+import mezz.jei.api.gui.inputs.IJeiInputHandler;
+import mezz.jei.api.gui.inputs.IJeiUserInput;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IJeiHelpers;
+import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.AbstractRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -25,11 +28,11 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailRecipe>> {
     private final IDrawable background;
 
-    public MailingRecipeCategory(IJeiHelpers helper) {
+    public MailingRecipeCategory(IJeiHelpers helpers) {
         super(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE,
               Component.translatable("envelope.jei.category.mailing"),
-              helper.getGuiHelper().createDrawableItemLike(Envelope.Items.PACKAGE.get()), 146, 74);
-        background = helper.getGuiHelper().createDrawable(
+              helpers.getGuiHelper().createDrawableItemLike(Envelope.Items.PACKAGE.get()), 146, 74);
+        background = helpers.getGuiHelper().createDrawable(
               Envelope.resource("textures/gui/jei/category_mailing.png"), 0, 0, getWidth(), getHeight());
     }
 
@@ -83,16 +86,43 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
 
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MailRecipe> recipeHolder, IFocusGroup focuses) {
-        Component component = recipeHolder.value().getAddress()
-              .format()
-              .withIcon()
-              .toComponent();
-
-        builder.addText(component, getWidth(), 12)
-              .setPosition(0, 0)
-              .setTextAlignment(HorizontalAlignment.CENTER)
-              .setColor(0xFF808080);
-
         builder.addRecipeArrow().setPosition(90, 32);
+
+        builder.addWidget(new ServiceAddressRecipeWidget(new ScreenRectangle(0, 0, getWidth(), 9), recipeHolder.value().getAddress()));
+
+        builder.addInputHandler(new IJeiInputHandler() {
+            @Override
+            public ScreenRectangle getArea() {
+                return new ScreenRectangle(0, 0, getWidth(), 9);
+            }
+
+            @Override
+            public boolean handleInput(double mouseX, double mouseY, IJeiUserInput input) {
+                if (EnvelopeJeiPlugin.runtime == null) {
+                    return false;
+                }
+
+                if (input.getKey().getValue() != InputConstants.MOUSE_BUTTON_LEFT
+                      && input.getKey().getValue() != InputConstants.MOUSE_BUTTON_RIGHT) {
+                    return false;
+                }
+
+                if (input.isSimulate()) {
+                    return true;
+                }
+
+                IFocus<?> focus = EnvelopeJeiPlugin.runtime
+                      .getJeiHelpers()
+                      .getFocusFactory()
+                      .createFocus(
+                            RecipeIngredientRole.INPUT,
+                            EnvelopeJeiPlugin.SERVICE_ADDRESS_INGREDIENT,
+                            recipeHolder.value().getAddress()
+                      );
+
+                EnvelopeJeiPlugin.runtime.getRecipesGui().show(focus);
+                return true;
+            }
+        });
     }
 }

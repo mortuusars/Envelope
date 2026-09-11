@@ -11,7 +11,6 @@ import io.github.mortuusars.envelope.integration.jei.util.PackingRecipeTransferI
 import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeingRecipe;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
-import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepositoryData;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
 import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
@@ -29,6 +28,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.registration.*;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -45,6 +45,8 @@ import java.util.List;
 public class EnvelopeJeiPlugin implements IModPlugin {
     private static final ResourceLocation ID = Envelope.resource("jei_plugin");
 
+    public static IJeiRuntime runtime;
+
     public static final IIngredientType<ServiceAddress> SERVICE_ADDRESS_INGREDIENT = new IIngredientType<>() {
         @Override
         public @NotNull Class<? extends ServiceAddress> getIngredientClass() {
@@ -55,6 +57,16 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     @Override
     public @NotNull ResourceLocation getPluginUid() {
         return ID;
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        runtime = jeiRuntime;
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        runtime = null;
     }
 
     @Override

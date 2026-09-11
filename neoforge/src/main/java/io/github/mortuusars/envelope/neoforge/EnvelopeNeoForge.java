@@ -14,6 +14,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.Objects;
+
 @Mod(Envelope.ID)
 public class EnvelopeNeoForge {
     public EnvelopeNeoForge(ModContainer container) {
@@ -22,6 +24,8 @@ public class EnvelopeNeoForge {
         container.registerConfig(ModConfig.Type.SERVER, Config.Server.SPEC);
         container.registerConfig(ModConfig.Type.COMMON, Config.Common.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, Config.Client.SPEC);
+
+        LootModifiers.LOOT_MODIFIERS.register(Objects.requireNonNull(container.getEventBus()));
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             EnvelopeNeoForgeClient.init(container);
