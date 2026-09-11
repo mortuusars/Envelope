@@ -8,8 +8,10 @@ import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,13 +20,41 @@ import java.util.List;
 public class ServiceAddressIngredientRenderer implements IIngredientRenderer<ServiceAddress> {
     @Override
     public void render(GuiGraphics guiGraphics, ServiceAddress ingredient) {
-        String address = ingredient.getString();
-        String string = AddressFormatter.getIcon(ingredient)
-              + EnvelopeSymbols.SMALL_SPACE
-              + (!address.isEmpty() ? address.charAt(0) : "");
+        Font font = Minecrft.get().font;
 
-        guiGraphics.drawCenteredString(Minecrft.get().font, string, 9, 5, Colors.GUI_LABEL);
-        guiGraphics.drawCenteredString(Minecrft.get().font, string, 8, 5, Colors.ADDRESS_NEUTRAL);
+        StringBuilder initials = new StringBuilder();
+        for (String s : ingredient.getString().split("\\s")) {
+            if (!s.isEmpty()) {
+                initials.append(Character.toUpperCase(s.charAt(0)));
+            }
+        }
+
+        String name = font.substrByWidth(FormattedText.of(initials.toString()), 16).getString();
+        String icon = font.substrByWidth(FormattedText.of(AddressFormatter.getIcon(ingredient)), 16).getString();
+
+        text(guiGraphics, font, icon, 9 - font.width(icon) / 2, 0);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(8 - font.width(name) / 2f + 0.5f, 0, 0);
+        text(guiGraphics, font, name, 0, 7);
+        guiGraphics.pose().popPose();
+    }
+
+    private static void text(GuiGraphics guiGraphics, Font font, String string, int x, int y) {
+        int mainColor = Colors.ADDRESS_NEUTRAL;
+        int shadowColor = 0x453723;
+        int outlineColor = 0x63533C;
+
+        guiGraphics.drawString(font, string, x - 1, y, outlineColor, false);
+        guiGraphics.drawString(font, string, x - 1, y - 1, outlineColor, false);
+        guiGraphics.drawString(font, string, x, y - 1, outlineColor, false);
+        guiGraphics.drawString(font, string, x + 1, y - 1, outlineColor, false);
+        guiGraphics.drawString(font, string, x + 1, y, outlineColor, false);
+        guiGraphics.drawString(font, string, x, y + 1, outlineColor, false);
+        guiGraphics.drawString(font, string, x - 1, y + 1, outlineColor, false);
+
+        guiGraphics.drawString(font, string, x + 1, y + 1, shadowColor, false);
+
+        guiGraphics.drawString(font, string, x, y, mainColor, false);
     }
 
     @Override

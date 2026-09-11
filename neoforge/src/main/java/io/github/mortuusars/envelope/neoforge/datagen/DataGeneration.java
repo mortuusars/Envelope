@@ -23,17 +23,17 @@ public class DataGeneration {
         PackOutput output = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> registries = new BuiltInDatapackEntries(output, event.getLookupProvider()).getRegistryProvider();
+        DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
 
         generator.addProvider(event.includeClient(), new ModelsDatagen(output, existingFileHelper));
 
-        generator.addProvider(event.includeServer(), new RecipesDatagen(output, registries));
+        generator.addProvider(event.includeServer(), new RecipesDatagen(output, datapackRegistries.getRegistryProvider()));
         BlockTagsDatagen blockTags = new BlockTagsDatagen(output, registries, existingFileHelper);
         generator.addProvider(event.includeServer(), blockTags);
         generator.addProvider(event.includeServer(), new ItemTagsDatagen(output, registries, blockTags.contentsGetter(), existingFileHelper));
         generator.addProvider(event.includeServer(), new EntityTypeTagsDatagen(output, registries, existingFileHelper));
         generator.addProvider(event.includeServer(), LootTablesDatagen.create(output, registries));
 
-        DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
         generator.addProvider(event.includeServer(), datapackRegistries);
         generator.addProvider(event.includeServer(), new SealImpressionTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
         generator.addProvider(event.includeServer(), new ServiceAddressTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));

@@ -1,10 +1,11 @@
 package io.github.mortuusars.envelope.integration.jei.category;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiRecipeTypes;
-import io.github.mortuusars.envelope.world.item.Unsealable;
+import io.github.mortuusars.envelope.world.item.SealedItem;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -63,7 +64,7 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               .addItemStack(recipe.getResultItem(Minecrft.registryAccess()));
 
         ItemStack resultItem = recipe.getResultItem(Minecrft.registryAccess());
-        if (!(resultItem.getItem() instanceof Unsealable)) { // If not sealed
+        if (!(resultItem.getItem() instanceof SealedItem)) { // If not sealed
             PackageContents resultContents = PackageContents.of(resultItem);
             if (!resultContents.isEmpty()) {
                 // Makes contents "known" to jei usages lookup:

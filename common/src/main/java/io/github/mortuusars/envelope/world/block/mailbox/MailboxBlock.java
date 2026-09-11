@@ -233,7 +233,7 @@ public class MailboxBlock extends BaseEntityBlock {
                               .recipient(blockEntity.getAddress())
                               .writeToLog(DeliveryRecord.sentFrom(new PlayerAddress(player)))
                               .writeToLog(DeliveryRecord.arrivedTo(blockEntity.getAddress()))
-                              .set(DataComponents.ITEM_NAME, Component.literal("Letter " + i))
+                              .itemName(Component.literal("Letter " + i))
                               .get());
 
                         if (blockEntity.addMail(mail)) {

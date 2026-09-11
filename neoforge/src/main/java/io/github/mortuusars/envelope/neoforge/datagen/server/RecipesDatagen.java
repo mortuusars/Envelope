@@ -7,13 +7,13 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.MailLetterBroadcas
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequestCancelingRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeBuilder;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
+import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
@@ -48,8 +48,10 @@ public class RecipesDatagen extends RecipeProvider {
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
         buildCraftingRecipes(output);
-        buildMailRecipes(output, Objects.requireNonNull(registries, "Registries are not available."));
+        buildMailRecipes(output);
     }
+
+    // --
 
     private void buildCraftingRecipes(@NotNull RecipeOutput output) {
         pigeonhole(output, Envelope.Items.OAK_PIGEONHOLE.get(), Items.OAK_PLANKS);
@@ -110,27 +112,37 @@ public class RecipesDatagen extends RecipeProvider {
         SpecialRecipeBuilder.special(AddressTagApplicationRecipe::new).save(output, Envelope.resource("address_tag_application"));
         SpecialRecipeBuilder.special(PaybackTagApplicationRecipe::new).save(output, Envelope.resource("payback_tag_application"));
         SpecialRecipeBuilder.special(SealStampDyeingRecipe::new).save(output, Envelope.resource("seal_stamp_dyeing"));
+
+        buildLetterPresettingRecipes(output);
     }
 
-    protected void pigeonhole(RecipeOutput output, ItemLike result, ItemLike planks) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, result)
-              .define('P', planks)
-              .define('H', Items.HAY_BLOCK)
-              .pattern("PPP")
-              .pattern("PHP")
-              .pattern("PPP")
-              .group("pigeonhole")
-              .unlockedBy("has_hay", has(Items.HAY_BLOCK))
-              .save(output);
+    private void buildLetterPresettingRecipes(@NotNull RecipeOutput output) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Mail.of(CloudDepository.createWithdrawalRequestLetter()).get())
+              .requires(Envelope.Items.LETTER_AND_QUILL.get())
+              .requires(Items.COPPER_INGOT)
+              .requires(Items.COPPER_INGOT)
+              .requires(Items.COPPER_INGOT)
+              .group("letter_presets")
+              .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
+              .save(output, Envelope.resource("letter_presetting/cloud_depository/withdrawal_request"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Mail.of(CloudDepository.createStatusRequestLetter()).get())
+              .requires(Envelope.Items.LETTER_AND_QUILL.get())
+              .requires(Items.COPPER_INGOT)
+              .group("letter_presets")
+              .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
+              .save(output, Envelope.resource("letter_presetting/cloud_depository/status_request"));
     }
 
-    private void buildMailRecipes(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
-        mailService(output, registries);
-        automatedSupplyService(output, registries);
-        equineAssuranceBureau(output, registries);
+    // --
+
+    private void buildMailRecipes(@NotNull RecipeOutput output) {
+        mailService(output);
+        automatedSupplyService(output);
+        equineAssuranceBureau(output);
     }
 
-    private void mailService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
+    private void mailService(@NotNull RecipeOutput output) {
         ServiceAddress address = address(ServiceAddresses.MAIL_SERVICE);
 
         MailRecipeBuilder.crafting(address)
@@ -142,7 +154,7 @@ public class RecipesDatagen extends RecipeProvider {
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.DIAMOND))
               .forResult(Mail.createPackage(Envelope.LootTables.LOST_MAIL)
-                    .set(DataComponents.ITEM_NAME, Component.translatable("item.envelope.lost_mail"))
+                    .itemName(Component.translatable("item.envelope.lost_mail"))
                     .get())
               .experience(1.5f)
               .save(output, "lost_mail");
@@ -175,7 +187,7 @@ public class RecipesDatagen extends RecipeProvider {
         sealStamp(output, address, Ingredient.of(Items.SKELETON_SKULL), SealSymbol.SKULL_AND_BONES);
     }
 
-    private void automatedSupplyService(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
+    private void automatedSupplyService(@NotNull RecipeOutput output) {
         ServiceAddress address = address(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE);
 
         MailRecipeBuilder.crafting(address)
@@ -236,11 +248,25 @@ public class RecipesDatagen extends RecipeProvider {
               .save(output);
     }
 
-    private void equineAssuranceBureau(@NotNull RecipeOutput output, HolderLookup.Provider registries) {
+    private void equineAssuranceBureau(@NotNull RecipeOutput output) {
         ServiceAddress address = address(ServiceAddresses.EQUINE_ASSURANCE_BUREAU);
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.GOLD_BLOCK))
               .forResult(Items.GOLDEN_HORSE_ARMOR)
+              .save(output);
+    }
+
+    // --
+
+    protected void pigeonhole(RecipeOutput output, ItemLike result, ItemLike planks) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, result)
+              .define('P', planks)
+              .define('H', Items.HAY_BLOCK)
+              .pattern("PPP")
+              .pattern("PHP")
+              .pattern("PPP")
+              .group("pigeonhole")
+              .unlockedBy("has_hay", has(Items.HAY_BLOCK))
               .save(output);
     }
 

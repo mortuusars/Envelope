@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class SealedPackageItem extends PackageItem implements Unsealable {
+public class SealedPackageItem extends PackageItem implements SealedItem {
     public SealedPackageItem(Block block, Properties properties) {
         super(block, properties);
     }

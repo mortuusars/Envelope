@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "letter_presets",
+  "ingredients": [
+    {
+      "item": "envelope:letter_and_quill"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    }
+  ],
+  "result": {
+    "components": {
+      "envelope:letter_content": {
+        "text": {
+          "translate": "letter.envelope.cloud_depository.withdrawal_request.message"
+        }
+      },
+      "envelope:letter_meaning": "envelope:cloud_depository/withdrawal_request"
+    },
+    "count": 1,
+    "id": "envelope:letter"
+  }
+}

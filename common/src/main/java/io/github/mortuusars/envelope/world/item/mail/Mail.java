@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item.mail;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.inventory.ContainerUtils;
 import io.github.mortuusars.envelope.world.item.PackageItem;
 import io.github.mortuusars.envelope.world.item.component.*;
@@ -169,6 +170,16 @@ public final class Mail {
               .set(Envelope.DataComponents.LETTER_CONTENT, content);
     }
 
+    public static MailBuilder<?> createSealedLetter(Component text) {
+        return new MailBuilder<>(Envelope.Items.SEALED_LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text));
+    }
+
+    public static MailBuilder<?> createSealedLetter(LetterContent content) {
+        return new MailBuilder<>(Envelope.Items.SEALED_LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, content);
+    }
+
     public static MailBuilder<?> createPackage(PackageContents contents) {
         return new MailBuilder<>(Envelope.Items.PACKAGE.get())
               .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
@@ -176,6 +187,16 @@ public final class Mail {
 
     public static MailBuilder<?> createPackage(ResourceKey<LootTable> lootTable) {
         return new MailBuilder<>(Envelope.Items.PACKAGE.get())
+              .set(DataComponents.CONTAINER_LOOT, new SeededContainerLoot(lootTable, 0L));
+    }
+
+    public static MailBuilder<?> createSealedPackage(PackageContents contents) {
+        return new MailBuilder<>(Envelope.Items.SEALED_PACKAGE.get())
+              .set(Envelope.DataComponents.PACKAGE_CONTENTS, contents);
+    }
+
+    public static MailBuilder<?> createSealedPackage(ResourceKey<LootTable> lootTable) {
+        return new MailBuilder<>(Envelope.Items.SEALED_PACKAGE.get())
               .set(DataComponents.CONTAINER_LOOT, new SeededContainerLoot(lootTable, 0L));
     }
 
@@ -248,7 +269,6 @@ public final class Mail {
                                           Item.TooltipContext context, Player player, TooltipFlag tooltipFlag) {
         DeliveryInfo deliveryInfo = DeliveryInfo.of(stack);
         if (!deliveryInfo.isEmpty()) {
-
             if (Screen.hasShiftDown() && !deliveryInfo.log().isEmpty()) {
                 consumer.accept(Component.translatable("gui.envelope.delivery_log"));
                 for (DeliveryRecord record : deliveryInfo.log().records()) {
@@ -264,6 +284,11 @@ public final class Mail {
                     consumer.accept(Component.translatable("gui.envelope.mail.to", recipient.format().asRecipient().toComponent())
                           .withStyle(ChatFormatting.GRAY));
                 });
+
+                if (deliveryInfo.isReturned()) {
+                    consumer.accept(Component.translatable("gui.envelope.mail.returned")
+                          .withColor(Colors.TOOLTIP_RED));
+                }
             }
         }
     }

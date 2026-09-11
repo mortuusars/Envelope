@@ -6,8 +6,12 @@ import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.integration.jei.extensions.SealStampDyeingRecipeRecipeExtension;
+import io.github.mortuusars.envelope.integration.jei.util.LetterMeaningSubtypeInterpreter;
 import io.github.mortuusars.envelope.integration.jei.util.PackingRecipeTransferInfo;
 import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeingRecipe;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
+import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
+import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepositoryData;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
 import io.github.mortuusars.envelope.integration.jei.extensions.AddressTagApplicationRecipeExtension;
@@ -25,12 +29,16 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.registration.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.List;
 
 @JeiPlugin
@@ -55,6 +63,11 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     }
 
     @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        registration.registerSubtypeInterpreter(Envelope.Items.LETTER.get(), new LetterMeaningSubtypeInterpreter());
+    }
+
+    @Override
     public void registerIngredients(IModIngredientRegistration registration) {
         if (Config.Client.JEI_SERVICE_ADDRESS_INGREDIENT.get()) {
             List<ServiceAddress> addressesWithRecipes = Minecrft.level().getRecipeManager().getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
@@ -70,6 +83,17 @@ public class EnvelopeJeiPlugin implements IModPlugin {
                   new ServiceAddressIngredientRenderer(),
                   ServiceAddress.CODEC.codec());
         }
+    }
+
+    @Override
+    public void registerExtraIngredients(IExtraIngredientRegistration registration) {
+        registration.addExtraItemStacks(List.of(
+              CloudDepository.createWithdrawalRequestLetter(),
+              CloudDepository.createStatusRequestLetter()
+        ));
+
+        registration.addExtraIngredients(SERVICE_ADDRESS_INGREDIENT, List.of(
+              ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY)));
     }
 
     @Override
@@ -89,6 +113,32 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .toList();
 
         registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, mailingRecipes);
+
+        addInfo(registration);
+    }
+
+    private static void addInfo(IRecipeRegistration registration) {
+        MutableComponent cloudDepositoryAddress = ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY).format()
+              .withIcon()
+              .withColor(0x426BB8)
+              .withIconColor(0x426BB8)
+              .toComponent();
+        registration.addItemStackInfo(CloudDepository.createWithdrawalRequestLetter(),
+              Component.translatable("envelope.jei.info.cloud_depository.withdrawal_request", cloudDepositoryAddress));
+        registration.addItemStackInfo(CloudDepository.createStatusRequestLetter(),
+              Component.translatable("envelope.jei.info.cloud_depository.status_request", cloudDepositoryAddress));
+
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE), SERVICE_ADDRESS_INGREDIENT,
+              Component.translatable("envelope.jei.info.mail_service"));
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.AUTOMATED_SUPPLY_SERVICE), SERVICE_ADDRESS_INGREDIENT,
+              Component.translatable("envelope.jei.info.automated_supply_service"));
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY), SERVICE_ADDRESS_INGREDIENT,
+              Component.translatable("envelope.jei.info.cloud_depository",
+                    Component.translatable("letter.envelope.cloud_depository.withdrawal_request.name").withStyle(Style.EMPTY
+                          .withColor(ChatFormatting.DARK_BLUE)
+                          .withUnderlined(true)
+                          .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(CloudDepository.createWithdrawalRequestLetter()))))
+              ));
     }
 
     @Override

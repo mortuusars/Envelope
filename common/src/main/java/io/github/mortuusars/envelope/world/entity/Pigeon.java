@@ -791,7 +791,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
             // Longer approach/depart phases to allow for pathfinding to finish
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 30 * Ticks.SECOND;
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 30 * Ticks.PER_SECOND;
             default -> PhysicalCourier.super.getPhaseDuration(level, delivery, phase);
         };
     }

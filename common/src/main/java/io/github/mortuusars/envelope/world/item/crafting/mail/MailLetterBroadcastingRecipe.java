@@ -35,7 +35,7 @@ public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
     public static final Logger LOGGER = LogUtils.getLogger();
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result = Mail.createLetter(Component.empty())
-          .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.broadcast_report.name"))
+          .itemName(Component.translatable("letter.envelope.broadcast_report.name"))
           .get();
 
     public MailLetterBroadcastingRecipe(ServiceAddress address, NonNullList<Ingredient> ingredients) {

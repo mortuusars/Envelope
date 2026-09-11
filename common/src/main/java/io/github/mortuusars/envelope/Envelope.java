@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.advancements.critereon.BreakPaperBoxWhenFal
 import io.github.mortuusars.envelope.advancements.critereon.MailDeliveredTrigger;
 import io.github.mortuusars.envelope.advancements.predicate.ItemOccludingBlockPredicate;
 import io.github.mortuusars.envelope.advancements.predicate.ItemPackagePredicate;
+import io.github.mortuusars.envelope.api.ServiceDropOffHandlerRegistry;
 import io.github.mortuusars.envelope.command.argument.AddressArgument;
 import io.github.mortuusars.envelope.integration.Mods;
 import io.github.mortuusars.envelope.integration.every_compat.EveryCompatIntegration;
@@ -42,7 +43,9 @@ import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
+import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
+import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.mortaar.Register;
 import io.github.mortuusars.mortaar.Registrar;
 import io.github.mortuusars.mortaar.bugger.data.EntityData;
@@ -132,6 +135,8 @@ public class Envelope {
         Register.clientboundPacket(ClientboundOpenAddressTagScreenPacket.TYPE, ClientboundOpenAddressTagScreenPacket.STREAM_CODEC);
         Register.clientboundPacket(ClientboundOpenMailboxAddressTagScreenPacket.TYPE, ClientboundOpenMailboxAddressTagScreenPacket.STREAM_CODEC);
         Register.clientboundPacket(ClientboundOpenMailboxPlacingScreenPacket.TYPE, ClientboundOpenMailboxPlacingScreenPacket.STREAM_CODEC);
+
+        ServiceDropOffHandlerRegistry.register(ServiceAddresses.CLOUD_DEPOSITORY, CloudDepository::handleDropOff);
 
         if (Mods.EVERY_COMPAT.isLoaded()) {
             EveryCompatIntegration.init();
@@ -403,6 +408,9 @@ public class Envelope {
         public static final DataComponentType<Unit> LETTER_TATTERED =
               REGISTRAR.dataComponentType("letter_tattered", b ->
                     b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
+        public static final DataComponentType<ResourceLocation> LETTER_MEANING =
+              REGISTRAR.dataComponentType("letter_meaning", b ->
+                    b.persistent(ResourceLocation.CODEC).networkSynchronized(ResourceLocation.STREAM_CODEC));
 
         // -- Package
 

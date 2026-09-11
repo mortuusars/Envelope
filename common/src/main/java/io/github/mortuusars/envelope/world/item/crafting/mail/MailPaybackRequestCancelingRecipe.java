@@ -56,7 +56,7 @@ public class MailPaybackRequestCancelingRecipe extends CustomMailRecipe {
     @Override
     public @NotNull ItemStack getResultItem(HolderLookup.Provider registries) {
         return Mail.of(new ItemStack(Envelope.Items.SEALED_PACKAGE.get()))
-              .set(DataComponents.ITEM_NAME, Component.translatable("package.envelope.canceled_payback_request.name"))
+              .itemName(Component.translatable("package.envelope.canceled_payback_request.name"))
               .get();
     }
 
@@ -81,7 +81,7 @@ public class MailPaybackRequestCancelingRecipe extends CustomMailRecipe {
                   .append("\n\n")
                   .append(getAddress().getComponent());
             return Mail.createLetter(text)
-                  .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.payback_request_cancel_report.name"))
+                  .itemName(Component.translatable("letter.envelope.payback_request_cancel_report.name"))
                   .get();
         }
 

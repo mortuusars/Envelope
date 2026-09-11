@@ -16,6 +16,7 @@ public class EnvelopeSymbols {
     public static final String ADDRESS_CUSTOM = "\uEE04";
     public static final String ADDRESS_MAIL_SERVICE = "\uEE05";
     public static final String ADDRESS_UNKNOWN = "\uEE06";
+    public static final String ADDRESS_CLOUD_DEPOSITORY = "\uEE07";
     public static final String LETTER = "\uEE10";
     public static final String SMALL_FILLED_ARROW_LEFT = "\uEE20";
     public static final String SMALL_FILLED_ARROW_RIGHT = "\uEE21";

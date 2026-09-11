@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -12,7 +13,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public interface Unsealable {
+public interface SealedItem {
     ItemLike getUnsealedItem();
 
     default SoundEvent getUnsealingSound() {

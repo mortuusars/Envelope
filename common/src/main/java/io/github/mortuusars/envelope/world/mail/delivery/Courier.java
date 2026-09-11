@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -88,6 +89,10 @@ public interface Courier {
     }
 
     default int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
+        return Math.max(1, (int)(getBasePhaseDuration(level, delivery, phase) * Config.Server.DELIVERY_PHASE_DURATION_MODIFIER.get()));
+    }
+
+    default int getBasePhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
             case STARTED, FINISHED -> 5;
             case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 100;

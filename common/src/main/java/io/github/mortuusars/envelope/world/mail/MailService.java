@@ -10,12 +10,12 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
 import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
+import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.envelope.world.mail.payback.PaybackDepartment;
 import io.github.mortuusars.envelope.world.block.mailbox.Mailboxes;
 import io.github.mortuusars.envelope.world.KnownPlayers;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -36,6 +36,7 @@ public class MailService {
     protected final ServiceAddresses serviceAddresses;
     protected final DeliveryManager deliveryManager;
     protected final PaybackDepartment paybackDepartment;
+    protected final CloudDepository cloudService;
 
     protected @Nullable KnownPlayers knownPlayers;
     protected @Nullable BackgroundDelivery backgroundDelivery;
@@ -47,6 +48,7 @@ public class MailService {
         this.serviceAddresses = new ServiceAddresses(this);
         this.deliveryManager = new DeliveryManager(this);
         this.paybackDepartment = new PaybackDepartment(this);
+        this.cloudService = new CloudDepository(this);
     }
 
     /**
@@ -95,6 +97,10 @@ public class MailService {
 
     public PaybackDepartment getPaybackDepartment() {
         return paybackDepartment;
+    }
+
+    public CloudDepository getCloudService() {
+        return cloudService;
     }
 
     public @NotNull KnownPlayers getKnownPlayers() {
@@ -195,7 +201,7 @@ public class MailService {
               .append(getAddress().getComponent());
 
         return Mail.createLetter(text)
-              .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.courier_death_notice.name"))
+              .itemName(Component.translatable("letter.envelope.courier_death_notice.name"))
               .get();
     }
 

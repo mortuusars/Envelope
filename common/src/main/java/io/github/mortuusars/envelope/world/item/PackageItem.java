@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class PackageItem extends BlockItem implements Sealable {
+public class PackageItem extends BlockItem implements SealableItem {
     public PackageItem(Block block, Properties properties) {
         super(block, properties);
     }

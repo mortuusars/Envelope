@@ -1,0 +1,10 @@
+{
+  "icon": "",
+  "location": {
+    "type": "relative",
+    "distance": 0
+  },
+  "name": {
+    "translate": "address.envelope.cloud_depository"
+  }
+}

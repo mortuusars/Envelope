@@ -13,7 +13,7 @@ import io.github.mortuusars.envelope.client.renderer.entity.layer.BatBackpackLay
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
-import io.github.mortuusars.envelope.world.item.Sealable;
+import io.github.mortuusars.envelope.world.item.SealableItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
@@ -41,9 +41,9 @@ public class EnvelopeFabricClient implements ClientModInitializer {
 
         BlockRenderLayerMap.INSTANCE.putBlock(Envelope.Blocks.LETTER.get(), RenderType.cutout());
 
-        ColorProviderRegistry.ITEM.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
-        ColorProviderRegistry.ITEM.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
-        ColorProviderRegistry.BLOCK.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
+        ColorProviderRegistry.ITEM.register(SealableItem::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+        ColorProviderRegistry.ITEM.register(SealableItem::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
+        ColorProviderRegistry.BLOCK.register(SealableItem::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);
         MenuScreens.register(Envelope.MenuTypes.PACKING.get(), PackingScreen::new);

@@ -4,9 +4,13 @@ import com.google.common.base.Preconditions;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -72,6 +76,11 @@ public class MailBuilder<T extends MailBuilder<T>> implements DataComponentHolde
 
     public <V> T update(DataComponentType<V> type, V defaultValue, @NotNull UnaryOperator<V> updater) {
         item.update(type, defaultValue, updater);
+        return self();
+    }
+
+    public T itemName(Component component) {
+        set(DataComponents.ITEM_NAME, component);
         return self();
     }
 

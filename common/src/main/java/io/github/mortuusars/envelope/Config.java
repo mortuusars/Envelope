@@ -53,6 +53,7 @@ public abstract class Config {
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
+        public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
 
         // Payback
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
@@ -215,6 +216,9 @@ public abstract class Config {
                       .comment("Delivering pigeons will not spawn when 'doMobSpawning' rule is set to 'false'.",
                             "Default: false (spawn anyway)")
                       .define("spawning_respects_domobspawning_rule", false);
+                DELIVERY_PHASE_DURATION_MODIFIER = builder
+                      .comment("Global modifier on the delivery phase duration.")
+                      .defineInRange("phase_duration_modifier", 1.0, 0.0, 999.0);
                 builder.pop();
             }
 

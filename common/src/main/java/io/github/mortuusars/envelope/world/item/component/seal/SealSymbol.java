@@ -65,6 +65,7 @@ public final class SealSymbol {
     public static final ResourceKey<SealSymbol> HOE = emblemKey("hoe");
     public static final ResourceKey<SealSymbol> SWORD = emblemKey("sword");
     public static final ResourceKey<SealSymbol> SWORDS = emblemKey("swords");
+    public static final ResourceKey<SealSymbol> CLOUD_DEPOSITORY = emblemKey("cloud_depository");
 
     public static final ResourceKey<SealSymbol> DEFAULT = CREEPER;
 

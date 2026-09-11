@@ -23,4 +23,6 @@ public record Seal(Holder<SealMaterial> material, Holder<SealSymbol> impression,
           ComponentSerialization.STREAM_CODEC, Seal::signature,
           Seal::new
     );
+
+
 }

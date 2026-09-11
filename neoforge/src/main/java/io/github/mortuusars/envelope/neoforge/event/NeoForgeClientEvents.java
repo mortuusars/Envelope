@@ -12,7 +12,7 @@ import io.github.mortuusars.envelope.client.renderer.entity.layer.BatBackpackLay
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.PigeonHatLayer;
-import io.github.mortuusars.envelope.world.item.Sealable;
+import io.github.mortuusars.envelope.world.item.SealableItem;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
@@ -62,12 +62,12 @@ public class NeoForgeClientEvents {
 
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
-        event.register(Sealable::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
+        event.register(SealableItem::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+        event.register(SealableItem::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
     }
 
     @SubscribeEvent
     public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
-        event.register(Sealable::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
+        event.register(SealableItem::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
     }
 }

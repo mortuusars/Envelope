@@ -39,6 +39,7 @@ public class MailServiceBuggerData extends NbtData {
         tag.putInt("mailboxes", mailService.getMailboxes().getAllAddresses().size());
         tag.putInt("dropped_mail_count", mailService.getBackgroundDelivery().getDroppedMail().size());
         tag.putInt("payback_pending_mail_count", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
+        tag.putInt("cloud_depository_count", mailService.getCloudService().getTotalItemCount());
 
         tag.putInt("delivering_pigeons", pigeons.size());
         tag.putInt("background_delivering_pigeons", backgroundCouriers.size());

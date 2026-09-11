@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public interface Sealable {
+public interface SealableItem {
     ItemStack seal(Level level, ItemStack stack, Seal seal);
 
     default boolean canSeal(Level level, ItemStack stack) {

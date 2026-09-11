@@ -149,6 +149,13 @@
   "gui.envelope.delivery_log.message.crafting.unable_to_process": "Unable To Process",
   "gui.envelope.delivery_log.message.crafting.unprocessed_items": "Unprocessed Items",
 
+  "gui.envelope.delivery_log.message.cloud_depository.no_identity": "Identity Cannot Be Determined",
+  "gui.envelope.delivery_log.message.cloud_depository.storage_is_full": "Storage Is Full",
+  "gui.envelope.delivery_log.message.cloud_depository.storage_is_empty": "Storage Is Empty",
+  "gui.envelope.delivery_log.message.cloud_depository.index_not_found": "Index Not Found",
+  "gui.envelope.delivery_log.message.cloud_depository.deposited": "Deposited Into Storage",
+  "gui.envelope.delivery_log.message.cloud_depository.withdrawn": "Withdrawn From Storage",
+
   "gui.envelope.time.remaining": "Remaining: ",
   "gui.envelope.time.years": "%sy",
   "gui.envelope.time.months": "%smo",
@@ -186,6 +193,7 @@
 
   "address.envelope.mail_service": "Mail Service",
   "address.envelope.automated_supply_service": "Automated Supply Service",
+  "address.envelope.cloud_depository": "Cloud Depository",
   "address.envelope.equine_assurance_bureau": "Equine Assurance Bureau",
   "address.envelope.unknown": "Unknown",
 
@@ -251,6 +259,23 @@
   "letter.envelope.broadcast_report.error_no_message": "No message suitable for broadcast was provided. Action was not taken.",
   "letter.envelope.broadcast_report.error_no_recipients": "No recipients suitable for broadcast are available. Action was not taken.",
 
+  "letter.envelope.cloud_depository.deposit_report.name": "Deposit Report",
+  "letter.envelope.cloud_depository.deposit_report.message": "        Deposit Report\n\n%s has been accepted and will be securely stored until a %s is issued.\n\nStorage status: %s\n\nThank you for choosing our services.\n\nCloud Depository",
+  "letter.envelope.cloud_depository.deposit_report.item": "Item",
+
+  "letter.envelope.cloud_depository.status_report.name": "Status Report",
+  "letter.envelope.cloud_depository.status_report.message": "         Status Report\n\nAccount: %s\nStatus: %s\n\n%s\n\nThank you for choosing our services.\n\nCloud Depository",
+  "letter.envelope.cloud_depository.status_report.indexable_none": "No indexable items in storage.",
+  "letter.envelope.cloud_depository.status_report.indexable_items": "Indexable items in storage: %s.\nIncluding: %s",
+
+  "letter.envelope.cloud_depository.withdrawal_request.name": "Withdrawal Request",
+  "letter.envelope.cloud_depository.withdrawal_request.message": "Please give me my item back.\nThanks.",
+
+  "letter.envelope.cloud_depository.status_request.name": "Status Request",
+  "letter.envelope.cloud_depository.status_request.message": "Please give me my item back.\nThanks.",
+
+  "letter.envelope.cloud_depository.stored_item.name": "Stored Item",
+
   "letter.envelope.equine_assurance_notice.name": "Equine Assurance Notice",
   "letter.envelope.equine_assurance_notice.body": "We've been trying to reach you about your horse's extended warranty.\n\nLack of assurance can lead to unexpected incidents including total loss of your vehicle.\n\nTo receive the full assurance package, send us: %s.\n\nAct promptly to secure your vehicle's future!",
 
@@ -300,6 +325,9 @@
   "letter.envelope.mail_service.signature": "Mail Service",
 
   "package.envelope.canceled_payback_request.name": "Canceled Payback Request",
+
+  "letter_meaning.envelope.cloud_depository.withdrawal_request": "Cloud Depository: Withdrawal Request",
+  "letter_meaning.envelope.cloud_depository.status_request": "Cloud Depository: Status Request",
 
   "envelope.configuration.misc": "Miscellaneous",
   "envelope.configuration.pigeon": "Pigeon",
@@ -361,6 +389,11 @@
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
   "envelope.jei.category.mailing": "Mailing",
+  "envelope.jei.info.mail_service": "Dispatches and handles deliveries and provides other mail-related services.",
+  "envelope.jei.info.automated_supply_service": "Contains various useful mailing recipes.",
+  "envelope.jei.info.cloud_depository": "Stores items remotely and securely.\n\nSend items to deposit.\nSend %s to withdraw.\n\nDeposits and requests must be sealed for identification reasons.",
+  "envelope.jei.info.cloud_depository.withdrawal_request": "When sealed and sent to %s - requests withdrawal of the last deposited item.\nIf renamed, item with the same name will be requested.",
+  "envelope.jei.info.cloud_depository.status_request": "When sealed and sent to %s - requests a storage status report.",
 
   "envelope.empty_tag": "Empty Tag",
 

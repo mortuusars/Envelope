@@ -4,8 +4,10 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class MailDropOffContext {
     private final MailService service;
@@ -24,6 +26,14 @@ public class MailDropOffContext {
 
     public ServerLevel getLevel() {
         return getService().getLevel();
+    }
+
+    public RegistryAccess getRegistryAccess() {
+        return getLevel().registryAccess();
+    }
+
+    public Address getOrigin() {
+        return delivery.getSender();
     }
 
     public Address getTarget() {

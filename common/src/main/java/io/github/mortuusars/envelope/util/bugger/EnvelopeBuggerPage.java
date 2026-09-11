@@ -26,6 +26,7 @@ public class EnvelopeBuggerPage implements BuggerScreenPage {
                         "Mail:",
                         "  Dropped: " + tag.getInt("dropped_mail_count"),
                         "  Awaiting Payback: " + tag.getInt("payback_pending_mail_count"),
+                        "  In Cloud Depository: " + tag.getInt("cloud_depository_count"),
                         "",
                         "Couriers:",
                         "  Real: " + tag.getInt("delivering_pigeons"),

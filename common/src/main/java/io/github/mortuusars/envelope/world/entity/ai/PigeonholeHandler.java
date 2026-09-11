@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class PigeonholeHandler {
     public static final int MAX_BLACKLISTED_TARGETS = 3;
     public static final int DEFAULT_LOCATE_COOLDOWN = 100;
-    public static final int FORGET_HOME_TIME = Ticks.IN_GAME_DAY * 3;
+    public static final int FORGET_HOME_TIME = Ticks.PER_IN_GAME_DAY * 3;
 
     public static final Codec<PigeonholeHandler> CODEC = RecordCodecBuilder.create(i -> i.group(
           BlockPos.CODEC.optionalFieldOf("target_pos").forGetter(o -> Optional.ofNullable(o.getTargetPos())),

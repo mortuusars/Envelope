@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+
+- Updated JEI service address ingredient display
+
 Wax Seals
 - Added 16 colors of seals and Seal Stamps to apply them
 - Changed Seal Stamp recipe to require a Honeycomb and any wooden planks, instead of two wooden slabs

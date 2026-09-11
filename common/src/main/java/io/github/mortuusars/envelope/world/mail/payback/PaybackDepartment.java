@@ -119,15 +119,6 @@ public class PaybackDepartment {
     }
 
     public void returnSubjectToSender(PaybackSubject subject, Component reason) {
-        @Nullable PaybackSubject removed = removeSubject(subject.id());
-
-        if (removed == null) {
-            LOGGER.error("Cannot return payback subject: {} is not in the department.", subject);
-            return;
-        }
-
-        subject = removed;
-
         ItemStack mail = subject.mail().copy();
 
         Mail.returned(mail, reason);

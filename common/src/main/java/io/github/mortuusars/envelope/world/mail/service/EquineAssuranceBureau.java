@@ -179,7 +179,7 @@ public class EquineAssuranceBureau {
         Component body = Component.translatable("letter.envelope.equine_assurance_notice.body", requiredItems);
 
         return Mail.createLetter(body)
-              .set(DataComponents.ITEM_NAME, Component.translatable("letter.envelope.equine_assurance_notice.name"))
+              .itemName(Component.translatable("letter.envelope.equine_assurance_notice.name"))
               .get();
     }
 

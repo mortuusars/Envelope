@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.item;
 
 import io.github.mortuusars.envelope.Envelope;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -9,16 +10,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 
-public class SealedLetterItem extends Item implements Unsealable {
+public class SealedLetterItem extends Item implements SealedItem {
     public SealedLetterItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        Envelope.Items.LETTER.get().appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 
     @Override

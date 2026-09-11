@@ -75,7 +75,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
         return new Seal(
               getMaterialOrDefault(stack, player.registryAccess()),
               getDieOrDefault(stack, player.registryAccess(), player),
-              player.getName());
+              Component.literal(player.getScoreboardName()));
     }
 
     // --
@@ -84,6 +84,14 @@ public class SealStampItem extends Item implements ApplicatorItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
         HolderLookup.Provider registries = context.registries();
         if (flag.isAdvanced() && registries != null) {
+            getMaterial(stack)
+                  .flatMap(t -> t.unwrap(registries))
+                  .flatMap(Holder::unwrapKey)
+                  .ifPresent(key -> {
+                      components.add(Component.literal("Material: ").withStyle(ChatFormatting.DARK_GRAY)
+                            .append(Component.literal(key.location().toString()).withStyle(ChatFormatting.GRAY)));
+                  });
+
             getDie(stack)
                   .flatMap(t -> t.unwrap(registries))
                   .flatMap(Holder::unwrapKey)
@@ -110,7 +118,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
         }
 
         return slot.getItem().has(Envelope.DataComponents.SEAL)
-              || (slot.getItem().getItem() instanceof Sealable sealable && sealable.canSeal(player.level(), slot.getItem()));
+              || (slot.getItem().getItem() instanceof SealableItem sealable && sealable.canSeal(player.level(), slot.getItem()));
     }
 
     @Override
@@ -139,7 +147,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
             return true;
         }
 
-        if (!(target.getItem() instanceof Sealable sealable) || !sealable.canSeal(player.level(), target)) {
+        if (!(target.getItem() instanceof SealableItem sealable) || !sealable.canSeal(player.level(), target)) {
             player.playSound(SoundEvents.COMPARATOR_CLICK);
             return true;
         }
