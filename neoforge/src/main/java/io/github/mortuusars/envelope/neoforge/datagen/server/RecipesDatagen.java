@@ -132,6 +132,14 @@ public class RecipesDatagen extends RecipeProvider {
               .group("letter_presets")
               .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
               .save(output, Envelope.resource("letter_presetting/cloud_depository/status_request"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Mail.of(CloudDepository.createExpansionRequestLetter()).get())
+              .requires(Envelope.Items.LETTER_AND_QUILL.get())
+              .requires(Items.COPPER_INGOT)
+              .requires(Items.DIAMOND)
+              .group("letter_presets")
+              .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
+              .save(output, Envelope.resource("letter_presetting/cloud_depository/expansion_request"));
     }
 
     // --

@@ -1,5 +1,6 @@
 package io.github.mortuusars.envelope.world.mail.service;
 
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.util.ResourceDefinition;
@@ -42,10 +43,18 @@ public class ServiceAddresses {
         return getMailService().getLevel().registryAccess().registryOrThrow(Envelope.Registries.SERVICE_ADDRESS_DEFINITION)
               .holders()
               .map(ServiceAddress::new)
+              .filter(ServiceAddresses::isEnabled)
               .collect(Collectors.toSet());
     }
 
     public void tick() {
+    }
+
+    public static boolean isEnabled(ServiceAddress address) {
+        if (address.getDefinitionHolder().is(CLOUD_DEPOSITORY)) {
+            return Config.Server.SPEC.isLoaded() && Config.Server.SERVICE_CLOUD_DEPOSITORY_ENABLED.get();
+        }
+        return true;
     }
 
     // --

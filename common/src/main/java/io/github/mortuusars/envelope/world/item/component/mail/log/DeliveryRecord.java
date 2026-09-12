@@ -122,6 +122,7 @@ public interface DeliveryRecord {
         Component RECIPIENT_INBOX_IS_FULL = Component.translatable("gui.envelope.delivery_log.message.recipient_inbox_is_full").withColor(Colors.TOOLTIP_RED);
         Component UNABLE_TO_REACH = Component.translatable("gui.envelope.delivery_log.message.unable_to_reach").withColor(Colors.TOOLTIP_RED);
         Component REJECTED = Component.translatable("gui.envelope.delivery_log.message.rejected").withColor(Colors.TOOLTIP_RED);
+        Component UNAVAILABLE = Component.translatable("gui.envelope.delivery_log.message.unavailable").withColor(Colors.TOOLTIP_RED);
 
         Component PAYBACK_FULFILLED = Component.translatable("gui.envelope.delivery_log.message.payback_fulfilled").withColor(Colors.TOOLTIP_GREEN);
         Component PAYBACK_SUBJECT_NOT_FOUND = Component.translatable("gui.envelope.delivery_log.message.payback.subject_not_found").withColor(Colors.TOOLTIP_RED);

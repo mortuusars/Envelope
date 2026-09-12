@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_letter": {
+      "conditions": {
+        "items": [
+          {
+            "items": "envelope:letter_and_quill"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "envelope:letter_presetting/cloud_depository/expansion_request"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_letter"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "envelope:letter_presetting/cloud_depository/expansion_request"
+    ]
+  }
+}

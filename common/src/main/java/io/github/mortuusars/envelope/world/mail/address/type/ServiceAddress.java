@@ -62,6 +62,10 @@ public final class ServiceAddress implements Address {
         return getDefinition().name().copy();
     }
 
+    public boolean isHidden() {
+        return getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN);
+    }
+
     // --
 
     @SuppressWarnings("deprecation")

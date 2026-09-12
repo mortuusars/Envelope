@@ -61,6 +61,12 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_LONG;
 
         // Service Addresses
+        // Cloud Depository
+        public static final ModConfigSpec.BooleanValue SERVICE_CLOUD_DEPOSITORY_ENABLED;
+        public static final ModConfigSpec.BooleanValue SERVICE_CLOUD_DEPOSITORY_ONLY_PLAYERS;
+        public static final ModConfigSpec.IntValue SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_STARTING_CAPACITY;
+        public static final ModConfigSpec.IntValue SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_MAX_CAPACITY;
+        public static final ModConfigSpec.IntValue SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_CAPACITY_PER_EXPANSION;
         // Equine Assurance Bureau
         public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
 
@@ -238,6 +244,27 @@ public abstract class Config {
 
             {
                 builder.push("service_addresses");
+
+                {
+                    builder.push("cloud_depository");
+                    SERVICE_CLOUD_DEPOSITORY_ENABLED = builder
+                          .comment("Cloud Depository accepts mail into storage. Setting this to 'false' will prevent the depository from accepting items and requests and hide the address from Address Tag and JEI", "Default: true")
+                          .define("enabled", true);
+                    SERVICE_CLOUD_DEPOSITORY_ONLY_PLAYERS = builder
+                          .comment("Cloud Depository only serves players.", "Default: true")
+                          .define("only_players", true);
+                    SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_STARTING_CAPACITY = builder
+                          .comment("Starting storage capacity of an account.")
+                          .defineInRange("account_storage_starting_capacity", 8, 1, 999);
+                    SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_MAX_CAPACITY = builder
+                          .comment("Maximum storage capacity of an account. Should be larger than 'account_storage_starting_capacity'.")
+                          .defineInRange("account_storage_max_capacity", 128, 1, 999);
+                    SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_CAPACITY_PER_EXPANSION = builder
+                          .comment("Storage capacity added per one expansion request.")
+                          .defineInRange("account_storage_capacity_per_expansion", 8, 1, 999);
+                    builder.pop();
+                }
+
                 {
                     builder.push("equine_assurance_bureau");
                     SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED = builder

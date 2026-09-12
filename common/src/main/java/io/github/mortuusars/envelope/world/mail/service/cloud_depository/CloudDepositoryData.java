@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.world.mail.service.cloud_depository;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.PersistentData;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +34,9 @@ public class CloudDepositoryData extends PersistentData {
     }
 
     public Account ofAccount(String account) {
-        return accounts().computeIfAbsent(account, c -> new CloudDepositoryData.Account(8, Collections.emptyList()));
+        return accounts().computeIfAbsent(account, c -> new CloudDepositoryData.Account(
+              Config.Server.SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_STARTING_CAPACITY.get(),
+              Collections.emptyList()));
     }
 
     public static class Account {

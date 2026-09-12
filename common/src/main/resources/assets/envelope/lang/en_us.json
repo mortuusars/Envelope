@@ -139,6 +139,7 @@
   "gui.envelope.delivery_log.message.recipient_not_found": "Recipient Not Found",
   "gui.envelope.delivery_log.message.recipient_inbox_is_full": "Recipient Inbox Is Full",
   "gui.envelope.delivery_log.message.rejected": "Rejected",
+  "gui.envelope.delivery_log.message.unavailable": "Unavailable",
 
   "gui.envelope.delivery_log.message.payback_fulfilled": "Payback Fulfilled",
   "gui.envelope.delivery_log.message.payback.subject_not_found": "Payback Subject Not Found",
@@ -150,9 +151,11 @@
   "gui.envelope.delivery_log.message.crafting.unprocessed_items": "Unprocessed Items",
 
   "gui.envelope.delivery_log.message.cloud_depository.no_identity": "Identity Cannot Be Determined",
+  "gui.envelope.delivery_log.message.cloud_depository.non_serviceable_identity": "Non-Serviceable Identity",
   "gui.envelope.delivery_log.message.cloud_depository.storage_is_full": "Storage Is Full",
   "gui.envelope.delivery_log.message.cloud_depository.storage_is_empty": "Storage Is Empty",
   "gui.envelope.delivery_log.message.cloud_depository.index_not_found": "Index Not Found",
+  "gui.envelope.delivery_log.message.cloud_depository.capacity_already_at_max": "Expansion Limit Reached",
   "gui.envelope.delivery_log.message.cloud_depository.deposited": "Deposited Into Storage",
   "gui.envelope.delivery_log.message.cloud_depository.withdrawn": "Withdrawn From Storage",
 
@@ -264,15 +267,23 @@
   "letter.envelope.cloud_depository.deposit_report.item": "Item",
 
   "letter.envelope.cloud_depository.status_report.name": "Status Report",
-  "letter.envelope.cloud_depository.status_report.message": "         Status Report\n\nAccount: %s\nStatus: %s\n\n%s\n\nThank you for choosing our services.\n\nCloud Depository",
+  "letter.envelope.cloud_depository.status_report.message": "         Status Report\n\nAccount: %s\nStorage: %s\n\n%s%s\n\nCloud Depository",
   "letter.envelope.cloud_depository.status_report.indexable_none": "No indexable items in storage.",
   "letter.envelope.cloud_depository.status_report.indexable_items": "Indexable items in storage: %s.\nIncluding: %s",
+  "letter.envelope.cloud_depository.status_report.expansion": "\n\nNeed more space? Expand capacity up to %s slots.",
+
+  "letter.envelope.cloud_depository.expansion_report.name": "Expansion Report",
+  "letter.envelope.cloud_depository.expansion_report.message": "         Expansion Report\n\nAccount: %s\n\nStorage capacity has been expanded by %s, totalling %s.%s\n\nThank you for choosing our services.\n\nCloud Depository",
+  "letter.envelope.cloud_depository.expansion_report.further_expansion": "\nFurther expansion is available up to %s.",
 
   "letter.envelope.cloud_depository.withdrawal_request.name": "Withdrawal Request",
-  "letter.envelope.cloud_depository.withdrawal_request.message": "Please give me my item back.\nThanks.",
+  "letter.envelope.cloud_depository.withdrawal_request.message": "      Withdrawal Request\n\n  Please withdraw an item from my account's storage and send it as a reply to this letter.\n\n  Thank you.",
 
   "letter.envelope.cloud_depository.status_request.name": "Status Request",
-  "letter.envelope.cloud_depository.status_request.message": "Please give me my item back.\nThanks.",
+  "letter.envelope.cloud_depository.status_request.message": "        Status Request\n\n  Please create a status report for my account and send it as a reply to this letter.\n\n  Thank you.",
+
+  "letter.envelope.cloud_depository.expansion_request.name": "Expansion Request",
+  "letter.envelope.cloud_depository.expansion_request.message": "     Expansion Request\n\n  Please extend my account's storage with extra item slots.\n\n  Thank you.",
 
   "letter.envelope.cloud_depository.stored_item.name": "Stored Item",
 
@@ -328,6 +339,7 @@
 
   "letter_meaning.envelope.cloud_depository.withdrawal_request": "Cloud Depository: Withdrawal Request",
   "letter_meaning.envelope.cloud_depository.status_request": "Cloud Depository: Status Request",
+  "letter_meaning.envelope.cloud_depository.expansion_request": "Cloud Depository: Expansion Request",
 
   "envelope.configuration.misc": "Miscellaneous",
   "envelope.configuration.pigeon": "Pigeon",
@@ -369,6 +381,7 @@
   "envelope.configuration.request_duration_short": "Request Duration - Short",
   "envelope.configuration.request_duration_long": "Request Duration - Long",
   "envelope.configuration.service_addresses": "Service Addresses",
+  "envelope.configuration.enabled": "Enabled",
   "envelope.configuration.notice_sending_enabled": "Notice: Enabled",
   "envelope.configuration.equine_assurance_bureau": "Equine Assurance Bureau",
   "envelope.configuration.villager_feeding_pigeons": "Villagers Feed Pigeons",
@@ -385,6 +398,11 @@
   "envelope.configuration.loot": "Loot",
   "envelope.configuration.ignite_seconds": "Ignite Seconds",
   "envelope.configuration.hide_default_seal_stamp_die_outside_of_inventory": "Hide Default Seal Die Outside Of Inventory",
+  "envelope.configuration.only_players": "Serve Only Players",
+  "envelope.configuration.cloud_depository": "Cloud Depository",
+  "envelope.configuration.account_storage_starting_capacity": "Account Storage: Starting Capacity",
+  "envelope.configuration.account_storage_max_capacity": "Account Storage: Maximum Capacity",
+  "envelope.configuration.account_storage_capacity_per_expansion": "Account Storage: Capacity Per Expansion",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
@@ -394,6 +412,7 @@
   "envelope.jei.info.cloud_depository": "Stores items remotely and securely.\n\nSend items to deposit.\nSend %s to withdraw.\n\nDeposits and requests must be sealed for identification reasons.",
   "envelope.jei.info.cloud_depository.withdrawal_request": "When sealed and sent to %s - requests withdrawal of the last deposited item.\nIf renamed, item with the same name will be requested.",
   "envelope.jei.info.cloud_depository.status_request": "When sealed and sent to %s - requests a storage status report.",
+  "envelope.jei.info.cloud_depository.expansion_request": "When sealed and sent to %s - requests a storage expansion by %s slots.",
 
   "envelope.empty_tag": "Empty Tag",
 

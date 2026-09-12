@@ -2,6 +2,11 @@
 
 ## UNRELEASED
 
+- Added Cloud Depository:
+  - Remote storage that accepts and stores sealed items until a Withdrawal Request is sent to it
+- Added Letter Presetting:
+  - Crafting a Letter and Quill with specific items will create a Letter with "meaning" that various systems can understand and respond to
+
 JEI
 - Added information about service addresses and some other items
 - Address in mailing recipes is now clickable and will show usages when clicked

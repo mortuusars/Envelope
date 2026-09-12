@@ -86,7 +86,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
                   .stream()
                   .map(recipe -> recipe.value().getAddress())
                   .distinct()
-                  .filter(address -> !address.getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN))
+                  .filter(address -> ServiceAddresses.isEnabled(address) && !address.isHidden())
                   .toList();
 
             registration.register(SERVICE_ADDRESS_INGREDIENT,
@@ -99,13 +99,16 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerExtraIngredients(IExtraIngredientRegistration registration) {
-        registration.addExtraItemStacks(List.of(
-              CloudDepository.createWithdrawalRequestLetter(),
-              CloudDepository.createStatusRequestLetter()
-        ));
+        if (Config.Server.SERVICE_CLOUD_DEPOSITORY_ENABLED.get()) {
+            registration.addExtraItemStacks(List.of(
+                  CloudDepository.createWithdrawalRequestLetter(),
+                  CloudDepository.createStatusRequestLetter(),
+                  CloudDepository.createExpansionRequestLetter()
+            ));
 
-        registration.addExtraIngredients(SERVICE_ADDRESS_INGREDIENT, List.of(
-              ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY)));
+            registration.addExtraIngredients(SERVICE_ADDRESS_INGREDIENT, List.of(
+                  ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY)));
+        }
     }
 
     @Override
@@ -119,9 +122,9 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .getRecipeManager()
               .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
               .stream()
-              .filter(recipe ->
-                    !recipe.value().getAddress().getDefinitionHolder().is(Envelope.Tags.ServiceAddresses.HIDDEN)
-                          && !recipe.value().getIngredients().isEmpty())
+              .filter(recipe -> ServiceAddresses.isEnabled(recipe.value().getAddress())
+                    && !recipe.value().getAddress().isHidden()
+                    && !recipe.value().getIngredients().isEmpty())
               .toList();
 
         registration.addRecipes(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE, mailingRecipes);
@@ -130,27 +133,33 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     }
 
     private static void addInfo(IRecipeRegistration registration) {
-        MutableComponent cloudDepositoryAddress = ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY).format()
-              .withIcon()
-              .withColor(0x426BB8)
-              .withIconColor(0x426BB8)
-              .toComponent();
-        registration.addItemStackInfo(CloudDepository.createWithdrawalRequestLetter(),
-              Component.translatable("envelope.jei.info.cloud_depository.withdrawal_request", cloudDepositoryAddress));
-        registration.addItemStackInfo(CloudDepository.createStatusRequestLetter(),
-              Component.translatable("envelope.jei.info.cloud_depository.status_request", cloudDepositoryAddress));
-
         registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.mail_service"));
         registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.AUTOMATED_SUPPLY_SERVICE), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.automated_supply_service"));
-        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY), SERVICE_ADDRESS_INGREDIENT,
-              Component.translatable("envelope.jei.info.cloud_depository",
-                    Component.translatable("letter.envelope.cloud_depository.withdrawal_request.name").withStyle(Style.EMPTY
-                          .withColor(ChatFormatting.DARK_BLUE)
-                          .withUnderlined(true)
-                          .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(CloudDepository.createWithdrawalRequestLetter()))))
-              ));
+
+        ServiceAddress cloudDepository = ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY);
+        if (ServiceAddresses.isEnabled(cloudDepository)) {
+            MutableComponent cloudDepositoryAddress = cloudDepository.format()
+                  .withIcon()
+                  .toComponent()
+                  .withStyle(ChatFormatting.DARK_BLUE);
+            registration.addItemStackInfo(CloudDepository.createWithdrawalRequestLetter(),
+                  Component.translatable("envelope.jei.info.cloud_depository.withdrawal_request", cloudDepositoryAddress));
+            registration.addItemStackInfo(CloudDepository.createStatusRequestLetter(),
+                  Component.translatable("envelope.jei.info.cloud_depository.status_request", cloudDepositoryAddress));
+            registration.addItemStackInfo(CloudDepository.createExpansionRequestLetter(),
+                  Component.translatable("envelope.jei.info.cloud_depository.expansion_request", cloudDepositoryAddress,
+                        Component.literal(Integer.toString(Config.Server.SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_CAPACITY_PER_EXPANSION.get())).withStyle(ChatFormatting.DARK_BLUE)));
+
+            registration.addIngredientInfo(cloudDepository, SERVICE_ADDRESS_INGREDIENT,
+                  Component.translatable("envelope.jei.info.cloud_depository",
+                        Component.translatable("letter.envelope.cloud_depository.withdrawal_request.name").withStyle(Style.EMPTY
+                              .withColor(ChatFormatting.DARK_BLUE)
+                              .withUnderlined(true)
+                              .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(CloudDepository.createWithdrawalRequestLetter()))))
+                  ));
+        }
     }
 
     @Override
