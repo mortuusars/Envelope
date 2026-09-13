@@ -206,6 +206,7 @@
   "address_type.envelope.custom": "Address",
   "address_type.envelope.unknown": "Unknown",
 
+  "subtitles.envelope.seal_stamp": "Seal Stamp stamps",
   "subtitles.envelope.paper.crackle": "Paper crackles",
   "subtitles.envelope.paper.tear": "Paper tears",
 

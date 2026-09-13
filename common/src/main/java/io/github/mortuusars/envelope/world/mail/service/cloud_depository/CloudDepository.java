@@ -109,12 +109,15 @@ public class CloudDepository {
             return MailDropOffResult.returned(mail, DeliveryRecord.Message.UNAVAILABLE);
         }
 
-        if (!(mail.get(Envelope.DataComponents.SEAL) instanceof Seal mailSeal)
-              || mailSeal.signature().getString().isEmpty()) {
+        if (!(mail.get(Envelope.DataComponents.SEAL) instanceof Seal mailSeal)) {
             return MailDropOffResult.returned(mail, RETURN_MESSAGE_NO_IDENTITY);
         }
 
-        String account = mailSeal.signature().getString();
+        String account = mailSeal.getSignatureAsId();
+
+        if (account.isEmpty()) {
+            return MailDropOffResult.returned(mail, RETURN_MESSAGE_NO_IDENTITY);
+        }
 
         if (Config.Server.SERVICE_CLOUD_DEPOSITORY_ONLY_PLAYERS.get()
               && service.getKnownPlayers().getDataOf(account).isEmpty()) {
@@ -246,7 +249,7 @@ public class CloudDepository {
     // --
 
     public static @NotNull Seal createSeal(RegistryAccess registryAccess) {
-        return new Seal(
+        return Seal.createForNpc(
               SealMaterial.getOrThrow(registryAccess, SealMaterial.WAX),
               SealSymbol.getOrThrow(registryAccess, SealSymbol.CLOUD_DEPOSITORY),
               Component.translatable("address.envelope.cloud_depository")

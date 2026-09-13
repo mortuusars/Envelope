@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class SealRenderer {
     public static final ResourceLocation IRON_DIE_TEXTURE = Envelope.resource("textures/seal/die/iron.png");
+    public static final ResourceLocation SEAL_GLINT_SPRITE = Envelope.resource("seal_glint.png");
 
     public void render(Seal seal, GuiGraphics guiGraphics, int x, int y) {
         SealMaterial material = seal.material().value();
@@ -49,6 +50,12 @@ public class SealRenderer {
         guiGraphics.blit(impressionTexture, x, y, 0, 0, 30, 30, 30, 30);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
+
+        if (material.hasGlint()) {
+            RenderSystem.enableBlend();
+            guiGraphics.blitSprite(Envelope.resource("seal_glint"), 32, 32, 0, 0, x, y, 32, 32);
+            RenderSystem.disableBlend();
+        }
     }
 
     public void renderDie(SealSymbol impression, ShadingPalette colors, GuiGraphics guiGraphics, int x, int y) {

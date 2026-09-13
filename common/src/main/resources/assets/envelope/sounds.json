@@ -1,4 +1,10 @@
 {
+  "item.seal_stamp": {
+    "sounds": [
+      "envelope:item/seal_stamp"
+    ],
+    "subtitle": "subtitles.envelope.seal_stamp"
+  },
   "item.paper.crackle": {
     "sounds": [
       "item/book/open_flip1",

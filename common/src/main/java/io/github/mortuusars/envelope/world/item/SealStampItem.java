@@ -6,6 +6,7 @@ import io.github.mortuusars.envelope.world.inventory.tooltip.SealDieTooltip;
 import io.github.mortuusars.envelope.world.item.component.seal.*;
 import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.client.Minecrft;
+import io.github.mortuusars.mortaar.util.supporter.Supporters;
 import io.github.mortuusars.mortaar.world.item.ApplicatorItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -52,9 +53,8 @@ public class SealStampItem extends Item implements ApplicatorItem {
               .orElse(false);
     }
 
-    protected boolean canApplyGold(ItemStack stack, Player player) {
-        //TODO: patreon supporters
-        return false;
+    public boolean canApplyGold(ItemStack stack, Player player) {
+        return Supporters.isEligibleForGoldenRewards(player.getUUID());
     }
 
     // -- Die
@@ -72,10 +72,11 @@ public class SealStampItem extends Item implements ApplicatorItem {
     // -- Seal
 
     public Seal createSeal(ItemStack stack, Player player) {
-        return new Seal(
+        return Seal.createForPlayer(
               getMaterialOrDefault(stack, player.registryAccess()),
               getDieOrDefault(stack, player.registryAccess(), player),
-              Component.literal(player.getScoreboardName()));
+              player
+        );
     }
 
     // --
@@ -135,15 +136,17 @@ public class SealStampItem extends Item implements ApplicatorItem {
         ItemStack target = slot.getItem();
 
         @Nullable Seal existingSeal = target.get(Envelope.DataComponents.SEAL);
-        if (existingSeal != null && canApplyGold(stack, player)) {
+        if (existingSeal != null && existingSeal.getSignatureAsId().equals(player.getScoreboardName()) && canApplyGold(stack, player)) {
             ResourceKey<SealMaterial> currentMaterial = existingSeal.material().unwrapKey().orElse(SealMaterial.WAX);
-            ResourceKey<SealMaterial> newMaterial = currentMaterial == SealMaterial.WAX ? SealMaterial.GOLD : SealMaterial.WAX;
+            ResourceKey<SealMaterial> newMaterial = currentMaterial != SealMaterial.GOLD
+                  ? SealMaterial.GOLD
+                  : getMaterialOrDefault(stack, player.registryAccess()).unwrapKey().orElse(SealMaterial.WAX);
 
             Holder<SealMaterial> material = SealMaterial.getOrThrow(player.registryAccess(), newMaterial);
 
-            target.set(Envelope.DataComponents.SEAL, new Seal(material, existingSeal.impression(), existingSeal.signature()));
+            target.set(Envelope.DataComponents.SEAL, Seal.createForPlayer(material, existingSeal.impression(), player));
             slot.set(target);
-            player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+            player.playSound(Envelope.SoundEvents.SEAL_STAMP.get(), 1f, player.getRandom().nextFloat() * 0.4f + 0.80f);
             return true;
         }
 
@@ -154,7 +157,7 @@ public class SealStampItem extends Item implements ApplicatorItem {
 
         ItemStack sealResult = sealable.seal(player.level(), target, createSeal(stack, player));
         slot.set(sealResult);
-        player.playSound(SoundEvents.UI_LOOM_SELECT_PATTERN);
+        player.playSound(Envelope.SoundEvents.SEAL_STAMP.get(), 1f, player.getRandom().nextFloat() * 0.4f + 0.80f);
 
         player.awardStat(Envelope.Stats.SEALS_APPLIED.get());
 

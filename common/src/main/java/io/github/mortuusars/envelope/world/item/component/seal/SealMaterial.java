@@ -22,13 +22,15 @@ public final class SealMaterial {
     public static final Codec<SealMaterial> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group(
           ResourceLocation.CODEC.fieldOf("texture").forGetter(SealMaterial::textureId),
           Codecs.HEX_COLOR.fieldOf("model_tint_color").forGetter(SealMaterial::modelTintColor),
-          ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette)
+          ShadingPalette.CODEC.fieldOf("impression_palette").forGetter(SealMaterial::impressionPalette),
+          Codec.BOOL.optionalFieldOf("has_glint", false).forGetter(SealMaterial::hasGlint)
     ).apply(i, SealMaterial::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SealMaterial> DIRECT_STREAM_CODEC = StreamCodec.composite(
           ResourceLocation.STREAM_CODEC, SealMaterial::textureId,
           ByteBufCodecs.INT, SealMaterial::modelTintColor,
           ShadingPalette.STREAM_CODEC, SealMaterial::impressionPalette,
+          ByteBufCodecs.BOOL, SealMaterial::hasGlint,
           SealMaterial::new
     );
 
@@ -63,12 +65,14 @@ public final class SealMaterial {
     private final ResourceLocation textureFull;
     private final int modelTintColor;
     private final ShadingPalette impressionPalette;
+    private final boolean hasGlint;
 
-    public SealMaterial(ResourceLocation texture, int modelTintColor, ShadingPalette impressionPalette) {
+    public SealMaterial(ResourceLocation texture, int modelTintColor, ShadingPalette impressionPalette, boolean hasGlint) {
         this.textureId = texture;
         this.textureFull = texture.withPath(path -> "textures/" + path + ".png");
         this.modelTintColor = modelTintColor;
         this.impressionPalette = impressionPalette;
+        this.hasGlint = hasGlint;
     }
 
     public static @Nullable ResourceKey<SealMaterial> fromDyeColor(DyeColor color) {
@@ -89,6 +93,10 @@ public final class SealMaterial {
 
     public ShadingPalette impressionPalette() {
         return impressionPalette;
+    }
+
+    public boolean hasGlint() {
+        return hasGlint;
     }
 
     @Override
@@ -114,7 +122,8 @@ public final class SealMaterial {
         return "SealMaterial[" +
               "texture=" + textureId + ", " +
               "modelTintColor=" + modelTintColor + ", " +
-              "impressionPalette=" + impressionPalette + ']';
+              "impressionPalette=" + impressionPalette + "," +
+              "hasGlint=" + hasGlint + ']';
     }
 
     // --
@@ -140,31 +149,31 @@ public final class SealMaterial {
     }
 
     public static void bootstrap(BootstrapContext<SealMaterial> context) {
-        register(context, WAX, 0xFFCC4E47, 0xFFA53732, 0xFFE17D68, 0xFF761814, 0xFF902926);
-        register(context, WHITE_WAX, 0xFFFCFDFF, 0xFFD1D1D7, 0xFFECECEE, 0xFF9F9FAC, 0xFFB8B8BF);
-        register(context, LIGHT_GRAY_WAX, 0xFFC9C9CD, 0xFF9D9DA5, 0xFFCCCCCF, 0xFF71717D, 0xFF8A8A94);
-        register(context, GRAY_WAX, 0xFF969595, 0xFF63636F, 0xFF8D8D94, 0xFF3F3F4C, 0xFF52525C);
-        register(context, BLACK_WAX, 0xFF414053, 0xFF2A293F, 0xFF58566E, 0xFF09081D, 0xFF161526);
-        register(context, BROWN_WAX, 0xFFA76641, 0xFF834623, 0xFFCC865C, 0xFF5D2A09, 0xFF6E3816);
-        register(context, RED_WAX, 0xFFFF5C53, 0xFFBB3B36, 0xFFF56F5D, 0xFF891312, 0xFFA62C29);
-        register(context, ORANGE_WAX, 0xFFF39B19, 0xFFCA712C, 0xFFF7A94F, 0xFF9D460C, 0xFFB55C1D);
-        register(context, YELLOW_WAX, 0xFFE6E029, 0xFFD3AF2A, 0xFFF4DF4F, 0xFFA3770C, 0xFFC2951B);
-        register(context, LIME_WAX, 0xFF87DA1C, 0xFF8AC03C, 0xFFB8ED63, 0xFF578812, 0xFF71A626);
-        register(context, GREEN_WAX, 0xFF668A16, 0xFF66881C, 0xFF97BA38, 0xFF3F5812, 0xFF527016);
-        register(context, CYAN_WAX, 0xFF4AA7B0, 0xFF3A8992, 0xFF6ABCC0, 0xFF16616A, 0xFF28747D);
-        register(context, LIGHT_BLUE_WAX, 0xFF93BFFF, 0xFF6E9FC8, 0xFF9DCDEA, 0xFF376993, 0xFF5386B5);
-        register(context, BLUE_WAX, 0xFF537EE8, 0xFF3A4D8F, 0xFF6A80C6, 0xFF182C65, 0xFF2A3D78);
-        register(context, PURPLE_WAX, 0xFFA755DA, 0xFF6C3697, 0xFF9D69CF, 0xFF3D1468, 0xFF53257D);
-        register(context, MAGENTA_WAX, 0xFFCA6DC4, 0xFF973291, 0xFFCF66CD, 0xFF681369, 0xFF7D247B);
-        register(context, PINK_WAX, 0xFFF283B9, 0xFFD4548E, 0xFFFA94CD, 0xFFA11D5D, 0xFFBA3C75);
-        register(context, GOLD, 0xFFFFB347, 0xFFE39C38, 0xFFFFE685, 0xFFA15611, 0xFFBF7B22);
+        register(context, WAX, 0xFFCC4E47, 0xFFA53732, 0xFFE17D68, 0xFF761814, 0xFF902926, false);
+        register(context, WHITE_WAX, 0xFFFCFDFF, 0xFFD1D1D7, 0xFFECECEE, 0xFF9F9FAC, 0xFFB8B8BF, false);
+        register(context, LIGHT_GRAY_WAX, 0xFFC9C9CD, 0xFF9D9DA5, 0xFFCCCCCF, 0xFF71717D, 0xFF8A8A94, false);
+        register(context, GRAY_WAX, 0xFF969595, 0xFF63636F, 0xFF8D8D94, 0xFF3F3F4C, 0xFF52525C, false);
+        register(context, BLACK_WAX, 0xFF414053, 0xFF2A293F, 0xFF58566E, 0xFF09081D, 0xFF161526, false);
+        register(context, BROWN_WAX, 0xFFA76641, 0xFF834623, 0xFFCC865C, 0xFF5D2A09, 0xFF6E3816, false);
+        register(context, RED_WAX, 0xFFFF5C53, 0xFFBB3B36, 0xFFF56F5D, 0xFF891312, 0xFFA62C29, false);
+        register(context, ORANGE_WAX, 0xFFF39B19, 0xFFCA712C, 0xFFF7A94F, 0xFF9D460C, 0xFFB55C1D, false);
+        register(context, YELLOW_WAX, 0xFFE6E029, 0xFFD3AF2A, 0xFFF4DF4F, 0xFFA3770C, 0xFFC2951B, false);
+        register(context, LIME_WAX, 0xFF87DA1C, 0xFF8AC03C, 0xFFB8ED63, 0xFF578812, 0xFF71A626, false);
+        register(context, GREEN_WAX, 0xFF668A16, 0xFF66881C, 0xFF97BA38, 0xFF3F5812, 0xFF527016, false);
+        register(context, CYAN_WAX, 0xFF4AA7B0, 0xFF3A8992, 0xFF6ABCC0, 0xFF16616A, 0xFF28747D, false);
+        register(context, LIGHT_BLUE_WAX, 0xFF93BFFF, 0xFF6E9FC8, 0xFF9DCDEA, 0xFF376993, 0xFF5386B5, false);
+        register(context, BLUE_WAX, 0xFF537EE8, 0xFF3A4D8F, 0xFF6A80C6, 0xFF182C65, 0xFF2A3D78, false);
+        register(context, PURPLE_WAX, 0xFFA755DA, 0xFF6C3697, 0xFF9D69CF, 0xFF3D1468, 0xFF53257D, false);
+        register(context, MAGENTA_WAX, 0xFFCA6DC4, 0xFF973291, 0xFFCF66CD, 0xFF681369, 0xFF7D247B, false);
+        register(context, PINK_WAX, 0xFFF283B9, 0xFFD4548E, 0xFFFA94CD, 0xFFA11D5D, 0xFFBA3C75, false);
+        register(context, GOLD, 0xFFFFB347, 0xFFE39C38, 0xFFFFE685, 0xFFA15611, 0xFFBF7B22, true);
     }
 
     private static void register(BootstrapContext<SealMaterial> context, ResourceKey<SealMaterial> key, int modelTintColor,
-                                 int paletteBaseColor, int paletteHighlightColor, int paletteShadowColor, int paletteSideColor) {
+                                 int paletteBaseColor, int paletteHighlightColor, int paletteShadowColor, int paletteSideColor, boolean hasGlint) {
         context.register(key, new SealMaterial(
               textureLocationFromKey(key),
               modelTintColor,
-              new ShadingPalette(paletteBaseColor, paletteHighlightColor, paletteShadowColor, paletteSideColor)));
+              new ShadingPalette(paletteBaseColor, paletteHighlightColor, paletteShadowColor, paletteSideColor), hasGlint));
     }
 }

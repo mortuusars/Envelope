@@ -32,6 +32,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
+import java.util.Optional;
+
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
         return Commands.literal("debug")
@@ -95,7 +97,7 @@ public class EnvelopeDebugCommand {
         stack1.set(Envelope.DataComponents.SEAL, new Seal(
               SealMaterial.getOrThrow(player.registryAccess(), SealMaterial.WAX),
               SealSymbol.getOrThrow(player.registryAccess(), SealSymbol.VILLAGER),
-              player.getDisplayName()));
+              player.getDisplayName(), Optional.of(player.getUUID())));
         player.addItem(stack1);
 
         SealMaterial.WAX_COLORS.values().forEach(material -> {
@@ -103,7 +105,7 @@ public class EnvelopeDebugCommand {
             stack.set(Envelope.DataComponents.SEAL, new Seal(
                   SealMaterial.getOrThrow(player.registryAccess(), material),
                   SealSymbol.getOrThrow(player.registryAccess(), SealSymbol.VILLAGER),
-                  player.getDisplayName()));
+                  player.getDisplayName(), Optional.of(player.getUUID())));
             player.addItem(stack);
         });
 

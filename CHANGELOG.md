@@ -15,8 +15,10 @@ JEI
 
 Wax Seals
 - Added 16 colors of seals and Seal Stamps to apply them
+- Added *Gold* seal material for Patreon supporters
+- Changed sealing sound
 - Changed Seal Stamp recipe to require a Honeycomb and any wooden planks, instead of two wooden slabs
-- Added `block` Seal Stamp mailing recipe - requires a **Grass Block**
+- Added `cube` Seal Stamp mailing recipe - requires a **Grass Block**
 - Redesigned or refreshed all seal symbol textures 
 - Added seal symbols:
   - `skull_and_bones`
@@ -25,6 +27,7 @@ Wax Seals
   - `block` -> `cube`
 - Removed seal symbols: `skeleton`, `skeleton_smirk`, `emerald`, `default`.
 - Default die (first letter of player name) will now show up in Seal Stamp's tooltip if outside of inventory or menu (in JEI for example) 
+- Added `player_uuid` to the `envelope:seal` item component.
 
 
 - Added original recipient to the delivered mail tooltip (To: <address>)

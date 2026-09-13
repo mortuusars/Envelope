@@ -528,6 +528,8 @@ public class Envelope {
     }
 
     public static class SoundEvents {
+        public static final Supplier<SoundEvent> SEAL_STAMP = register("item", "seal_stamp");
+
         public static final Supplier<SoundEvent> PAPER_TEAR = register("item", "paper.tear");
         public static final Supplier<SoundEvent> PAPER_CRACKLE = register("item", "paper.crackle");
         public static final Supplier<SoundEvent> PAPER_PLACE = register("block", "paper.place");
