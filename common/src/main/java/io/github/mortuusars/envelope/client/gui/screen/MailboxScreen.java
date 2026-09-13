@@ -12,6 +12,7 @@ import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundMailboxMenuInboxActionPacket;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.mortaar.client.gui.Sprites;
+import io.github.mortuusars.mortaar.util.Time;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -54,6 +55,9 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("mailbox/new_mail_indicator"));
 
+    public static final ResourceLocation SPIDER_WEB_SPRITE = Envelope.resource("mailbox/spider_web");
+    public static final ResourceLocation SPIDER_SPRITE = Envelope.resource("mailbox/spider");
+
     protected static final int SCROLL_THUMB_TOP_HEIGHT = 3;
     protected static final int SCROLL_THUMB_MID_HEIGHT = 2;
     protected static final int SCROLL_THUMB_BOT_HEIGHT = 2;
@@ -79,6 +83,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected int scrollAtDragStart = 0;
     protected boolean isDraggingScrollbar = false;
     protected double dragDelta = 0;
+    protected boolean hadMail;
 
     public MailboxScreen(MailboxMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -222,6 +227,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         List<MailboxMenu.MailInSlot> mail = getMenu().getMail();
 
         if (!mail.isEmpty()) {
+            hadMail = true;
             scroll = Math.clamp(scroll, 0, Math.max(0, mail.size() - MAX_INBOX_MAIL_BUTTONS));
 
             for (int i = 0; i < Math.min(mail.size(), MAX_INBOX_MAIL_BUTTONS); i++) {
@@ -236,9 +242,16 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
                 }
                 renderMailButton(guiGraphics, partialTick, mouseX, mouseY, mailInSlot, leftPos + x, topPos + y);
             }
-        } else if (this.hashCode() % 20 == 0) {
-            // Sad face
-            guiGraphics.blit(TEXTURE, leftPos + 59, topPos + 92, 348, 0, 17, 9, 512, 256);
+        } else {
+            if (!hadMail && Time.isHalloween()) {
+                guiGraphics.blitSprite(SPIDER_WEB_SPRITE, leftPos + 8, topPos + 18, 117, 144);
+                guiGraphics.blitSprite(SPIDER_SPRITE, leftPos + 22, topPos + 38, 11, 11);
+            }
+
+            if (this.hashCode() % 20 == 0) {
+                // Sad face
+                guiGraphics.blit(TEXTURE, leftPos + 59, topPos + 92, 348, 0, 17, 9, 512, 256);
+            }
         }
 
         Slot foodSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_FOOD);
