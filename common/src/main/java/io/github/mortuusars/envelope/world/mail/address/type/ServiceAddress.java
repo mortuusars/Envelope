@@ -2,6 +2,7 @@ package io.github.mortuusars.envelope.world.mail.address.type;
 
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
@@ -32,6 +33,15 @@ public final class ServiceAddress implements Address {
           ByteBufCodecs.holderRegistry(Envelope.Registries.SERVICE_ADDRESS_DEFINITION), ServiceAddress::getDefinitionHolder,
           ServiceAddress::new
     );
+
+    public static final ResourceKey<ServiceAddressDefinition> MAIL_SERVICE =
+          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("mail_service"));
+    public static final ResourceKey<ServiceAddressDefinition> AUTOMATED_SUPPLY_SERVICE =
+          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("automated_supply_service"));
+    public static final ResourceKey<ServiceAddressDefinition> CLOUD_DEPOSITORY =
+          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("cloud_depository"));
+    public static final ResourceKey<ServiceAddressDefinition> EQUINE_ASSURANCE_BUREAU =
+          ResourceKey.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, Envelope.resource("equine_assurance_bureau"));
 
     private final Holder<ServiceAddressDefinition> definition;
 
@@ -84,6 +94,19 @@ public final class ServiceAddress implements Address {
     @Override
     public @NotNull String toString() {
         return "Service[" + getString() + "]";
+    }
+
+    // --
+
+    public static boolean isEnabled(Holder<ServiceAddressDefinition> definition) {
+        if (definition.is(CLOUD_DEPOSITORY)) {
+            return Config.Server.SPEC.isLoaded() && Config.Server.SERVICE_CLOUD_DEPOSITORY_ENABLED.get();
+        }
+        return true;
+    }
+
+    public static boolean isEnabled(ServiceAddress address) {
+        return isEnabled(address.getDefinitionHolder());
     }
 
     // --

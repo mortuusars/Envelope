@@ -156,7 +156,6 @@ public class MailService {
     public void tick() {
         getBackgroundDelivery().tick(level);
         getPaybackDepartment().tick();
-        getServiceAddresses().tick();
 
         if (level.getGameTime() % 20 == 0) Envelope.BuggerData.MAIL_SERVICE.collectAndSendData(this);
     }
@@ -206,7 +205,7 @@ public class MailService {
     }
 
     public ServiceAddress getAddress() {
-        return ServiceAddress.getOrThrow(getLevel().registryAccess(), ServiceAddresses.MAIL_SERVICE);
+        return ServiceAddress.getOrThrow(getLevel().registryAccess(), ServiceAddress.MAIL_SERVICE);
     }
 
     /**

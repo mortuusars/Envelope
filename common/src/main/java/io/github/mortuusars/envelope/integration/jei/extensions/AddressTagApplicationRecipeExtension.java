@@ -5,7 +5,6 @@ import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.world.item.crafting.AddressTagApplicationRecipe;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
@@ -26,7 +25,7 @@ public class AddressTagApplicationRecipeExtension implements ICraftingCategoryEx
               .orElse(List.of());
 
         ItemStack tag = new ItemStack(Envelope.Items.ADDRESS_TAG.get());
-        tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE));
+        tag.set(Envelope.DataComponents.ADDRESS_TAG_ADDRESS, ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.MAIL_SERVICE));
         List<ItemStack> tagItems = List.of(tag);
 
         List<ItemStack> resultItems = mailableItems.stream()

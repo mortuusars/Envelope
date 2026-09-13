@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.api.ServiceDropOffHandlerRegistry;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.service.EquineAssuranceBureau;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
@@ -60,7 +59,7 @@ public class ServiceDropOffHandler implements MailDropOffHandler {
     // Alternative would be to create a registry for callback types or something, which would be too much code.
     // This will suffice for the time being.
     protected void onCraftingHandled(MailDropOffContext context, ServiceAddress address, MailDropOffResult craftingResult) {
-        if (address.getDefinitionHolder().is(ServiceAddresses.EQUINE_ASSURANCE_BUREAU)) {
+        if (address.getDefinitionHolder().is(ServiceAddress.EQUINE_ASSURANCE_BUREAU)) {
             EquineAssuranceBureau.onCraft(context, address, craftingResult);
         }
     }

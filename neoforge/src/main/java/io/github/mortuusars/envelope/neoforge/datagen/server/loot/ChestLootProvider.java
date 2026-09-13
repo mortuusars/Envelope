@@ -4,7 +4,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.loot.LootTableSubProvider;
@@ -57,7 +56,7 @@ public class ChestLootProvider implements LootTableSubProvider {
               )
         );
 
-        MutableComponent automatedSupplyService = ServiceAddress.getOrThrow(registries, ServiceAddresses.AUTOMATED_SUPPLY_SERVICE).format().toComponent();
+        MutableComponent automatedSupplyService = ServiceAddress.getOrThrow(registries, ServiceAddress.AUTOMATED_SUPPLY_SERVICE).format().toComponent();
 
         output.accept(
               Envelope.LootTables.COLLAPSED_MAIL_HUB_STORAGE_MAIL,

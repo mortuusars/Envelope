@@ -7,9 +7,9 @@ import io.github.mortuusars.envelope.client.gui.widget.textbox.text.FormattedStr
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.JeiCompatibleScreen;
 import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundLetterEditPacket;
-import io.github.mortuusars.envelope.util.ItemAndStack;
 import io.github.mortuusars.envelope.world.item.LetterAndQuillItem;
 import io.github.mortuusars.mortaar.client.gui.Sprites;
+import io.github.mortuusars.mortaar.util.ItemAndStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

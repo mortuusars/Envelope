@@ -1,9 +1,9 @@
 package io.github.mortuusars.envelope.integration.jei.category;
 
 import io.github.mortuusars.envelope.integration.jei.EnvelopeJeiPlugin;
-import io.github.mortuusars.envelope.util.TextUtil;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.mortaar.client.Minecrft;
+import io.github.mortuusars.mortaar.util.TextUtil;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.widgets.IRecipeWidget;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -14,7 +14,6 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
 

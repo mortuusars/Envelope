@@ -2,7 +2,7 @@ package io.github.mortuusars.envelope.world.item.component;
 
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
-import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.mortaar.util.Ticks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

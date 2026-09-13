@@ -4,7 +4,6 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.loot.LootTableSubProvider;
@@ -31,31 +30,31 @@ public record GameplayEquipmentLootProvider(HolderLookup.Provider registries) im
               Envelope.LootTables.CHARRED_PIGEON_MAIL,
               LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
-                    .add(recipePackage(ServiceAddresses.MAIL_SERVICE,
+                    .add(recipePackage(ServiceAddress.MAIL_SERVICE,
                           new ItemStack(Envelope.Items.ADDRESS_TAG.get(), 3),
                           new ItemStack(Items.RED_DYE, 3)))
-                    .add(recipePackage(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE,
+                    .add(recipePackage(ServiceAddress.AUTOMATED_SUPPLY_SERVICE,
                           new ItemStack(Items.ANDESITE, 4),
                           new ItemStack(Items.FLINT, 4),
                           new ItemStack(Items.FLINT, 4),
                           new ItemStack(Items.FLINT, 4),
                           new ItemStack(Items.FLINT, 4),
                           new ItemStack(Items.FLINT, 4)))
-                    .add(recipePackage(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE,
+                    .add(recipePackage(ServiceAddress.AUTOMATED_SUPPLY_SERVICE,
                           new ItemStack(Items.DIORITE, 4),
                           new ItemStack(Items.BONE_MEAL, 4),
                           new ItemStack(Items.BONE_MEAL, 4),
                           new ItemStack(Items.BONE_MEAL, 4),
                           new ItemStack(Items.BONE_MEAL, 4),
                           new ItemStack(Items.BONE_MEAL, 4)))
-                    .add(recipePackage(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE,
+                    .add(recipePackage(ServiceAddress.AUTOMATED_SUPPLY_SERVICE,
                           new ItemStack(Items.INK_SAC, 4),
                           new ItemStack(Items.GLOWSTONE_DUST, 4),
                           new ItemStack(Items.GLOWSTONE_DUST, 4),
                           new ItemStack(Items.GLOWSTONE_DUST, 4),
                           new ItemStack(Items.GLOWSTONE_DUST, 4),
                           new ItemStack(Items.GLOWSTONE_DUST, 4)))
-                    .add(recipePackage(ServiceAddresses.EQUINE_ASSURANCE_BUREAU,
+                    .add(recipePackage(ServiceAddress.EQUINE_ASSURANCE_BUREAU,
                           new ItemStack(Items.GOLD_BLOCK, 1)))
                     .add(LootItem.lootTableItem(Envelope.Items.PACKAGE.get())
                           .apply(SetNameFunction.setName(Component.translatable("item.envelope.lost_mail"), SetNameFunction.Target.ITEM_NAME))

@@ -9,7 +9,6 @@ import io.github.mortuusars.envelope.integration.jei.extensions.SealStampDyeingR
 import io.github.mortuusars.envelope.integration.jei.util.LetterMeaningSubtypeInterpreter;
 import io.github.mortuusars.envelope.integration.jei.util.PackingRecipeTransferInfo;
 import io.github.mortuusars.envelope.world.item.crafting.SealStampDyeingRecipe;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.integration.jei.category.MailingRecipeCategory;
@@ -86,7 +85,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
                   .stream()
                   .map(recipe -> recipe.value().getAddress())
                   .distinct()
-                  .filter(address -> ServiceAddresses.isEnabled(address) && !address.isHidden())
+                  .filter(address -> ServiceAddress.isEnabled(address) && !address.isHidden())
                   .toList();
 
             registration.register(SERVICE_ADDRESS_INGREDIENT,
@@ -107,7 +106,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
             ));
 
             registration.addExtraIngredients(SERVICE_ADDRESS_INGREDIENT, List.of(
-                  ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY)));
+                  ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.CLOUD_DEPOSITORY)));
         }
     }
 
@@ -122,7 +121,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
               .getRecipeManager()
               .getAllRecipesFor(Envelope.RecipeTypes.MAILING.get())
               .stream()
-              .filter(recipe -> ServiceAddresses.isEnabled(recipe.value().getAddress())
+              .filter(recipe -> ServiceAddress.isEnabled(recipe.value().getAddress())
                     && !recipe.value().getAddress().isHidden()
                     && !recipe.value().getIngredients().isEmpty())
               .toList();
@@ -133,13 +132,13 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     }
 
     private static void addInfo(IRecipeRegistration registration) {
-        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.MAIL_SERVICE), SERVICE_ADDRESS_INGREDIENT,
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.MAIL_SERVICE), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.mail_service"));
-        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.AUTOMATED_SUPPLY_SERVICE), SERVICE_ADDRESS_INGREDIENT,
+        registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.AUTOMATED_SUPPLY_SERVICE), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.automated_supply_service"));
 
-        ServiceAddress cloudDepository = ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY);
-        if (ServiceAddresses.isEnabled(cloudDepository)) {
+        ServiceAddress cloudDepository = ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.CLOUD_DEPOSITORY);
+        if (ServiceAddress.isEnabled(cloudDepository)) {
             MutableComponent cloudDepositoryAddress = cloudDepository.format()
                   .withIcon()
                   .toComponent()

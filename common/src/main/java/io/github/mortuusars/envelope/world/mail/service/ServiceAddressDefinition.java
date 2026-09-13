@@ -5,7 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.mail.address.AddressLocation;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.Holder;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryFileCodec;
@@ -19,4 +21,25 @@ public record ServiceAddressDefinition(Component name, String icon, AddressLocat
 
     public static final Codec<Holder<ServiceAddressDefinition>> CODEC =
           RegistryFileCodec.create(Envelope.Registries.SERVICE_ADDRESS_DEFINITION, DIRECT_CODEC);
+
+    // --
+
+    public static void bootstrap(BootstrapContext<ServiceAddressDefinition> context) {
+        context.register(ServiceAddress.MAIL_SERVICE, new ServiceAddressDefinition(
+              Component.translatable("address.envelope.mail_service"),
+              EnvelopeSymbols.ADDRESS_MAIL_SERVICE,
+              new AddressLocation.Relative(0)));
+        context.register(ServiceAddress.AUTOMATED_SUPPLY_SERVICE, new ServiceAddressDefinition(
+              Component.translatable("address.envelope.automated_supply_service"),
+              EnvelopeSymbols.ADDRESS_SERVICE,
+              new AddressLocation.Relative(1000)));
+        context.register(ServiceAddress.CLOUD_DEPOSITORY, new ServiceAddressDefinition(
+              Component.translatable("address.envelope.cloud_depository"),
+              EnvelopeSymbols.ADDRESS_CLOUD_DEPOSITORY,
+              new AddressLocation.Relative(0)));
+        context.register(ServiceAddress.EQUINE_ASSURANCE_BUREAU, new ServiceAddressDefinition(
+              Component.translatable("address.envelope.equine_assurance_bureau"),
+              EnvelopeSymbols.ADDRESS_SERVICE,
+              new AddressLocation.Relative(2000)));
+    }
 }

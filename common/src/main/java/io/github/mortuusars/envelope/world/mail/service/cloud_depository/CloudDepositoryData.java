@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.util.PersistentData;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class CloudDepositoryData extends PersistentData {
                 .forGetter(CloudDepositoryData::accounts)
     ).apply(i, CloudDepositoryData::new));
 
-    public static final Type<CloudDepositoryData> TYPE = new Type<>(ServiceAddresses.CLOUD_DEPOSITORY.location(), CloudDepositoryData::new, CODEC);
+    public static final Type<CloudDepositoryData> TYPE = new Type<>(ServiceAddress.CLOUD_DEPOSITORY.location(), CloudDepositoryData::new, CODEC);
 
     private final Map<String, Account> accounts;
 

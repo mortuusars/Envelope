@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.client.gui.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.client.gui.widget.AddressBoxSuggestions;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.world.mail.address.Address;
@@ -125,7 +125,7 @@ public class AddressTagScreen extends Screen {
               knownAddresses.blocks(),
               knownAddresses.players(),
               knownAddresses.services().stream()
-                    .filter(address -> ServiceAddresses.isEnabled(address) && !address.isHidden())
+                    .filter(address -> ServiceAddress.isEnabled(address) && !address.isHidden())
                     .collect(Collectors.toSet()));
     }
 

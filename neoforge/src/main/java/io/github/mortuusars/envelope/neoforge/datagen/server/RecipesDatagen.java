@@ -8,7 +8,6 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequest
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipeBuilder;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.Util;
@@ -151,7 +150,7 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void mailService(@NotNull RecipeOutput output) {
-        ServiceAddress address = address(ServiceAddresses.MAIL_SERVICE);
+        ServiceAddress address = address(ServiceAddress.MAIL_SERVICE);
 
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Envelope.Items.ADDRESS_TAG.get()))
@@ -196,7 +195,7 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void automatedSupplyService(@NotNull RecipeOutput output) {
-        ServiceAddress address = address(ServiceAddresses.AUTOMATED_SUPPLY_SERVICE);
+        ServiceAddress address = address(ServiceAddress.AUTOMATED_SUPPLY_SERVICE);
 
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.ROTTEN_FLESH), 6)
@@ -257,7 +256,7 @@ public class RecipesDatagen extends RecipeProvider {
     }
 
     private void equineAssuranceBureau(@NotNull RecipeOutput output) {
-        ServiceAddress address = address(ServiceAddresses.EQUINE_ASSURANCE_BUREAU);
+        ServiceAddress address = address(ServiceAddress.EQUINE_ASSURANCE_BUREAU);
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.GOLD_BLOCK))
               .forResult(Items.GOLDEN_HORSE_ARMOR)

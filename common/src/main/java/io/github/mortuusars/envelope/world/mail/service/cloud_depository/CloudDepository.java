@@ -13,7 +13,6 @@ import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
@@ -60,7 +59,7 @@ public class CloudDepository {
 
     public CloudDepository(MailService service) {
         this.service = service;
-        this.address = ServiceAddress.getOrThrow(service.getLevel().registryAccess(), ServiceAddresses.CLOUD_DEPOSITORY);
+        this.address = ServiceAddress.getOrThrow(service.getLevel().registryAccess(), ServiceAddress.CLOUD_DEPOSITORY);
         this.seal = createSeal(service.getLevel().registryAccess());
     }
 

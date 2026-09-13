@@ -33,23 +33,23 @@ import io.github.mortuusars.envelope.world.item.crafting.mail.MailPaybackRequest
 import io.github.mortuusars.envelope.world.item.crafting.mail.MailRecipe;
 import io.github.mortuusars.envelope.world.item.crafting.mail.serializer.MailRecipeSerializer;
 import io.github.mortuusars.envelope.world.mail.address.Address;
-import io.github.mortuusars.envelope.util.DeferredSoundType;
 import io.github.mortuusars.envelope.world.block.*;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupant;
 import io.github.mortuusars.envelope.world.item.component.*;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.component.PaybackSubject;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import io.github.mortuusars.mortaar.Register;
 import io.github.mortuusars.mortaar.Registrar;
 import io.github.mortuusars.mortaar.bugger.data.EntityData;
 import io.github.mortuusars.mortaar.bugger.data.OptionalEntityData;
+import io.github.mortuusars.mortaar.util.DeferredSoundType;
 import net.minecraft.advancements.critereon.ItemSubPredicate;
 import net.minecraft.advancements.critereon.PlayerTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -136,7 +136,7 @@ public class Envelope {
         Register.clientboundPacket(ClientboundOpenMailboxAddressTagScreenPacket.TYPE, ClientboundOpenMailboxAddressTagScreenPacket.STREAM_CODEC);
         Register.clientboundPacket(ClientboundOpenMailboxPlacingScreenPacket.TYPE, ClientboundOpenMailboxPlacingScreenPacket.STREAM_CODEC);
 
-        ServiceDropOffHandlerRegistry.register(ServiceAddresses.CLOUD_DEPOSITORY, CloudDepository::handleDropOff);
+        ServiceDropOffHandlerRegistry.register(ServiceAddress.CLOUD_DEPOSITORY, CloudDepository::handleDropOff);
 
         if (Mods.EVERY_COMPAT.isLoaded()) {
             EveryCompatIntegration.init();

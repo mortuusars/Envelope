@@ -3,7 +3,6 @@ package io.github.mortuusars.envelope.world.mail.address;
 import com.mojang.serialization.*;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -36,7 +35,7 @@ public interface Address {
     }
 
     default boolean isMailService() {
-        return this instanceof ServiceAddress serviceAddress && serviceAddress.getDefinitionHolder().is(ServiceAddresses.MAIL_SERVICE);
+        return this instanceof ServiceAddress serviceAddress && serviceAddress.getDefinitionHolder().is(ServiceAddress.MAIL_SERVICE);
     }
 
     default boolean isUnknown() {

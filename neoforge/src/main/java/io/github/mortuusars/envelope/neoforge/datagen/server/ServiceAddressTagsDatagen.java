@@ -1,8 +1,8 @@
 package io.github.mortuusars.envelope.neoforge.datagen.server;
 
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
-import io.github.mortuusars.envelope.world.mail.service.ServiceAddresses;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
@@ -21,6 +21,6 @@ public class ServiceAddressTagsDatagen extends TagsProvider<ServiceAddressDefini
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
         tag(Envelope.Tags.ServiceAddresses.HIDDEN)
-              .add(ServiceAddresses.EQUINE_ASSURANCE_BUREAU);
+              .add(ServiceAddress.EQUINE_ASSURANCE_BUREAU);
     }
 }

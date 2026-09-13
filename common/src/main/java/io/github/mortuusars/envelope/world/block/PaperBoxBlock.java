@@ -1,7 +1,7 @@
 package io.github.mortuusars.envelope.world.block;
 
 import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.util.VoxelShapeUtils;
+import io.github.mortuusars.mortaar.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;

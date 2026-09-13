@@ -3,7 +3,7 @@ package io.github.mortuusars.envelope.world.mail.delivery;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import io.github.mortuusars.envelope.Config;
-import io.github.mortuusars.envelope.util.Ticks;
+import io.github.mortuusars.mortaar.util.Ticks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.codec.ByteBufCodecs;

@@ -16,7 +16,6 @@ import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +32,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class EquineAssuranceBureau {
-    private static final ResourceLocation RECIPE_ID = ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location()
+    private static final ResourceLocation RECIPE_ID = ServiceAddress.EQUINE_ASSURANCE_BUREAU.location()
           .withPrefix("mailing/")
           .withSuffix("/golden_horse_armor");
     private static final long MIN_SEND_INTERVAL = SharedConstants.TICKS_PER_GAME_DAY;
@@ -46,7 +45,7 @@ public class EquineAssuranceBureau {
             return;
         }
 
-        Optional<ServiceAddress> bureauAddress = ServiceAddress.get(player.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU);
+        Optional<ServiceAddress> bureauAddress = ServiceAddress.get(player.registryAccess(), ServiceAddress.EQUINE_ASSURANCE_BUREAU);
         if (bureauAddress.isEmpty()) {
             return;
         }
@@ -70,7 +69,7 @@ public class EquineAssuranceBureau {
             return;
         }
 
-        CompoundTag data = service.getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location());
+        CompoundTag data = service.getPersistentData().get(ServiceAddress.EQUINE_ASSURANCE_BUREAU.location());
         CompoundTag playerData = data.getCompound(player.getScoreboardName());
 
         long lastSendTime = playerData.getLong(DATA_LAST_SEND_TIME);
@@ -87,7 +86,7 @@ public class EquineAssuranceBureau {
             playerData.putInt(DATA_SENT_NOTICES_COUNT, sentNoticesCount + 1);
             playerData.putLong(DATA_LAST_SEND_TIME, service.getGameTime());
             data.put(player.getScoreboardName(), playerData);
-            service.getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location(), data);
+            service.getPersistentData().set(ServiceAddress.EQUINE_ASSURANCE_BUREAU.location(), data);
         }
     }
 
@@ -101,7 +100,7 @@ public class EquineAssuranceBureau {
             return false;
         }
 
-        return ServiceAddress.get(level.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU)
+        return ServiceAddress.get(level.registryAccess(), ServiceAddress.EQUINE_ASSURANCE_BUREAU)
               .map(address -> {
                   MailService.of(level).getDeliveryManager().startService(Delivery.draft()
                         .deliver(letter)
@@ -117,13 +116,13 @@ public class EquineAssuranceBureau {
               .filter(owner -> isCarryingRecipeResult(context, craftingResult))
               .flatMap(owner -> context.getService().getKnownPlayers().getDataOf(owner))
               .ifPresent(player -> {
-                  CompoundTag data = context.getService().getPersistentData().get(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location());
+                  CompoundTag data = context.getService().getPersistentData().get(ServiceAddress.EQUINE_ASSURANCE_BUREAU.location());
                   CompoundTag playerData = data.getCompound(player.getProfile().getName());
 
                   playerData.putInt(DATA_DELIVERIES_COUNT, playerData.getInt(DATA_DELIVERIES_COUNT) + 1);
                   data.put(player.getProfile().getName(), playerData);
 
-                  context.getService().getPersistentData().set(ServiceAddresses.EQUINE_ASSURANCE_BUREAU.location(), data);
+                  context.getService().getPersistentData().set(ServiceAddress.EQUINE_ASSURANCE_BUREAU.location(), data);
               });
     }
 
@@ -141,7 +140,7 @@ public class EquineAssuranceBureau {
     }
 
     public static ItemStack createLetter(ServerLevel level) {
-        Optional<RecipeHolder<MailRecipe>> recipe = ServiceAddress.get(level.registryAccess(), ServiceAddresses.EQUINE_ASSURANCE_BUREAU)
+        Optional<RecipeHolder<MailRecipe>> recipe = ServiceAddress.get(level.registryAccess(), ServiceAddress.EQUINE_ASSURANCE_BUREAU)
               .flatMap(address -> Mailing.getAllRecipesOf(address, level)
                     .filter(recipeHolder -> recipeHolder.id().equals(RECIPE_ID))
                     .findFirst());
