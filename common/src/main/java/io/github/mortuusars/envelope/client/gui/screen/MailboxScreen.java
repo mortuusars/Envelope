@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryLog;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.mail.address.Address;
+import io.github.mortuusars.envelope.world.mail.address.AddressFormatter;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.network.packet.serverbound.ServerboundMailboxMenuInboxActionPacket;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
@@ -42,16 +43,8 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
 
     public static final WidgetSprites REGULAR_MAIL_BUTTON_SPRITES = Sprites.threeStates(Envelope.resource("mailbox/mail_button"));
 
-    public static final WidgetSprites ICON_ADDRESS_GENERIC_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_generic"));
-    public static final WidgetSprites ICON_ADDRESS_BLOCK_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_block"));
-    public static final WidgetSprites ICON_ADDRESS_PLAYER_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_player"));
-    public static final WidgetSprites ICON_ADDRESS_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_service"));
-    public static final WidgetSprites ICON_ADDRESS_CUSTOM_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_custom"));
-    public static final WidgetSprites ICON_ADDRESS_MAIL_SERVICE_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_mail_service"));
-    public static final WidgetSprites ICON_ADDRESS_UNKNOWN_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unknown"));
-    public static final WidgetSprites ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_returned"));
-    public static final WidgetSprites ICON_REJECTED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_rejected"));
-    public static final WidgetSprites ICON_UNCLAIMED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/icon_unclaimed"));
+    public static final WidgetSprites MAIL_ICON_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/mail_icon"));
+    public static final WidgetSprites MAIL_ICON_RETURNED_SPRITES = Sprites.normalAndHighlighted(Envelope.resource("mailbox/mail_icon_returned"));
 
     public static final WidgetSprites NEW_MAIL_INDICATOR_SPRITES = Sprites.normalOnly(Envelope.resource("mailbox/new_mail_indicator"));
 
@@ -288,14 +281,18 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected void renderMailButton(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, MailboxMenu.MailInSlot mailInSlot, int x, int y) {
         boolean isHovered = hoveredMail == mailInSlot;
         ItemStack mail = mailInSlot.mail();
+        MailIcon icon = MailIcon.create(mail);
 
         guiGraphics.blitSprite(REGULAR_MAIL_BUTTON_SPRITES.get(true, isHovered), x, y, 0, 117, 18);
 
         guiGraphics.renderItem(mail, x + 2, y + 1);
 
-        WidgetSprites iconSprites = getDisplayedIcon(mail);
-        ResourceLocation iconSprite = isHovered ? iconSprites.enabledFocused() : iconSprites.enabled();
+        ResourceLocation iconSprite = isHovered ? icon.sprites().enabledFocused() : icon.sprites().enabled();
         guiGraphics.blitSprite(iconSprite, x + 23, y + 4, 0, 10, 10);
+
+        if (!icon.icon().isEmpty()) {
+            guiGraphics.drawString(font, icon.icon(), x + 26, y + 5, 0xFFC6B38F, false);
+        }
 
         String sender = getDisplayedSender(mail).getString();
         if (font.width(sender) > 76) {
@@ -359,7 +356,7 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         }
 
         if (x >= leftPos + 31 && x < leftPos + 41) {
-            guiGraphics.renderTooltip(font, getDisplayedIconName(mail), x, y);
+            guiGraphics.renderTooltip(font, MailIcon.create(mail).name(), x, y);
             return;
         }
 
@@ -499,35 +496,6 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
         return false;
     }
 
-    // --
-
-    protected WidgetSprites getDisplayedIcon(ItemStack mail) {
-        if (Mail.isReturned(mail)) return ICON_RETURNED_SPRITES;
-        Address sender = Mail.getSenderOrUnknown(mail);
-        return switch (sender.getType()) {
-            case BLOCK -> ICON_ADDRESS_BLOCK_SPRITES;
-            case PLAYER -> ICON_ADDRESS_PLAYER_SPRITES;
-            case SERVICE -> sender.isMailService()
-                  ? ICON_ADDRESS_MAIL_SERVICE_SPRITES
-                  : ICON_ADDRESS_SERVICE_SPRITES;
-            case CUSTOM -> ICON_ADDRESS_CUSTOM_SPRITES;
-            case UNKNOWN -> ICON_ADDRESS_UNKNOWN_SPRITES;
-            default -> ICON_ADDRESS_GENERIC_SPRITES;
-        };
-    }
-
-    protected Component getDisplayedIconName(ItemStack mail) {
-        if (Mail.isReturned(mail)) return Component.translatable("gui.envelope.mail.returned");
-        Address sender = Mail.getSenderOrUnknown(mail);
-        return switch (sender.getType()) {
-            case BLOCK -> Component.translatable("address_type.envelope.block");
-            case PLAYER -> Component.translatable("address_type.envelope.player");
-            case SERVICE -> Component.translatable("address_type.envelope.service");
-            case CUSTOM -> Component.translatable("address_type.envelope.custom");
-            case UNKNOWN -> Component.translatable("address_type.envelope.unknown");
-        };
-    }
-
     protected Address getDisplayedSender(ItemStack mail) {
         return Mail.getSenderOrUnknown(mail);
     }
@@ -537,5 +505,23 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
     protected boolean isMouseOver(Rect2i rect, double mouseX, double mouseY) {
         return mouseX >= rect.getX() && mouseX < rect.getX() + rect.getWidth()
               && mouseY >= rect.getY() && mouseY < rect.getY() + rect.getHeight();
+    }
+
+    // --
+
+    public record MailIcon(WidgetSprites sprites, String icon, Component name) {
+        public static MailIcon create(ItemStack mail) {
+            if (Mail.isReturned(mail)) {
+                return new MailIcon(MAIL_ICON_RETURNED_SPRITES, "", Component.translatable("gui.envelope.mail.returned"));
+            }
+
+            Address sender = Mail.getSenderOrUnknown(mail);
+
+            return new MailIcon(
+                  MAIL_ICON_SPRITES,
+                  AddressFormatter.getIcon(sender),
+                  sender.getType().translate()
+            );
+        }
     }
 }
