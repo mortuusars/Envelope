@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Book and Quill and Letter and Quill mailing recipes no longer require a Slimeball
 
 - Added Cloud Depository:
   - Remote storage that accepts and stores sealed items until a Withdrawal Request is sent to it

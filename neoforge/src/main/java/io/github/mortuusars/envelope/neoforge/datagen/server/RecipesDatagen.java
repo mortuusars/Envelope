@@ -241,7 +241,6 @@ public class RecipesDatagen extends RecipeProvider {
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.PAPER))
               .requires(Ingredient.of(Items.BLACK_DYE))
-              .requires(Ingredient.of(Items.SLIME_BALL))
               .requires(Ingredient.of(Items.FEATHER))
               .forResult(Envelope.Items.LETTER_AND_QUILL.get())
               .save(output);
@@ -249,7 +248,6 @@ public class RecipesDatagen extends RecipeProvider {
         MailRecipeBuilder.crafting(address)
               .requires(Ingredient.of(Items.BOOK))
               .requires(Ingredient.of(Items.BLACK_DYE))
-              .requires(Ingredient.of(Items.SLIME_BALL))
               .requires(Ingredient.of(Items.FEATHER))
               .forResult(Items.WRITABLE_BOOK)
               .save(output);
