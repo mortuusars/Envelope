@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.world.mail.dropoff.*;
 import io.github.mortuusars.mortaar.bugger.Bugger;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public interface Courier {
     default int getBasePhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
         return switch (phase) {
             case STARTED, FINISHED -> 5;
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> 100;
+            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER -> Mth.ceil(120 * (Config.Server.DELIVERY_ASCEND_DISTANCE.get() / 16f));
             case TRAVELING_FROM_SENDER_TO_HUB, TRAVELING_FROM_HUB_TO_SENDER -> delivery.getRoute().getSenderToHubDuration().ticks();
             case TRAVELING_FROM_HUB_TO_RECIPIENT, TRAVELING_FROM_RECIPIENT_TO_HUB ->
                   delivery.getRoute().getRecipientToHubDuration().ticks();

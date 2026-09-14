@@ -50,6 +50,7 @@ public abstract class Config {
 
         // Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
+        public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
@@ -212,6 +213,9 @@ public abstract class Config {
                 DELIVERY_DEFAULT_DISTANCE = builder
                       .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined (recipient does not exist, for example).")
                       .defineInRange("default_distance", 1500, 1, Integer.MAX_VALUE);
+                DELIVERY_ASCEND_DISTANCE = builder
+                      .comment("Distance (in blocks) above the mailbox where the courier disappears (transitions to the traveling phase).")
+                      .defineInRange("ascend_distance", 24, 1, 64);
                 DELIVERY_COURIER_TRAVEL_SPEED = builder
                       .comment("Courier speed (in blocks per second) while in traveling (background) phases.")
                       .defineInRange("courier_travel_speed", 20.0, 0.01, 9999.0);

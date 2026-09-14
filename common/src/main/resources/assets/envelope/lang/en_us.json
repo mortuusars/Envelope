@@ -352,6 +352,7 @@
   "envelope.configuration.debug_mode": "Debug Mode",
   "envelope.configuration.courier_travel_speed": "Courier Travel Speed",
   "envelope.configuration.default_distance": "Default Distance",
+  "envelope.configuration.ascend_distance": "Ascend Distance",
   "envelope.configuration.pause": "Pause",
   "envelope.configuration.integration": "Integration",
   "envelope.configuration.jei": "JEI",
@@ -361,10 +362,10 @@
   "envelope.configuration.min_ticks_outside_pigeonhole": "Min Ticks Outside Pigeonhole",
   "envelope.configuration.hunted_by_ocelot": "Hunted by Ocelot",
   "envelope.configuration.address_experience_levels_cost": "Address XP Levels Cost",
-  "envelope.configuration.waste_level_increase_chance_after_delivery": "Waste Level Increase Chance After Delivery",
+  "envelope.configuration.waste_level_increase_chance_after_delivery": "Waste Chance After Delivery",
   "envelope.configuration.mailbox": "Mailbox",
   "envelope.configuration.min_ticks_inside_pigeonhole": "Min Ticks Inside Pigeonhole",
-  "envelope.configuration.waste_level_increase_chance": "Waste Level Increase Chance",
+  "envelope.configuration.waste_level_increase_chance": "Waste Chance",
   "envelope.configuration.payback_timeout_minutes": "Payback Timeout (minutes)",
   "envelope.configuration.hunted_by_cat": "Hunted by Cat",
   "envelope.configuration.damage_evasion_chance_while_delivering": "Damage Evasion Chance While Delivering",
@@ -404,6 +405,7 @@
   "envelope.configuration.account_storage_starting_capacity": "Account Storage: Starting Capacity",
   "envelope.configuration.account_storage_max_capacity": "Account Storage: Maximum Capacity",
   "envelope.configuration.account_storage_capacity_per_expansion": "Account Storage: Capacity Per Expansion",
+  "envelope.configuration.phase_duration_modifier": "Phase Duration Modifier",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

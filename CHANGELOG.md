@@ -3,6 +3,11 @@
 ## UNRELEASED
 - Fixed Mailbox block not breaking properly if it has mail inside  
 - Book and Quill and Letter and Quill mailing recipes no longer require a Slimeball
+- Increased courier ascend distance from 16 to 24 blocks (position above the mailbox where it disappears)
+
+Config
+- Added `delivery.phase_duration_modifier` and `delivery.ascend_distance` options to server config
+- Added `hide_default_seal_stamp_die_outside_of_inventory` option to client config
 
 - Added Cloud Depository:
   - Remote storage that accepts and stores sealed items until a Withdrawal Request is sent to it

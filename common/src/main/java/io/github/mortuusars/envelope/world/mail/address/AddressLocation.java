@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public interface AddressLocation {
-    int ASCEND_DISTANCE = 16;
-
     Codec<AddressLocation> CODEC = Type.CODEC.dispatch(AddressLocation::getType, Type::getCodec);
 
     Type getType();
@@ -43,9 +41,13 @@ public interface AddressLocation {
 
     default Optional<BlockPos> ascendTowards(Level level, Optional<BlockPos> targetPos) {
         return getPosition().map(pos -> targetPos
-                    .map(blockPos -> Position.ascendTowards(pos, blockPos, 3))
-                    .orElseGet(() -> Position.towardsRandomHorizontalDirection(pos, 3, hashCode())))
+                    .map(blockPos -> Position.ascendTowards(pos, blockPos, getAscendDistance()))
+                    .orElseGet(() -> Position.towardsRandomHorizontalDirection(pos, getAscendDistance(), hashCode())))
               .map(pos -> Position.aboveGround(level, pos, 5));
+    }
+
+    default int getAscendDistance() {
+        return Config.Server.DELIVERY_ASCEND_DISTANCE.get();
     }
 
     default int getDistanceTo(Level level, BlockPos pos) {
