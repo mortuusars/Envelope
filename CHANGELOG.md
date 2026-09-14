@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Fixed Mailbox block not breaking properly if it has mail inside  
 - Book and Quill and Letter and Quill mailing recipes no longer require a Slimeball
 
 - Added Cloud Depository:

@@ -341,9 +341,9 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     }
 
     public void onBlockRemoved(Level level, BlockPos pos, BlockState state, BlockState newState) {
+        blockRemoved = true;
         Containers.dropContentsOnDestroy(state, newState, level, pos);
         clearMail();
-        blockRemoved = true;
     }
 
     @Override
@@ -368,7 +368,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     }
 
     private void updateBlockStateIfNeeded() {
-        if (!isRemoved() && level instanceof ServerLevel serverLevel) {
+        if (!blockRemoved && !isRemoved() && level instanceof ServerLevel serverLevel) {
             BlockState state = getBlockState();
             boolean isOpen = state.getValue(MailboxBlock.OPEN);
             boolean hasMail = state.getValue(MailboxBlock.HAS_MAIL);
