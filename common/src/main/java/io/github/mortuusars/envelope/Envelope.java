@@ -57,6 +57,7 @@ import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -106,6 +107,7 @@ public class Envelope {
         EntityTypes.init();
         EntityDataSerializers.init();
         Items.init();
+        CreativeTabs.init();
         DataComponents.init();
         CriteriaTriggers.init();
         ItemSubPredicates.init();
@@ -377,6 +379,37 @@ public class Envelope {
               () -> new SpawnEggItem(EntityTypes.PIGEON.get(), 0x676781, 0xB8B8CB, new Item.Properties()));
         public static final Supplier<SpawnEggItem> CHARRED_PIGEON_SPAWN_EGG = REGISTRAR.item("charred_pigeon_spawn_egg",
               () -> new SpawnEggItem(EntityTypes.CHARRED_PIGEON.get(), 0x2B2223, 0xE85F00, new Item.Properties()));
+
+        static void init() {
+        }
+    }
+
+    public static class CreativeTabs {
+        public static final Supplier<CreativeModeTab> ENVELOPE = REGISTRAR.creativeTab("envelope", () ->
+              CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+                    .title(Component.translatable("item_group.envelope.envelope"))
+                    .icon(() -> new ItemStack(Items.LETTER.get()))
+                    .displayItems((params, output) -> {
+                        Envelope.Items.PIGEONHOLES.forEach(item -> output.accept(item.get()));
+                        output.accept(Envelope.Items.MAILBOX.get());
+                        output.accept(Envelope.Items.ADDRESS_TAG.get());
+                        output.accept(Envelope.Items.PAYBACK_TAG.get());
+
+                        output.accept(Envelope.Items.LETTER_AND_QUILL.get());
+                        output.accept(Envelope.Items.LETTER.get());
+                        output.accept(Envelope.Items.SEALED_LETTER.get());
+
+                        output.accept(Envelope.Items.PAPER_BOX.get());
+                        output.accept(Envelope.Items.PACKAGE.get());
+                        output.accept(Envelope.Items.SEALED_PACKAGE.get());
+
+                        output.accept(Envelope.Items.SEAL_STAMP.get());
+                        Envelope.Items.DYED_SEAL_STAMPS.values().forEach(stamp -> output.accept(stamp.get()));
+
+                        output.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
+                        output.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
+                    })
+                    .build());
 
         static void init() {
         }

@@ -12,12 +12,10 @@ import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.envelope.world.mail.service.ServiceAddressDefinition;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.SpawnPlacementTypes;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
@@ -34,30 +32,6 @@ public class NeoForgeCommonEvents {
     @SubscribeEvent
     public static void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(CommonEvents::commonSetup);
-    }
-
-    @SubscribeEvent
-    public static void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
-            Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
-            event.accept(Envelope.Items.PAPER_BOX.get());
-            event.accept(Envelope.Items.MAILBOX.get());
-        }
-        if (event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
-            event.accept(Envelope.Items.LETTER_AND_QUILL.get());
-            event.accept(Envelope.Items.LETTER.get());
-            event.accept(Envelope.Items.SEALED_LETTER.get());
-            event.accept(Envelope.Items.PACKAGE.get());
-            event.accept(Envelope.Items.SEALED_PACKAGE.get());
-            event.accept(Envelope.Items.ADDRESS_TAG.get());
-            event.accept(Envelope.Items.PAYBACK_TAG.get());
-            event.accept(Envelope.Items.SEAL_STAMP.get());
-            Envelope.Items.DYED_SEAL_STAMPS.values().forEach(stamp -> event.accept(stamp.get()));
-        }
-        if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)) {
-            event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
-            event.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
-        }
     }
 
     @SubscribeEvent

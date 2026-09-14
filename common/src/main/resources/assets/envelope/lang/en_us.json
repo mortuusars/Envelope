@@ -342,6 +342,11 @@
   "letter_meaning.envelope.cloud_depository.status_request": "Cloud Depository: Status Request",
   "letter_meaning.envelope.cloud_depository.expansion_request": "Cloud Depository: Expansion Request",
 
+  "recipe.envelope.mailing.mail_service.letter_broadcasting.info": "Sends copies of the letter to all players who have a default mailbox",
+  "recipe.envelope.mailing.mail_service.payback_cancelling.info": "Cancels and returns the last mail with payback request",
+
+  "item_group.envelope.envelope": "Envelope",
+
   "envelope.configuration.misc": "Miscellaneous",
   "envelope.configuration.pigeon": "Pigeon",
   "envelope.configuration.charred_pigeon": "Charred Pigeon",
@@ -411,6 +416,7 @@
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
   "envelope.jei.category.mailing": "Mailing",
+  "envelope.jei.info": "Info",
   "envelope.jei.info.mail_service": "Dispatches and handles deliveries. Provides mail-related services.",
   "envelope.jei.info.automated_supply_service": "Contains various useful mailing recipes.",
   "envelope.jei.info.cloud_depository": "Stores items remotely and securely.\n\nSend items to deposit.\nSend %s to withdraw.\n\nDeposits and requests must be sealed for identification reasons.",

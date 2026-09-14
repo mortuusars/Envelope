@@ -4,12 +4,15 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.PackageContents;
 import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 public interface MailRecipe extends Recipe<MailRecipeInput> {
     ServiceAddress getAddress();
@@ -30,6 +33,10 @@ public interface MailRecipe extends Recipe<MailRecipeInput> {
      */
     default boolean isOneCraftPerDelivery() {
         return false;
+    }
+
+    default Optional<Component> getInfo() {
+        return Optional.empty();
     }
 
     @Override

@@ -27,11 +27,13 @@ import org.slf4j.Logger;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class MailPaybackRequestCancelingRecipe extends CustomMailRecipe {
     public static final Logger LOGGER = LogUtils.getLogger();
     private final NonNullList<Ingredient> ingredients;
+    private final Optional<Component> info = Optional.of(Component.translatable("recipe.envelope.mailing.mail_service.payback_cancelling.info"));
 
     public MailPaybackRequestCancelingRecipe(ServiceAddress address, NonNullList<Ingredient> ingredients) {
         super(address);
@@ -51,6 +53,11 @@ public class MailPaybackRequestCancelingRecipe extends CustomMailRecipe {
     @Override
     public boolean isOneCraftPerDelivery() {
         return true;
+    }
+
+    @Override
+    public Optional<Component> getInfo() {
+        return info;
     }
 
     @Override

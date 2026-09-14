@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Added dedicated creative-mode tab for Envelope items
 - Slightly increased Pigeon's mailbox mail pickup range
 - Fixed Mailbox block not breaking properly if it has mail inside  
 - Book and Quill and Letter and Quill mailing recipes no longer require a Slimeball
@@ -17,6 +18,7 @@ Config
 
 JEI
 - Added information about service addresses and some other items
+- Added information to a couple of mailing recipes 
 - Address in mailing recipes is now clickable and will show usages when clicked
 - Updated how service address ingredient renders
 

@@ -54,29 +54,6 @@ public class EnvelopeFabric implements ModInitializer {
         DynamicRegistries.registerSynced(Envelope.Registries.SEAL_MATERIAL, SealMaterial.DIRECT_CODEC, SealMaterial.DIRECT_CODEC);
         DynamicRegistries.registerSynced(Envelope.Registries.SEAL_SYMBOL, SealSymbol.DIRECT_CODEC, SealSymbol.DIRECT_CODEC);
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(event -> {
-            Envelope.Items.PIGEONHOLES.forEach(item -> event.accept(item.get()));
-            event.accept(Envelope.Items.PAPER_BOX.get());
-            event.accept(Envelope.Items.MAILBOX.get());
-        });
-
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(event -> {
-            event.accept(Envelope.Items.LETTER_AND_QUILL.get());
-            event.accept(Envelope.Items.LETTER.get());
-            event.accept(Envelope.Items.SEALED_LETTER.get());
-            event.accept(Envelope.Items.PACKAGE.get());
-            event.accept(Envelope.Items.SEALED_PACKAGE.get());
-            event.accept(Envelope.Items.ADDRESS_TAG.get());
-            event.accept(Envelope.Items.PAYBACK_TAG.get());
-            event.accept(Envelope.Items.SEAL_STAMP.get());
-            Envelope.Items.DYED_SEAL_STAMPS.values().forEach(stamp -> event.accept(stamp.get()));
-        });
-
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(event -> {
-            event.accept(Envelope.Items.PIGEON_SPAWN_EGG.get());
-            event.accept(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
-        });
-
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
         FabricDefaultAttributeRegistry.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
 

@@ -19,6 +19,7 @@ import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.AbstractRecipeCategory;
+import mezz.jei.common.gui.elements.HighResolutionDrawable;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
@@ -27,6 +28,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<MailRecipe>> {
     private final IDrawable background;
+    private final IDrawable infoIcon;
 
     public MailingRecipeCategory(IJeiHelpers helpers) {
         super(EnvelopeJeiRecipeTypes.MAILING_RECIPE_TYPE,
@@ -34,6 +36,10 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
               helpers.getGuiHelper().createDrawableItemLike(Envelope.Items.PACKAGE.get()), 146, 74);
         background = helpers.getGuiHelper().createDrawable(
               Envelope.resource("textures/gui/jei/category_mailing.png"), 0, 0, getWidth(), getHeight());
+        infoIcon = new HighResolutionDrawable(
+              helpers.getGuiHelper().drawableBuilder(Envelope.resource("textures/gui/jei/info_icon.png"), 0, 0, 32, 32)
+                    .setTextureSize(32, 32)
+                    .build(), 4);
     }
 
     @Override
@@ -89,6 +95,8 @@ public class MailingRecipeCategory extends AbstractRecipeCategory<RecipeHolder<M
         builder.addRecipeArrow().setPosition(90, 32);
 
         builder.addWidget(new ServiceAddressRecipeWidget(new ScreenRectangle(0, 0, getWidth(), 9), recipeHolder.value().getAddress()));
+        recipeHolder.value().getInfo().ifPresent(info ->
+              builder.addWidget(new MailingRecipeInfoWidget(infoIcon, 126, 20, info)));
 
         builder.addInputHandler(new IJeiInputHandler() {
             @Override
