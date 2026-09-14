@@ -24,7 +24,7 @@ public class StartDeliveryFromMailboxGoal extends Goal {
         @Nullable BlockPos pos = courier.getMailboxHandler().getTargetPos();
 
         return pos != null
-              && courier.closerThan(pos, CourierNavigation.getReachDistance())
+              && courier.closerThan(pos, CourierNavigation.getReachDistance() * 1.2f)
               && courier.level().getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
               && blockEntity.isAvailableForPickup();
     }
