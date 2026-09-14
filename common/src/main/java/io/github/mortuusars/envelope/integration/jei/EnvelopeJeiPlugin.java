@@ -132,6 +132,10 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     }
 
     private static void addInfo(IRecipeRegistration registration) {
+        if (!Config.Client.JEI_INFORMATION.get()) {
+            return;
+        }
+
         registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.MAIL_SERVICE), SERVICE_ADDRESS_INGREDIENT,
               Component.translatable("envelope.jei.info.mail_service"));
         registration.addIngredientInfo(ServiceAddress.getOrThrow(Minecrft.registryAccess(), ServiceAddress.AUTOMATED_SUPPLY_SERVICE), SERVICE_ADDRESS_INGREDIENT,

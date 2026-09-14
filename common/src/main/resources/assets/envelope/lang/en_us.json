@@ -406,6 +406,7 @@
   "envelope.configuration.account_storage_max_capacity": "Account Storage: Maximum Capacity",
   "envelope.configuration.account_storage_capacity_per_expansion": "Account Storage: Capacity Per Expansion",
   "envelope.configuration.phase_duration_modifier": "Phase Duration Modifier",
+  "envelope.configuration.information": "Information",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

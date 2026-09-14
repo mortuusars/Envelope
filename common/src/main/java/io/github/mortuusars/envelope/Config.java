@@ -330,6 +330,7 @@ public abstract class Config {
 
         // JEI
         public static final ModConfigSpec.BooleanValue JEI_SERVICE_ADDRESS_INGREDIENT;
+        public static final ModConfigSpec.BooleanValue JEI_INFORMATION;
 
         static {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -347,6 +348,9 @@ public abstract class Config {
                                 "Changing the value requires relogging into the world or /reload to take effect.",
                                 " Default: true.")
                           .define("service_address_ingredient", true);
+                    JEI_INFORMATION = builder
+                          .comment("Add information about some items and ingredients", "Default: true")
+                          .define("information", true);
                     builder.pop();
                 }
                 builder.pop();
