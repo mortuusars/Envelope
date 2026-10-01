@@ -8,11 +8,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+
 public class StartDeliveryFromMailboxGoal extends Goal {
     private final PhysicalCourier courier;
 
     public StartDeliveryFromMailboxGoal(PhysicalCourier courier) {
         this.courier = courier;
+        setFlags(EnumSet.of(Flag.MOVE));
     }
 
     @Override
@@ -26,7 +29,8 @@ public class StartDeliveryFromMailboxGoal extends Goal {
         return pos != null
               && courier.closerThan(pos, CourierNavigation.getReachDistance() * 1.2f)
               && courier.level().getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
-              && blockEntity.isAvailableForPickup();
+              && blockEntity.isAvailableForPickup()
+              && courier.canEat(blockEntity.getFood());
     }
 
     @Override

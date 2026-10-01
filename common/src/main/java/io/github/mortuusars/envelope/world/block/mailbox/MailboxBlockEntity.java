@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundMailboxHasNewMailPacket;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -156,6 +157,10 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         return super.getItem(slot);
     }
 
+    public ItemStack getFood() {
+        return getItem(SLOT_FOOD);
+    }
+
     @Override
     public @NotNull ItemStack removeItem(int slot, int amount) {
         if (slot >= INBOX_SLOT) {
@@ -183,7 +188,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
+        if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.COURIER_FOOD);
         if (slot == SLOT_MAIL) return isSendable(stack);
         return false;
     }

@@ -9,7 +9,7 @@ public abstract class Config {
     public static abstract class Server {
         public static final ModConfigSpec SPEC;
 
-        // Pigeon
+        // -- Pigeon
         public static final ModConfigSpec.BooleanValue PIGEON_SPAWNS_NATURALLY;
         public static final ModConfigSpec.BooleanValue PIGEON_SPAWNS_IN_VILLAGE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE;
@@ -23,39 +23,42 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
         public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
 
-        // Charred Pigeon
+        // -- Charred Pigeon
         public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_SPAWNS_NATURALLY;
         public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_MAIL_CHANCE;
         public static final ModConfigSpec.DoubleValue CHARRED_PIGEON_IGNITE_SECONDS;
         public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_CONVERT_INTO_REGULAR;
         public static final ModConfigSpec.IntValue CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS;
 
-        // Pigeonhole
+        // -- Bat
+        public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
+
+        // -- Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE_AFTER_DELIVERY;
         public static final ModConfigSpec.BooleanValue PIGEONHOLE_DISPENSER_WASTE_SCOOPING;
 
-        // Mailbox
+        // -- Mailbox
         public static final ModConfigSpec.IntValue MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST;
 
-        // Letter
+        // -- Letter
         public static final ModConfigSpec.BooleanValue LETTER_PAUSE;
         public static final ModConfigSpec.BooleanValue LETTER_BURNING;
         public static final ModConfigSpec.BooleanValue FOX_LETTER_TATTERING;
 
-        // Package
+        // -- Package
         public static final ModConfigSpec.BooleanValue PACKAGE_SNEAK_QUICK_UNPACK;
         public static final ModConfigSpec.DoubleValue PACKAGE_PAPER_BOX_RETURN_CHANCE;
         public static final ModConfigSpec.DoubleValue PAYBACK_PACKAGE_BOX_RETURN_CHANCE;
 
-        // Seal
+        // -- Seal
         public static final ModConfigSpec.IntValue SEAL_REMOVE_DURATION;
         public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_ENABLED;
         public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_CONSUMABLE;
         public static final ModConfigSpec.BooleanValue SOULBOUND_SEAL_STAMP_CREATES_LOCK;
         public static final ModConfigSpec.BooleanValue LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING;
 
-        // Delivery
+        // -- Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
@@ -63,22 +66,27 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
         public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
 
-        // Payback
+        // -- Payback
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_MEDIUM;
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_LONG;
 
-        // Service Addresses
+        // -- Service Addresses
+
+        // Mail Service
+        public static final ModConfigSpec.BooleanValue MAIL_SERVICE_COURIER_DEATH_NOTICE;
+
         // Cloud Depository
         public static final ModConfigSpec.BooleanValue SERVICE_CLOUD_DEPOSITORY_ENABLED;
         public static final ModConfigSpec.BooleanValue SERVICE_CLOUD_DEPOSITORY_ONLY_PLAYERS;
         public static final ModConfigSpec.IntValue SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_STARTING_CAPACITY;
         public static final ModConfigSpec.IntValue SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_MAX_CAPACITY;
         public static final ModConfigSpec.IntValue SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_CAPACITY_PER_EXPANSION;
+
         // Equine Assurance Bureau
         public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
 
-        // Misc
+        // -- Misc
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
         public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
         public static final ModConfigSpec.DoubleValue ARCHIMEDES_CHANCE;
@@ -155,6 +163,14 @@ public abstract class Config {
                 CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS = builder
                       .comment("Time (in ticks) Charred Pigeon needs to stay outside of the ultrawarm dimension to convert into a regular Pigeon.")
                       .defineInRange("convert_into_regular_ticks", 300, 0, Integer.MAX_VALUE);
+                builder.pop();
+            }
+
+            {
+                builder.push("bat");
+                BAT_MAX_DELIVERIES = builder
+                      .comment("Maximum number of deliveries a single bat can do before leaving.")
+                      .defineInRange("max_deliveries", 3, 1, 999);
                 builder.pop();
             }
 
@@ -274,6 +290,14 @@ public abstract class Config {
 
             {
                 builder.push("service_addresses");
+
+                {
+                    builder.push("mail_service");
+                    MAIL_SERVICE_COURIER_DEATH_NOTICE = builder
+                          .comment("Courier Death Notice letter will be sent to the origin mailbox when a courier dies while delivering.", "Default: true")
+                          .define("courier_death_notice", true);
+                    builder.pop();
+                }
 
                 {
                     builder.push("cloud_depository");

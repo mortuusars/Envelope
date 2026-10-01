@@ -104,6 +104,7 @@
 
   "entity.envelope.pigeon": "Pigeon",
   "entity.envelope.charred_pigeon": "Charred Pigeon",
+  "entity.envelope.courier_bat": "Bat",
 
   "gui.envelope.confirm": "Confirm",
   "gui.envelope.cancel": "Cancel",
@@ -381,7 +382,9 @@
   "envelope.configuration.service_addresses": "Service Addresses",
   "envelope.configuration.enabled": "Enabled",
   "envelope.configuration.notice_sending_enabled": "Notice: Enabled",
+  "envelope.configuration.courier_death_notice": "Courier Death Notice",
   "envelope.configuration.equine_assurance_bureau": "Equine Assurance Bureau",
+  "envelope.configuration.mail_service": "Mail Service",
   "envelope.configuration.villager_feeding_pigeons": "Villagers Feed Pigeons",
   "envelope.configuration.villager_feeding_pigeons_only_nitwits": "Villagers Feed Pigeons: Only Nitwits",
   "envelope.configuration.eats_seeds": "Eats Seeds",
@@ -409,6 +412,8 @@
   "envelope.configuration.soulbound_seal_stamp_consumable": "Soulbound Seal Stamp - Consumable",
   "envelope.configuration.soulbound_seal_stamp_creates_lock": "Soulbound Seal Stamp - Creates Lock",
   "envelope.configuration.locked_seal_owner_can_remove_without_unlocking": "Locked Seal - Owner Can Always Remove",
+  "envelope.configuration.bat": "Bat",
+  "envelope.configuration.max_deliveries": "Max Deliveries",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

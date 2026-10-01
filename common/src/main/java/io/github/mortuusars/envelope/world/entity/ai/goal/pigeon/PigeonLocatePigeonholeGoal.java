@@ -1,13 +1,11 @@
-package io.github.mortuusars.envelope.world.entity.ai.goal;
+package io.github.mortuusars.envelope.world.entity.ai.goal.pigeon;
 
-import io.github.mortuusars.envelope.Envelope;
-import io.github.mortuusars.envelope.integration.sable.ContraptionTargets;
-import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
 
+import java.util.EnumSet;
 import java.util.List;
 
 public class PigeonLocatePigeonholeGoal extends Goal {
@@ -15,6 +13,7 @@ public class PigeonLocatePigeonholeGoal extends Goal {
 
     public PigeonLocatePigeonholeGoal(Pigeon pigeon) {
         this.pigeon = pigeon;
+        setFlags(EnumSet.of(Flag.TARGET));
     }
 
     @Override

@@ -1,21 +1,24 @@
-package io.github.mortuusars.envelope.world.entity.ai.goal;
+package io.github.mortuusars.envelope.world.entity.ai.goal.pigeon;
 
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
+import io.github.mortuusars.envelope.world.entity.ai.goal.courier.AbstractGoToBlockGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class PigeonGoToPigeonholeGoal extends AbstractGoToBlockGoal {
+    protected final Pigeon pigeon;
     @Nullable
     protected Path lastPath;
     protected Vec3 lastStuckCheckPos = Vec3.ZERO;
 
     public PigeonGoToPigeonholeGoal(Pigeon pigeon) {
         super(pigeon);
+        this.pigeon = pigeon;
     }
 
     @Override

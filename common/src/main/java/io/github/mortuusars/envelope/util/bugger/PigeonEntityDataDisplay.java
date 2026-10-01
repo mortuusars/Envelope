@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class PigeonEntityDataDisplay implements BuggerEntityOverhead.EntityOverheadDisplay {
     @Override
     public void addLines(Entity entity, ArrayList<Component> lines) {
-        if (!(entity instanceof Pigeon pigeon)) return;
+        if (!(entity instanceof Pigeon pigeon) || pigeon.isNoAi()) return;
 
         if (pigeon.getCurrentDelivery().isPresent()) {
             Delivery delivery = pigeon.getCurrentDelivery().get();

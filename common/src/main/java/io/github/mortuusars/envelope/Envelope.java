@@ -19,6 +19,7 @@ import io.github.mortuusars.envelope.util.bugger.data.MailServiceBuggerData;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlock;
 import io.github.mortuusars.envelope.world.block.mailbox.MailboxBlockEntity;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
@@ -498,6 +499,11 @@ public class Envelope {
                     .passengerAttachments(0.4625F)
                     .clientTrackingRange(8));
 
+        public static final Supplier<EntityType<CourierBat>> COURIER_BAT = REGISTRAR.entityType("courier_bat",
+              CourierBat::new, MobCategory.CREATURE, true, builder -> builder
+                    .sized(0.5F, 0.9F)
+                    .eyeHeight(0.45F)
+                    .clientTrackingRange(8));
 
         static void init() {
         }
@@ -729,6 +735,10 @@ public class Envelope {
         public static class Items {
             public static final TagKey<Item> PIGEON_FOOD =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("pigeon_food"));
+            public static final TagKey<Item> BAT_FOOD =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("bat_food"));
+            public static final TagKey<Item> COURIER_FOOD =
+                  TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("courier_food"));
 
             public static final TagKey<Item> VILLAGER_FEEDING_PIGEON_FOOD_COMMON =
                   TagKey.create(net.minecraft.core.registries.Registries.ITEM, resource("villager_feeding_pigeon_food_common"));

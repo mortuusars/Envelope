@@ -29,9 +29,9 @@ public class EnvelopeBuggerPage implements BuggerScreenPage {
                         "  In Cloud Depository: " + tag.getInt("cloud_depository_count"),
                         "",
                         "Couriers:",
-                        "  Real: " + tag.getInt("delivering_pigeons"),
-                        "  Background: " + tag.getInt("background_delivering_pigeons"),
-                        "  Finished: " + tag.getInt("background_finished_pigeons")
+                        "  Real: " + tag.getInt("delivering_couriers"),
+                        "  Background: " + tag.getInt("background_delivering_couriers"),
+                        "  Finished: " + tag.getInt("background_finished_couriers")
                   ));
 
                   ListTag deliveries = tag.getList("deliveries", Tag.TAG_STRING);

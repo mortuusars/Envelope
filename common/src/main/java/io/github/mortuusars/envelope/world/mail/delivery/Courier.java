@@ -160,8 +160,8 @@ public interface Courier {
             return true;
         }
 
-        if (getCourierOrigin().isService() && shouldTerminateServiceDeliveryEarly(level, delivery)) {
-            LOGGER.debug("Terminating service delivery [{}] early.", delivery.getId());
+        if (shouldTerminateAndDespawnEarly(level, delivery)) {
+            LOGGER.debug("Terminating delivery [{}] and despawning the courier early.", delivery.getId());
             delivery.beginPhase(DeliveryPhase.FINISHED);
             return true;
         }
@@ -207,12 +207,16 @@ public interface Courier {
     }
 
     /**
-     * Whether a service delivery should be ended early (when dispatching return),
+     * Whether a delivery should be ended early (when dispatching return),
      * to save on processing and avoid spawning the courier when it doesn't deliver anything.
      * <br>
      * This can cause side effects, if some logic depends on courier completing specific phase, even if empty.
      */
-    default boolean shouldTerminateServiceDeliveryEarly(ServerLevel level, Delivery delivery) {
-        return delivery.getMail().isEmpty();
+    default boolean shouldTerminateAndDespawnEarly(ServerLevel level, Delivery delivery) {
+        if (!delivery.getMail().isEmpty()) {
+            return false;
+        }
+
+        return getCourierOrigin().isService();
     }
 }

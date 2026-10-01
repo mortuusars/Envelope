@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.entity.ai.goal;
+package io.github.mortuusars.envelope.world.entity.ai.goal.pigeon;
 
 import io.github.mortuusars.envelope.world.block.PigeonholeBlockEntity;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -8,11 +8,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+
 public class PigeonEnterPigeonholeGoal extends Goal {
     private final Pigeon pigeon;
 
     public PigeonEnterPigeonholeGoal(Pigeon pigeon) {
         this.pigeon = pigeon;
+        setFlags(EnumSet.of(Flag.MOVE));
     }
 
     @Override

@@ -6,17 +6,16 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
-import io.github.mortuusars.envelope.world.entity.ai.PigeonNavigation;
 import io.github.mortuusars.envelope.world.entity.ai.PigeonholeHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.*;
 import io.github.mortuusars.envelope.world.entity.ai.goal.courier.DeliverMailGoal;
+import io.github.mortuusars.envelope.world.entity.ai.goal.courier.GoToMailboxGoal;
+import io.github.mortuusars.envelope.world.entity.ai.goal.courier.LocateMailboxGoal;
+import io.github.mortuusars.envelope.world.entity.ai.goal.courier.StartDeliveryFromMailboxGoal;
+import io.github.mortuusars.envelope.world.entity.ai.goal.pigeon.*;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
-import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
-import io.github.mortuusars.envelope.world.item.mail.Mail;
-import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.delivery.*;
 import io.github.mortuusars.mortaar.bugger.Bugger;
-import io.github.mortuusars.mortaar.util.Ticks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -127,8 +126,8 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     protected float flapping = 1.0F;
     protected float nextFlap = 1.0F;
 
-    protected PigeonholeHandler pigeonholeHandler;
-    protected MailboxHandler mailboxHandler;
+    protected PigeonholeHandler pigeonholeHandler = new PigeonholeHandler();
+    protected MailboxHandler mailboxHandler = new MailboxHandler();
 
     protected PigeonWanderGoal wanderGoal;
     protected PigeonAvoidEntityGoal<Animal> avoidEntityGoal;
@@ -140,8 +139,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     public Pigeon(EntityType<? extends Pigeon> entityType, Level level) {
         super(entityType, level);
         moveControl = new FlyingMoveControl(this, 10, false);
-        pigeonholeHandler = new PigeonholeHandler();
-        mailboxHandler = new MailboxHandler();
         setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
         setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
         setCanPickUpLoot(true);
@@ -216,15 +213,15 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
               5, 0.5, 0.6, AVOID_SELECTOR));
         goalSelector.addGoal(2, new PigeonPanicGoal(this, 3.5));
         goalSelector.addGoal(2, new PigeonEnterPigeonholeGoal(this));
-        goalSelector.addGoal(3, new PigeonStartDeliveryFromMailboxGoal(this));
+        goalSelector.addGoal(3, new StartDeliveryFromMailboxGoal(this));
         goalSelector.addGoal(4, new BreedGoal(this, 1.0));
         goalSelector.addGoal(5, new TemptGoal(this, 1.25, itemStack -> itemStack.is(Envelope.Tags.Items.PIGEON_FOOD), false));
         goalSelector.addGoal(6, new FollowParentGoal(this, 1.25));
         goalSelector.addGoal(7, new PigeonLocatePigeonholeGoal(this));
         goalSelector.addGoal(7, new PigeonGoToPigeonholeGoal(this));
-        goalSelector.addGoal(7, new PigeonLocateMailboxGoal(this));
+        goalSelector.addGoal(7, new LocateMailboxGoal(this, 32, 0.05f));
         goalSelector.addGoal(7, new PigeonSitGoal(this));
-        goalSelector.addGoal(8, new PigeonGoToMailboxGoal(this));
+        goalSelector.addGoal(8, new GoToMailboxGoal(this));
         goalSelector.addGoal(9, new PigeonSearchForFoodGoal(this));
         goalSelector.addGoal(9, new FollowSpecificMobGoal(this, FOLLOW_PREDICATE, 0.5, 3, 8));
         goalSelector.addGoal(10, wanderGoal = new PigeonWanderGoal(this, 0.5));
@@ -246,6 +243,10 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     public void aiStep() {
         super.aiStep();
         this.calculateFlapping();
+
+        if (isNoAi()) {
+            return;
+        }
 
         getPigeonholeHandler().tick(this, level());
         getMailboxHandler().tick(this, level());
@@ -418,30 +419,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         });
     }
 
-    protected void diedWhileDelivering(ServerLevel level, DamageSource damageSource, Delivery delivery) {
-        String message = damageSource.getLocalizedDeathMessage(this).getString();
-        String carriedItem = !delivery.getMail().isEmpty()
-              ? " a " + delivery.getMail().getHoverName().getString()
-              : "";
-        String addresses = delivery.getSender().getString()
-              + " to "
-              + delivery.getRecipient().getString();
-        String service = getCourierOrigin().isService() ? "Service " : "";
-        Envelope.LOGGER.info("{}{} at [{}] while delivering{} from {}!", service, message, blockPosition().toShortString(), carriedItem, addresses);
-
-        if (!getCourierOrigin().isService()) {
-            MailService.of(level).sendCourierDeathNotice(this, delivery, damageSource);
-        }
-
-        if (!delivery.getMail().isEmpty()) {
-            ItemStack mail = delivery.getPhase().isOnRecipientSide()
-                  ? Mail.asDelivered(delivery.getMail())
-                  : delivery.getMail();
-            spawnAtLocation(mail);
-            delivery.setMail(ItemStack.EMPTY);
-        }
-    }
-
     // -- Properties
 
     public boolean isSitting() {
@@ -575,51 +552,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return new Vec3(0.0, getEyeHeight() * 0.65F, getBbWidth() * 0.4F);
     }
 
-//    public boolean hasReachedTarget(BlockPos localPos) {
-//        return PigeonNavigation.hasReachedTarget(this, localPos, PigeonNavigation.getReachDistance());
-//    }
-//
-//    protected boolean hasReachedTarget(BlockPos localPos, double distance) {
-//        return PigeonNavigation.hasReachedTarget(this, localPos, distance);
-//    }
-//
-//    public boolean closerThan(BlockPos localPos, double distance) {
-//        return PigeonNavigation.isWithinReach(this, localPos, distance);
-//    }
-
-//    public boolean pathfindDirectlyTowards(BlockPos localPos) {
-//        BlockPos navigationPos = PigeonNavigation.getNavigationPos(this, localPos);
-//        getNavigation().setMaxVisitedNodesMultiplier(10.0F);
-//        getNavigation().moveTo(navigationPos.getX(), navigationPos.getY(), navigationPos.getZ(), 1, 1);
-//        return getNavigation().getPath() != null && getNavigation().getPath().canReach();
-//    }
-//
-//    public void pathfindRandomlyTowards(BlockPos localPos) {
-//        Vec3 vec3 = Position.getGlobalCenter(level(), localPos).subtract(0, 0.5, 0);
-//        int i = 0;
-//        BlockPos blockPos = this.blockPosition();
-//        int j = (int) vec3.y - blockPos.getY();
-//        if (j > 2) {
-//            i = 4;
-//        } else if (j < -2) {
-//            i = -4;
-//        }
-//
-//        int k = 6;
-//        int l = 8;
-//        int m = blockPos.distManhattan(Position.getNavigationPos(level(), localPos));
-//        if (m < 15) {
-//            k = m / 2;
-//            l = m / 2;
-//        }
-//
-//        Vec3 vec32 = AirRandomPos.getPosTowards(this, k, l, i, vec3, (float) (Math.PI / 10));
-//        if (vec32 != null) {
-//            this.navigation.setMaxVisitedNodesMultiplier(1.0F);
-//            this.navigation.moveTo(vec32.x, vec32.y, vec32.z, 1);
-//        }
-//    }
-
     public PigeonWanderGoal getWanderGoal() {
         return wanderGoal;
     }
@@ -745,10 +677,12 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return !isLeashed() && !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
     }
 
+    @Override
     public Optional<Delivery> getCurrentDelivery() {
         return Optional.ofNullable(delivery);
     }
 
+    @Override
     public void setDelivery(@Nullable Delivery delivery) {
         if (delivery == null && this.delivery == null) {
             return;
@@ -761,6 +695,15 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         }
     }
 
+    @Override
+    public void startDelivery(Delivery delivery) {
+        PhysicalCourier.super.startDelivery(delivery);
+        if (origin == null) {
+            origin = CourierOrigin.regular(blockPosition());
+        }
+    }
+
+    @Override
     public void onDeliveryChanged() {
         if (!level().isClientSide()) {
             setDelivering(getCurrentDelivery().isPresent());
@@ -788,42 +731,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     }
 
     @Override
-    public int getPhaseDuration(ServerLevel level, Delivery delivery, DeliveryPhase phase) {
-        return switch (phase) {
-            // Longer approach/depart phases to allow for pathfinding to finish
-            case DEPARTING_SENDER, APPROACHING_RECIPIENT, DEPARTING_RECIPIENT, APPROACHING_SENDER ->
-                  Mth.ceil(Ticks.fromSeconds(40) * (Config.Server.DELIVERY_ASCEND_DISTANCE.get() / 24f));
-            default -> PhysicalCourier.super.getPhaseDuration(level, delivery, phase);
-        };
-    }
-
-    @Override
-    public void phaseStarted(ServerLevel level, Delivery delivery) {
-        PhysicalCourier.super.phaseStarted(level, delivery);
-        if (delivery.getPhase().isTraveling()) {
-            transitionToBackground(level);
-        }
-        onDeliveryChanged();
-    }
-
-    @Override
-    public boolean handlePhaseTransition(ServerLevel level, Delivery delivery) {
-        if (delivery.getPhase() == DeliveryPhase.DEPARTING_SENDER && !hasReachedSegmentEndPos(delivery)) {
-            Mail.returned(delivery.getMail(), DeliveryRecord.Message.UNABLE_TO_REACH);
-            delivery.beginPhase(DeliveryPhase.APPROACHING_SENDER);
-            return true;
-        }
-
-        if (delivery.getPhase() == DeliveryPhase.APPROACHING_RECIPIENT && !hasReachedSegmentEndPos(delivery)) {
-            Mail.returned(delivery.getMail(), DeliveryRecord.Message.UNABLE_TO_REACH);
-            delivery.beginPhase(DeliveryPhase.DEPARTING_RECIPIENT);
-            return true;
-        }
-
-        return PhysicalCourier.super.handlePhaseTransition(level, delivery);
-    }
-
-    @Override
     public void endDelivery(ServerLevel level, Delivery delivery) {
         if (!delivery.getMail().isEmpty()) {
             spawnAtLocation(delivery.getMail().copy());
@@ -834,6 +741,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         setDelivery(null);
 
         if (getCourierOrigin().isService()) {
+            //TODO: Go back to ascend pos and then vanish (might not be necessary as service courier endpoint is not a mailbox, unless spawned manually)
             onVanished(level);
             discard();
         } else {
@@ -843,13 +751,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
             getPigeonholeHandler().setWantCooldown(20);
             setTiredTicks(Config.Server.PIGEON_TIRED_AFTER_DELIVERY_TICKS.get());
         }
-    }
-
-    protected boolean hasReachedSegmentEndPos(Delivery delivery) {
-        return delivery.getRoute().getSegment(delivery.getPhase()).endPos()
-              .map(endPos -> hasReachedTarget(
-                    PigeonNavigation.getSegmentApproachTarget(level(), endPos, delivery.getPhase())))
-              .orElse(true);
     }
 
     // -- Save / Load

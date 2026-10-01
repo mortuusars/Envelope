@@ -5,8 +5,10 @@ import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.*;
 import io.github.mortuusars.envelope.client.model.BatBackpackModel;
 import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
+import io.github.mortuusars.envelope.client.model.CourierBatModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.CharredPigeonRenderer;
+import io.github.mortuusars.envelope.client.renderer.entity.CourierBatRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.BatBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
@@ -48,6 +50,7 @@ public class NeoForgeClientEvents {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(Envelope.EntityTypes.PIGEON.get(), PigeonRenderer::new);
         event.registerEntityRenderer(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeonRenderer::new);
+        event.registerEntityRenderer(Envelope.EntityTypes.COURIER_BAT.get(), CourierBatRenderer::new);
     }
 
     @SubscribeEvent

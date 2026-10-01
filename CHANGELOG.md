@@ -8,6 +8,9 @@ Seal
   - Sealing an item with it creates a **Soulbound Seal**, which will prevent the item from dropping when sealer dies, and another players from opening it until the sealer dies
   - Has 8 uses and will return back to original stamp when depleted
 
+Misc
+- Courier appear/disappear (poof) particles now visible at higher distances
+
 ### Technical Changes
 Item components
 - `envelope:seal` definition now has an optional `lock` field 

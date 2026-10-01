@@ -11,13 +11,19 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 
+import java.util.EnumSet;
 import java.util.List;
 
 public class LocateMailboxGoal extends Goal {
     protected final PhysicalCourier courier;
+    protected final int maxDistance;
+    protected final float frequency;
 
-    public LocateMailboxGoal(PhysicalCourier courier) {
+    public LocateMailboxGoal(PhysicalCourier courier, int maxDistance, float frequency) {
         this.courier = courier;
+        this.maxDistance = maxDistance;
+        this.frequency = frequency;
+        setFlags(EnumSet.of(Flag.TARGET));
     }
 
     @Override
@@ -32,7 +38,7 @@ public class LocateMailboxGoal extends Goal {
               && courier.canStartDelivery()
               && courier.getMailboxHandler().getLocateCooldown() <= 0
               && courier.getMailboxHandler().getTargetPos() == null
-              && courier.level().getRandom().nextFloat() < 0.05;
+              && courier.level().getRandom().nextFloat() < frequency;
     }
 
     @Override
@@ -59,21 +65,18 @@ public class LocateMailboxGoal extends Goal {
 
     private List<BlockPos> findNearbyAvailableMailboxes() {
         ServerLevel level = (ServerLevel) courier.level();
-        int radius = 20;
         PoiManager poiManager = level.getPoiManager();
-        List<BlockPos> poiResults = poiManager.getInRange(holder ->
-                    holder.is(Envelope.PoiTypes.MAILBOX), courier.blockPosition(), radius, PoiManager.Occupancy.ANY)
+
+        List<BlockPos> poiResults = poiManager.getInRange(holder -> holder.is(Envelope.PoiTypes.MAILBOX),
+                    courier.blockPosition(), maxDistance, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
-              .filter(p -> level.getBlockEntity(p) instanceof MailboxBlockEntity mailbox
-                    && mailbox.isAvailableForPickup())
+              .filter(p -> level.getBlockEntity(p) instanceof MailboxBlockEntity blockEntity
+                    && blockEntity.isAvailableForPickup()
+                    && courier.canEat(blockEntity.getFood()))
               .toList();
 
-        return ContraptionTargets.locateNearby(
-              level,
-              courier.position(),
-              radius,
-              poiResults,
+        return ContraptionTargets.locateNearby(level, courier.position(), maxDistance, poiResults,
               () -> ContraptionTargets.findNearbyMailboxes(
-                    level, courier.position(), radius, MailboxBlockEntity::isAvailableForPickup));
+                    level, courier.position(), maxDistance, be -> be.isAvailableForPickup() && courier.canEat(be.getFood())));
     }
 }

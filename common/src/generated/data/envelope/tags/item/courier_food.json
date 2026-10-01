@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "#envelope:pigeon_food",
+      "required": false
+    },
+    {
+      "id": "#envelope:bat_food",
+      "required": false
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.command.EnvelopeCommand;
 import io.github.mortuusars.envelope.event.CommonEvents;
 import io.github.mortuusars.envelope.event.ServerEvents;
 import io.github.mortuusars.envelope.world.entity.CharredPigeon;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.PigeonVariant;
 import io.github.mortuusars.envelope.world.item.component.seal.SealSymbol;
@@ -38,6 +39,7 @@ public class NeoForgeCommonEvents {
     public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
         event.put(Envelope.EntityTypes.PIGEON.get(), Pigeon.createAttributes().build());
         event.put(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeon.createAttributes().build());
+        event.put(Envelope.EntityTypes.COURIER_BAT.get(), CourierBat.createAttributes().build());
     }
 
     @SubscribeEvent

@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail;
 
 import com.google.common.base.Preconditions;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.DeliveryManager;
@@ -168,6 +169,10 @@ public class MailService {
     }
 
     public void sendCourierDeathNotice(LivingEntity courier, Delivery delivery, DamageSource damageSource) {
+        if (!Config.Server.MAIL_SERVICE_COURIER_DEATH_NOTICE.get()) {
+            return;
+        }
+
         Address recipient = delivery.getSender();
 
         if (!(recipient instanceof BlockAddress) && !(recipient instanceof PlayerAddress)) {

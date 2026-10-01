@@ -22,7 +22,8 @@ public class EntityTypeTagsDatagen extends EntityTypeTagsProvider {
         tag(EntityTypeTags.FALL_DAMAGE_IMMUNE)
               .add(
                     Envelope.EntityTypes.PIGEON.get(),
-                    Envelope.EntityTypes.CHARRED_PIGEON.get()
+                    Envelope.EntityTypes.CHARRED_PIGEON.get(),
+                    Envelope.EntityTypes.COURIER_BAT.get()
               );
 
         tag(Envelope.Tags.EntityTypes.SPAWNS_ARCHIMEDES)

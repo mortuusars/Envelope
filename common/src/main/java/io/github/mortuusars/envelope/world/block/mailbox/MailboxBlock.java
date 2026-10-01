@@ -3,11 +3,12 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 import com.mojang.serialization.MapCodec;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenMailboxAddressTagScreenPacket;
-import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.item.AddressTagItem;
 import io.github.mortuusars.envelope.world.mail.address.BlockAddressValidation;
@@ -15,10 +16,10 @@ import io.github.mortuusars.envelope.world.mail.address.AllAddresses;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import io.github.mortuusars.envelope.world.mail.address.type.PlayerAddress;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,6 +52,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class MailboxBlock extends BaseEntityBlock {
     public static final MapCodec<MailboxBlock> CODEC = simpleCodec(MailboxBlock::new);
@@ -249,18 +252,52 @@ public class MailboxBlock extends BaseEntityBlock {
             if (level instanceof ServerLevel serverLevel) {
                 if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                       && blockEntity.isAvailableForPickup()
+                      && blockEntity.getFood().is(Envelope.Tags.Items.PIGEON_FOOD)
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
-                      pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
+                        pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
-                    if (player.isCreative()) {
-                        pigeon.setOrigin(CourierOrigin.service());
-                    } else {
+                    if (!player.isCreative()) {
                         pigeon.setOrigin(CourierOrigin.regular(pos));
                         stack.shrink(1);
+                    } else {
+                        pigeon.setOrigin(CourierOrigin.service());
                     }
                 } else {
                     serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
                 }
+            }
+
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        if (stack.is(Items.BAT_SPAWN_EGG)) {
+            if (!(level instanceof ServerLevel serverLevel)) {
+                return ItemInteractionResult.SUCCESS;
+            }
+
+            if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
+                  && blockEntity.isAvailableForPickup()
+                  && blockEntity.getFood().is(Envelope.Tags.Items.BAT_FOOD)) {
+
+                if (!level.isNight() || level.isRaining() || level.isThundering()) {
+                    serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                    player.displayClientMessage(Component.literal("Bat cannot deliver at this time.").withStyle(ChatFormatting.RED), true);
+                    return ItemInteractionResult.SUCCESS;
+                }
+
+                BlockPos spawnPos = Position.ascendTowards(level, pos, Optional.empty(),
+                      Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt());
+                @Nullable CourierBat bat = Envelope.EntityTypes.COURIER_BAT.get().spawn(serverLevel, spawnPos, MobSpawnType.SPAWN_EGG);
+                if (bat != null) {
+                    bat.setSpawnPos(spawnPos);
+                    bat.getMailboxHandler().setTargetPos(pos);
+                    bat.onAppeared(serverLevel);
+                    if (!player.isCreative()) {
+                        stack.shrink(1);
+                    }
+                }
+            } else {
+                serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
             }
 
             return ItemInteractionResult.SUCCESS;

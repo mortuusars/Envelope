@@ -1,4 +1,4 @@
-package io.github.mortuusars.envelope.world.entity.ai.goal;
+package io.github.mortuusars.envelope.world.entity.ai.goal.pigeon;
 
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.entity.Pigeon;

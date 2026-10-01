@@ -27,7 +27,8 @@ public class GoToMailboxGoal extends AbstractGoToBlockGoal {
               && courier.canStartDelivery()
               && super.canUse()
               && courier.level().getBlockEntity(getBlockPos()) instanceof MailboxBlockEntity blockEntity
-              && blockEntity.isAvailableForPickup();
+              && blockEntity.isAvailableForPickup()
+              && courier.canEat(blockEntity.getFood());
     }
 
     @Override
@@ -48,14 +49,14 @@ public class GoToMailboxGoal extends AbstractGoToBlockGoal {
 
         if (!courier.closerThan(handler.getTargetPos(), 16)) {
             if (handler.getTargetPos() != null
-                  && Position.distanceToSqr(courier.level(), handler.getTargetPos(), courier.position()) > 32 * 32) {
+                  && Position.distanceToSqr(courier.level(), handler.getTargetPos(), courier.position()) > 48 * 48) {
                 handler.dropMailbox();
             } else {
                 courier.pathfindRandomlyTowards(handler.getTargetPos());
             }
-        } else {
+        } else if (!courier.getNavigation().isInProgress()) {
             boolean canReach = courier.pathfindDirectlyTowards(handler.getTargetPos());
-            if (!canReach) {
+            if (!canReach && courier.getNavigation().getPath() == null) {
                 handler.dropAndBlacklistMailbox();
             } else if (lastPath != null && lastPath.sameAs(courier.getNavigation().getPath())) {
                 ticksStuck++;

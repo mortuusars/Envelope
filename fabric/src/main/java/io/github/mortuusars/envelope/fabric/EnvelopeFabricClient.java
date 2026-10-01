@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.client.model.BatBackpackModel;
 import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.CharredPigeonRenderer;
+import io.github.mortuusars.envelope.client.renderer.entity.CourierBatRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.PigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.BatBackpackLayer;
 import io.github.mortuusars.envelope.client.renderer.entity.layer.CharredPigeonBackpackLayer;
@@ -32,6 +33,8 @@ public class EnvelopeFabricClient implements ClientModInitializer {
 
         EntityRendererRegistry.register(Envelope.EntityTypes.PIGEON.get(), PigeonRenderer::new);
         EntityRendererRegistry.register(Envelope.EntityTypes.CHARRED_PIGEON.get(), CharredPigeonRenderer::new);
+        EntityRendererRegistry.register(Envelope.EntityTypes.COURIER_BAT.get(), CourierBatRenderer::new);
+
         EntityModelLayerRegistry.registerModelLayer(PigeonRenderer.MODEL_LAYER, PigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(PigeonBackpackLayer.MODEL_LAYER, PigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(PigeonHatLayer.MODEL_LAYER, PigeonModel::createLayerDefinition);

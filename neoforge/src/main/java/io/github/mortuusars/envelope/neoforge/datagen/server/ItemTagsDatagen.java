@@ -28,6 +28,11 @@ public class ItemTagsDatagen extends ItemTagsProvider {
 
         tag(Envelope.Tags.Items.PIGEON_FOOD)
               .addOptionalTag(Tags.Items.SEEDS);
+        tag(Envelope.Tags.Items.BAT_FOOD)
+              .add(Items.SPIDER_EYE);
+        tag(Envelope.Tags.Items.COURIER_FOOD)
+              .addOptionalTag(Envelope.Tags.Items.PIGEON_FOOD)
+              .addOptionalTag(Envelope.Tags.Items.BAT_FOOD);
 
         tag(Envelope.Tags.Items.VILLAGER_FEEDING_PIGEON_FOOD_COMMON)
               .add(Items.WHEAT_SEEDS);

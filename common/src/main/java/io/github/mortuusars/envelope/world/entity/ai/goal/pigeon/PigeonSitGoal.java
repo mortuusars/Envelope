@@ -1,7 +1,9 @@
-package io.github.mortuusars.envelope.world.entity.ai.goal;
+package io.github.mortuusars.envelope.world.entity.ai.goal.pigeon;
 
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.world.entity.ai.goal.Goal;
+
+import java.util.EnumSet;
 
 public class PigeonSitGoal extends Goal {
     private final Pigeon pigeon;
@@ -10,6 +12,7 @@ public class PigeonSitGoal extends Goal {
 
     public PigeonSitGoal(Pigeon pigeon) {
         this.pigeon = pigeon;
+        setFlags(EnumSet.of(Flag.MOVE));
     }
 
     @Override

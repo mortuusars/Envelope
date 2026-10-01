@@ -5,6 +5,7 @@ import io.github.mortuusars.envelope.util.EnvelopeSymbols;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
 import io.github.mortuusars.envelope.world.mail.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.mail.MailService;
@@ -13,6 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +35,10 @@ public class MailServiceBuggerData extends NbtData {
     // --
 
     private void writeDebugInfo(MailService mailService, CompoundTag tag) {
-        List<? extends Pigeon> pigeons = mailService.getLevel().getEntities(EntityTypeTest.forClass(Pigeon.class), Pigeon::isDelivering);
+        List<PhysicalCourier> couriers = mailService.getLevel().getEntities(EntityTypeTest.forClass(PathfinderMob.class),
+              mob -> !mob.isNoAi() && mob instanceof PhysicalCourier courier && courier.isDelivering())
+              .stream().map(mob -> (PhysicalCourier)mob)
+              .toList();
         List<BackgroundCourier> backgroundCouriers = mailService.getBackgroundDelivery().getActiveCouriers();
 
         tag.putInt("mailboxes", mailService.getMailboxes().getAllAddresses().size());
@@ -41,11 +46,11 @@ public class MailServiceBuggerData extends NbtData {
         tag.putInt("payback_pending_mail_count", mailService.getPaybackDepartment().getPendingPaybackSubjectCount());
         tag.putInt("cloud_depository_count", mailService.getCloudService().getTotalItemCount());
 
-        tag.putInt("delivering_pigeons", pigeons.size());
-        tag.putInt("background_delivering_pigeons", backgroundCouriers.size());
-        tag.putInt("background_finished_pigeons", mailService.getBackgroundDelivery().getFinishedCouriers().size());
+        tag.putInt("delivering_couriers", couriers.size());
+        tag.putInt("background_delivering_couriers", backgroundCouriers.size());
+        tag.putInt("background_finished_couriers", mailService.getBackgroundDelivery().getFinishedCouriers().size());
 
-        ListTag deliveries = Stream.concat(pigeons.stream(), backgroundCouriers.stream())
+        ListTag deliveries = Stream.concat(couriers.stream(), backgroundCouriers.stream())
               .sorted(Comparator.comparingLong(courier -> courier.getCurrentDelivery().orElseThrow().getId().getTick()))
               .map(courier -> formDeliveryString(mailService, courier))
               .map(StringTag::valueOf)
