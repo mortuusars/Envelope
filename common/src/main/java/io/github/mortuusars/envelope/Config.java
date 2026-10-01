@@ -14,14 +14,15 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_SPAWNS_IN_VILLAGE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE;
-        public static final ModConfigSpec.IntValue PIGEON_TIRED_AFTER_DELIVERY_TICKS;
+        public static final ModConfigSpec.IntValue PIGEON_DELIVERY_TIRED_TICKS;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_CAT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
-        public static final ModConfigSpec.DoubleValue PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING;
         public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
         public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
         public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
+        public static final ModConfigSpec.DoubleValue PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE;
+        public static final ModConfigSpec.DoubleValue PIGEON_DELIVERY_TRAVEL_SPEED;
 
         // -- Charred Pigeon
         public static final ModConfigSpec.BooleanValue CHARRED_PIGEON_SPAWNS_NATURALLY;
@@ -32,6 +33,7 @@ public abstract class Config {
 
         // -- Bat
         public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
+        public static final ModConfigSpec.DoubleValue BAT_DELIVERY_TRAVEL_SPEED;
 
         // -- Pigeonhole
         public static final ModConfigSpec.DoubleValue PIGEONHOLE_WASTE_INCREASE_CHANCE;
@@ -61,7 +63,7 @@ public abstract class Config {
         // -- Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
-        public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
+//        public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
         public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
@@ -110,9 +112,10 @@ public abstract class Config {
                 PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE = builder
                       .comment("Minimum time (in ticks) that Pigeon will spend outside of a Pigeonhole.")
                       .defineInRange("min_ticks_outside_pigeonhole", 2400, 100, Integer.MAX_VALUE);
-                PIGEON_TIRED_AFTER_DELIVERY_TICKS = builder
-                      .comment("Time (in ticks) for which Pigeon will be tired after finishing a delivery.")
-                      .defineInRange("ticks_tired_after_delivery", 6000, 0, Integer.MAX_VALUE);
+
+                PIGEON_EATS_SEEDS = builder
+                      .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
+                      .define("eats_seeds", true);
 
                 PIGEON_HUNTED_BY_CAT = builder
                       .comment("Cat will hunt and kill pigeons.", "Default: true")
@@ -124,21 +127,23 @@ public abstract class Config {
                       .comment("Fox will hunt and kill pigeons.", "Default: true")
                       .define("hunted_by_fox", true);
 
-                PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING = builder
-                      .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
-                      .defineInRange("damage_evasion_chance_while_delivering", 0.0, 0.0, 1.0);
-
-                PIGEON_EATS_SEEDS = builder
-                      .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
-                      .define("eats_seeds", true);
 
                 PIGEON_CONVERT_INTO_CHARRED = builder
                       .comment("Pigeon will convert into a Charred Pigeon when it stays in the ultrawarm dimension for some time.", "Default: true")
                       .define("convert_into_charred", true);
-
                 PIGEON_CONVERT_INTO_CHARRED_TICKS = builder
                       .comment("Time (in ticks) Pigeon needs to stay in the ultrawarm dimension to convert into Charred Pigeon.")
                       .defineInRange("convert_into_charred_ticks", 300, 0, Integer.MAX_VALUE);
+
+                PIGEON_DELIVERY_TRAVEL_SPEED = builder
+                      .comment("Speed (in blocks per second) while in traveling (background) phases of a delivery.")
+                      .defineInRange("delivery_travel_speed", 25.0, 0.1, 9999.0);
+                PIGEON_DELIVERY_TIRED_TICKS = builder
+                      .comment("Time (in ticks) for which Pigeon will be tired after finishing a delivery.")
+                      .defineInRange("ticks_tired_after_delivery", 6000, 0, Integer.MAX_VALUE);
+                PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE = builder
+                      .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
+                      .defineInRange("damage_evasion_chance_while_delivering", 0.0, 0.0, 1.0);
 
                 builder.pop();
             }
@@ -171,6 +176,9 @@ public abstract class Config {
                 BAT_MAX_DELIVERIES = builder
                       .comment("Maximum number of deliveries a single bat can do before leaving.")
                       .defineInRange("max_deliveries", 3, 1, 999);
+                BAT_DELIVERY_TRAVEL_SPEED = builder
+                      .comment("Speed (in blocks per second) while in traveling (background) phases of a delivery.")
+                      .defineInRange("delivery_travel_speed", 50.0, 0.1, 9999.0);
                 builder.pop();
             }
 
@@ -258,9 +266,6 @@ public abstract class Config {
                 DELIVERY_ASCEND_DISTANCE = builder
                       .comment("Distance (in blocks) above the mailbox where the courier disappears (transitions to the traveling phase).")
                       .defineInRange("ascend_distance", 24, 1, 64);
-                DELIVERY_COURIER_TRAVEL_SPEED = builder
-                      .comment("Courier speed (in blocks per second) while in traveling (background) phases.")
-                      .defineInRange("courier_travel_speed", 20.0, 0.01, 9999.0);
                 DELIVERY_TRAVEL_DURATION_DISTANCE_CAP = builder
                       .comment("Distance (in blocks) after which travel duration stops increasing and stays at maximum value.")
                       .defineInRange("travel_duration_distance_cap", 5000, 1, Integer.MAX_VALUE);

@@ -56,7 +56,7 @@ public class FinishedBackgroundCourierSpawner extends Spawner {
         level.addFreshEntityWithPassengers(entity);
 
         if (entity instanceof Pigeon pigeon) {
-            long tiredUntil = courier.finishedAt() + Config.Server.PIGEON_TIRED_AFTER_DELIVERY_TICKS.get();
+            long tiredUntil = courier.finishedAt() + Config.Server.PIGEON_DELIVERY_TIRED_TICKS.get();
             int tiredTicks = Math.max(0, GameTime.of(level).remainingTo(tiredUntil).getAsInt());
             pigeon.setTiredTicks(tiredTicks);
         }

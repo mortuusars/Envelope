@@ -29,9 +29,9 @@ public record TravelDuration(int ticks) {
 
     // --
 
-    public static TravelDuration basedOnDistance(int distanceInBlocks) {
+    public static TravelDuration basedOnDistance(int distanceInBlocks, double travelSpeed) {
         distanceInBlocks = Math.min(distanceInBlocks, Config.Server.DELIVERY_TRAVEL_DURATION_DISTANCE_CAP.get());
-        double seconds = distanceInBlocks / Config.Server.DELIVERY_COURIER_TRAVEL_SPEED.get();
+        double seconds = distanceInBlocks / travelSpeed;
         return new TravelDuration(Math.max(1, (int) Ticks.fromSeconds(seconds)));
     }
 }

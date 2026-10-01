@@ -133,7 +133,7 @@ public interface PhysicalCourier extends Courier {
 
     default BackgroundCourier transitionToBackground(ServerLevel level) {
         Delivery delivery = getCurrentDelivery().orElseThrow(() -> new IllegalStateException("Cannot transition: courier is not delivering."));
-        BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableCourierData(), getCourierOrigin(), delivery);
+        BackgroundCourier backgroundCourier = new BackgroundCourier(toSpawnableCourierData(), getCourierProperties(), getCourierOrigin(), delivery);
         MailService.of(level).getBackgroundDelivery().addCourier(backgroundCourier);
         onVanished(level);
         ((Entity) this).discard();

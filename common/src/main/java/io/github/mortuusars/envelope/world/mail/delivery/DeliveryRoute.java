@@ -67,7 +67,7 @@ public class DeliveryRoute {
         this.recipientPos = recipientPos;
     }
 
-    public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient) {
+    public static DeliveryRoute build(ServerLevel level, Address sender, Address recipient, Courier courier) {
         MailService mailService = MailService.of(level);
 
         AddressLocation senderLocation = mailService.getLocationOf(sender);
@@ -77,14 +77,16 @@ public class DeliveryRoute {
         Optional<BlockPos> recipientPos = recipientLocation.getPosition();
         Optional<BlockPos> hubPos = getHubPosition(senderLocation, recipientLocation);
 
+        double courierTravelSpeed = courier.getCourierProperties().travelSpeed();
+
         return new DeliveryRoute(
               senderLocation,
               recipientLocation,
               senderPos,
               senderLocation.ascendTowards(level, hubPos),
-              TravelDuration.basedOnDistance(senderLocation.getDistanceTo(level, hubPos)),
+              TravelDuration.basedOnDistance(senderLocation.getDistanceTo(level, hubPos), courierTravelSpeed),
               hubPos,
-              TravelDuration.basedOnDistance(recipientLocation.getDistanceTo(level, hubPos)),
+              TravelDuration.basedOnDistance(recipientLocation.getDistanceTo(level, hubPos), courierTravelSpeed),
               recipientLocation.ascendTowards(level, hubPos),
               recipientPos);
     }

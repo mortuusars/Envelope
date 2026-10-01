@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.world.entity.spawning.SpawnableItem;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.delivery.Courier;
 import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierProperties;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -18,24 +19,33 @@ import java.util.Optional;
 public class BackgroundCourier implements Courier {
     public static final Codec<BackgroundCourier> CODEC = RecordCodecBuilder.create(i -> i.group(
           SpawnableEntityData.CODEC.fieldOf("entity").forGetter(BackgroundCourier::getSpawnableEntityData),
+          CourierProperties.CODEC.optionalFieldOf("properties", CourierProperties.DEFAULT).forGetter(BackgroundCourier::getCourierProperties),
           CourierOrigin.CODEC.optionalFieldOf("origin", CourierOrigin.service()).forGetter(BackgroundCourier::getCourierOrigin),
           Delivery.CODEC.fieldOf("delivery").forGetter(BackgroundCourier::getDelivery)
     ).apply(i, BackgroundCourier::new));
     public static final Logger LOGGER = LogUtils.getLogger();
 
     private final SpawnableEntityData entityData;
-    private final Delivery delivery;
+    private final CourierProperties properties;
     private final CourierOrigin origin;
+    private final Delivery delivery;
+
     private boolean removed;
 
-    public BackgroundCourier(SpawnableEntityData entityData, CourierOrigin origin, Delivery delivery) {
+    public BackgroundCourier(SpawnableEntityData entityData, CourierProperties properties, CourierOrigin origin, Delivery delivery) {
         this.entityData = entityData;
-        this.delivery = delivery;
+        this.properties = properties;
         this.origin = origin;
+        this.delivery = delivery;
     }
 
     public SpawnableEntityData getSpawnableEntityData() {
         return entityData;
+    }
+
+    @Override
+    public CourierProperties getCourierProperties() {
+        return properties;
     }
 
     @Override

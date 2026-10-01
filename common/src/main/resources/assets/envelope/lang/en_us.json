@@ -347,7 +347,6 @@
   "envelope.configuration.spawns_naturally": "Spawns Naturally",
   "envelope.configuration.travel_duration_distance_cap": "Travel Duration Distance Cap",
   "envelope.configuration.debug_mode": "Debug Mode",
-  "envelope.configuration.courier_travel_speed": "Courier Travel Speed",
   "envelope.configuration.default_distance": "Default Distance",
   "envelope.configuration.ascend_distance": "Ascend Distance",
   "envelope.configuration.pause": "Pause",
@@ -414,6 +413,7 @@
   "envelope.configuration.locked_seal_owner_can_remove_without_unlocking": "Locked Seal - Owner Can Always Remove",
   "envelope.configuration.bat": "Bat",
   "envelope.configuration.max_deliveries": "Max Deliveries",
+  "envelope.configuration.delivery_travel_speed": "Delivery Travel Speed",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

@@ -8,6 +8,7 @@ import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.courier.*;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
 import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierProperties;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
 import io.github.mortuusars.mortaar.bugger.Bugger;
@@ -100,6 +101,11 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
               .add(Attributes.MAX_HEALTH, 6.0)
               .add(Attributes.FLYING_SPEED, 1F)
               .add(Attributes.MOVEMENT_SPEED, 0.2F);
+    }
+
+    public static PhysicalCourier createService(ServerLevel level) {
+        return Objects.requireNonNull(Envelope.EntityTypes.COURIER_BAT.get().create(level),
+              "Failed to create an entity. This should not happen.");
     }
 
     @Override
@@ -254,7 +260,7 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
         if (isDeadOrDying()) return false;
 
         //TODO: Change to generic courier names
-        if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING.get()
+        if (getRandom().nextDouble() < Config.Server.PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE.get()
               && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
 
             if (level() instanceof ServerLevel level) {
@@ -351,6 +357,11 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
     }
 
     // -- Courier
+
+    @Override
+    public CourierProperties getCourierProperties() {
+        return new CourierProperties(Config.Server.BAT_DELIVERY_TRAVEL_SPEED.get());
+    }
 
     @Override
     public ParticleOptions getTransitionParticle() {

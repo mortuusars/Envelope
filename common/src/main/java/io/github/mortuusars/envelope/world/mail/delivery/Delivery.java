@@ -86,8 +86,8 @@ public class Delivery {
         this.route = route;
     }
 
-    public void updateRoute(ServerLevel level) {
-        setRoute(DeliveryRoute.build(level, getSender(), getRecipient()));
+    public void updateRoute(ServerLevel level, Courier courier) {
+        setRoute(DeliveryRoute.build(level, getSender(), getRecipient(), courier));
     }
 
     public DeliveryPhase getPhase() {

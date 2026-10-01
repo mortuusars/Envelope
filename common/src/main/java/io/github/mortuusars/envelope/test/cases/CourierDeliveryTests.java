@@ -70,20 +70,18 @@ public class CourierDeliveryTests extends BuggerTests {
         }
 
         @Override
-        public void endDelivery(ServerLevel level, Delivery delivery) {
-            if (delivery.getPhase() == DeliveryPhase.FINISHED) {
-                endedCorrectly = true;
-            }
-        }
-
-        @Override
-        public Optional<Delivery> getCurrentDelivery() {
-            return Optional.of(delivery);
+        public CourierProperties getCourierProperties() {
+            return CourierProperties.DEFAULT;
         }
 
         @Override
         public @NotNull CourierOrigin getCourierOrigin() {
             return CourierOrigin.service();
+        }
+
+        @Override
+        public Optional<Delivery> getCurrentDelivery() {
+            return Optional.of(delivery);
         }
 
         @Override
@@ -111,6 +109,13 @@ public class CourierDeliveryTests extends BuggerTests {
         @Override
         public void phaseCompleted(ServerLevel level, Delivery delivery) {
             checks.get(delivery.getPhase()).set(2);
+        }
+
+        @Override
+        public void endDelivery(ServerLevel level, Delivery delivery) {
+            if (delivery.getPhase() == DeliveryPhase.FINISHED) {
+                endedCorrectly = true;
+            }
         }
     }
 }

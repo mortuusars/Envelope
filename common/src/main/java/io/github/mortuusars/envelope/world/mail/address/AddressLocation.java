@@ -27,12 +27,12 @@ public interface AddressLocation {
         return pos.map(this::getDistanceTo).orElse(Config.Server.DELIVERY_DEFAULT_DISTANCE.get());
     }
 
-    default TravelDuration getTravelDurationTo(BlockPos pos) {
-        return TravelDuration.basedOnDistance(getDistanceTo(pos));
+    default TravelDuration getTravelDurationTo(BlockPos pos, double speed) {
+        return TravelDuration.basedOnDistance(getDistanceTo(pos), speed);
     }
 
-    default TravelDuration getTravelDurationTo(Optional<BlockPos> pos) {
-        return TravelDuration.basedOnDistance(getDistanceTo(pos));
+    default TravelDuration getTravelDurationTo(Optional<BlockPos> pos, double speed) {
+        return TravelDuration.basedOnDistance(getDistanceTo(pos), speed);
     }
 
     default Optional<BlockPos> getNearestHub() {

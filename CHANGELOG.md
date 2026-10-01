@@ -21,7 +21,8 @@ Misc
 - `/envelope send` and `/envelope broadcast` commands have been moved to `/envelope mail send` and `/envelope mail broadcast` respectively
 - `/envelope mail send` now has an additional "recipient" parameter, allowing to specify the target without changing sendable item components (a bit easier to type) 
 - Moved seal-related textures from `textures/seal` to `textures/gui/sprites/seal` folder to allow for animations with .mcmeta files
-- Changed field `texture` to `sprite` in  `envelope:seal_material` and `envelope:seal_symbol` definitions  
+- Changed field `texture` to `sprite` in  `envelope:seal_material` and `envelope:seal_symbol` definitions
+- Replaced `courier_travel_speed` config option with separate `delivery_travel_speed` for pigeons and bats
 
 ## 0.8.0-Snapshot1
 ### New features

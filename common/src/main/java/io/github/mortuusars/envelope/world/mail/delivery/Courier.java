@@ -30,6 +30,8 @@ public interface Courier {
           context -> MailDropOffResult.returned(context.getMail())
     );
 
+    CourierProperties getCourierProperties();
+
     Optional<Delivery> getCurrentDelivery();
 
     @NotNull
@@ -145,7 +147,7 @@ public interface Courier {
             return true;
         }
 
-        delivery.updateRoute(level);
+        delivery.updateRoute(level, this);
         return false;
     }
 
@@ -167,7 +169,7 @@ public interface Courier {
         }
 
         if (service.getDeliveryManager().canDeliverTo(delivery.getSender())) {
-            delivery.updateRoute(level);
+            delivery.updateRoute(level, this);
         }
 
         return false;

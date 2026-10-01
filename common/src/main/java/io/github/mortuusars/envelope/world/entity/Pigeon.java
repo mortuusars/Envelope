@@ -509,7 +509,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         if (level().isClientSide()) return false;
         if (isDeadOrDying()) return false;
 
-        if (getRandom().nextDouble() < Config.Server.PIGEON_DAMAGE_EVASION_CHANCE_WHILE_DELIVERING.get()
+        if (getRandom().nextDouble() < Config.Server.PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE.get()
               && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
 
             if (level() instanceof ServerLevel level) {
@@ -673,6 +673,11 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     // -- Courier
 
     @Override
+    public CourierProperties getCourierProperties() {
+        return new CourierProperties(Config.Server.PIGEON_DELIVERY_TRAVEL_SPEED.get());
+    }
+
+    @Override
     public boolean canStartDelivery() {
         return !isLeashed() && !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
     }
@@ -749,7 +754,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
             getPigeonholeHandler().setTargetPos(getPigeonholeHandler().getHomePos());
             // Prevent Pigeon entering Pigeonhole immediately:
             getPigeonholeHandler().setWantCooldown(20);
-            setTiredTicks(Config.Server.PIGEON_TIRED_AFTER_DELIVERY_TICKS.get());
+            setTiredTicks(Config.Server.PIGEON_DELIVERY_TIRED_TICKS.get());
         }
     }
 

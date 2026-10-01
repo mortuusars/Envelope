@@ -1,5 +1,7 @@
 package io.github.mortuusars.envelope.integration.jei.ingredient;
 
+import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierProperties;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import io.github.mortuusars.envelope.util.Colors;
 import io.github.mortuusars.envelope.util.EnvelopeSymbols;
@@ -61,7 +63,9 @@ public class ServiceAddressIngredientRenderer implements IIngredientRenderer<Ser
     @Override
     public @NotNull List<Component> getTooltip(ServiceAddress ingredient, TooltipFlag tooltipFlag) {
         if (tooltipFlag.isAdvanced()) {
-            int travelDuration = ingredient.getDefinition().location().getTravelDurationTo(Minecrft.player().blockPosition()).ticks();
+            int travelDuration = ingredient.getDefinition().location().getTravelDurationTo(
+                  Minecrft.player().blockPosition(),
+                  Config.Server.PIGEON_DELIVERY_TRAVEL_SPEED.get()).ticks();
             return List.of(
                   ingredient.format().withIcon().toComponent(),
                   Component.literal("⌚" + EnvelopeSymbols.SMALL_SPACE)
