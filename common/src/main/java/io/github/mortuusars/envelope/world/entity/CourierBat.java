@@ -103,7 +103,7 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
               .add(Attributes.MOVEMENT_SPEED, 0.2F);
     }
 
-    public static PhysicalCourier createService(ServerLevel level) {
+    public static CourierBat createService(ServerLevel level) {
         return Objects.requireNonNull(Envelope.EntityTypes.COURIER_BAT.get().create(level),
               "Failed to create an entity. This should not happen.");
     }
@@ -488,7 +488,8 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
 
         @Override
         public boolean canUse() {
-            return !isDelivering() && getMailboxHandler().getTargetPos() == null && super.canUse();
+            if (isDelivering()) return false;
+            return super.canUse() && (!canStartDelivery() || getMailboxHandler().getTargetPos() == null);
         }
 
         @Override
@@ -539,7 +540,9 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
 
         @Override
         public boolean canUse() {
-            return !isDelivering() && getMailboxHandler().getTargetPos() == null && (spawnPos == null || hasReachedTarget(spawnPos));
+            if (isDelivering()) return false;
+            return (!canStartDelivery() || getMailboxHandler().getTargetPos() == null)
+                  && (spawnPos == null || hasReachedTarget(spawnPos));
         }
 
         @Override

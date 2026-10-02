@@ -32,6 +32,7 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS;
 
         // -- Bat
+        public static final ModConfigSpec.BooleanValue BAT_ENABLED;
         public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
         public static final ModConfigSpec.DoubleValue BAT_DELIVERY_TRAVEL_SPEED;
 
@@ -173,6 +174,9 @@ public abstract class Config {
 
             {
                 builder.push("bat");
+                BAT_ENABLED = builder
+                      .comment("Courier Bat is enabled and will deliver mail at night.", "Default: true")
+                      .define("enabled", true);
                 BAT_MAX_DELIVERIES = builder
                       .comment("Maximum number of deliveries a single bat can do before leaving.")
                       .defineInRange("max_deliveries", 3, 1, 999);

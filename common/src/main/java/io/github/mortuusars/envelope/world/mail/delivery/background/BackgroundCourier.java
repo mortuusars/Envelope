@@ -3,12 +3,13 @@ package io.github.mortuusars.envelope.world.mail.delivery.background;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mortuusars.envelope.Config;
+import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
+import io.github.mortuusars.envelope.world.entity.Pigeon;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableItem;
 import io.github.mortuusars.envelope.world.mail.MailService;
-import io.github.mortuusars.envelope.world.mail.delivery.Courier;
-import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
-import io.github.mortuusars.envelope.world.mail.delivery.CourierProperties;
-import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
+import io.github.mortuusars.envelope.world.mail.delivery.*;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
@@ -76,6 +77,47 @@ public class BackgroundCourier implements Courier {
         if (!isRemoved()) {
             tickDelivery(level, getDelivery());
         }
+    }
+
+    @Override
+    public boolean dispatchDelivery(ServerLevel level, Delivery delivery) {
+        boolean handled = Courier.super.dispatchDelivery(level, delivery);
+        changeToAppropriateCourierIfNeeded(level, delivery);
+        return handled;
+    }
+
+    @Override
+    public boolean dispatchReturn(ServerLevel level, Delivery delivery) {
+        boolean handled = Courier.super.dispatchReturn(level, delivery);
+        changeToAppropriateCourierIfNeeded(level, delivery);
+        return handled;
+    }
+
+    public boolean changeToAppropriateCourierIfNeeded(ServerLevel level, Delivery delivery) {
+        if (!getCourierOrigin().isService() || delivery.getPhase() == DeliveryPhase.FINISHED) {
+            return false;
+        }
+
+        return getSpawnableEntityData().getEntityType()
+              .flatMap(type -> {
+                  if (type.equals(Envelope.EntityTypes.COURIER_BAT.get()) && (!level.isNight() || !Config.Server.BAT_ENABLED.get())) {
+                      return Optional.of(Pigeon.createService(level));
+                  }
+                  if (type.equals(Envelope.EntityTypes.PIGEON.get()) && level.isNight() && Config.Server.BAT_ENABLED.get()) {
+                      return Optional.of(CourierBat.createService(level));
+                  }
+                  return Optional.empty();
+              })
+              .map(courier -> {
+                  level.getEnvelopeMailService().getBackgroundDelivery().addCourier(new BackgroundCourier(
+                        courier.toSpawnableCourierData(),
+                        courier.getCourierProperties(),
+                        CourierOrigin.service(),
+                        delivery));
+                  setRemoved();
+                  return true;
+              })
+              .orElse(false);
     }
 
     @Override

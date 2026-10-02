@@ -1,6 +1,7 @@
 package io.github.mortuusars.envelope.world.mail.delivery;
 
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
@@ -8,9 +9,6 @@ import io.github.mortuusars.envelope.world.mail.address.Address;
 import io.github.mortuusars.envelope.world.mail.address.type.*;
 import net.minecraft.server.level.ServerLevel;
 import org.slf4j.Logger;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class DeliveryManager {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -36,7 +34,7 @@ public class DeliveryManager {
     public void startService(DeliveryDraft draft) {
         ServerLevel level = getMailService().getLevel();
 
-        PhysicalCourier courier = level.isNight()
+        PhysicalCourier courier = Config.Server.BAT_ENABLED.get() && level.isNight()
               ? CourierBat.createService(level)
               : Pigeon.createService(level);
         start(courier, draft);

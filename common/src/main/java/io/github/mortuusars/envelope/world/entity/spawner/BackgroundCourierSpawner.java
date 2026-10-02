@@ -66,7 +66,8 @@ public class BackgroundCourierSpawner extends Spawner {
         if (courier.getCourierOrigin().isService()
               && courier.getDelivery().getMail().isEmpty()
               && !courier.getDelivery().getPhase().isOnRecipientSide()) {
-            return false; // Don't spawn service couriers when it doesn't make sense
+            return false; // Don't spawn service couriers when they won't do any work
+            // This check is a redundant safeguard, as empty service couriers are terminated early in Courier#dispatchReturn
         }
 
         return courier.getDelivery().getPhase().isSpawnable();

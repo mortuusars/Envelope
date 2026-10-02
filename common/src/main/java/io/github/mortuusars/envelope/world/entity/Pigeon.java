@@ -161,12 +161,6 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         return pigeon;
     }
 
-    public static Courier spawnServiceCourier(ServerLevel level, Delivery delivery) {
-        Pigeon pigeon = createService(level);
-        pigeon.startDelivery(delivery);
-        return pigeon.transitionToBackground(level);
-    }
-
     @Override
     public @NotNull SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                  MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {

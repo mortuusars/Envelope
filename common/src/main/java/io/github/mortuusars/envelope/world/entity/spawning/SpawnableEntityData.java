@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public record SpawnableEntityData(CustomData data) {
@@ -58,5 +59,10 @@ public record SpawnableEntityData(CustomData data) {
             LOGGER.error("Failed to create spawnable entity. Tag: {}", data.getUnsafe());
         }
         return entity;
+    }
+
+    @SuppressWarnings("deprecation")
+    public Optional<EntityType<?>> getEntityType() {
+        return EntityType.by(data.getUnsafe());
     }
 }
