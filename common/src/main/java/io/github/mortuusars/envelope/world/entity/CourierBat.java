@@ -33,8 +33,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,7 +44,7 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
-public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier {
+public class CourierBat extends PathfinderMob implements PhysicalCourier {
     public static final List<String> IGNORED_TAGS = Arrays.asList(
           "Air",
           "ArmorDropChances",
@@ -154,26 +152,6 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
     }
 
     @Override
-    protected int getBaseExperienceReward() {
-        return 0;
-    }
-
-    @Override
-    public boolean isFood(ItemStack stack) {
-        return stack.is(Envelope.Tags.Items.BAT_FOOD);
-    }
-
-    @Override
-    public boolean canFallInLove() {
-        return false;
-    }
-
-    @Override
-    public @Nullable AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        return null;
-    }
-
-    @Override
     protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
 
     }
@@ -214,11 +192,6 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
     public boolean isPersistenceRequired() {
         // Not sure if this changes much, but just to make sure.
         return super.isPersistenceRequired() || isDelivering();
-    }
-
-    @Override
-    public boolean isFlying() {
-        return true;
     }
 
     @Override
@@ -357,6 +330,11 @@ public class CourierBat extends Animal implements FlyingAnimal, PhysicalCourier 
     }
 
     // -- Courier
+
+    @Override
+    public boolean canEat(ItemStack food) {
+        return food.is(Envelope.Tags.Items.BAT_FOOD);
+    }
 
     @Override
     public CourierProperties getCourierProperties() {
