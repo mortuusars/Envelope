@@ -28,6 +28,7 @@ Misc
 - Replaced `courier_travel_speed` config option with separate `delivery_travel_speed` for pigeons and bats
 - Replaced `pigeon.damage_evasion_chance_while_delivering` config option with `delivery.courier_damage_evasion_chance`
 - Replaced `#envelope:bypasses_pigeon_delivery_evasion` damage type tag with `#envelope:bypasses_courier_delivery_evasion`
+- Changed `delivery.spawning_respects_domobspawning_rule` config option to `delivery.spawning_ignores_domobspawning_rule`
 
 ## 0.8.0-Snapshot1
 ### New features

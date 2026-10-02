@@ -28,7 +28,7 @@ public class FinishedBackgroundCourierSpawner extends Spawner {
 
     @Override
     public void spawn(ServerLevel level) {
-        if (Config.Server.DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE.get()
+        if (!Config.Server.DELIVERY_SPAWNING_IGNORES_DOMOBSPAWNING_RULE.get()
               && !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
             return;
         }

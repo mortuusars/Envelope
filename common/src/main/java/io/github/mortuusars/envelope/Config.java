@@ -68,7 +68,7 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
-        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
+        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_IGNORES_DOMOBSPAWNING_RULE;
         public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_DAMAGE_EVASION_CHANCE;
 
         // -- Payback
@@ -187,7 +187,8 @@ public abstract class Config {
                             "The actual summon time is randomized within this interval.")
                       .defineInRange("summon_interval", 400, 1, Integer.MAX_VALUE);
                 BAT_MAX_DELIVERIES = builder
-                      .comment("Maximum number of deliveries a single bat can do before leaving.")
+                      .comment("Maximum number of deliveries a single bat can do before leaving.",
+                            "This will only apply when delivery had a reply, as the bat will despawn early if it's not carrying anything back.")
                       .defineInRange("max_deliveries", 3, 1, 999);
                 BAT_DELIVERY_TRAVEL_SPEED = builder
                       .comment("Speed (in blocks per second) while in traveling (background) phases of a delivery.")
@@ -285,7 +286,7 @@ public abstract class Config {
                 DELIVERY_PHASE_DURATION_MODIFIER = builder
                       .comment("Global modifier on the delivery phase duration.")
                       .defineInRange("phase_duration_modifier", 1.0, 0.0, 999.0);
-                DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE = builder
+                DELIVERY_SPAWNING_IGNORES_DOMOBSPAWNING_RULE = builder
                       .comment("Delivering couriers will spawn regardless of 'doMobSpawning' gamerule.",
                             "Default: true")
                       .define("spawning_ignores_domobspawning_rule", true);
