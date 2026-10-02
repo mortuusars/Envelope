@@ -353,7 +353,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (batSummonCooldown > 0
               || !Config.Server.BAT_ENABLED.get()
               || !Config.Server.BAT_SUMMONED_TO_MAILBOX.get()
-              || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
+              || (!Config.Server.BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING.get() && !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
               || !level.isNight()
               || level.isRaining()
               || level.isThundering()

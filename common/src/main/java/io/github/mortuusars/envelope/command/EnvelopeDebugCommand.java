@@ -6,6 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import io.github.mortuusars.envelope.world.mail.MailService;
+import io.github.mortuusars.envelope.world.mail.delivery.PhysicalCourier;
+import io.github.mortuusars.envelope.world.mail.delivery.background.BackgroundCourier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -19,15 +21,68 @@ import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.levelgen.structure.Structure;
+
+import java.util.List;
 
 public class EnvelopeDebugCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> commands() {
         return Commands.literal("debug")
+              .then(Commands.literal("terminate_all_deliveries")
+                    .executes(EnvelopeDebugCommand::terminateAllDeliveries))
               .then(Commands.literal("expire_all_awaiting_payback")
                     .executes(EnvelopeDebugCommand::timeoutAllPaybackMail))
               .then(Commands.literal("test")
                     .executes(EnvelopeDebugCommand::test));
+    }
+
+    // --
+
+    private static boolean terminateAllDeliveriesRequiresConfirmation = true;
+
+    private static int terminateAllDeliveries(CommandContext<CommandSourceStack> context) {
+        if (terminateAllDeliveriesRequiresConfirmation) {
+            terminateAllDeliveriesRequiresConfirmation = false;
+            context.getSource().sendSuccess(() -> Component.literal(
+                        "Do you really want to stop all deliveries, despawning the couriers and voiding their mail?"), true);
+            context.getSource().sendSuccess(() -> Component.literal("[Kill Them All!]")
+                  .withStyle(Style.EMPTY
+                        .withColor(ChatFormatting.RED)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/envelope debug terminate_all_deliveries"))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click")))), true);
+        } else {
+            terminateAllDeliveriesRequiresConfirmation = true;
+
+            ServerLevel level = context.getSource().getLevel();
+
+            int count = 0;
+
+            for (BackgroundCourier courier : level.getEnvelopeMailService().getBackgroundDelivery().getActiveCouriers()) {
+                courier.setRemoved();
+                count++;
+            }
+
+            for (LivingEntity entity : level.getEntities(EntityTypeTest.forClass(LivingEntity.class),
+                  e -> e instanceof PhysicalCourier courier && courier.isDelivering())) {
+                if (entity instanceof Mob mob && mob.isNoAi()) {
+                    continue;
+                }
+                entity.discard();
+                count++;
+            }
+
+            if (count == 0) {
+                context.getSource().sendSuccess(() -> Component.literal("No deliveries to terminate."), true);
+            } else {
+                int finalCount = count;
+                context.getSource().sendSuccess(() -> Component.literal("Terminated '" + finalCount + "' " + (finalCount > 1 ? "deliveries." : "delivery.")), true);
+            }
+        }
+
+        return 0;
     }
 
     private static int timeoutAllPaybackMail(CommandContext<CommandSourceStack> context) {

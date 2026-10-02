@@ -108,7 +108,6 @@ public class SealRenderer {
         setShaderTintColor(colors.highlight());
         guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0,  x, y + 1, 30, 30);
 
-
         // Shadow
         setShaderTintColor(colors.shadow());
         guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0,  x, y - 1, 30, 30);

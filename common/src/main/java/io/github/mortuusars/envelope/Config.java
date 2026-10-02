@@ -33,6 +33,7 @@ public abstract class Config {
         // -- Bat
         public static final ModConfigSpec.BooleanValue BAT_ENABLED;
         public static final ModConfigSpec.BooleanValue BAT_SUMMONED_TO_MAILBOX;
+        public static final ModConfigSpec.BooleanValue BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING;
         public static final ModConfigSpec.IntValue BAT_SUMMON_COOLDOWN;
         public static final ModConfigSpec.IntValue BAT_SUMMON_INTERVAL;
         public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
@@ -174,11 +175,15 @@ public abstract class Config {
             {
                 builder.push("bat");
                 BAT_ENABLED = builder
-                      .comment("Courier Bat is enabled and will deliver mail at night.", "Default: true")
+                      .comment("Courier Bat is enabled and will deliver mail at night.",
+                            "Default: true")
                       .define("enabled", true);
                 BAT_SUMMONED_TO_MAILBOX = builder
-                      .comment("Bat will be spawned around a Mailbox if it has bat food and mail to deliver.", "Default: true")
+                      .comment("Bat will be summoned around to a Mailbox if it has `#envelope:bat_food` and mail to deliver.", "Default: true")
                       .define("summoned_to_mailbox", true);
+                BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING = builder
+                      .comment("Bat ignores doMobSpawning rule when summoned to a Mailbox", "Default: true")
+                      .define("mailbox_summon_ignores_domobspawning_rule", true);
                 BAT_SUMMON_COOLDOWN = builder
                       .comment("Cooldown (in ticks) to wait from previous summon before summoning another Bat to the same Mailbox.")
                       .defineInRange("summon_cooldown", 600, 1, Integer.MAX_VALUE);
@@ -281,7 +286,7 @@ public abstract class Config {
                       .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined.")
                       .defineInRange("default_distance", 1500, 1, Integer.MAX_VALUE);
                 DELIVERY_TRAVEL_DURATION_DISTANCE_CAP = builder
-                      .comment("Distance (in blocks) after which travel duration stops increasing and stays at maximum value.")
+                      .comment("Distance (in blocks) after which travel duration stops increasing.")
                       .defineInRange("travel_duration_distance_cap", 5000, 1, Integer.MAX_VALUE);
                 DELIVERY_PHASE_DURATION_MODIFIER = builder
                       .comment("Global modifier on the delivery phase duration.")

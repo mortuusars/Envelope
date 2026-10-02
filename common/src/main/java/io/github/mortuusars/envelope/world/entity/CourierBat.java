@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.entity.ai.CourierNavigation;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.courier.*;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
@@ -33,6 +34,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,7 +46,7 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
-public class CourierBat extends PathfinderMob implements PhysicalCourier {
+public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalCourier {
     public static final List<String> IGNORED_TAGS = Arrays.asList(
           "Air",
           "ArmorDropChances",
@@ -194,9 +196,19 @@ public class CourierBat extends PathfinderMob implements PhysicalCourier {
         return super.isPersistenceRequired() || isDelivering();
     }
 
+    /**
+     * Implementing FlyingAnimal makes significant difference, as some movement code (in LivingEntity) executes differently if entity is one.
+     * Without it, Bat turns back occasionally making its flight look weird.<br>
+     * The method itself doesn't really make a difference, but Bat is flying - so returning 'true' here wouldn't hurt.
+     */
+    @Override
+    public boolean isFlying() {
+        return true;
+    }
+
     @Override
     protected float getFlyingSpeed() {
-        return 0.035f;
+        return 0.04f;
     }
 
     public boolean isFlapping() {
@@ -395,8 +407,11 @@ public class CourierBat extends PathfinderMob implements PhysicalCourier {
         deliveries++;
 
         getMailboxHandler().setTargetPos(null);
-        spawnPos = Position.ascendTowards(level, blockPosition(),
-              Optional.empty(), Config.Server.DELIVERY_ASCEND_DISTANCE.get(), getId());
+        if (spawnPos == null) {
+            spawnPos = Position.ascendTowards(level, blockPosition(),
+                  Optional.empty(), Config.Server.DELIVERY_ASCEND_DISTANCE.get(), getId());
+        }
+        playAmbientSound();
     }
 
     public void despawn() {
@@ -518,7 +533,7 @@ public class CourierBat extends PathfinderMob implements PhysicalCourier {
         public boolean canUse() {
             if (isDelivering()) return false;
             return (!canStartDelivery() || getMailboxHandler().getTargetPos() == null)
-                  && (spawnPos == null || hasReachedTarget(spawnPos));
+                  && (spawnPos == null || hasReachedTarget(spawnPos, CourierNavigation.getReachDistance() + 1));
         }
 
         @Override

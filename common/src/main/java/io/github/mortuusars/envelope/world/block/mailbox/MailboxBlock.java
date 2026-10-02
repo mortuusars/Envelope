@@ -298,7 +298,7 @@ public class MailboxBlock extends BaseEntityBlock {
                 return ItemInteractionResult.SUCCESS;
             }
 
-            if (!player.isCreative() && !blockEntity.getFood().is(Envelope.Tags.Items.BAT_FOOD)) {
+            if (!blockEntity.getFood().is(Envelope.Tags.Items.BAT_FOOD)) {
                 serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
                 player.displayClientMessage(Component.literal("Bat doesn't like the food.").withStyle(ChatFormatting.RED), true);
                 return ItemInteractionResult.SUCCESS;

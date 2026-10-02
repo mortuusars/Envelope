@@ -417,6 +417,7 @@
   "envelope.configuration.summoned_to_mailbox": "Summoned To Mailbox",
   "envelope.configuration.summon_cooldown": "Summon Cooldown",
   "envelope.configuration.summon_interval": "Summon Interval",
+  "envelope.configuration.mailbox_summon_ignores_domobspawning_rule": "Mailbox Summon Ignores 'doMobSpawning' Rule",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 

@@ -747,6 +747,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
             // Prevent Pigeon entering Pigeonhole immediately:
             getPigeonholeHandler().setWantCooldown(20);
             setTiredTicks(Config.Server.PIGEON_DELIVERY_TIRED_TICKS.get());
+            playAmbientSound();
         }
     }
 
