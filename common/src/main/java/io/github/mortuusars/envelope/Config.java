@@ -33,6 +33,9 @@ public abstract class Config {
 
         // -- Bat
         public static final ModConfigSpec.BooleanValue BAT_ENABLED;
+        public static final ModConfigSpec.BooleanValue BAT_SUMMONED_TO_MAILBOX;
+        public static final ModConfigSpec.IntValue BAT_SUMMON_COOLDOWN;
+        public static final ModConfigSpec.IntValue BAT_SUMMON_INTERVAL;
         public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
         public static final ModConfigSpec.DoubleValue BAT_DELIVERY_TRAVEL_SPEED;
 
@@ -64,7 +67,6 @@ public abstract class Config {
         // -- Delivery
         public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
-//        public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_TRAVEL_SPEED;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
         public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
         public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
@@ -177,6 +179,16 @@ public abstract class Config {
                 BAT_ENABLED = builder
                       .comment("Courier Bat is enabled and will deliver mail at night.", "Default: true")
                       .define("enabled", true);
+                BAT_SUMMONED_TO_MAILBOX = builder
+                      .comment("Bat will be spawned around a Mailbox if it has bat food and mail to deliver.", "Default: true")
+                      .define("summoned_to_mailbox", true);
+                BAT_SUMMON_COOLDOWN = builder
+                      .comment("Cooldown (in ticks) to wait from previous summon before summoning another Bat to the same Mailbox.")
+                      .defineInRange("summon_cooldown", 600, 1, Integer.MAX_VALUE);
+                BAT_SUMMON_INTERVAL = builder
+                      .comment("Maximum time (in ticks) between Bat summon attempts.",
+                            "The actual summon time is randomized within this interval.")
+                      .defineInRange("summon_interval", 400, 1, Integer.MAX_VALUE);
                 BAT_MAX_DELIVERIES = builder
                       .comment("Maximum number of deliveries a single bat can do before leaving.")
                       .defineInRange("max_deliveries", 3, 1, 999);
@@ -303,7 +315,7 @@ public abstract class Config {
                 {
                     builder.push("mail_service");
                     MAIL_SERVICE_COURIER_DEATH_NOTICE = builder
-                          .comment("Courier Death Notice letter will be sent to the origin mailbox when a courier dies while delivering.", "Default: true")
+                          .comment("Courier Death Notice letter will be sent to the origin mailbox when the courier dies while delivering.", "Default: true")
                           .define("courier_death_notice", true);
                     builder.pop();
                 }

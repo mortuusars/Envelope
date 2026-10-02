@@ -248,14 +248,25 @@ public class MailboxBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
+
+        //TODO: refactor the hell out from this:
+
         if (stack.is(Envelope.Items.PIGEON_SPAWN_EGG.get())) {
             if (level instanceof ServerLevel serverLevel) {
                 if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                       && blockEntity.isAvailableForPickup()
                       && blockEntity.getFood().is(Envelope.Tags.Items.PIGEON_FOOD)
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
-                        pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
+                      pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
+
+                    if (level.isNight() || level.isRaining() || level.isThundering()) {
+                        serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                        player.displayClientMessage(Component.literal("Pigeon cannot deliver at this time.").withStyle(ChatFormatting.RED), true);
+                        return ItemInteractionResult.SUCCESS;
+                    }
+
+
                     if (!player.isCreative()) {
                         pigeon.setOrigin(CourierOrigin.regular(pos));
                         stack.shrink(1);
@@ -270,34 +281,46 @@ public class MailboxBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        if (stack.is(Items.BAT_SPAWN_EGG)) {
+        //TODO: Don't consume food and mail in creative
+        if (stack.is(Items.BAT_SPAWN_EGG) && Config.Server.BAT_ENABLED.get()) {
             if (!(level instanceof ServerLevel serverLevel)) {
                 return ItemInteractionResult.SUCCESS;
             }
 
-            if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
-                  && blockEntity.isAvailableForPickup()
-                  && blockEntity.getFood().is(Envelope.Tags.Items.BAT_FOOD)) {
+            if (!(level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity)) {
+                serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                return ItemInteractionResult.SUCCESS;
+            }
 
-                if (!level.isNight() || level.isRaining() || level.isThundering()) {
-                    serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
-                    player.displayClientMessage(Component.literal("Bat cannot deliver at this time.").withStyle(ChatFormatting.RED), true);
-                    return ItemInteractionResult.SUCCESS;
-                }
+            if (!blockEntity.isAvailableForPickup()) {
+                serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                player.displayClientMessage(Component.literal("Nothing to deliver or food is missing.").withStyle(ChatFormatting.RED), true);
+                return ItemInteractionResult.SUCCESS;
+            }
 
-                BlockPos spawnPos = Position.ascendTowards(level, pos, Optional.empty(),
-                      Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt());
-                @Nullable CourierBat bat = Envelope.EntityTypes.COURIER_BAT.get().spawn(serverLevel, spawnPos, MobSpawnType.SPAWN_EGG);
-                if (bat != null) {
-                    bat.setSpawnPos(spawnPos);
-                    bat.getMailboxHandler().setTargetPos(pos);
-                    bat.onAppeared(serverLevel);
-                    if (!player.isCreative()) {
-                        stack.shrink(1);
-                    }
+            if (!player.isCreative() && !blockEntity.getFood().is(Envelope.Tags.Items.BAT_FOOD)) {
+                serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                player.displayClientMessage(Component.literal("Bat doesn't like the food.").withStyle(ChatFormatting.RED), true);
+                return ItemInteractionResult.SUCCESS;
+            }
+
+            if (!level.isNight() || level.isRaining() || level.isThundering()) {
+                serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                player.displayClientMessage(Component.literal("Bat cannot deliver at this time.").withStyle(ChatFormatting.RED), true);
+                return ItemInteractionResult.SUCCESS;
+            }
+
+            @Nullable CourierBat bat = Envelope.EntityTypes.COURIER_BAT.get().spawn(serverLevel, pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG);
+            if (bat != null) {
+                bat.setSpawnPos(Position.ascendTowards(level, pos, Optional.empty(),
+                      Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt()));
+                bat.getMailboxHandler().setTargetPos(pos);
+                if (!player.isCreative()) {
+                    stack.shrink(1);
                 }
             } else {
                 serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
+                player.displayClientMessage(Component.literal("Bat failed to arrive.").withStyle(ChatFormatting.RED), true);
             }
 
             return ItemInteractionResult.SUCCESS;

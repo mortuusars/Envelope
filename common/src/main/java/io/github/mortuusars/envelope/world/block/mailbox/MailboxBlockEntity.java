@@ -2,9 +2,11 @@ package io.github.mortuusars.envelope.world.block.mailbox;
 
 import com.google.common.base.Preconditions;
 import com.mojang.logging.LogUtils;
+import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundMailboxHasNewMailPacket;
-import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
+import io.github.mortuusars.envelope.world.Position;
+import io.github.mortuusars.envelope.world.entity.CourierBat;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -32,6 +34,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -53,16 +56,18 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public static final int SLOT_MAIL = 1;
     public static final int INBOX_SLOT = 2;
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    protected static final Logger LOGGER = LogUtils.getLogger();
 
-    private NonNullList<ItemStack> items = NonNullList.withSize(REGULAR_SLOTS, ItemStack.EMPTY);
-    private @NotNull UUID inboxId = UUID.randomUUID();
-    private @Nullable BlockAddress address;
-    private @Nullable UUID owner;
+    protected NonNullList<ItemStack> items = NonNullList.withSize(REGULAR_SLOTS, ItemStack.EMPTY);
+    protected @NotNull UUID inboxId = UUID.randomUUID();
+    protected @Nullable BlockAddress address;
+    protected @Nullable UUID owner;
 
-    private @NotNull List<ItemStack> mail = new ArrayList<>();
-    private boolean loaded = false;
-    private boolean blockRemoved = false;
+    protected @NotNull List<ItemStack> mail = new ArrayList<>();
+    protected boolean loaded = false;
+    protected boolean blockRemoved = false;
+    protected int batSummonCooldown;
+    protected int batSummonAttempt;
 
     protected MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -188,7 +193,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.COURIER_FOOD);
+        if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD)
+              || (Config.Server.BAT_ENABLED.get() && Config.Server.BAT_SUMMONED_TO_MAILBOX.get() && stack.is(Envelope.Tags.Items.BAT_FOOD));
         if (slot == SLOT_MAIL) return isSendable(stack);
         return false;
     }
@@ -331,11 +337,44 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     // -- Events
 
-    public void serverTick(ServerLevel level, BlockPos blockPos, BlockState blockState) {
+    public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         if (!loaded) {
             onLoaded();
             loaded = true;
         }
+
+        maybeSummonBat(level, pos);
+    }
+
+    protected boolean maybeSummonBat(ServerLevel level, BlockPos pos) {
+        batSummonCooldown--;
+
+        if (batSummonCooldown > 0
+              || !Config.Server.BAT_ENABLED.get()
+              || !Config.Server.BAT_SUMMONED_TO_MAILBOX.get()
+              || !level.isNight()
+              || level.isRaining()
+              || level.isThundering()
+              || !isAvailableForPickup()
+              || !getFood().is(Envelope.Tags.Items.BAT_FOOD)
+              || level.getRandom().nextInt(Math.max(1, Config.Server.BAT_SUMMON_INTERVAL.get() - batSummonAttempt++)) != 0) {
+            return false;
+        }
+
+        BlockPos spawnPos = Position.ascendTowards(level, pos, Optional.empty(),
+              Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt());
+        @Nullable CourierBat bat = Envelope.EntityTypes.COURIER_BAT.get().spawn(level, spawnPos, MobSpawnType.NATURAL);
+        if (bat != null) {
+            bat.setSpawnPos(spawnPos);
+            bat.getMailboxHandler().setTargetPos(pos);
+            bat.onAppeared(level);
+            level.playSound(null, spawnPos, SoundEvents.APPLY_EFFECT_BAD_OMEN, SoundSource.BLOCKS, 1f, 1f);
+            batSummonCooldown = Config.Server.BAT_SUMMON_COOLDOWN.get();
+            batSummonAttempt = 0;
+            return true;
+        }
+
+        return false;
     }
 
     protected void onLoaded() {
@@ -416,6 +455,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (address != null) tag.putString("address", address.getString());
         if (owner != null) tag.putUUID("owner", owner);
         if (!inboxId.equals(Util.NIL_UUID)) tag.putUUID("inbox_id", inboxId);
+        if (batSummonCooldown > 0) tag.putInt("bat_summon_cooldown", batSummonCooldown);
+        if (batSummonAttempt > 0) tag.putInt("bat_summon_attempt", batSummonCooldown);
     }
 
     @Override
@@ -424,6 +465,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         setAddress(tag.contains("address", Tag.TAG_STRING) ? new BlockAddress(tag.getString("address")) : null);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         inboxId = tag.hasUUID("inbox_id") ? tag.getUUID("inbox_id") : UUID.randomUUID();
+        batSummonCooldown = tag.getInt("bat_summon_cooldown");
+        batSummonAttempt = tag.getInt("bat_summon_attempt");
     }
 
     // -- Util

@@ -414,6 +414,9 @@
   "envelope.configuration.bat": "Bat",
   "envelope.configuration.max_deliveries": "Max Deliveries",
   "envelope.configuration.delivery_travel_speed": "Delivery Travel Speed",
+  "envelope.configuration.summoned_to_mailbox": "Summoned To Mailbox",
+  "envelope.configuration.summon_cooldown": "Summon Cooldown",
+  "envelope.configuration.summon_interval": "Summon Interval",
 
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
