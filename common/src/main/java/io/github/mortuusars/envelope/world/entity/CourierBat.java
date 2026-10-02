@@ -484,6 +484,15 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         }
 
         @Override
+        public void start() {
+            super.start();
+            // If bat decided to leave - prevent it from searching mailbox again.
+            // Default cooldown is rather short, and in some cases the bat will be caught in a loop of
+            // leaving -> going to mailbox -> cannot reach -> leaving -> going to mailbox -> cannot reach -> etc.
+            getMailboxHandler().setLocateCooldown(400);
+        }
+
+        @Override
         public void tick() {
             BlockPos target = getBlockPos();
 
@@ -533,7 +542,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         public boolean canUse() {
             if (isDelivering()) return false;
             return (!canStartDelivery() || getMailboxHandler().getTargetPos() == null)
-                  && (spawnPos == null || hasReachedTarget(spawnPos, CourierNavigation.getReachDistance() + 1));
+                  && (spawnPos == null || hasReachedTarget(spawnPos));
         }
 
         @Override
