@@ -9,6 +9,8 @@ Seal
   - Has 8 uses and will return back to original stamp when depleted
 
 Misc
+- Increased Pigeon delivery travel speed (when in background) from 20 to 25
+  - Existing configs would need to be updated or regenerated for this change to apply after updating from previous version 
 - Courier appear/disappear (poof) particles now visible at higher distances
 
 ### Technical Changes
@@ -24,6 +26,8 @@ Misc
 - Changed field `texture` to `sprite` in  `envelope:seal_material` and `envelope:seal_symbol` definitions
 - Added `service_addresses.mail_service.courier_death_notice` server config option
 - Replaced `courier_travel_speed` config option with separate `delivery_travel_speed` for pigeons and bats
+- Replaced `pigeon.damage_evasion_chance_while_delivering` config option with `delivery.courier_damage_evasion_chance`
+- Replaced `#envelope:bypasses_pigeon_delivery_evasion` damage type tag with `#envelope:bypasses_courier_delivery_evasion`
 
 ## 0.8.0-Snapshot1
 ### New features

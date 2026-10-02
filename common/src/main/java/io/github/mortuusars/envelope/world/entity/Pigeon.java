@@ -407,10 +407,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
     @Override
     protected void dropAllDeathLoot(ServerLevel level, DamageSource damageSource) {
         super.dropAllDeathLoot(level, damageSource);
-
-        getCurrentDelivery().ifPresent(delivery -> {
-            diedWhileDelivering(level, damageSource, delivery);
-        });
+        getCurrentDelivery().ifPresent(delivery -> diedWhileDelivering(level, damageSource, delivery));
     }
 
     // -- Properties
@@ -503,8 +500,8 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         if (level().isClientSide()) return false;
         if (isDeadOrDying()) return false;
 
-        if (getRandom().nextDouble() < Config.Server.PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE.get()
-              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
+        if (getRandom().nextDouble() < Config.Server.DELIVERY_COURIER_DAMAGE_EVASION_CHANCE.get()
+              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_COURIER_DELIVERY_EVASION)) {
 
             if (level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.POOF, position().x, position().y, position().z, 3, 0.3, 0.3, 0.3, 0);
@@ -740,7 +737,8 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
         setDelivery(null);
 
         if (getCourierOrigin().isService()) {
-            //TODO: Go back to ascend pos and then vanish (might not be necessary as service courier endpoint is not a mailbox, unless spawned manually)
+            //TODO: Go back to ascend pos and then vanish
+            // (though this might not be necessary as service courier endpoint is not a mailbox, unless spawned manually)
             onVanished(level);
             discard();
         } else {

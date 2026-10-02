@@ -21,25 +21,32 @@ public class DataGeneration {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+        ExistingFileHelper helper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> registries = new BuiltInDatapackEntries(output, event.getLookupProvider()).getRegistryProvider();
-        DatapackBuiltinEntriesProvider datapackRegistries = new BuiltInDatapackEntries(output, registries);
+        DatapackBuiltinEntriesProvider datapackEntries = new BuiltInDatapackEntries(output, registries);
+        CompletableFuture<HolderLookup.Provider> datapackRegistries = datapackEntries.getRegistryProvider();
 
-        generator.addProvider(event.includeClient(), new ModelsDatagen(output, existingFileHelper));
+        // -- Server
 
-        generator.addProvider(event.includeServer(), new RecipesDatagen(output, datapackRegistries.getRegistryProvider()));
-        BlockTagsDatagen blockTags = new BlockTagsDatagen(output, registries, existingFileHelper);
+        generator.addProvider(event.includeServer(), new RecipesDatagen(output, datapackRegistries));
+        TagsDatagen.BlockTagsDatagen blockTags = new TagsDatagen.BlockTagsDatagen(output, registries, helper);
         generator.addProvider(event.includeServer(), blockTags);
-        generator.addProvider(event.includeServer(), new ItemTagsDatagen(output, registries, blockTags.contentsGetter(), existingFileHelper));
-        generator.addProvider(event.includeServer(), new EntityTypeTagsDatagen(output, registries, existingFileHelper));
+        generator.addProvider(event.includeServer(), new TagsDatagen.ItemTags(output, registries, blockTags.contentsGetter(), helper));
+        generator.addProvider(event.includeServer(), new TagsDatagen.DamageTypeTags(output, registries, helper));
+        generator.addProvider(event.includeServer(), new TagsDatagen.EntityTypeTagsDatagen(output, registries, helper));
         generator.addProvider(event.includeServer(), LootTablesDatagen.create(output, registries));
 
-        generator.addProvider(event.includeServer(), datapackRegistries);
-        generator.addProvider(event.includeServer(), new SealImpressionTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ServiceAddressTagsDatagen(output, datapackRegistries.getRegistryProvider(), Envelope.ID, existingFileHelper));
+        generator.addProvider(event.includeServer(), datapackEntries);
+        generator.addProvider(event.includeServer(), new TagsDatagen.SealImpressionTagsDatagen(output, datapackRegistries, helper));
+        generator.addProvider(event.includeServer(), new TagsDatagen.ServiceAddressTagsDatagen(output, datapackRegistries, helper));
 
-        generator.addProvider(event.includeServer(), new AdvancementsDatagen(output, datapackRegistries.getRegistryProvider(), existingFileHelper, List.of(
+        generator.addProvider(event.includeServer(), new AdvancementsDatagen(output, datapackRegistries, helper, List.of(
               new AdvancementsDatagen.Generator()
         )));
+
+
+        // -- Client
+
+        generator.addProvider(event.includeClient(), new ModelsDatagen(output, helper));
     }
 }

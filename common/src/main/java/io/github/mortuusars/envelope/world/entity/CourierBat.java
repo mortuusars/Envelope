@@ -223,7 +223,6 @@ public class CourierBat extends PathfinderMob implements PhysicalCourier {
     @Override
     protected void dropAllDeathLoot(ServerLevel level, DamageSource damageSource) {
         super.dropAllDeathLoot(level, damageSource);
-
         getCurrentDelivery().ifPresent(delivery -> diedWhileDelivering(level, damageSource, delivery));
     }
 
@@ -232,9 +231,8 @@ public class CourierBat extends PathfinderMob implements PhysicalCourier {
         if (level().isClientSide()) return false;
         if (isDeadOrDying()) return false;
 
-        //TODO: Change to generic courier names
-        if (getRandom().nextDouble() < Config.Server.PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE.get()
-              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_PIGEON_DELIVERY_EVASION)) {
+        if (getRandom().nextDouble() < Config.Server.DELIVERY_COURIER_DAMAGE_EVASION_CHANCE.get()
+              && !source.is(Envelope.Tags.DamageTypes.BYPASSES_COURIER_DELIVERY_EVASION)) {
 
             if (level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.POOF, position().x, position().y, position().z, 3, 0.3, 0.3, 0.3, 0);

@@ -475,8 +475,6 @@ public class Envelope {
               b -> b.persistent(PaybackSubject.CODEC).networkSynchronized(PaybackSubject.STREAM_CODEC).cacheEncoding());
 
         // -- Misc
-//        public static final DataComponentType<Unit> KEPT_ON_DEATH = REGISTRAR.dataComponentType("kept_on_death",
-//              b -> b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
         public static final DataComponentType<List<Occupant>> PIGEONS = REGISTRAR.dataComponentType("pigeons", b ->
               b.persistent(Occupant.LIST_CODEC).networkSynchronized(Occupant.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());
 
@@ -730,6 +728,12 @@ public class Envelope {
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("pigeonholes_that_burn"));
             public static final TagKey<Block> BURNING =
                   TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("burning"));
+            public static final TagKey<Block> DOVECOTE_PLAINS_REPLACEABLE =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("dovecote_plains_replaceable"));
+            public static final TagKey<Block> DOVECOTE_SAVANNA_REPLACEABLE =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("dovecote_savanna_replaceable"));
+            public static final TagKey<Block> DOVECOTE_TAIGA_REPLACEABLE =
+                  TagKey.create(net.minecraft.core.registries.Registries.BLOCK, resource("dovecote_taiga_replaceable"));
         }
 
         public static class Items {
@@ -776,8 +780,8 @@ public class Envelope {
         }
 
         public static class DamageTypes {
-            public static final TagKey<DamageType> BYPASSES_PIGEON_DELIVERY_EVASION =
-                  TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("bypasses_pigeon_delivery_evasion"));
+            public static final TagKey<DamageType> BYPASSES_COURIER_DELIVERY_EVASION =
+                  TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("bypasses_courier_delivery_evasion"));
             public static final TagKey<DamageType> SPAWNS_ARCHIMEDES =
                   TagKey.create(net.minecraft.core.registries.Registries.DAMAGE_TYPE, resource("spawns_archimedes"));
         }

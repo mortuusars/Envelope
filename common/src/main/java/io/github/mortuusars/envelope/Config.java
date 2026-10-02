@@ -21,7 +21,6 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
         public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
         public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
-        public static final ModConfigSpec.DoubleValue PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE;
         public static final ModConfigSpec.DoubleValue PIGEON_DELIVERY_TRAVEL_SPEED;
 
         // -- Charred Pigeon
@@ -65,11 +64,12 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING;
 
         // -- Delivery
-        public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_ASCEND_DISTANCE;
+        public static final ModConfigSpec.IntValue DELIVERY_DEFAULT_DISTANCE;
         public static final ModConfigSpec.IntValue DELIVERY_TRAVEL_DURATION_DISTANCE_CAP;
-        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
         public static final ModConfigSpec.DoubleValue DELIVERY_PHASE_DURATION_MODIFIER;
+        public static final ModConfigSpec.BooleanValue DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE;
+        public static final ModConfigSpec.DoubleValue DELIVERY_COURIER_DAMAGE_EVASION_CHANCE;
 
         // -- Payback
         public static final ModConfigSpec.IntValue PAYBACK_REQUEST_DURATION_SHORT;
@@ -144,9 +144,6 @@ public abstract class Config {
                 PIGEON_DELIVERY_TIRED_TICKS = builder
                       .comment("Time (in ticks) for which Pigeon will be tired after finishing a delivery.")
                       .defineInRange("ticks_tired_after_delivery", 6000, 0, Integer.MAX_VALUE);
-                PIGEON_DELIVERY_DAMAGE_EVASION_CHANCE = builder
-                      .comment("Chance to evade damage while delivering. `#envelope:bypasses_pigeon_delivery_evasion` tag can be used to control which damage types will not be affected.")
-                      .defineInRange("damage_evasion_chance_while_delivering", 0.0, 0.0, 1.0);
 
                 builder.pop();
             }
@@ -276,22 +273,25 @@ public abstract class Config {
 
             {
                 builder.push("delivery");
-                DELIVERY_DEFAULT_DISTANCE = builder
-                      .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined (recipient does not exist, for example).")
-                      .defineInRange("default_distance", 1500, 1, Integer.MAX_VALUE);
                 DELIVERY_ASCEND_DISTANCE = builder
                       .comment("Distance (in blocks) above the mailbox where the courier disappears (transitions to the traveling phase).")
                       .defineInRange("ascend_distance", 24, 1, 64);
+                DELIVERY_DEFAULT_DISTANCE = builder
+                      .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined.")
+                      .defineInRange("default_distance", 1500, 1, Integer.MAX_VALUE);
                 DELIVERY_TRAVEL_DURATION_DISTANCE_CAP = builder
                       .comment("Distance (in blocks) after which travel duration stops increasing and stays at maximum value.")
                       .defineInRange("travel_duration_distance_cap", 5000, 1, Integer.MAX_VALUE);
-                DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE = builder
-                      .comment("Delivering pigeons will not spawn when 'doMobSpawning' rule is set to 'false'.",
-                            "Default: false (spawn anyway)")
-                      .define("spawning_respects_domobspawning_rule", false);
                 DELIVERY_PHASE_DURATION_MODIFIER = builder
                       .comment("Global modifier on the delivery phase duration.")
                       .defineInRange("phase_duration_modifier", 1.0, 0.0, 999.0);
+                DELIVERY_SPAWNING_RESPECTS_DOMOBSPAWNING_RULE = builder
+                      .comment("Delivering couriers will spawn regardless of 'doMobSpawning' gamerule.",
+                            "Default: true")
+                      .define("spawning_ignores_domobspawning_rule", true);
+                DELIVERY_COURIER_DAMAGE_EVASION_CHANCE = builder
+                      .comment("Chance to evade damage while delivering. `#envelope:bypasses_courier_delivery_evasion` tag can be used to control which damage types will not be affected.")
+                      .defineInRange("courier_damage_evasion_chance", 0.0, 0.0, 1.0);
                 builder.pop();
             }
 
