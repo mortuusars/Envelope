@@ -12,6 +12,7 @@ Misc
 - Increased Pigeon delivery travel speed (when in background) from 20 to 25
   - Existing configs would need to be updated or regenerated for this change to apply after updating from previous version 
 - Courier appear/disappear (poof) particles now visible at higher distances
+- When the courier finishes a delivery, it will play its ambient sound
 
 ### Technical Changes
 Item components
