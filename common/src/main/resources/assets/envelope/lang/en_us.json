@@ -11,13 +11,14 @@
   "block.envelope.crimson_pigeonhole": "Crimson Pigeonhole",
   "block.envelope.warped_pigeonhole": "Warped Pigeonhole",
 
-  "block.envelope.mailbox": "Mailbox",
+  "block.envelope.letter": "Letter",
   "block.envelope.paper_box": "Paper Box",
   "block.envelope.package": "Package",
   "block.envelope.sealed_package": "Sealed Package",
-  "block.envelope.letter": "Letter",
+  "block.envelope.mailbox": "Mailbox",
 
   "block_type.envelope.pigeonhole": "%s Pigeonhole",
+
 
   "item.envelope.oak_pigeonhole": "Oak Pigeonhole",
   "item.envelope.spruce_pigeonhole": "Spruce Pigeonhole",
@@ -34,16 +35,17 @@
   "item.envelope.letter_and_quill": "Letter and Quill",
   "item.envelope.letter": "Letter",
   "item.envelope.sealed_letter": "Sealed Letter",
-
   "item.envelope.paper_box": "Payback Box",
   "item.envelope.package": "Package",
   "item.envelope.sealed_package": "Sealed Package",
-
   "item.envelope.payback_box": "Payback Box",
   "item.envelope.payback_package": "Payback Package",
-
   "item.envelope.address_tag": "Address Tag",
   "item.envelope.payback_tag": "Payback Tag",
+  "item.envelope.mailbox": "Mailbox",
+  "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
+  "item.envelope.charred_pigeon_spawn_egg": "Charred Pigeon Spawn Egg",
+  "item.envelope.lost_mail": "Lost Mail",
 
   "item.envelope.seal_stamp": "Seal Stamp",
   "item.envelope.white_seal_stamp": "White Seal Stamp",
@@ -64,156 +66,12 @@
   "item.envelope.pink_seal_stamp": "Pink Seal Stamp",
   "item.envelope.soulbound_seal_stamp": "Soulbound Seal Stamp",
 
-  "item.envelope.mailbox": "Mailbox",
+  "item_group.envelope.envelope": "Envelope",
 
-  "item.envelope.pigeon_spawn_egg": "Pigeon Spawn Egg",
-  "item.envelope.charred_pigeon_spawn_egg": "Charred Pigeon Spawn Egg",
-
-  "item.envelope.lost_mail": "Lost Mail",
-
-  "container.envelope.mailbox": "Mailbox",
-  "container.envelope.payback_tag": "Payback",
-
-  "gui.envelope.mailbox_address.rename_warning.inbox": "§6• Mail in inbox will be dropped on the ground.",
-  "gui.envelope.mailbox_address.rename_warning.traveling": "§6• Mail traveling to previous address will be returned.",
-
-  "envelope.letter_and_quill.fold_button": "Fold",
-  "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
-
-  "gui.envelope.sealed_item.locked": "Seal is protected by the mysterious force",
-
-  "gui.envelope.packing.pack": "Pack",
-  "gui.envelope.packing.preset_address": "Address",
-  "gui.envelope.packing.preset_address.will_apply": "Packing will apply an Address Tag",
-  "gui.envelope.packing.preset_address.no_address_tag": "No Address Tag available",
-
-  "gui.envelope.address_tag.title": "Address",
-
-  "gui.envelope.mailbox_choose_address.title": "Mailbox Address",
-  "gui.envelope.mailbox_change_address.title": "Mailbox Address",
-
-  "gui.envelope.mailbox.inbox": "Inbox",
-  "gui.envelope.mailbox.send": "Send",
-  "gui.envelope.mailbox.empty": "Empty",
-
-  "error.envelope.address.id_cannot_be_empty": "Address cannot be empty",
-  "error.envelope.address.id_too_long": "Address is too long",
-  "error.envelope.address.id_contains_invalid_chars": "Address contains invalid characters",
-  "error.envelope.address.taken": "Address is already taken",
-  "error.envelope.address.not_enough_xp_levels": "Not enough experience levels",
 
   "entity.envelope.pigeon": "Pigeon",
   "entity.envelope.charred_pigeon": "Charred Pigeon",
   "entity.envelope.courier_bat": "Bat",
-
-  "gui.envelope.confirm": "Confirm",
-  "gui.envelope.cancel": "Cancel",
-
-  "gui.envelope.mailbox.mail.tooltip.sender": "§7From: %s",
-  "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §fago",
-  "gui.envelope.mailbox.mail.tooltip.status": "§7Status: %s",
-
-  "gui.envelope.time.past": "%s ago",
-
-  "gui.envelope.mail.returned": "Returned",
-
-  "gui.exposure.mailbox.address_box.title": "Address",
-
-  "gui.envelope.mailbox.address": "Set as Default Address",
-  "gui.envelope.mailbox.address.tooltip": "§7Mail sent to your name will be delivered to this Mailbox",
-  "gui.envelope.mailbox.address.default": "Default Address",
-  "gui.envelope.mailbox.address.default.tooltip": "§7Mail sent to your name is delivered to this Mailbox",
-
-  "gui.envelope.mailbox.mail.tooltip.new_mail": "New Mail Arrived",
-  "gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
-
-  "gui.envelope.mail.sender": "Sender",
-  "gui.envelope.mail.recipient": "Recipient",
-  "gui.envelope.mail.from": "From: %s",
-  "gui.envelope.mail.to": "To: %s",
-
-  "gui.envelope.delivery_log": "§7Delivery Log",
-  "gui.envelope.delivery_log.record.sent": " §7Sent from %s %s",
-  "gui.envelope.delivery_log.record.arrived": " §7Arrived to %s %s",
-  "gui.envelope.delivery_log.record.returned": " §7Returned: %s",
-  "gui.envelope.delivery_log.record.message": " %s",
-
-  "gui.envelope.delivery_log.message.unable_to_reach": "Unable To Reach",
-  "gui.envelope.delivery_log.message.recipient_unknown": "Recipient Is Unknown",
-  "gui.envelope.delivery_log.message.recipient_not_found": "Recipient Not Found",
-  "gui.envelope.delivery_log.message.recipient_inbox_is_full": "Recipient Inbox Is Full",
-  "gui.envelope.delivery_log.message.rejected": "Rejected",
-  "gui.envelope.delivery_log.message.unavailable": "Unavailable",
-
-  "gui.envelope.delivery_log.message.payback_fulfilled": "Payback Fulfilled",
-  "gui.envelope.delivery_log.message.payback.subject_not_found": "Payback Subject Not Found",
-  "gui.envelope.delivery_log.message.payback.is_not_valid": "Payback Is Not Valid",
-  "gui.envelope.delivery_log.message.payback.expired": "Payback Request Expired",
-  "gui.envelope.delivery_log.message.payback.canceled": "Payback Request Canceled",
-
-  "gui.envelope.delivery_log.message.crafting.unable_to_process": "Unable To Process",
-  "gui.envelope.delivery_log.message.crafting.unprocessed_items": "Unprocessed Items",
-
-  "gui.envelope.delivery_log.message.cloud_depository.no_identity": "Identity Cannot Be Determined",
-  "gui.envelope.delivery_log.message.cloud_depository.non_serviceable_identity": "Non-Serviceable Identity",
-  "gui.envelope.delivery_log.message.cloud_depository.storage_is_full": "Storage Is Full",
-  "gui.envelope.delivery_log.message.cloud_depository.storage_is_empty": "Storage Is Empty",
-  "gui.envelope.delivery_log.message.cloud_depository.index_not_found": "Index Not Found",
-  "gui.envelope.delivery_log.message.cloud_depository.capacity_already_at_max": "Expansion Limit Reached",
-  "gui.envelope.delivery_log.message.cloud_depository.deposited": "Deposited Into Storage",
-  "gui.envelope.delivery_log.message.cloud_depository.withdrawn": "Withdrawn From Storage",
-
-  "gui.envelope.formatting.aqua": "Aqua",
-  "gui.envelope.formatting.black": "Black",
-  "gui.envelope.formatting.blue": "Blue",
-  "gui.envelope.formatting.bold": "Bold",
-  "gui.envelope.formatting.dark_aqua": "Dark Aqua",
-  "gui.envelope.formatting.dark_blue": "Dark Blue",
-  "gui.envelope.formatting.dark_gray": "Dark Gray",
-  "gui.envelope.formatting.dark_green": "Dark Green",
-  "gui.envelope.formatting.dark_purple": "Dark Purple",
-  "gui.envelope.formatting.dark_red": "Dark Red",
-  "gui.envelope.formatting.gold": "Gold",
-  "gui.envelope.formatting.gray": "Gray",
-  "gui.envelope.formatting.green": "Green",
-  "gui.envelope.formatting.italic": "Italic",
-  "gui.envelope.formatting.light_purple": "Light Purple",
-  "gui.envelope.formatting.obfuscated": "Obfuscated",
-  "gui.envelope.formatting.red": "Red",
-  "gui.envelope.formatting.reset": "Reset",
-  "gui.envelope.formatting.strikethrough": "Strikethrough",
-  "gui.envelope.formatting.underline": "Underline",
-  "gui.envelope.formatting.white": "White",
-  "gui.envelope.formatting.yellow": "Yellow",
-
-  "address.envelope.mail_service": "Mail Service",
-  "address.envelope.automated_supply_service": "Automated Supply Service",
-  "address.envelope.cloud_depository": "Cloud Depository",
-  "address.envelope.equine_assurance_bureau": "Equine Assurance Bureau",
-  "address.envelope.unknown": "Unknown",
-
-  "address_type.envelope.block": "Block",
-  "address_type.envelope.player": "Player",
-  "address_type.envelope.service": "Service",
-  "address_type.envelope.custom": "Address",
-  "address_type.envelope.unknown": "Unknown",
-
-  "subtitles.envelope.seal_stamp": "Seal Stamp stamps",
-  "subtitles.envelope.paper.crackle": "Paper crackles",
-  "subtitles.envelope.paper.tear": "Paper tears",
-
-  "subtitles.envelope.entity.pigeon.ambient": "Pigeon coos",
-  "subtitles.envelope.entity.pigeon.death": "Pigeon dies",
-  "subtitles.envelope.entity.pigeon.eats": "Pigeon eats",
-  "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
-  "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
-
-  "subtitles.envelope.entity.charred_pigeon.ambient": "Charred Pigeon coos",
-  "subtitles.envelope.entity.charred_pigeon.death": "Charred Pigeon dies",
-  "subtitles.envelope.entity.charred_pigeon.fly": "Charred Pigeon flutters",
-  "subtitles.envelope.entity.charred_pigeon.hurts": "Charred Pigeon hurts",
-
-  "subtitles.envelope.entity.villager.throw_pigeon_food": "Villager throws food",
 
   "letter.envelope.courier_death_notice.name": "Courier Death Notice",
   "letter.envelope.courier_death_notice.title": "     Courier Death Notice\n\n",
@@ -328,117 +186,173 @@
 
   "letter.envelope.mail_service.signature": "Mail Service",
 
-  "package.envelope.canceled_payback_request.name": "Canceled Payback Request",
-
   "letter_meaning.envelope.cloud_depository.withdrawal_request": "Cloud Depository: Withdrawal Request",
   "letter_meaning.envelope.cloud_depository.status_request": "Cloud Depository: Status Request",
   "letter_meaning.envelope.cloud_depository.expansion_request": "Cloud Depository: Expansion Request",
 
-  "recipe.envelope.mailing.mail_service.letter_broadcasting.info": "Sends copies of the letter to all players who have a default mailbox",
-  "recipe.envelope.mailing.mail_service.payback_cancelling.info": "Cancels and returns the last mail with payback request",
 
-  "item_group.envelope.envelope": "Envelope",
+  "package.envelope.canceled_payback_request.name": "Canceled Payback Request",
 
-  "envelope.configuration.misc": "Miscellaneous",
-  "envelope.configuration.pigeon": "Pigeon",
-  "envelope.configuration.charred_pigeon": "Charred Pigeon",
-  "envelope.configuration.delivery": "Delivery",
-  "envelope.configuration.hunted_by_fox": "Hunted by Fox",
-  "envelope.configuration.spawns_naturally": "Spawns Naturally",
-  "envelope.configuration.travel_duration_distance_cap": "Travel Duration Distance Cap",
-  "envelope.configuration.debug_mode": "Debug Mode",
-  "envelope.configuration.default_distance": "Default Distance",
-  "envelope.configuration.ascend_distance": "Ascend Distance",
-  "envelope.configuration.pause": "Pause",
-  "envelope.configuration.integration": "Integration",
-  "envelope.configuration.jei": "JEI",
-  "envelope.configuration.payback": "Payback",
-  "envelope.configuration.debug": "Debug",
-  "envelope.configuration.spawns_in_village": "Spawns In Village",
-  "envelope.configuration.min_ticks_outside_pigeonhole": "Min Ticks Outside Pigeonhole",
-  "envelope.configuration.hunted_by_ocelot": "Hunted by Ocelot",
-  "envelope.configuration.address_experience_levels_cost": "Address XP Levels Cost",
-  "envelope.configuration.waste_level_increase_chance_after_delivery": "Waste Chance After Delivery",
-  "envelope.configuration.mailbox": "Mailbox",
-  "envelope.configuration.min_ticks_inside_pigeonhole": "Min Ticks Inside Pigeonhole",
-  "envelope.configuration.waste_level_increase_chance": "Waste Chance",
-  "envelope.configuration.payback_timeout_minutes": "Payback Timeout (minutes)",
-  "envelope.configuration.hunted_by_cat": "Hunted by Cat",
-  "envelope.configuration.courier_damage_evasion_chance": "Courier Damage Evasion Chance",
-  "envelope.configuration.letter": "Letter",
-  "envelope.configuration.dispenser_waste_scooping": "Dispenser Waste Scooping",
-  "envelope.configuration.pigeonhole": "Pigeonhole",
-  "envelope.configuration.ticks_tired_after_delivery": "Ticks Tired After Delivery",
-  "envelope.configuration.package": "Package",
-  "envelope.configuration.paper_box_return_chance": "Paper Box Return Chance",
-  "envelope.configuration.payback_box_return_chance": "Payback Box Return Chance",
-  "envelope.configuration.spawning_ignores_domobspawning_rule": "Spawning Ignores 'doMobSpawning' Rule",
-  "envelope.configuration.sneak_quick_unpack": "Sneak Quick Unpack",
-  "envelope.configuration.service_address_ingredient": "Service Address Ingredient",
-  "envelope.configuration.request_duration_medium": "Request Duration - Medium",
-  "envelope.configuration.request_duration_short": "Request Duration - Short",
-  "envelope.configuration.request_duration_long": "Request Duration - Long",
-  "envelope.configuration.service_addresses": "Service Addresses",
-  "envelope.configuration.enabled": "Enabled",
-  "envelope.configuration.notice_sending_enabled": "Notice: Enabled",
-  "envelope.configuration.courier_death_notice": "Courier Death Notice",
-  "envelope.configuration.equine_assurance_bureau": "Equine Assurance Bureau",
-  "envelope.configuration.mail_service": "Mail Service",
-  "envelope.configuration.villager_feeding_pigeons": "Villagers Feed Pigeons",
-  "envelope.configuration.villager_feeding_pigeons_only_nitwits": "Villagers Feed Pigeons: Only Nitwits",
-  "envelope.configuration.eats_seeds": "Eats Seeds",
-  "envelope.configuration.fox_tattering": "Fox Tattering",
-  "envelope.configuration.convert_into_charred": "Convert Into Charred",
-  "envelope.configuration.convert_into_charred_ticks": "Ticks To Convert Into Charred",
-  "envelope.configuration.convert_into_regular": "Convert Into Regular",
-  "envelope.configuration.convert_into_regular_ticks": "Ticks To Convert Into Regular",
-  "envelope.configuration.mail_chance": "Mail Chance",
-  "envelope.configuration.archimedes_chance": "Archimedes Chance",
-  "envelope.configuration.burning": "Burning",
-  "envelope.configuration.loot": "Loot",
-  "envelope.configuration.ignite_seconds": "Ignite Seconds",
-  "envelope.configuration.hide_default_seal_stamp_die_outside_of_inventory": "Hide Default Seal Die Outside Of Inventory",
-  "envelope.configuration.only_players": "Serve Only Players",
-  "envelope.configuration.cloud_depository": "Cloud Depository",
-  "envelope.configuration.account_storage_starting_capacity": "Account Storage: Starting Capacity",
-  "envelope.configuration.account_storage_max_capacity": "Account Storage: Maximum Capacity",
-  "envelope.configuration.account_storage_capacity_per_expansion": "Account Storage: Capacity Per Expansion",
-  "envelope.configuration.phase_duration_modifier": "Phase Duration Modifier",
-  "envelope.configuration.information": "Information",
-  "envelope.configuration.seal": "Seal",
-  "envelope.configuration.seal_remove_duration": "Seal Remove Duration",
-  "envelope.configuration.soulbound_seal_stamp_enabled": "Soulbound Seal Stamp - Enabled",
-  "envelope.configuration.soulbound_seal_stamp_consumable": "Soulbound Seal Stamp - Consumable",
-  "envelope.configuration.soulbound_seal_stamp_creates_lock": "Soulbound Seal Stamp - Creates Lock",
-  "envelope.configuration.locked_seal_owner_can_remove_without_unlocking": "Locked Seal - Owner Can Always Remove",
-  "envelope.configuration.bat": "Bat",
-  "envelope.configuration.max_deliveries": "Max Deliveries",
-  "envelope.configuration.delivery_travel_speed": "Delivery Travel Speed",
-  "envelope.configuration.summoned_to_mailbox": "Summoned To Mailbox",
-  "envelope.configuration.summon_cooldown": "Summon Cooldown",
-  "envelope.configuration.summon_interval": "Summon Interval",
-  "envelope.configuration.mailbox_summon_ignores_domobspawning_rule": "Mailbox Summon Ignores 'doMobSpawning' Rule",
 
+  "address_type.envelope.block": "Block",
+  "address_type.envelope.player": "Player",
+  "address_type.envelope.service": "Service",
+  "address_type.envelope.custom": "Address",
+  "address_type.envelope.unknown": "Unknown",
+
+  "address.envelope.mail_service": "Mail Service",
+  "address.envelope.automated_supply_service": "Automated Supply Service",
+  "address.envelope.cloud_depository": "Cloud Depository",
+  "address.envelope.equine_assurance_bureau": "Equine Assurance Bureau",
+  "address.envelope.unknown": "Unknown",
+
+
+  "container.envelope.mailbox": "Mailbox",
+  "container.envelope.payback_tag": "Payback",
   "container.envelope.package.contents_unknown": "Contents Unknown",
 
-  "envelope.jei.category.mailing": "Mailing",
-  "envelope.jei.info": "Info",
-  "envelope.jei.info.mail_service": "Dispatches and handles deliveries. Provides mail-related services.",
-  "envelope.jei.info.automated_supply_service": "Contains various useful mailing recipes.",
-  "envelope.jei.info.cloud_depository": "Stores items remotely and securely.\n\nSend items to deposit.\nSend %s to withdraw.\n\nDeposits and requests must be sealed for identification reasons.",
-  "envelope.jei.info.cloud_depository.withdrawal_request": "When sealed and sent to %s - requests withdrawal of the last deposited item.\nIf renamed, item with the same name will be requested.",
-  "envelope.jei.info.cloud_depository.status_request": "When sealed and sent to %s - requests a storage status report.",
-  "envelope.jei.info.cloud_depository.expansion_request": "When sealed and sent to %s - requests a storage expansion by %s slots.",
 
-  "envelope.empty_tag": "Empty Tag",
+  "envelope.letter_and_quill.fold_button": "Fold",
+  "envelope.letter_and_quill.fold_warning": "Note! When you fold the letter, it will no longer be editable.",
+
+
+  "gui.envelope.mailbox_address.rename_warning.inbox": "§6• Mail in inbox will be dropped on the ground.",
+  "gui.envelope.mailbox_address.rename_warning.traveling": "§6• Mail traveling to previous address will be returned.",
+
+  "gui.envelope.sealed_item.locked": "Seal is protected by the mysterious force",
+
+  "gui.envelope.packing.pack": "Pack",
+  "gui.envelope.packing.preset_address": "Address",
+  "gui.envelope.packing.preset_address.will_apply": "Packing will apply an Address Tag",
+  "gui.envelope.packing.preset_address.no_address_tag": "No Address Tag available",
+
+  "gui.envelope.address_tag.title": "Address",
+
+  "gui.envelope.mailbox_choose_address.title": "Mailbox Address",
+  "gui.envelope.mailbox_change_address.title": "Mailbox Address",
+
+  "gui.envelope.mailbox.inbox": "Inbox",
+  "gui.envelope.mailbox.send": "Send",
+  "gui.envelope.mailbox.empty": "Empty",
 
   "gui.envelope.payback.expired": "Expired",
-
   "gui.envelope.payback_tag.duration_short": "Duration: Short",
   "gui.envelope.payback_tag.duration_medium": "Duration: Medium",
   "gui.envelope.payback_tag.duration_long": "Duration: Long",
-
   "gui.envelope.payback_tag.tooltip.scroll": "§8[§7Scroll§8] to change amount",
+
+  "gui.envelope.confirm": "Confirm",
+  "gui.envelope.cancel": "Cancel",
+
+  "gui.envelope.mailbox.mail.tooltip.sender": "§7From: %s",
+  "gui.envelope.mailbox.mail.tooltip.age": "§7Received: §c%s §fago",
+  "gui.envelope.mailbox.mail.tooltip.status": "§7Status: %s",
+
+  "gui.envelope.time.past": "%s ago",
+
+  "gui.envelope.mail.returned": "Returned",
+
+  "gui.envelope.mailbox.address": "Set as Default Address",
+  "gui.envelope.mailbox.address.tooltip": "§7Mail sent to your name will be delivered to this Mailbox",
+  "gui.envelope.mailbox.address.default": "Default Address",
+  "gui.envelope.mailbox.address.default.tooltip": "§7Mail sent to your name is delivered to this Mailbox",
+
+  "gui.envelope.mailbox.mail.tooltip.new_mail": "New Mail Arrived",
+  "gui.envelope.mailbox.mail.tooltip.new_mail.click_to_refresh": "§8[§7Click§8] to show",
+
+  "gui.envelope.mail.sender": "Sender",
+  "gui.envelope.mail.recipient": "Recipient",
+  "gui.envelope.mail.from": "From: %s",
+  "gui.envelope.mail.to": "To: %s",
+
+  "gui.envelope.delivery_log": "§7Delivery Log",
+  "gui.envelope.delivery_log.record.sent": " §7Sent from %s %s",
+  "gui.envelope.delivery_log.record.arrived": " §7Arrived to %s %s",
+  "gui.envelope.delivery_log.record.returned": " §7Returned: %s",
+  "gui.envelope.delivery_log.record.message": " %s",
+
+  "gui.envelope.delivery_log.message.unable_to_reach": "Unable To Reach",
+  "gui.envelope.delivery_log.message.recipient_unknown": "Recipient Is Unknown",
+  "gui.envelope.delivery_log.message.recipient_not_found": "Recipient Not Found",
+  "gui.envelope.delivery_log.message.recipient_inbox_is_full": "Recipient Inbox Is Full",
+  "gui.envelope.delivery_log.message.rejected": "Rejected",
+  "gui.envelope.delivery_log.message.unavailable": "Unavailable",
+
+  "gui.envelope.delivery_log.message.payback_fulfilled": "Payback Fulfilled",
+  "gui.envelope.delivery_log.message.payback.subject_not_found": "Payback Subject Not Found",
+  "gui.envelope.delivery_log.message.payback.is_not_valid": "Payback Is Not Valid",
+  "gui.envelope.delivery_log.message.payback.expired": "Payback Request Expired",
+  "gui.envelope.delivery_log.message.payback.canceled": "Payback Request Canceled",
+
+  "gui.envelope.delivery_log.message.crafting.unable_to_process": "Unable To Process",
+  "gui.envelope.delivery_log.message.crafting.unprocessed_items": "Unprocessed Items",
+
+  "gui.envelope.delivery_log.message.cloud_depository.no_identity": "Identity Cannot Be Determined",
+  "gui.envelope.delivery_log.message.cloud_depository.non_serviceable_identity": "Non-Serviceable Identity",
+  "gui.envelope.delivery_log.message.cloud_depository.storage_is_full": "Storage Is Full",
+  "gui.envelope.delivery_log.message.cloud_depository.storage_is_empty": "Storage Is Empty",
+  "gui.envelope.delivery_log.message.cloud_depository.index_not_found": "Index Not Found",
+  "gui.envelope.delivery_log.message.cloud_depository.capacity_already_at_max": "Expansion Limit Reached",
+  "gui.envelope.delivery_log.message.cloud_depository.deposited": "Deposited Into Storage",
+  "gui.envelope.delivery_log.message.cloud_depository.withdrawn": "Withdrawn From Storage",
+
+  "gui.envelope.formatting.aqua": "Aqua",
+  "gui.envelope.formatting.black": "Black",
+  "gui.envelope.formatting.blue": "Blue",
+  "gui.envelope.formatting.bold": "Bold",
+  "gui.envelope.formatting.dark_aqua": "Dark Aqua",
+  "gui.envelope.formatting.dark_blue": "Dark Blue",
+  "gui.envelope.formatting.dark_gray": "Dark Gray",
+  "gui.envelope.formatting.dark_green": "Dark Green",
+  "gui.envelope.formatting.dark_purple": "Dark Purple",
+  "gui.envelope.formatting.dark_red": "Dark Red",
+  "gui.envelope.formatting.gold": "Gold",
+  "gui.envelope.formatting.gray": "Gray",
+  "gui.envelope.formatting.green": "Green",
+  "gui.envelope.formatting.italic": "Italic",
+  "gui.envelope.formatting.light_purple": "Light Purple",
+  "gui.envelope.formatting.obfuscated": "Obfuscated",
+  "gui.envelope.formatting.red": "Red",
+  "gui.envelope.formatting.reset": "Reset",
+  "gui.envelope.formatting.strikethrough": "Strikethrough",
+  "gui.envelope.formatting.underline": "Underline",
+  "gui.envelope.formatting.white": "White",
+  "gui.envelope.formatting.yellow": "Yellow",
+
+
+  "error.envelope.address.id_cannot_be_empty": "Address cannot be empty",
+  "error.envelope.address.id_too_long": "Address is too long",
+  "error.envelope.address.id_contains_invalid_chars": "Address contains invalid characters",
+  "error.envelope.address.taken": "Address is already taken",
+  "error.envelope.address.not_enough_xp_levels": "Not enough experience levels",
+
+
+  "subtitles.envelope.block.pigeonhole.enter": "Pigeon enters hole",
+  "subtitles.envelope.block.pigeonhole.exit": "Pigeon leaves hole",
+  "subtitles.envelope.block.pigeonhole.work": "Pigeons \"work\"",
+  "subtitles.envelope.block.pigeonhole.scoop": "Shovel scoops",
+
+  "subtitles.envelope.seal_stamp": "Seal Stamp stamps",
+  "subtitles.envelope.paper.crackle": "Paper crackles",
+  "subtitles.envelope.paper.tear": "Paper tears",
+
+  "subtitles.envelope.entity.pigeon.ambient": "Pigeon coos",
+  "subtitles.envelope.entity.pigeon.death": "Pigeon dies",
+  "subtitles.envelope.entity.pigeon.eats": "Pigeon eats",
+  "subtitles.envelope.entity.pigeon.fly": "Pigeon flutters",
+  "subtitles.envelope.entity.pigeon.hurts": "Pigeon hurts",
+
+  "subtitles.envelope.entity.charred_pigeon.ambient": "Charred Pigeon coos",
+  "subtitles.envelope.entity.charred_pigeon.death": "Charred Pigeon dies",
+  "subtitles.envelope.entity.charred_pigeon.fly": "Charred Pigeon flutters",
+  "subtitles.envelope.entity.charred_pigeon.hurts": "Charred Pigeon hurts",
+
+  "subtitles.envelope.entity.villager.throw_pigeon_food": "Villager throws food",
+
+
+  "recipe.envelope.mailing.mail_service.letter_broadcasting.info": "Sends copies of the letter to all players who have a default mailbox",
+  "recipe.envelope.mailing.mail_service.payback_cancelling.info": "Cancels and returns the last mail with payback request",
+
 
   "advancement.envelope.dirt_to_diamonds.title": "Dirt to Diamonds",
   "advancement.envelope.dirt_to_diamonds.description": "Find a Diamond in Pigeonhole waste",
@@ -461,10 +375,6 @@
   "advancement.envelope.system_failure.title": "System Failure",
   "advancement.envelope.system_failure.description": "Step foot on a Collapsed Mail Hub",
 
-  "subtitles.envelope.block.pigeonhole.enter": "Pigeon enters hole",
-  "subtitles.envelope.block.pigeonhole.exit": "Pigeon leaves hole",
-  "subtitles.envelope.block.pigeonhole.work": "Pigeons \"work\"",
-  "subtitles.envelope.block.pigeonhole.scoop": "Shovel scoops",
 
   "stat.envelope.interact_with_mailbox": "Interactions with Mailbox",
   "stat.envelope.mail_deliveries": "Mail Deliveries",
@@ -472,5 +382,117 @@
   "stat.envelope.seals_broken": "Seals Broken",
   "stat.envelope.letters_folded": "Letters Folded",
   "stat.envelope.packages_created": "Packages Created",
-  "stat.envelope.packages_opened": "Packages Opened"
+  "stat.envelope.packages_opened": "Packages Opened",
+
+
+  "envelope.empty_tag": "Empty Tag",
+
+
+  "envelope.jei.category.mailing": "Mailing",
+  "envelope.jei.info": "Info",
+  "envelope.jei.info.mail_service": "Dispatches and handles deliveries. Provides mail-related services.",
+  "envelope.jei.info.automated_supply_service": "Contains various useful mailing recipes.",
+  "envelope.jei.info.cloud_depository": "Stores items remotely and securely.\n\nSend items to deposit.\nSend %s to withdraw.\n\nDeposits and requests must be sealed for identification reasons.",
+  "envelope.jei.info.cloud_depository.withdrawal_request": "When sealed and sent to %s - requests withdrawal of the last deposited item.\nIf renamed, item with the same name will be requested.",
+  "envelope.jei.info.cloud_depository.status_request": "When sealed and sent to %s - requests a storage status report.",
+  "envelope.jei.info.cloud_depository.expansion_request": "When sealed and sent to %s - requests a storage expansion by %s slots.",
+
+
+  "envelope.configuration.pigeon": "Pigeon",
+  "envelope.configuration.spawns_naturally": "Spawns Naturally",
+  "envelope.configuration.spawns_in_village": "Spawns In Village",
+  "envelope.configuration.min_ticks_inside_pigeonhole": "Min Ticks Inside Pigeonhole",
+  "envelope.configuration.min_ticks_outside_pigeonhole": "Min Ticks Outside Pigeonhole",
+  "envelope.configuration.eats_seeds": "Eats Seeds",
+  "envelope.configuration.villager_feeding_pigeons": "Villagers Feed Pigeons",
+  "envelope.configuration.villager_feeding_pigeons_only_nitwits": "Villagers Feed Pigeons: Only Nitwits",
+  "envelope.configuration.hunted_by_fox": "Hunted by Fox",
+  "envelope.configuration.hunted_by_ocelot": "Hunted by Ocelot",
+  "envelope.configuration.hunted_by_cat": "Hunted by Cat",
+  "envelope.configuration.convert_into_charred": "Convert Into Charred",
+  "envelope.configuration.convert_into_charred_ticks": "Ticks To Convert Into Charred",
+  "envelope.configuration.archimedes_chance": "Archimedes Chance",
+  "envelope.configuration.delivery_travel_speed": "Delivery Travel Speed",
+  "envelope.configuration.ticks_tired_after_delivery": "Ticks Tired After Delivery",
+
+  "envelope.configuration.charred_pigeon": "Charred Pigeon",
+  "envelope.configuration.mail_chance": "Mail Chance",
+  "envelope.configuration.ignite_seconds": "Ignite Seconds",
+  "envelope.configuration.convert_into_regular": "Convert Into Regular",
+  "envelope.configuration.convert_into_regular_ticks": "Ticks To Convert Into Regular",
+
+  "envelope.configuration.bat": "Bat",
+  "envelope.configuration.employed_at_mail_service": "Employed At Mail Service",
+  "envelope.configuration.employed_at_mailbox": "Employed At Mailbox",
+  "envelope.configuration.summoned_to_mailbox": "Summoned To Mailbox",
+  "envelope.configuration.summoned_to_mailbox_ignores_domobspawning_rule": "Summoned To Mailbox - Ignore 'doMobSpawning' Rule",
+  "envelope.configuration.employ_cooldown": "Employ Cooldown",
+  "envelope.configuration.employ_interval": "Employ Interval",
+  "envelope.configuration.max_deliveries": "Max Deliveries",
+
+  "envelope.configuration.pigeonhole": "Pigeonhole",
+  "envelope.configuration.waste_level_increase_chance": "Waste Chance",
+  "envelope.configuration.waste_level_increase_chance_after_delivery": "Waste Chance After Delivery",
+  "envelope.configuration.dispenser_waste_scooping": "Dispenser Waste Scooping",
+
+  "envelope.configuration.mailbox": "Mailbox",
+  "envelope.configuration.address_experience_levels_cost": "Address XP Levels Cost",
+
+  "envelope.configuration.letter": "Letter",
+  "envelope.configuration.pause": "Pause",
+  "envelope.configuration.burning": "Burning",
+  "envelope.configuration.fox_tattering": "Fox Tattering",
+
+  "envelope.configuration.package": "Package",
+  "envelope.configuration.sneak_quick_unpack": "Sneak Quick Unpack",
+  "envelope.configuration.paper_box_return_chance": "Paper Box Return Chance",
+  "envelope.configuration.payback_box_return_chance": "Payback Box Return Chance",
+
+  "envelope.configuration.seal": "Seal",
+  "envelope.configuration.seal_remove_duration": "Seal Remove Duration",
+  "envelope.configuration.soulbound_seal_stamp_enabled": "Soulbound Seal Stamp",
+  "envelope.configuration.soulbound_seal_stamp_consumable": "Soulbound Seal Stamp: Consumable",
+  "envelope.configuration.soulbound_seal_stamp_creates_lock": "Soulbound Seal Stamp: Creates Lock",
+  "envelope.configuration.locked_seal_owner_can_remove_without_unlocking": "Locked Seal: Owner Can Always Remove",
+
+  "envelope.configuration.delivery": "Delivery",
+  "envelope.configuration.ascend_distance": "Ascend Distance",
+  "envelope.configuration.default_distance": "Default Distance",
+  "envelope.configuration.travel_duration_distance_cap": "Travel Duration Distance Cap",
+  "envelope.configuration.phase_duration_modifier": "Phase Duration Modifier",
+  "envelope.configuration.spawning_ignores_domobspawning_rule": "Spawning Ignores 'doMobSpawning' Rule",
+  "envelope.configuration.courier_damage_evasion_chance": "Courier Damage Evasion Chance",
+
+  "envelope.configuration.payback": "Payback",
+  "envelope.configuration.request_duration_short": "Request Duration: Short",
+  "envelope.configuration.request_duration_medium": "Request Duration: Medium",
+  "envelope.configuration.request_duration_long": "Request Duration: Long",
+
+  "envelope.configuration.service_addresses": "Service Addresses",
+
+  "envelope.configuration.mail_service": "Mail Service",
+  "envelope.configuration.courier_death_notice": "Courier Death Notice",
+
+  "envelope.configuration.cloud_depository": "Cloud Depository",
+  "envelope.configuration.only_players": "Only For Players",
+  "envelope.configuration.account_storage_starting_capacity": "Account Storage: Starting Capacity",
+  "envelope.configuration.account_storage_max_capacity": "Account Storage: Maximum Capacity",
+  "envelope.configuration.account_storage_capacity_per_expansion": "Account Storage: Capacity Per Expansion",
+
+  "envelope.configuration.equine_assurance_bureau": "Equine Assurance Bureau",
+  "envelope.configuration.notice_sending_enabled": "Notice: Enabled",
+
+  "envelope.configuration.misc": "Miscellaneous",
+
+  "envelope.configuration.loot": "Loot",
+
+  "envelope.configuration.hide_default_seal_stamp_die_outside_of_inventory": "Hide Default Seal Die Outside Of Inventory",
+
+  "envelope.configuration.integration": "Integration",
+
+  "envelope.configuration.jei": "JEI",
+  "envelope.configuration.service_address_ingredient": "Service Address Ingredient",
+  "envelope.configuration.information": "Information",
+
+  "envelope.configuration.enabled": "Enabled"
 }
