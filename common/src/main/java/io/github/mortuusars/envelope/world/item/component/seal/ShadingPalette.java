@@ -26,5 +26,5 @@ public record ShadingPalette(TintColor base, TintColor highlight, TintColor shad
           ShadingPalette::new
     );
 
-    public static final ShadingPalette IRON_DIE = new ShadingPalette(0xFF9FA1A6, 0xFFDFE0E3, 0xFF5D6068, 0xFFC4C5C8);
+    public static final ShadingPalette IRON_DIE = new ShadingPalette(0xFFA0A3A9, 0xFFE5E6E8, 0xFF6C717B, 0xFFC4C5C8);
 }

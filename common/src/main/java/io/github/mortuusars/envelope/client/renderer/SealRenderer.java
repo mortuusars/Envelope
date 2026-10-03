@@ -89,32 +89,34 @@ public class SealRenderer {
 
         // flipping the sprite on the X axis is a bit tricky, hopefully it'll not break
 
+        y--;
+
         // Side
         setShaderTintColor(colors.side());
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x + 1, y + 1,  30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x, y + 1, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x - 1, y + 1, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x + 1, y, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x, y, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x - 1, y, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x + 1, y - 1, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x, y - 1, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x - 1, y - 1, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x + 1, y - 2, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x, y - 2, 30, 30);
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0, x - 1, y - 2, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x + 1, y + 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y + 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x - 1, y + 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x + 1, y, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x - 1, y, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x + 1, y - 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y - 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x - 1, y - 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x + 1, y - 2, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y - 2, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x - 1, y - 2, 30, 30);
 
         // Highlight
         setShaderTintColor(colors.highlight());
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0,  x, y + 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y + 1, 30, 30);
 
         // Shadow
         setShaderTintColor(colors.shadow());
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0,  x, y - 1, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y - 1, 30, 30);
 
         // Base
         setShaderTintColor(colors.base());
-        guiGraphics.blitSprite(impressionSprite, -30, 30,  -30, 0,  x, y, 30, 30);
+        guiGraphics.blitSprite(impressionSprite, -30, 30, -30, 0, x, y, 30, 30);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }

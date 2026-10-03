@@ -66,7 +66,7 @@ Seal
   - `letter` -> `letter_and_quill`
   - `block` -> `cube`
 - Removed seal symbols: `skeleton`, `skeleton_smirk`, `emerald`, `default`.
-- Default die (first letter of player name) will now show up in Seal Stamp's tooltip if outside of inventory or menu (in JEI for example)
+- Default die (first letter of player name) will not show up in Seal Stamp's tooltip if outside of inventory or menu (in JEI for example)
 
 Misc
 - Slightly increased courier mailbox mail pickup range
