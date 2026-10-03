@@ -1,7 +1,7 @@
 # Changelog
 
 ## UNRELEASED
-### Changes and fixes
+### New Features
 Seal
 - Added **Soulbound Seal Stamp**
   - Obtained by combining any **Seal Stamp** with an **Echo Shard**
@@ -9,6 +9,9 @@ Seal
   - Has 8 uses and will return back to original stamp when depleted
 
 Misc
+- Added **The Pigeons and the Bats** advancement
+
+### Changes and Fixes
 - Increased Pigeon delivery travel speed (when in background) from 20 to 25
   - Existing configs would need to be updated or regenerated for this change to apply after updating from previous version 
 - Courier appear/disappear (poof) particles now visible at higher distances

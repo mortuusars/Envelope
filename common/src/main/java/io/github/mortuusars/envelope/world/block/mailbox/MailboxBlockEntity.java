@@ -70,6 +70,9 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     protected int batSummonCooldown;
     protected int batSummonAttempt;
 
+    protected boolean deliveredWithPigeon;
+    protected boolean deliveredWithBat;
+
     protected MailboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }
@@ -245,11 +248,10 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     // -- Delivery
 
     public boolean tryStartDelivery(PhysicalCourier courier) {
-        if (!MailService.operatesIn(courier.level())) {
+        //noinspection PatternVariableHidesField
+        if (!(getLevel() instanceof ServerLevel level) || !MailService.operatesIn(level)) {
             return false;
         }
-
-        ServerLevel level = ((ServerLevel) courier.level());
 
         if (courier.isDelivering()) return false;
         ItemStack mailStack = getItem(SLOT_MAIL);
@@ -272,6 +274,20 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         Vec3 pos = courier.position();
         level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
         level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.NEUTRAL, 1f, 1.3f);
+
+        if (courier.asCourierEntity().getType().equals(Envelope.EntityTypes.PIGEON.get())) {
+            deliveredWithPigeon = true;
+        } else if (courier.asCourierEntity().getType().equals(Envelope.EntityTypes.COURIER_BAT.get())) {
+            deliveredWithBat = true;
+        }
+
+        if (deliveredWithPigeon && deliveredWithBat) {
+            getOwnerPlayer().ifPresent(player -> {
+                if (player instanceof ServerPlayer serverPlayer) {
+                    Envelope.CriteriaTriggers.DELIVER_WITH_PIGEON_AND_BAT.get().trigger(serverPlayer);
+                }
+            });
+        }
 
         return true;
     }
@@ -459,6 +475,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (!inboxId.equals(Util.NIL_UUID)) tag.putUUID("inbox_id", inboxId);
         if (batSummonCooldown > 0) tag.putInt("bat_summon_cooldown", batSummonCooldown);
         if (batSummonAttempt > 0) tag.putInt("bat_summon_attempt", batSummonCooldown);
+        if (deliveredWithPigeon) tag.putBoolean("delivered_with_pigeon", true);
+        if (deliveredWithBat) tag.putBoolean("delivered_with_bat", true);
     }
 
     @Override
@@ -469,6 +487,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         inboxId = tag.hasUUID("inbox_id") ? tag.getUUID("inbox_id") : UUID.randomUUID();
         batSummonCooldown = tag.getInt("bat_summon_cooldown");
         batSummonAttempt = tag.getInt("bat_summon_attempt");
+        deliveredWithPigeon = tag.getBoolean("delivered_with_pigeon");
+        deliveredWithBat = tag.getBoolean("delivered_with_bat");
     }
 
     // -- Util

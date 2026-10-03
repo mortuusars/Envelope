@@ -1,0 +1,26 @@
+{
+  "parent": "envelope:adventure/overworld_wide_web",
+  "criteria": {
+    "deliver_with_pigeon_and_bat": {
+      "trigger": "envelope:deliver_with_pigeon_and_bat"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.envelope.pigeons_and_bats.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:spider_eye"
+    },
+    "title": {
+      "translate": "advancement.envelope.pigeons_and_bats.title"
+    }
+  },
+  "requirements": [
+    [
+      "deliver_with_pigeon_and_bat"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -128,6 +128,23 @@ public class AdvancementsDatagen extends AdvancementProvider {
                               .setBlock(BlockPredicate.Builder.block().of(Envelope.Blocks.MAILBOX.get())))))
                   .save(consumer, Envelope.resource("adventure/overworld_wide_web"), existingFileHelper);
 
+            Advancement.Builder.advancement()
+                  .parent(placeMailbox)
+                  .display(
+                        new ItemStack(Items.SPIDER_EYE),
+                        Component.translatable("advancement.envelope.pigeons_and_bats.title"),
+                        Component.translatable("advancement.envelope.pigeons_and_bats.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                  )
+                  .requirements(AdvancementRequirements.Strategy.OR)
+                  .addCriterion("deliver_with_pigeon_and_bat", Envelope.CriteriaTriggers.DELIVER_WITH_PIGEON_AND_BAT.get()
+                        .createCriterion(new PlayerTrigger.TriggerInstance(Optional.empty())))
+                  .save(consumer, Envelope.resource("adventure/pigeons_and_bats"), existingFileHelper);
+
             ItemPackagePredicate fullPackagePredicate = new ItemPackagePredicate(Optional.of(new CollectionPredicate<>(
                   Optional.of(new CollectionContentsPredicate.Multiple<>(NonNullList.withSize(6, ItemPredicate.Builder.item()
                         .withCount(MinMaxBounds.Ints.atLeast(64))

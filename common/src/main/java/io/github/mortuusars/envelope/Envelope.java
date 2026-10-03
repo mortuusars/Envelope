@@ -649,6 +649,7 @@ public class Envelope {
     public static class CriteriaTriggers {
         public static Supplier<MailDeliveredTrigger> MAIL_DELIVERED = REGISTRAR.criterionTrigger("mail_delivered", MailDeliveredTrigger::new);
         public static Supplier<BreakPaperBoxWhenFallingTrigger> BREAK_PAPER_BOX_WHEN_FALLING_TRIGGER = REGISTRAR.criterionTrigger("break_paper_box_when_falling", BreakPaperBoxWhenFallingTrigger::new);
+        public static Supplier<PlayerTrigger> DELIVER_WITH_PIGEON_AND_BAT = REGISTRAR.criterionTrigger("deliver_with_pigeon_and_bat", PlayerTrigger::new);
         public static Supplier<PlayerTrigger> SMOKE_PIGEONHOLE = REGISTRAR.criterionTrigger("smoke_pigeonhole", PlayerTrigger::new);
         public static Supplier<PlayerTrigger> SCOOP_DIAMOND = REGISTRAR.criterionTrigger("scoop_diamond", PlayerTrigger::new);
         public static Supplier<PlayerTrigger> SPAWN_ARCHIMEDES = REGISTRAR.criterionTrigger("spawn_archimedes", PlayerTrigger::new);
