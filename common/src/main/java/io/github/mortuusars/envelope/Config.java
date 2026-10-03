@@ -15,10 +15,12 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_INSIDE_PIGEONHOLE;
         public static final ModConfigSpec.IntValue PIGEON_MIN_TICKS_OUTSIDE_PIGEONHOLE;
         public static final ModConfigSpec.IntValue PIGEON_DELIVERY_TIRED_TICKS;
+        public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
+        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
+        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_CAT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_OCELOT;
         public static final ModConfigSpec.BooleanValue PIGEON_HUNTED_BY_FOX;
-        public static final ModConfigSpec.BooleanValue PIGEON_EATS_SEEDS;
         public static final ModConfigSpec.BooleanValue PIGEON_CONVERT_INTO_CHARRED;
         public static final ModConfigSpec.IntValue PIGEON_CONVERT_INTO_CHARRED_TICKS;
         public static final ModConfigSpec.DoubleValue PIGEON_DELIVERY_TRAVEL_SPEED;
@@ -31,11 +33,12 @@ public abstract class Config {
         public static final ModConfigSpec.IntValue CHARRED_PIGEON_CONVERT_INTO_REGULAR_TICKS;
 
         // -- Bat
-        public static final ModConfigSpec.BooleanValue BAT_ENABLED;
-        public static final ModConfigSpec.BooleanValue BAT_SUMMONED_TO_MAILBOX;
+        public static final ModConfigSpec.BooleanValue BAT_EMPLOYED_AT_MAIL_SERVICE;
+        public static final ModConfigSpec.BooleanValue BAT_EMPLOYED_AT_MAILBOX;
+        public static final ModConfigSpec.BooleanValue BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY;
         public static final ModConfigSpec.BooleanValue BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING;
-        public static final ModConfigSpec.IntValue BAT_SUMMON_COOLDOWN;
-        public static final ModConfigSpec.IntValue BAT_SUMMON_INTERVAL;
+        public static final ModConfigSpec.IntValue BAT_EMPLOY_COOLDOWN;
+        public static final ModConfigSpec.IntValue BAT_EMPLOY_INTERVAL;
         public static final ModConfigSpec.IntValue BAT_MAX_DELIVERIES;
         public static final ModConfigSpec.DoubleValue BAT_DELIVERY_TRAVEL_SPEED;
 
@@ -93,8 +96,6 @@ public abstract class Config {
         public static final ModConfigSpec.BooleanValue SERVICE_EQUINE_BUREAU_NOTICE_SENDING_ENABLED;
 
         // -- Misc
-        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS;
-        public static final ModConfigSpec.BooleanValue VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY;
         public static final ModConfigSpec.DoubleValue ARCHIMEDES_CHANCE;
 
         static {
@@ -120,6 +121,13 @@ public abstract class Config {
                 PIGEON_EATS_SEEDS = builder
                       .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
                       .define("eats_seeds", true);
+                VILLAGER_FEEDING_PIGEONS = builder
+                      .comment("Villagers will feed nearby pigeons by throwing them seeds.",
+                            "Requires 'pigeon.eats_seeds' config option to be enabled.", "Default: true")
+                      .define("villager_feeding_pigeons", true);
+                VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY = builder
+                      .comment("Only Nitwits can feed pigeons.", "Default: true")
+                      .define("villager_feeding_pigeons_only_nitwits", true);
 
                 PIGEON_HUNTED_BY_CAT = builder
                       .comment("Cat will hunt and kill pigeons.", "Default: true")
@@ -131,13 +139,16 @@ public abstract class Config {
                       .comment("Fox will hunt and kill pigeons.", "Default: true")
                       .define("hunted_by_fox", true);
 
-
                 PIGEON_CONVERT_INTO_CHARRED = builder
                       .comment("Pigeon will convert into a Charred Pigeon when it stays in the ultrawarm dimension for some time.", "Default: true")
                       .define("convert_into_charred", true);
                 PIGEON_CONVERT_INTO_CHARRED_TICKS = builder
                       .comment("Time (in ticks) Pigeon needs to stay in the ultrawarm dimension to convert into Charred Pigeon.")
                       .defineInRange("convert_into_charred_ticks", 300, 0, Integer.MAX_VALUE);
+
+                ARCHIMEDES_CHANCE = builder
+                      .comment("Chance of an Archimedes spawning when 'envelope:spawns_archimedes' mob is killed by 'envelope:spawns_archimedes' damage type (player explosion by default).")
+                      .defineInRange("archimedes_chance", 0.05, 0, 1);
 
                 PIGEON_DELIVERY_TRAVEL_SPEED = builder
                       .comment("Speed (in blocks per second) while in traveling (background) phases of a delivery.")
@@ -153,7 +164,7 @@ public abstract class Config {
                 builder.push("charred_pigeon");
                 CHARRED_PIGEON_SPAWNS_NATURALLY = builder
                       .comment("Charred Pigeons can spawn naturally in '#envelope:allows_charred_pigeon_spawns' biomes.",
-                            " Default: true")
+                            "Default: true")
                       .define("spawns_naturally", true);
                 CHARRED_PIGEON_MAIL_CHANCE = builder
                       .comment("Chance of a Charred Pigeon carrying mail when spawned.")
@@ -174,23 +185,28 @@ public abstract class Config {
 
             {
                 builder.push("bat");
-                BAT_ENABLED = builder
-                      .comment("Courier Bat is enabled and will deliver mail at night.",
+                BAT_EMPLOYED_AT_MAIL_SERVICE = builder
+                      .comment("At night, Bat works at mail service as a service courier.",
+                            "When the courier passes through mail hub - it will switch between Pigeon and Bat depending on the time of day.",
                             "Default: true")
-                      .define("enabled", true);
-                BAT_SUMMONED_TO_MAILBOX = builder
-                      .comment("Bat will be summoned around to a Mailbox if it has `#envelope:bat_food` and mail to deliver.", "Default: true")
+                      .define("employed_at_mail_service", true);
+                //TODO: mention slot disabling when false:
+                BAT_EMPLOYED_AT_MAILBOX = builder
+                      .comment("At night, Bat will deliver mail from a Mailbox, if it has '#envelope:bat_food'.", "Default: true")
+                      .define("employed_at_mailbox", true);
+                BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY = builder
+                      .comment("If there is no regular Bat nearby, a service one will be summoned (spawned) instead.", "Default: true")
                       .define("summoned_to_mailbox", true);
                 BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING = builder
-                      .comment("Bat ignores doMobSpawning rule when summoned to a Mailbox", "Default: true")
-                      .define("mailbox_summon_ignores_domobspawning_rule", true);
-                BAT_SUMMON_COOLDOWN = builder
-                      .comment("Cooldown (in ticks) to wait from previous summon before summoning another Bat to the same Mailbox.")
-                      .defineInRange("summon_cooldown", 600, 1, Integer.MAX_VALUE);
-                BAT_SUMMON_INTERVAL = builder
-                      .comment("Maximum time (in ticks) between Bat summon attempts.",
-                            "The actual summon time is randomized within this interval.")
-                      .defineInRange("summon_interval", 400, 1, Integer.MAX_VALUE);
+                      .comment("Bat summoning ignores doMobSpawning rule.", "Default: true")
+                      .define("summoned_to_mailbox_ignores_domobspawning_rule", true);
+                BAT_EMPLOY_COOLDOWN = builder
+                      .comment("Cooldown (in ticks) to wait from previous employment before attempting to employ another Bat at the same Mailbox.")
+                      .defineInRange("employ_cooldown", 600, 1, Integer.MAX_VALUE);
+                BAT_EMPLOY_INTERVAL = builder
+                      .comment("Maximum time (in ticks) between Bat employment attempts.",
+                            "The actual employ time is randomized within this interval.")
+                      .defineInRange("employ_interval", 400, 1, Integer.MAX_VALUE);
                 BAT_MAX_DELIVERIES = builder
                       .comment("Maximum number of deliveries a single bat can do before leaving.",
                             "This will only apply when delivery had a reply, as the bat will despawn early if it's not carrying anything back.")
@@ -221,6 +237,8 @@ public abstract class Config {
                 MAILBOX_ADDRESS_EXPERIENCE_LEVELS_COST = builder
                       .comment("Levels of experience needed to set or change the address.")
                       .defineInRange("address_experience_levels_cost", 3, 0, 128);
+
+
                 builder.pop();
             }
 
@@ -269,7 +287,7 @@ public abstract class Config {
                       .define("soulbound_seal_stamp_consumable", true);
                 SOULBOUND_SEAL_STAMP_CREATES_LOCK = builder
                       .comment("Soulbound Seal Stamp will create a seal lock when the item is sealed.",
-                            "Seal lock keeps the item in owner's inventory when they die, or prevents other player from removing the seal until the owner dies.")
+                            "Seal lock keeps the item in owner's inventory when they die, and prevents other players from removing the seal until the owner dies.")
                       .define("soulbound_seal_stamp_creates_lock", true);
                 LOCKED_SEAL_OWNER_CAN_REMOVE_WITHOUT_UNLOCKING = builder
                       .comment("Locked seals (created by Soulbound Seal Stamp or commands) can be removed by their owner regardless of their lock status.")
@@ -280,7 +298,7 @@ public abstract class Config {
             {
                 builder.push("delivery");
                 DELIVERY_ASCEND_DISTANCE = builder
-                      .comment("Distance (in blocks) above the mailbox where the courier disappears (transitions to the traveling phase).")
+                      .comment("Distance (in blocks) above and to the side of the mailbox where the courier disappears (transitions to the traveling phase).")
                       .defineInRange("ascend_distance", 24, 1, 64);
                 DELIVERY_DEFAULT_DISTANCE = builder
                       .comment("Default distance (in blocks) that will be used if distance between two addresses cannot be determined.")
@@ -356,20 +374,10 @@ public abstract class Config {
                 builder.pop();
             }
 
-            {
-                builder.push("misc");
-                VILLAGER_FEEDING_PIGEONS = builder
-                      .comment("Villagers will feed nearby pigeons by throwing them seeds.",
-                            "Requires 'pigeon.eats_seeds' config option to be enabled.", "Default: true")
-                      .define("villager_feeding_pigeons", true);
-                VILLAGER_FEEDING_PIGEONS_NITWIT_ONLY = builder
-                      .comment("Only Nitwits can feed pigeons.", "Default: true")
-                      .define("villager_feeding_pigeons_only_nitwits", true);
-                ARCHIMEDES_CHANCE = builder
-                      .comment("Chance of an Archimedes spawning when 'envelope:spawns_archimedes' mob is killed by 'envelope:spawns_archimedes' damage type (player explosion by default).")
-                      .defineInRange("archimedes_chance", 0.05, 0, 1);
-                builder.pop();
-            }
+//            {
+//                builder.push("misc");
+//                builder.pop();
+//            }
 
             SPEC = builder.build();
         }
@@ -396,6 +404,8 @@ public abstract class Config {
         public static final ModConfigSpec SPEC;
 
         public static final ModConfigSpec.BooleanValue HIDE_DEFAULT_SEAL_STAMP_DIE_TOOLTIP_OUTSIDE_OF_INVENTORY;
+
+        // Integration
 
         // JEI
         public static final ModConfigSpec.BooleanValue JEI_SERVICE_ADDRESS_INGREDIENT;

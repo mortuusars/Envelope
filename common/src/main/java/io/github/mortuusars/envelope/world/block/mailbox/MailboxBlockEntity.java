@@ -7,6 +7,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundMailboxHasNewMailPacket;
 import io.github.mortuusars.envelope.world.Position;
 import io.github.mortuusars.envelope.world.entity.CourierBat;
+import io.github.mortuusars.envelope.world.mail.delivery.CourierOrigin;
 import io.github.mortuusars.envelope.world.mail.delivery.Delivery;
 import io.github.mortuusars.envelope.world.inventory.MailboxMenu;
 import io.github.mortuusars.envelope.world.item.mail.Mail;
@@ -35,6 +36,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -44,6 +46,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,8 +70,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     protected @NotNull List<ItemStack> mail = new ArrayList<>();
     protected boolean loaded = false;
     protected boolean blockRemoved = false;
-    protected int batSummonCooldown;
-    protected int batSummonAttempt;
+    protected int batEmployCooldown;
+    protected int batEmployAttempt;
 
     protected boolean deliveredWithPigeon;
     protected boolean deliveredWithBat;
@@ -198,7 +201,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD)
-              || (Config.Server.BAT_ENABLED.get() && Config.Server.BAT_SUMMONED_TO_MAILBOX.get() && stack.is(Envelope.Tags.Items.BAT_FOOD));
+              || (Config.Server.BAT_EMPLOYED_AT_MAILBOX.get() && stack.is(Envelope.Tags.Items.BAT_FOOD));
         if (slot == SLOT_MAIL) return isSendable(stack);
         return false;
     }
@@ -364,31 +367,47 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     }
 
     protected boolean maybeSummonBat(ServerLevel level, BlockPos pos) {
-        batSummonCooldown--;
+        batEmployCooldown--;
 
-        if (batSummonCooldown > 0
-              || !Config.Server.BAT_ENABLED.get()
-              || !Config.Server.BAT_SUMMONED_TO_MAILBOX.get()
-              || (!Config.Server.BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING.get() && !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
+        if (batEmployCooldown > 0
+              || !Config.Server.BAT_EMPLOYED_AT_MAILBOX.get()
               || !level.isNight()
               || level.isRaining()
               || level.isThundering()
               || !isAvailableForPickup()
               || !getFood().is(Envelope.Tags.Items.BAT_FOOD)
-              || level.getRandom().nextInt(Math.max(1, Config.Server.BAT_SUMMON_INTERVAL.get() - batSummonAttempt++)) != 0) {
+              || level.getRandom().nextInt(Math.max(1, Config.Server.BAT_EMPLOY_INTERVAL.get() - batEmployAttempt++)) != 0) {
             return false;
         }
 
-        BlockPos spawnPos = Position.ascendTowards(level, pos, Optional.empty(),
-              Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt());
-        @Nullable CourierBat bat = Envelope.EntityTypes.COURIER_BAT.get().spawn(level, spawnPos, MobSpawnType.NATURAL);
+        @Nullable CourierBat bat = null;
+
+        List<Bat> batsNearby = level.getEntitiesOfClass(Bat.class, new AABB(pos).inflate(32), b -> !b.isDeadOrDying() && !b.isRemoved());
+        if (!batsNearby.isEmpty()) {
+            Bat regularBat = Util.getRandom(batsNearby, level.getRandom());
+            @Nullable CourierBat courierBat = regularBat.convertTo(Envelope.EntityTypes.COURIER_BAT.get(), false);
+            if (courierBat != null) {
+                courierBat.setOrigin(CourierOrigin.regular(pos));
+                bat = courierBat;
+            }
+        }
+
+        if (bat == null
+              && Config.Server.BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY.get()
+              && (Config.Server.BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING.get() || level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))) {
+            BlockPos spawnPos = Position.ascendTowards(level, pos, Optional.empty(),
+                  Config.Server.DELIVERY_ASCEND_DISTANCE.get(), level.getRandom().nextInt());
+            bat = Envelope.EntityTypes.COURIER_BAT.get().spawn(level, spawnPos, MobSpawnType.NATURAL);
+            if (bat != null) {
+                bat.setSpawnPos(spawnPos);
+                bat.onAppeared(level);
+            }
+        }
+
         if (bat != null) {
-            bat.setSpawnPos(spawnPos);
             bat.getMailboxHandler().setTargetPos(pos);
-            bat.onAppeared(level);
-            level.playSound(null, spawnPos, SoundEvents.APPLY_EFFECT_BAD_OMEN, SoundSource.BLOCKS, 1f, 1f);
-            batSummonCooldown = Config.Server.BAT_SUMMON_COOLDOWN.get();
-            batSummonAttempt = 0;
+            batEmployCooldown = Config.Server.BAT_EMPLOY_COOLDOWN.get();
+            batEmployAttempt = 0;
             return true;
         }
 
@@ -473,8 +492,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         if (address != null) tag.putString("address", address.getString());
         if (owner != null) tag.putUUID("owner", owner);
         if (!inboxId.equals(Util.NIL_UUID)) tag.putUUID("inbox_id", inboxId);
-        if (batSummonCooldown > 0) tag.putInt("bat_summon_cooldown", batSummonCooldown);
-        if (batSummonAttempt > 0) tag.putInt("bat_summon_attempt", batSummonCooldown);
+        if (batEmployCooldown > 0) tag.putInt("bat_employ_cooldown", batEmployCooldown);
+        if (batEmployAttempt > 0) tag.putInt("bat_employ_attempt", batEmployCooldown);
         if (deliveredWithPigeon) tag.putBoolean("delivered_with_pigeon", true);
         if (deliveredWithBat) tag.putBoolean("delivered_with_bat", true);
     }
@@ -485,8 +504,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         setAddress(tag.contains("address", Tag.TAG_STRING) ? new BlockAddress(tag.getString("address")) : null);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
         inboxId = tag.hasUUID("inbox_id") ? tag.getUUID("inbox_id") : UUID.randomUUID();
-        batSummonCooldown = tag.getInt("bat_summon_cooldown");
-        batSummonAttempt = tag.getInt("bat_summon_attempt");
+        batEmployCooldown = tag.getInt("bat_employ_cooldown");
+        batEmployAttempt = tag.getInt("bat_employ_attempt");
         deliveredWithPigeon = tag.getBoolean("delivered_with_pigeon");
         deliveredWithBat = tag.getBoolean("delivered_with_bat");
     }

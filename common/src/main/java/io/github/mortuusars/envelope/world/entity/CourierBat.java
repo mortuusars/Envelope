@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.Position;
-import io.github.mortuusars.envelope.world.entity.ai.CourierNavigation;
 import io.github.mortuusars.envelope.world.entity.ai.MailboxHandler;
 import io.github.mortuusars.envelope.world.entity.ai.goal.courier.*;
 import io.github.mortuusars.envelope.world.entity.spawning.SpawnableEntityData;
@@ -81,12 +80,14 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
     private static final EntityDataAccessor<Boolean> DATA_DELIVERING = SynchedEntityData.defineId(CourierBat.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HAS_MAIL = SynchedEntityData.defineId(CourierBat.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_SERVICE = SynchedEntityData.defineId(CourierBat.class, EntityDataSerializers.BOOLEAN);
 
     public final AnimationState flyAnimationState = new AnimationState();
 
     protected MailboxHandler mailboxHandler = new MailboxHandler();
 
     protected @Nullable Delivery delivery;
+    protected @Nullable CourierOrigin origin;
 
     protected @Nullable BlockPos spawnPos;
     protected int deliveries;
@@ -113,6 +114,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         super.defineSynchedData(builder);
         builder.define(DATA_DELIVERING, false);
         builder.define(DATA_HAS_MAIL, false);
+        builder.define(DATA_SERVICE, false);
     }
 
     // -- Mailbox
@@ -142,6 +144,14 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
     public void setHasMail(boolean hasMail) {
         entityData.set(DATA_HAS_MAIL, hasMail);
+    }
+
+    public boolean isService() {
+        return entityData.get(DATA_SERVICE);
+    }
+
+    public void setService(boolean service) {
+        entityData.set(DATA_SERVICE, service);
     }
 
     public @Nullable BlockPos getSpawnPos() {
@@ -296,6 +306,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new DespawnGoal());
+        goalSelector.addGoal(0, new ConvertGoal());
         goalSelector.addGoal(0, new LeaveGoal(this));
         goalSelector.addGoal(0, new DeliverMailGoal(this));
         goalSelector.addGoal(1, new StartDeliveryFromMailboxGoal(this));
@@ -358,7 +369,11 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
     @Override
     public boolean canStartDelivery() {
-        return deliveries < Config.Server.BAT_MAX_DELIVERIES.get() && level().isNight() && !level().isRaining() && !level().isThundering();
+        return Config.Server.BAT_EMPLOYED_AT_MAILBOX.get()
+              && level().isNight()
+              && !level().isRaining()
+              && !level().isThundering()
+              && deliveries < Config.Server.BAT_MAX_DELIVERIES.get();
     }
 
     public Optional<Delivery> getCurrentDelivery() {
@@ -386,7 +401,16 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
     @Override
     public @NotNull CourierOrigin getCourierOrigin() {
-        return CourierOrigin.service();
+        if (origin == null) {
+            LOGGER.warn("Origin of a Bat was not set properly. Service origin will be used instead.");
+            origin = CourierOrigin.service();
+        }
+        return origin;
+    }
+
+    public void setOrigin(@Nullable CourierOrigin origin) {
+        this.origin = origin;
+        setService(origin != null && origin.isService());
     }
 
     @Override
@@ -407,11 +431,12 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         deliveries++;
 
         getMailboxHandler().setTargetPos(null);
-        if (spawnPos == null) {
+        playAmbientSound();
+
+        if (getCourierOrigin().isService() && spawnPos == null) {
             spawnPos = Position.ascendTowards(level, blockPosition(),
                   Optional.empty(), Config.Server.DELIVERY_ASCEND_DISTANCE.get(), getId());
         }
-        playAmbientSound();
     }
 
     public void despawn() {
@@ -426,11 +451,19 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+
         tag.put("MailboxHandler", MailboxHandler.CODEC.encode(getMailboxHandler(), NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
+
         if (delivery != null) {
             Delivery.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), delivery)
                   .resultOrPartial(LOGGER::error)
                   .ifPresent(value -> tag.put("Delivery", value));
+        }
+
+        if (origin != null) {
+            CourierOrigin.CODEC.encodeStart(NbtOps.INSTANCE, origin)
+                  .resultOrPartial(LOGGER::error)
+                  .ifPresent(value -> tag.put("Origin", value));
         }
 
         if (deliveries > 0) {
@@ -455,6 +488,12 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
                   .resultOrPartial(e -> LOGGER.error("Cannot parse Delivery from tag '{}': {}", tag.getCompound("Delivery"), e))
                   .orElse(null)
             );
+        }
+
+        if (tag.contains("Origin")) {
+            setOrigin(CourierOrigin.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("Origin"))
+                  .resultOrPartial(e -> LOGGER.error("Cannot parse CourierOrigin from tag '{}': {}", tag.getCompound("Origin"), e))
+                  .orElse(null));
         }
 
         setDelivering(delivery != null);
@@ -502,7 +541,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
             travellingTicks++;
             if (travellingTicks > adjustedTickDelay(600)) {
-                spawnPos = null;
+                setSpawnPos(null);
             } else if (!getNavigation().isInProgress()) {
                 if (!closerThan(target, 20)) {
                     pathfindRandomlyTowards(target);
@@ -521,7 +560,7 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
                         ticksStuck++;
                         if (ticksStuck > 40) {
-                            spawnPos = null;
+                            setSpawnPos(null);
                             ticksStuck = 0;
                         }
                     } else {
@@ -534,13 +573,8 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
 
     public class DespawnGoal extends Goal {
         @Override
-        public boolean requiresUpdateEveryTick() {
-            return true;
-        }
-
-        @Override
         public boolean canUse() {
-            if (isDelivering()) return false;
+            if (isDelivering() || getCourierOrigin().isRegular()) return false;
             return (!canStartDelivery() || getMailboxHandler().getTargetPos() == null)
                   && (spawnPos == null || hasReachedTarget(spawnPos));
         }
@@ -548,6 +582,28 @@ public class CourierBat extends PathfinderMob implements FlyingAnimal, PhysicalC
         @Override
         public void start() {
             despawn();
+            Envelope.LOGGER.debug("Service CourierBat was despawned.");
+        }
+    }
+
+    public class ConvertGoal extends Goal {
+        @Override
+        public boolean canUse() {
+            if (isDelivering() || getCourierOrigin().isService()) return false;
+            return (!canStartDelivery() || getMailboxHandler().getTargetPos() == null);
+        }
+
+        @Override
+        public void start() {
+            if (convertTo(EntityType.BAT, false) == null) {
+                if (level() instanceof ServerLevel serverLevel) {
+                    onVanished(serverLevel);
+                }
+                discard();
+                Envelope.LOGGER.debug("CourierBat was despawned as it failed to convert into a regular Bat.");
+            } else {
+                Envelope.LOGGER.debug("CourierBat was converted into a regular Bat.");
+            }
         }
     }
 }

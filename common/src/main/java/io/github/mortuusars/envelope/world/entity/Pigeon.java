@@ -772,6 +772,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
                   .resultOrPartial(LOGGER::error)
                   .ifPresent(value -> tag.put("Delivery", value));
         }
+
         if (origin != null) {
             CourierOrigin.CODEC.encodeStart(NbtOps.INSTANCE, origin)
                   .resultOrPartial(LOGGER::error)

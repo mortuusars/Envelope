@@ -34,7 +34,7 @@ public class DeliveryManager {
     public void startService(DeliveryDraft draft) {
         ServerLevel level = getMailService().getLevel();
 
-        PhysicalCourier courier = Config.Server.BAT_ENABLED.get() && level.isNight()
+        PhysicalCourier courier = Config.Server.BAT_EMPLOYED_AT_MAIL_SERVICE.get() && level.isNight()
               ? CourierBat.createService(level)
               : Pigeon.createService(level);
         start(courier, draft);

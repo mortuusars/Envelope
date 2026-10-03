@@ -282,7 +282,7 @@ public class MailboxBlock extends BaseEntityBlock {
         }
 
         //TODO: Don't consume food and mail in creative
-        if (stack.is(Items.BAT_SPAWN_EGG) && Config.Server.BAT_ENABLED.get()) {
+        if (stack.is(Items.BAT_SPAWN_EGG) && Config.Server.BAT_EMPLOYED_AT_MAILBOX.get()) {
             if (!(level instanceof ServerLevel serverLevel)) {
                 return ItemInteractionResult.SUCCESS;
             }

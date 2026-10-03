@@ -34,6 +34,8 @@ Misc
 - Replaced `pigeon.damage_evasion_chance_while_delivering` config option with `delivery.courier_damage_evasion_chance`
 - Replaced `#envelope:bypasses_pigeon_delivery_evasion` damage type tag with `#envelope:bypasses_courier_delivery_evasion`
 - Changed `delivery.spawning_respects_domobspawning_rule` config option to `delivery.spawning_ignores_domobspawning_rule`
+- Minor changes, moves and renames of some config options
+  - This might cause some of the settings to reset, if they have been changed
 
 ## 0.8.0-Snapshot1
 ### New features

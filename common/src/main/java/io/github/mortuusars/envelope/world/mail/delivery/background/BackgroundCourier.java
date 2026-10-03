@@ -100,10 +100,10 @@ public class BackgroundCourier implements Courier {
 
         return getSpawnableEntityData().getEntityType()
               .flatMap(type -> {
-                  if (type.equals(Envelope.EntityTypes.COURIER_BAT.get()) && (!level.isNight() || !Config.Server.BAT_ENABLED.get())) {
+                  if (type.equals(Envelope.EntityTypes.COURIER_BAT.get()) && (!level.isNight() || !Config.Server.BAT_EMPLOYED_AT_MAIL_SERVICE.get())) {
                       return Optional.of(Pigeon.createService(level));
                   }
-                  if (type.equals(Envelope.EntityTypes.PIGEON.get()) && level.isNight() && Config.Server.BAT_ENABLED.get()) {
+                  if (type.equals(Envelope.EntityTypes.PIGEON.get()) && level.isNight() && Config.Server.BAT_EMPLOYED_AT_MAIL_SERVICE.get()) {
                       return Optional.of(CourierBat.createService(level));
                   }
                   return Optional.empty();
