@@ -423,7 +423,6 @@
 
   "envelope.configuration.bat": "Bat",
   "envelope.configuration.employed_at_mail_service": "Employed At Mail Service",
-  "envelope.configuration.employed_at_mailbox": "Employed At Mailbox",
   "envelope.configuration.summoned_to_mailbox": "Summoned To Mailbox",
   "envelope.configuration.summoned_to_mailbox_ignores_domobspawning_rule": "Summoned To Mailbox - Ignore 'doMobSpawning' Rule",
   "envelope.configuration.employ_cooldown": "Employ Cooldown",

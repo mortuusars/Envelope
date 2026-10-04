@@ -205,7 +205,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (slot == SLOT_MAIL) return isSendable(stack);
         if (slot == SLOT_PIGEON_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
-        if (slot == SLOT_BAT_FOOD) return Config.Server.BAT_EMPLOYED_AT_MAILBOX.get() && stack.is(Envelope.Tags.Items.BAT_FOOD);
+        if (slot == SLOT_BAT_FOOD) return stack.is(Envelope.Tags.Items.BAT_FOOD);
         return false;
     }
 
@@ -368,14 +368,13 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         }
 
         updateBlockStateIfNeeded();
-        maybeSummonBat(level, pos);
+        maybeEmployBat(level, pos);
     }
 
-    protected boolean maybeSummonBat(ServerLevel level, BlockPos pos) {
+    protected boolean maybeEmployBat(ServerLevel level, BlockPos pos) {
         batEmployCooldown--;
 
         if (batEmployCooldown > 0
-              || !Config.Server.BAT_EMPLOYED_AT_MAILBOX.get()
               || !level.isNight()
               || level.isRaining()
               || level.isThundering()

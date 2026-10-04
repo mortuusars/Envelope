@@ -282,7 +282,7 @@ public class MailboxBlock extends BaseEntityBlock {
         }
 
         //TODO: Don't consume food and mail in creative
-        if (stack.is(Items.BAT_SPAWN_EGG) && Config.Server.BAT_EMPLOYED_AT_MAILBOX.get()) {
+        if (stack.is(Items.BAT_SPAWN_EGG)) {
             if (!(level instanceof ServerLevel serverLevel)) {
                 return ItemInteractionResult.SUCCESS;
             }
@@ -304,7 +304,7 @@ public class MailboxBlock extends BaseEntityBlock {
                 return ItemInteractionResult.SUCCESS;
             }
 
-            if (!level.isNight() || level.isRaining() || level.isThundering()) {
+            if (level.isDay() || level.isRaining() || level.isThundering()) {
                 serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
                 player.displayClientMessage(Component.literal("Bat cannot deliver at this time.").withStyle(ChatFormatting.RED), true);
                 return ItemInteractionResult.SUCCESS;

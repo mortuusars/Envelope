@@ -34,7 +34,6 @@ public abstract class Config {
 
         // -- Bat
         public static final ModConfigSpec.BooleanValue BAT_EMPLOYED_AT_MAIL_SERVICE;
-        public static final ModConfigSpec.BooleanValue BAT_EMPLOYED_AT_MAILBOX;
         public static final ModConfigSpec.BooleanValue BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY;
         public static final ModConfigSpec.BooleanValue BAT_MAILBOX_SUMMON_IGNORES_DOMOBSPAWNING;
         public static final ModConfigSpec.IntValue BAT_EMPLOY_COOLDOWN;
@@ -119,7 +118,7 @@ public abstract class Config {
                       .defineInRange("min_ticks_outside_pigeonhole", 2400, 100, Integer.MAX_VALUE);
 
                 PIGEON_EATS_SEEDS = builder
-                      .comment("Pigeon searches for nearby dropped seeds (envelope:pigeon_food) and eats them.")
+                      .comment("Pigeon searches for nearby dropped seeds (#envelope:pigeon_food) and eats them.")
                       .define("eats_seeds", true);
                 VILLAGER_FEEDING_PIGEONS = builder
                       .comment("Villagers will feed nearby pigeons by throwing them seeds.",
@@ -190,10 +189,6 @@ public abstract class Config {
                             "When the courier passes through mail hub - it will switch between Pigeon and Bat depending on the time of day.",
                             "Default: true")
                       .define("employed_at_mail_service", true);
-                //TODO: mention slot disabling when false:
-                BAT_EMPLOYED_AT_MAILBOX = builder
-                      .comment("At night, Bat will deliver mail from a Mailbox, if it has '#envelope:bat_food'.", "Default: true")
-                      .define("employed_at_mailbox", true);
                 BAT_SUMMONED_TO_MAILBOX_IF_NONE_NEARBY = builder
                       .comment("If there is no regular Bat nearby, a service one will be summoned (spawned) instead.", "Default: true")
                       .define("summoned_to_mailbox", true);
