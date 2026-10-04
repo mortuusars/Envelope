@@ -255,7 +255,7 @@ public class MailboxBlock extends BaseEntityBlock {
             if (level instanceof ServerLevel serverLevel) {
                 if (level.getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
                       && blockEntity.isAvailableForPickup()
-                      && blockEntity.getFood().is(Envelope.Tags.Items.PIGEON_FOOD)
+                      && !blockEntity.getPigeonFoodItem().isEmpty()
                       && Envelope.EntityTypes.PIGEON.get().spawn(serverLevel,
                       pos.relative(state.getValue(FACING)), MobSpawnType.SPAWN_EGG) instanceof Pigeon pigeon
                       && blockEntity.tryStartDelivery(pigeon)) {
@@ -298,7 +298,7 @@ public class MailboxBlock extends BaseEntityBlock {
                 return ItemInteractionResult.SUCCESS;
             }
 
-            if (!blockEntity.getFood().is(Envelope.Tags.Items.BAT_FOOD)) {
+            if (blockEntity.getBatFoodItem().isEmpty()) {
                 serverLevel.playSound(null, pos, SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1, 1);
                 player.displayClientMessage(Component.literal("Bat doesn't like the food.").withStyle(ChatFormatting.RED), true);
                 return ItemInteractionResult.SUCCESS;

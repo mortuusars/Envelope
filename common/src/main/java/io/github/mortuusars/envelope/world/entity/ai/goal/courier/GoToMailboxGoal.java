@@ -27,8 +27,7 @@ public class GoToMailboxGoal extends AbstractGoToBlockGoal {
               && courier.canStartDelivery()
               && super.canUse()
               && courier.level().getBlockEntity(getBlockPos()) instanceof MailboxBlockEntity blockEntity
-              && blockEntity.isAvailableForPickup()
-              && courier.canEat(blockEntity.getFood());
+              && blockEntity.isAvailableForPickup();
     }
 
     @Override

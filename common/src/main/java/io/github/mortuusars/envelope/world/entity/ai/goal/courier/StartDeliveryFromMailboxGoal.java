@@ -29,8 +29,7 @@ public class StartDeliveryFromMailboxGoal extends Goal {
         return pos != null
               && courier.closerThan(pos, CourierNavigation.getReachDistance() * 1.2f)
               && courier.level().getBlockEntity(pos) instanceof MailboxBlockEntity blockEntity
-              && blockEntity.isAvailableForPickup()
-              && courier.canEat(blockEntity.getFood());
+              && blockEntity.isAvailableForPickup();
     }
 
     @Override

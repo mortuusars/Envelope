@@ -71,12 +71,11 @@ public class LocateMailboxGoal extends Goal {
                     courier.blockPosition(), maxDistance, PoiManager.Occupancy.ANY)
               .map(PoiRecord::getPos)
               .filter(p -> level.getBlockEntity(p) instanceof MailboxBlockEntity blockEntity
-                    && blockEntity.isAvailableForPickup()
-                    && courier.canEat(blockEntity.getFood()))
+                    && blockEntity.isAvailableForPickup())
               .toList();
 
         return ContraptionTargets.locateNearby(level, courier.position(), maxDistance, poiResults,
               () -> ContraptionTargets.findNearbyMailboxes(
-                    level, courier.position(), maxDistance, be -> be.isAvailableForPickup() && courier.canEat(be.getFood())));
+                    level, courier.position(), maxDistance, MailboxBlockEntity::isAvailableForPickup));
     }
 }

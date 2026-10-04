@@ -247,9 +247,24 @@ public class MailboxScreen extends AbstractContainerScreen<MailboxMenu> {
             }
         }
 
-        Slot foodSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_FOOD);
-        if (!foodSlot.hasItem()) {
-            guiGraphics.blit(TEXTURE, leftPos + foodSlot.x, topPos + foodSlot.y, 314, 0, 16, 16, 512, 256);
+        Minecrft.level().updateSkyBrightness(); // Without this isDay/isNight doesn't work on client
+
+        Slot pigeonFoodSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_PIGEON_FOOD);
+        if (!pigeonFoodSlot.hasItem()) {
+            // Seeds slot placeholder
+            guiGraphics.blit(TEXTURE, leftPos + pigeonFoodSlot.x, topPos + pigeonFoodSlot.y, 314, 0, 16, 16, 512, 256);
+        } else if (Minecrft.level().isDay() && getMenu().getBlockEntity().isAvailableForPickup()) {
+            // Sun
+            guiGraphics.blit(TEXTURE, leftPos + pigeonFoodSlot.x - 22, topPos + pigeonFoodSlot.y - 1, 365, 0, 18, 18, 512, 256);
+        }
+        Slot batFoodSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_BAT_FOOD);
+        if (!batFoodSlot.hasItem()) {
+            // Spider eye slot placeholder
+            guiGraphics.blit(TEXTURE, leftPos + batFoodSlot.x, topPos + batFoodSlot.y, 314, 16, 16, 16, 512, 256);
+        }
+        else if (Minecrft.level().isNight() && getMenu().getBlockEntity().isAvailableForPickup()) {
+            // Moon
+            guiGraphics.blit(TEXTURE, leftPos + batFoodSlot.x - 22, topPos + batFoodSlot.y - 1, 365, 18, 18, 18, 512, 256);
         }
         Slot mailSlot = getMenu().getSlot(MailboxBlockEntity.SLOT_MAIL);
         if (!mailSlot.hasItem()) {

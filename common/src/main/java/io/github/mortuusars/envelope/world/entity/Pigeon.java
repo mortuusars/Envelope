@@ -670,7 +670,7 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
 
     @Override
     public boolean canStartDelivery() {
-        return !isLeashed() && !isTired() && !level().isNight() && !level().isRaining() && !level().isThundering();
+        return !isLeashed() && !isTired() && level().isDay() && !level().isRaining() && !level().isThundering();
     }
 
     @Override

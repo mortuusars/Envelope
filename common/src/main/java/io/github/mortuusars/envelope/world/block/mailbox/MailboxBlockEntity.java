@@ -55,10 +55,11 @@ import org.slf4j.Logger;
 import java.util.*;
 
 public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbox {
-    public static final int REGULAR_SLOTS = 2;
-    public static final int SLOT_FOOD = 0;
-    public static final int SLOT_MAIL = 1;
-    public static final int INBOX_SLOT = 2;
+    public static final int REGULAR_SLOTS = 3;
+    public static final int SLOT_MAIL = 0;
+    public static final int SLOT_PIGEON_FOOD = 1;
+    public static final int SLOT_BAT_FOOD = 2;
+    public static final int INBOX_SLOT = REGULAR_SLOTS;
 
     protected static final Logger LOGGER = LogUtils.getLogger();
 
@@ -66,13 +67,11 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
     protected @NotNull UUID inboxId = UUID.randomUUID();
     protected @Nullable BlockAddress address;
     protected @Nullable UUID owner;
-
     protected @NotNull List<ItemStack> mail = new ArrayList<>();
     protected boolean loaded = false;
     protected boolean blockRemoved = false;
     protected int batEmployCooldown;
     protected int batEmployAttempt;
-
     protected boolean deliveredWithPigeon;
     protected boolean deliveredWithBat;
 
@@ -169,8 +168,12 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
         return super.getItem(slot);
     }
 
-    public ItemStack getFood() {
-        return getItem(SLOT_FOOD);
+    public ItemStack getPigeonFoodItem() {
+        return getItem(SLOT_PIGEON_FOOD);
+    }
+
+    public ItemStack getBatFoodItem() {
+        return getItem(SLOT_BAT_FOOD);
     }
 
     @Override
@@ -200,9 +203,9 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (slot == SLOT_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD)
-              || (Config.Server.BAT_EMPLOYED_AT_MAILBOX.get() && stack.is(Envelope.Tags.Items.BAT_FOOD));
         if (slot == SLOT_MAIL) return isSendable(stack);
+        if (slot == SLOT_PIGEON_FOOD) return stack.is(Envelope.Tags.Items.PIGEON_FOOD);
+        if (slot == SLOT_BAT_FOOD) return Config.Server.BAT_EMPLOYED_AT_MAILBOX.get() && stack.is(Envelope.Tags.Items.BAT_FOOD);
         return false;
     }
 
@@ -218,7 +221,8 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
 
     public boolean isAvailableForPickup() {
         if (level == null) return false;
-        return !getItem(SLOT_FOOD).isEmpty() && isSendable(getItem(SLOT_MAIL));
+        return getBlockState().getValue(MailboxBlock.OPEN);
+        // isSendable(getItem(SLOT_MAIL)) && !(level.isDay() ? getPigeonFoodItem() : getBatFoodItem()).isEmpty();
     }
 
     @Override
@@ -272,7 +276,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
                     .owner(getOwner()));
 
         removeItem(SLOT_MAIL, 1);
-        removeItem(SLOT_FOOD, 1);
+        removeItem(level.isDay() ? SLOT_PIGEON_FOOD : SLOT_BAT_FOOD, 1);
 
         Vec3 pos = courier.position();
         level.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.02);
@@ -363,6 +367,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
             loaded = true;
         }
 
+        updateBlockStateIfNeeded();
         maybeSummonBat(level, pos);
     }
 
@@ -375,7 +380,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
               || level.isRaining()
               || level.isThundering()
               || !isAvailableForPickup()
-              || !getFood().is(Envelope.Tags.Items.BAT_FOOD)
+              || getBatFoodItem().isEmpty()
               || level.getRandom().nextInt(Math.max(1, Config.Server.BAT_EMPLOY_INTERVAL.get() - batEmployAttempt++)) != 0) {
             return false;
         }
@@ -454,7 +459,7 @@ public class MailboxBlockEntity extends BaseContainerBlockEntity implements Inbo
             boolean isOpen = state.getValue(MailboxBlock.OPEN);
             boolean hasMail = state.getValue(MailboxBlock.HAS_MAIL);
 
-            boolean shouldBeOpen = isAvailableForPickup();
+            boolean shouldBeOpen = !(level.isDay() ? getPigeonFoodItem() : getBatFoodItem()).isEmpty() && isSendable(getItem(SLOT_MAIL));
             boolean shouldHaveMail = !getAllMail().isEmpty();
 
             if (isOpen != shouldBeOpen || hasMail != shouldHaveMail) {

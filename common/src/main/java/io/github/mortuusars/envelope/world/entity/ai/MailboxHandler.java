@@ -88,8 +88,7 @@ public class MailboxHandler {
         if (currentPos == null) return false;
         if (Position.distanceToSqr(level, currentPos, courier.blockPosition().getCenter()) > 48 * 48) return false;
         return level.getBlockEntity(currentPos) instanceof MailboxBlockEntity blockEntity
-              && blockEntity.isAvailableForPickup()
-              && courier.canEat(blockEntity.getFood());
+              && blockEntity.isAvailableForPickup();
     }
 
     public boolean isTargetBlacklisted(BlockPos pos) {
