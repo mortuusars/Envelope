@@ -1,15 +1,22 @@
 # Changelog
 
-## UNRELEASED
+## 0.8.0-Snapshot2
 ### New Features
+Courier Bat
+- **Mail** can now be delivered at night using the **Bat**
+  - **Bat** delivers mail **2 times faster** than a **Pigeon**
+- Added slots for bat food (**Spider Eye**) to the **Mailbox**
+- If no bats are nearby, one will be **spawned** for delivery
+  - Spawned bats will despawn after delivery
+- Service deliveries (created by the game) will use bats at night
+  - When the courier passes through the mail hub (virtual point) - it will be changed to time-appropriate one (if day changes to night or night to day while delivery is in progress)
+- Added **The Pigeons and the Bats** advancement
+
 Seal
 - Added **Soulbound Seal Stamp**
   - Obtained by combining any **Seal Stamp** with an **Echo Shard**
   - Sealing an item with it creates a **Soulbound Seal**, which will prevent the item from dropping when sealer dies, and another players from opening it until the sealer dies
   - Has 8 uses and will return back to original stamp when depleted
-
-Misc
-- Added **The Pigeons and the Bats** advancement
 
 ### Changes and Fixes
 - Increased Pigeon delivery travel speed (when in background) from 20 to 25
