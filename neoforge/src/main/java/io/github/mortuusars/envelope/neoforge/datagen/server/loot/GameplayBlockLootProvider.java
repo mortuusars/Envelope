@@ -8,6 +8,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.function.BiConsumer;
@@ -17,11 +18,15 @@ public record GameplayBlockLootProvider(HolderLookup.Provider registries) implem
     public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
         output.accept(
               Envelope.LootTables.PIGEONHOLE_WASTE,
-              LootTable.lootTable().withPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1))
-                    .add(LootItem.lootTableItem(Items.BONE_MEAL).setWeight(99))
-                    .add(LootItem.lootTableItem(Items.DIAMOND).setWeight(1))
-              )
+              LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                          .setRolls(ConstantValue.exactly(1))
+                          .add(LootItem.lootTableItem(Items.BONE_MEAL).setWeight(99))
+                          .add(LootItem.lootTableItem(Items.DIAMOND).setWeight(1)))
+                    .withPool(LootPool.lootPool()
+                          .setRolls(ConstantValue.exactly(1))
+                          .add(LootItem.lootTableItem(Items.FEATHER))
+                          .when(LootItemRandomChanceCondition.randomChance(0.5f)))
         );
     }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## UNRELEASED
+### New Features
+Misc
+- Scooping waste from **Pigeonhole** now has a 50% chance to drop **Feather**  
+- Added particles to **Pigeonhole** waste scooping
+
 ## 0.8.0-Snapshot2
 ### New Features
 Courier Bat

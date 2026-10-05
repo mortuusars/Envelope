@@ -6,14 +6,18 @@ import io.github.mortuusars.envelope.world.block.occupiable.Occupiable;
 import io.github.mortuusars.envelope.world.entity.Pigeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -219,6 +223,18 @@ public class PigeonholeBlock extends BaseEntityBlock {
                 clearWaste(level, pos, state);
                 stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
+
+                Direction facing = state.getValue(FACING);
+                // Pos copied from popResourceFromFace
+                int i = facing.getStepX();
+                int j = facing.getStepY();
+                int k = facing.getStepZ();
+                double d = 0.2;
+                double e = 0.2;
+                double f = (double)pos.getX() + (double)0.5F + (i == 0 ? Mth.nextDouble(level.random, -0.25F, 0.25F) : (double)i * ((double)0.5F + d));
+                double g = (double)pos.getY() + (double)0.5F + (j == 0 ? Mth.nextDouble(level.random, -0.25F, 0.25F) : (double)j * ((double)0.5F + e)) - e;
+                double h = (double)pos.getZ() + (double)0.5F + (k == 0 ? Mth.nextDouble(level.random, -0.25F, 0.25F) : (double)k * ((double)0.5F + d));
+                serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIORITE.defaultBlockState()), f, g, h, 6, 0.1, 0.1, 0.1, 0);
             }
 
             level.playSound(player, pos, Envelope.SoundEvents.PIGEONHOLE_SCOOP.get(), SoundSource.BLOCKS,
