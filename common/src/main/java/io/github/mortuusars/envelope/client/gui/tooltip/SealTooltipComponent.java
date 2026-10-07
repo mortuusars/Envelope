@@ -27,8 +27,8 @@ public class SealTooltipComponent implements ClientTooltipComponent {
     @Override
     public int getHeight() {
         return seal.lock()
-              .map(lock -> lock.isLocked(Minecrft.level()) ? 33 : 32) // +1 pixel to make some room for lock tentacles
-              .orElse(32);
+              .map(lock -> lock.isLocked(Minecrft.level()) ? 35 : 34) // +1 pixel to make some room for lock tentacles
+              .orElse(34);
     }
 
     @Override
@@ -39,11 +39,11 @@ public class SealTooltipComponent implements ClientTooltipComponent {
     @Override
     public void renderText(Font font, int x, int y, Matrix4f matrix, MultiBufferSource.BufferSource buffer) {
         // Signature:
-        x += 34;
-        y += 11;
-        int mainColor = FastColor.ARGB32.lerp(0.3f, seal.material().value().impressionPalette().highlight().tint(), 0xFFFFFFFF);
-        int outlineColor = FastColor.ARGB32.lerp(0.3f, seal.material().value().impressionPalette().side().tint(), 0xFF666666);
-        int shadowColor = FastColor.ARGB32.lerp(0.5f, seal.material().value().impressionPalette().shadow().tint(), 0xFF333333);
+        x += 36;
+        y += 12;
+        int mainColor = FastColor.ARGB32.lerp(0.25f, seal.material().value().impressionPalette().highlight().tint(), 0xFFFFFFFF);
+        int outlineColor = FastColor.ARGB32.lerp(0.25f, seal.material().value().impressionPalette().side().tint(), 0xFF7F7F7F);
+        int shadowColor = FastColor.ARGB32.lerp(0.25f, seal.material().value().impressionPalette().shadow().tint(), 0xFF333333);
         text(seal.signature(), font, x - 1, y, outlineColor, matrix, buffer);
         text(seal.signature(), font, x - 1, y - 1, outlineColor, matrix, buffer);
         text(seal.signature(), font, x, y - 1, outlineColor, matrix, buffer);

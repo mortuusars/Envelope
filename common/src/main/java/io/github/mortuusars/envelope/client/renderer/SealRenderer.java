@@ -23,41 +23,41 @@ public class SealRenderer {
         ResourceLocation impressionTexture = seal.impression().value().sprite();
 
         // Background
-        guiGraphics.blitSprite(materialTexture, x, y, 30, 30);
+        guiGraphics.blitSprite(materialTexture, x, y, 32, 32);
 
         // Side
         setShaderTintColor(colors.side());
-        guiGraphics.blitSprite(impressionTexture, x + 1, y + 2, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x, y + 2, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x - 1, y + 2, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x + 1, y + 1, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x, y + 1, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x - 1, y + 1, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x + 1, y, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x, y, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x - 1, y, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x + 1, y - 1, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x, y - 1, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x - 1, y - 1, 30, 30);
-        guiGraphics.blitSprite(impressionTexture, x, y - 2, 30, 30);
+        guiGraphics.blitSprite(impressionTexture, x + 1, y + 2, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x, y + 2, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x - 1, y + 2, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x + 1, y + 1, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x, y + 1, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x - 1, y + 1, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x + 1, y, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x, y, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x - 1, y, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x + 1, y - 1, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x, y - 1, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x - 1, y - 1, 32, 32);
+        guiGraphics.blitSprite(impressionTexture, x, y - 2, 32, 32);
 
         // Shadow
         setShaderTintColor(colors.shadow());
-        guiGraphics.blitSprite(impressionTexture, x, y + 1, 30, 30);
+        guiGraphics.blitSprite(impressionTexture, x, y + 1, 32, 32);
 
         // Highlight
         setShaderTintColor(colors.highlight());
-        guiGraphics.blitSprite(impressionTexture, x, y - 1, 30, 30);
+        guiGraphics.blitSprite(impressionTexture, x, y - 1, 32, 32);
 
         // Base
         setShaderTintColor(colors.base());
-        guiGraphics.blitSprite(impressionTexture, x, y, 30, 30);
+        guiGraphics.blitSprite(impressionTexture, x, y, 32, 32);
 
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
         if (material.hasGlint()) {
             RenderSystem.enableBlend();
-            guiGraphics.blitSprite(SEAL_GLINT_SPRITE, 32, 32, 0, 0, x, y, 32, 32);
+            guiGraphics.blitSprite(SEAL_GLINT_SPRITE, 32, 32, 0, 0, x + 1, y + 1, 32, 32);
             RenderSystem.disableBlend();
         }
 
@@ -71,11 +71,11 @@ public class SealRenderer {
 
                 RenderSystem.enableBlend();
                 guiGraphics.blitSprite(LOCKED_OVERLAY_SPRITE, 34, 34,
-                      0, 0, x - 2, y - 2, 34, 34);
+                      0, 0, x - 1, y - 1, 34, 34);
                 RenderSystem.disableBlend();
 
                 guiGraphics.blitSprite(LOCK_SPRITE, 34, 34,
-                      0, 0, x - 2, y - 2, 34, 34);
+                      0, 0, x - 1, y - 1, 34, 34);
                 RenderSystem.setShaderColor(1, 1, 1, 1);
             }
         });
