@@ -4,7 +4,9 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -59,6 +61,12 @@ public class SoulboundSealStampItem extends SealStampItem {
 
     @Override
     public Seal createSeal(ItemStack stack, Player player) {
+        if (player.isCreative()) {
+            player.displayClientMessage(Component.translatable("item.envelope.soulbound_seal_stamp.error.in_creative_mode")
+                  .withStyle(ChatFormatting.RED), true);
+            return super.createSeal(stack, player);
+        }
+
         if (Config.Server.SOULBOUND_SEAL_STAMP_CREATES_LOCK.get()) {
             return Seal.copy(super.createSeal(stack, player), player.registryAccess())
                   .lockedBy(player)

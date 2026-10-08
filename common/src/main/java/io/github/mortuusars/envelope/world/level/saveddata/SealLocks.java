@@ -71,23 +71,21 @@ public class SealLocks extends SavedData {
     // --
 
     @Override
-    public void setDirty() {
-        super.setDirty();
-        if (Platform.isDedicatedServer()) {
+    public void setDirty(boolean dirty) {
+        super.setDirty(dirty);
+        if (dirty) {
             syncToAllClients();
         }
     }
 
     public void syncToAllClients() {
-        if (Platform.isDedicatedServer()) {
+        if (Platform.getCurrentServer() != null) {
             new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToAllClients();
         }
     }
 
     public void syncToClient(ServerPlayer player) {
-        if (Platform.isDedicatedServer()) {
-            new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToClient(player);
-        }
+        new ClientboundSyncDeathLockDataPacket(List.copyOf(locks)).sendToClient(player);
     }
 
     // -- Save / Load

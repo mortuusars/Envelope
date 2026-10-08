@@ -65,6 +65,7 @@
   "item.envelope.magenta_seal_stamp": "Magenta Seal Stamp",
   "item.envelope.pink_seal_stamp": "Pink Seal Stamp",
   "item.envelope.soulbound_seal_stamp": "Soulbound Seal Stamp",
+  "item.envelope.soulbound_seal_stamp.error.in_creative_mode": "Soulbound seal lock was not created. Creative-mode players have no soul.",
 
   "item_group.envelope.envelope": "Envelope",
 
