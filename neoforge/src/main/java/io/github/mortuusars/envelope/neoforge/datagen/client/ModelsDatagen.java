@@ -76,20 +76,20 @@ public class ModelsDatagen extends BlockStateProvider {
 
         itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
               .parent(new ModelFile.UncheckedModelFile("item/generated"))
-              .texture("layer0", Envelope.resource("item/letter"))
-              .texture("layer1", Envelope.resource("item/letter_seal_overlay"))
+              .texture("layer0", Envelope.resource("item/sealed_letter"))
+              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"))
               .override()
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
               .model(itemModels().getBuilder(Envelope.resource("sealed_letter_tattered").toString())
                     .parent(new ModelFile.UncheckedModelFile("item/generated"))
                     .texture("layer0", Envelope.resource("item/letter_tattered"))
-                    .texture("layer1", Envelope.resource("item/letter_seal_overlay")))
+                    .texture("layer1", Envelope.resource("item/sealed_letter_overlay")))
               .end();
 
         itemModels().getBuilder(Envelope.resource("sealed_package").toString())
               .parent(new ModelFile.UncheckedModelFile("item/generated"))
-              .texture("layer0", Envelope.resource("item/package"))
-              .texture("layer1", Envelope.resource("item/package_seal_overlay"));
+              .texture("layer0", Envelope.resource("item/sealed_package"))
+              .texture("layer1", Envelope.resource("item/sealed_package_overlay"));
 
         itemModels().basicItem(Envelope.Items.PAPER_BOX.get());
         itemModels().basicItem(Envelope.Items.PACKAGE.get());
