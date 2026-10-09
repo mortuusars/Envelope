@@ -98,7 +98,7 @@ public interface SealedItem {
     // --
 
     class Client {
-        public static int LOCKED_HIGHLIGHT_OVERLAY_COLOR = 0xFF158292;
+        public static int LOCKED_HIGHLIGHT_OVERLAY_COLOR = 0xFF18A2B6;
 
         public static int getSealOverlayColor(ItemStack stack, int layer) {
             if (layer != 1) {

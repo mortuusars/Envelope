@@ -82,7 +82,7 @@ public class ModelsDatagen extends BlockStateProvider {
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
               .model(itemModels().getBuilder(Envelope.resource("sealed_letter_tattered").toString())
                     .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                    .texture("layer0", Envelope.resource("item/letter_tattered"))
+                    .texture("layer0", Envelope.resource("item/sealed_tattered_letter"))
                     .texture("layer1", Envelope.resource("item/sealed_letter_overlay")))
               .end();
 
