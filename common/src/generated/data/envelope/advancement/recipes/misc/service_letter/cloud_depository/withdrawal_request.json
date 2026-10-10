@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "envelope:letter_presetting/cloud_depository/status_request"
+        "recipe": "envelope:service_letter/cloud_depository/withdrawal_request"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "envelope:letter_presetting/cloud_depository/status_request"
+      "envelope:service_letter/cloud_depository/withdrawal_request"
     ]
   }
 }

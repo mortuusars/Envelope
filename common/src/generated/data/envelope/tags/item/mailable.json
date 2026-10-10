@@ -1,9 +1,11 @@
 {
   "values": [
     "envelope:letter",
-    "envelope:tattered_letter",
     "envelope:sealed_letter",
+    "envelope:tattered_letter",
     "envelope:sealed_tattered_letter",
+    "envelope:service_letter",
+    "envelope:sealed_service_letter",
     "envelope:package",
     "envelope:sealed_package",
     "envelope:payback_box",

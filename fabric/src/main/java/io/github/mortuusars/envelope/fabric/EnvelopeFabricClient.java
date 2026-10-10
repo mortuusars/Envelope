@@ -44,10 +44,12 @@ public class EnvelopeFabricClient implements ClientModInitializer {
 
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(),
               Envelope.Blocks.LETTER.get(),
-              Envelope.Blocks.TATTERED_LETTER.get());
+              Envelope.Blocks.TATTERED_LETTER.get(),
+              Envelope.Blocks.SERVICE_LETTER.get());
 
         ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
         ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_TATTERED_LETTER.get());
+        ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_SERVICE_LETTER.get());
         ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
 
         ColorProviderRegistry.BLOCK.register(SealedItem.Client::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());

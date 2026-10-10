@@ -145,7 +145,9 @@ public class TagsDatagen {
                   .add(Envelope.Items.LETTER.get())
                   .add(Envelope.Items.SEALED_LETTER.get())
                   .add(Envelope.Items.TATTERED_LETTER.get())
-                  .add(Envelope.Items.SEALED_TATTERED_LETTER.get());
+                  .add(Envelope.Items.SEALED_TATTERED_LETTER.get())
+                  .add(Envelope.Items.SERVICE_LETTER.get())
+                  .add(Envelope.Items.SEALED_SERVICE_LETTER.get());
 
             tag(Envelope.Tags.Items.PACKAGES)
                   .add(Envelope.Items.PACKAGE.get())
@@ -164,6 +166,8 @@ public class TagsDatagen {
                   .add(Envelope.Items.SEALED_LETTER.get())
                   .add(Envelope.Items.TATTERED_LETTER.get())
                   .add(Envelope.Items.SEALED_TATTERED_LETTER.get())
+                  .add(Envelope.Items.SERVICE_LETTER.get())
+                  .add(Envelope.Items.SEALED_SERVICE_LETTER.get())
                   .add(Envelope.Items.PACKAGE.get())
                   .add(Envelope.Items.SEALED_PACKAGE.get())
                   .add(Envelope.Items.PAYBACK_BOX.get())

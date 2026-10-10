@@ -13,6 +13,7 @@
 
   "block.envelope.letter": "Letter",
   "block.envelope.tattered_letter": "Tattered Letter",
+  "block.envelope.service_letter": "Service Letter",
   "block.envelope.paper_box": "Paper Box",
   "block.envelope.package": "Package",
   "block.envelope.sealed_package": "Sealed Package",
@@ -38,6 +39,9 @@
   "item.envelope.sealed_letter": "Sealed Letter",
   "item.envelope.tattered_letter": "Tattered Letter",
   "item.envelope.sealed_tattered_letter": "Sealed Tattered Letter",
+  "item.envelope.service_letter": "Service Letter",
+  "item.envelope.sealed_service_letter": "Sealed Service Letter",
+  "item.envelope.sealed_service_letter.name": "Sealed %s",
   "item.envelope.paper_box": "Payback Box",
   "item.envelope.package": "Package",
   "item.envelope.sealed_package": "Sealed Package",
@@ -190,9 +194,9 @@
 
   "letter.envelope.mail_service.signature": "Mail Service",
 
-  "letter_meaning.envelope.cloud_depository.withdrawal_request": "Cloud Depository: Withdrawal Request",
-  "letter_meaning.envelope.cloud_depository.status_request": "Cloud Depository: Status Request",
-  "letter_meaning.envelope.cloud_depository.expansion_request": "Cloud Depository: Expansion Request",
+  "service_letter_meaning.envelope.cloud_depository.withdrawal_request": "Withdrawal Request",
+  "service_letter_meaning.envelope.cloud_depository.status_request": "Status Request",
+  "service_letter_meaning.envelope.cloud_depository.expansion_request": "Expansion Request",
 
 
   "package.envelope.canceled_payback_request.name": "Canceled Payback Request",

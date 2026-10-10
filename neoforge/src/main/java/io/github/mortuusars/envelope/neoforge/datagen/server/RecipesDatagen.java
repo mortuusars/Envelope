@@ -118,33 +118,35 @@ public class RecipesDatagen extends RecipeProvider {
                     new ItemStack(Envelope.Items.SOULBOUND_SEAL_STAMP.get())))
               .save(output, Envelope.resource("soulbound_seal_stamp"));
 
-        buildLetterPresettingRecipes(output);
+        buildServiceLetterRecipes(output);
     }
 
-    private void buildLetterPresettingRecipes(@NotNull RecipeOutput output) {
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Mail.of(CloudDepository.createWithdrawalRequestLetter()).get())
+    private void buildServiceLetterRecipes(@NotNull RecipeOutput output) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, CloudDepository.createWithdrawalRequestLetter(registries))
               .requires(Envelope.Items.LETTER_AND_QUILL.get())
+              .requires(Envelope.Items.ADDRESS_TAG.get())
               .requires(Items.COPPER_INGOT)
               .requires(Items.COPPER_INGOT)
-              .requires(Items.COPPER_INGOT)
-              .group("letter_presets")
+              .group("service_letters")
               .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
-              .save(output, Envelope.resource("letter_presetting/cloud_depository/withdrawal_request"));
+              .save(output, Envelope.resource("service_letter/cloud_depository/withdrawal_request"));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Mail.of(CloudDepository.createStatusRequestLetter()).get())
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, CloudDepository.createStatusRequestLetter(registries))
               .requires(Envelope.Items.LETTER_AND_QUILL.get())
+              .requires(Envelope.Items.ADDRESS_TAG.get())
               .requires(Items.COPPER_INGOT)
-              .group("letter_presets")
+              .group("service_letters")
               .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
-              .save(output, Envelope.resource("letter_presetting/cloud_depository/status_request"));
+              .save(output, Envelope.resource("service_letter/cloud_depository/status_request"));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Mail.of(CloudDepository.createExpansionRequestLetter()).get())
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, CloudDepository.createExpansionRequestLetter(registries))
               .requires(Envelope.Items.LETTER_AND_QUILL.get())
+              .requires(Envelope.Items.ADDRESS_TAG.get())
               .requires(Items.COPPER_INGOT)
               .requires(Items.DIAMOND)
-              .group("letter_presets")
+              .group("service_letters")
               .unlockedBy("has_letter", has(Envelope.Items.LETTER_AND_QUILL.get()))
-              .save(output, Envelope.resource("letter_presetting/cloud_depository/expansion_request"));
+              .save(output, Envelope.resource("service_letter/cloud_depository/expansion_request"));
     }
 
     // --

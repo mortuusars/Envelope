@@ -2,12 +2,17 @@
 
 ## UNRELEASED
 ### New Features
+Letter
+- Added separate **Tattered Letter** item (previously was just a data component on the **Letter**)
+- Added **Service Letter**
+
 Misc
-- Scooping waste from **Pigeonhole** now has a 50% chance to drop **Feather**  
+- Scooping waste from **Pigeonhole** now has a 50% chance to drop a **Feather**  
 - Added particles to **Pigeonhole** waste scooping
 
 ### Changes and Fixes
-- Tattered Letter is now a separate item type, instead of a component 
+- Updated all item textures
+- Small update to hanging letter block textures
 
 ## 0.8.0-Snapshot2
 ### New Features

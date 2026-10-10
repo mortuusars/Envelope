@@ -33,6 +33,7 @@ public class NeoForgeClientEvents {
             EnvelopeClient.init();
             ItemBlockRenderTypes.setRenderLayer(Envelope.Blocks.LETTER.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(Envelope.Blocks.TATTERED_LETTER.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(Envelope.Blocks.SERVICE_LETTER.get(), RenderType.cutout());
         });
     }
 
@@ -67,6 +68,7 @@ public class NeoForgeClientEvents {
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
         event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_TATTERED_LETTER.get());
+        event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_SERVICE_LETTER.get());
         event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
     }
 

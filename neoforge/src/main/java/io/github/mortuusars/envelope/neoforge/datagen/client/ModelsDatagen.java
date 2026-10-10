@@ -58,6 +58,14 @@ public class ModelsDatagen extends BlockStateProvider {
                   .build();
         });
 
+        getVariantBuilder(Envelope.Blocks.SERVICE_LETTER.get()).forAllStates(state -> {
+            String model = "service_letter" + (state.getValue(LetterBlock.HAS_CONTENT) ? "_content" : "");
+            return ConfiguredModel.builder()
+                  .modelFile(models().getExistingFile(modLoc("block/" + model)))
+                  .rotationY(((int)state.getValue(LetterBlock.FACING).toYRot() + 180) % 360)
+                  .build();
+        });
+
         getVariantBuilder(Envelope.Blocks.PAPER_BOX.get()).forAllStates(state -> {
             String[] boxes = {"one", "two", "three", "four", "five"};
             ModelFile.ExistingModelFile model = models().getExistingFile(
@@ -81,16 +89,29 @@ public class ModelsDatagen extends BlockStateProvider {
 
         letter(Envelope.Items.LETTER.get());
         letter(Envelope.Items.TATTERED_LETTER.get());
+        letter(Envelope.Items.SERVICE_LETTER.get());
 
-        itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
-              .parent(new ModelFile.UncheckedModelFile("item/generated"))
-              .texture("layer0", Envelope.resource("item/sealed_letter"))
+        itemModels().basicItem(Envelope.Items.SEALED_LETTER.get())
+              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+        itemModels().basicItem(Envelope.Items.SEALED_TATTERED_LETTER.get())
+              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+        itemModels().basicItem(Envelope.Items.SEALED_SERVICE_LETTER.get())
               .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
 
-        itemModels().getBuilder(Envelope.resource("sealed_tattered_letter").toString())
-              .parent(new ModelFile.UncheckedModelFile("item/generated"))
-              .texture("layer0", Envelope.resource("item/sealed_tattered_letter"))
-              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+//        itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
+//              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+//              .texture("layer0", Envelope.resource("item/sealed_letter"))
+//              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+//
+//        itemModels().getBuilder(Envelope.resource("sealed_tattered_letter").toString())
+//              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+//              .texture("layer0", Envelope.resource("item/sealed_tattered_letter"))
+//              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+//
+//        itemModels().getBuilder(Envelope.resource("sealed_service_letter").toString())
+//              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+//              .texture("layer0", Envelope.resource("item/sealed_service_letter"))
+//              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
 
 //        itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
 //              .parent(new ModelFile.UncheckedModelFile("item/generated"))

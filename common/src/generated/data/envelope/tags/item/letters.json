@@ -1,8 +1,10 @@
 {
   "values": [
     "envelope:letter",
-    "envelope:tattered_letter",
     "envelope:sealed_letter",
-    "envelope:sealed_tattered_letter"
+    "envelope:tattered_letter",
+    "envelope:sealed_tattered_letter",
+    "envelope:service_letter",
+    "envelope:sealed_service_letter"
   ]
 }

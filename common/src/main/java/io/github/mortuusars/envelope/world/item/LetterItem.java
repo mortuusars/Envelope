@@ -5,10 +5,7 @@ import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.network.packet.clientbound.ClientboundOpenLetterViewScreenPacket;
 import io.github.mortuusars.envelope.world.item.component.LetterContent;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -20,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -28,19 +24,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class LetterItem extends BlockItem implements SealableItem {
     public LetterItem(Block block, Properties properties) {
         super(block, properties);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        if (stack.get(Envelope.DataComponents.LETTER_MEANING) instanceof ResourceLocation meaning) {
-            tooltipComponents.add(Component.translatable(meaning.toLanguageKey("letter_meaning")
-                  .replace("/", ".")).withStyle(ChatFormatting.GRAY));
-        }
     }
 
     @Override
@@ -102,12 +88,10 @@ public class LetterItem extends BlockItem implements SealableItem {
             return stack;
         }
 
-        Item item = stack.getItem();
-
-        if (item instanceof LetterItem) {
+        if (stack.is(Envelope.Items.LETTER.get())) {
             return stack.transmuteCopy(Envelope.Items.TATTERED_LETTER.get());
         }
-        else if (item instanceof SealedLetterItem) {
+        else if (stack.is(Envelope.Items.SEALED_LETTER.get())) {
             return stack.transmuteCopy(Envelope.Items.SEALED_TATTERED_LETTER.get());
         }
 

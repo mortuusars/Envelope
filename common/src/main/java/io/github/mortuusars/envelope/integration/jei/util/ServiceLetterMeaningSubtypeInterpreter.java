@@ -7,10 +7,10 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class LetterMeaningSubtypeInterpreter implements ISubtypeInterpreter<ItemStack> {
+public class ServiceLetterMeaningSubtypeInterpreter implements ISubtypeInterpreter<ItemStack> {
     @Override
     public @Nullable Object getSubtypeData(ItemStack ingredient, UidContext context) {
-        return ingredient.get(Envelope.DataComponents.LETTER_MEANING);
+        return ingredient.get(Envelope.DataComponents.SERVICE_LETTER_MEANING);
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.github.mortuusars.envelope.test.cases;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import io.github.mortuusars.envelope.Envelope;
+import io.github.mortuusars.envelope.world.item.component.ServiceLetterMeaning;
 import io.github.mortuusars.envelope.world.item.component.mail.DeliveryInfo;
 import io.github.mortuusars.mortaar.Platform;
 import io.github.mortuusars.mortaar.bugger.test.BuggerTests;
@@ -173,7 +174,7 @@ public class StackIngredientTests extends BuggerTests {
                   stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable());
                   stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
-                  stack.set(Envelope.DataComponents.LETTER_MEANING, ResourceLocation.parse("asd:123"));
+                  stack.set(Envelope.DataComponents.SERVICE_LETTER_MEANING, new ServiceLetterMeaning(ResourceLocation.parse("asd:123")));
                   return decodeFromJson(json).test(stack);
               }));
     }

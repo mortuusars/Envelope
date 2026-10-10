@@ -170,6 +170,16 @@ public final class Mail {
               .set(Envelope.DataComponents.LETTER_CONTENT, content);
     }
 
+    public static MailBuilder<?> createServiceLetter(Component text) {
+        return new MailBuilder<>(Envelope.Items.SERVICE_LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text));
+    }
+
+    public static MailBuilder<?> createServiceLetter(LetterContent content) {
+        return new MailBuilder<>(Envelope.Items.SERVICE_LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, content);
+    }
+
     public static MailBuilder<?> createSealedLetter(Component text) {
         return new MailBuilder<>(Envelope.Items.SEALED_LETTER.get())
               .set(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text));
@@ -177,6 +187,16 @@ public final class Mail {
 
     public static MailBuilder<?> createSealedLetter(LetterContent content) {
         return new MailBuilder<>(Envelope.Items.SEALED_LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, content);
+    }
+
+    public static MailBuilder<?> createSealedServiceLetter(Component text) {
+        return new MailBuilder<>(Envelope.Items.SEALED_SERVICE_LETTER.get())
+              .set(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text));
+    }
+
+    public static MailBuilder<?> createSealedServiceLetter(LetterContent content) {
+        return new MailBuilder<>(Envelope.Items.SEALED_SERVICE_LETTER.get())
               .set(Envelope.DataComponents.LETTER_CONTENT, content);
     }
 

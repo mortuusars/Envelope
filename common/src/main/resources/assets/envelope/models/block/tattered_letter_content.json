@@ -3,6 +3,6 @@
 	"textures": {
 		"texture": "envelope:block/tattered_letter_content",
 		"pin": "envelope:block/letter_pin",
-		"particle": "envelope:block/tattered_letter"
+		"particle": "envelope:block/tattered_letter_content"
 	}
 }

@@ -35,7 +35,7 @@ import java.util.function.Function;
 public class MailLetterBroadcastingRecipe extends CustomMailRecipe {
     public static final Logger LOGGER = LogUtils.getLogger();
     private final NonNullList<Ingredient> ingredients;
-    private final ItemStack result = Mail.createLetter(Component.empty())
+    private final ItemStack result = Mail.createServiceLetter(Component.empty())
           .itemName(Component.translatable("letter.envelope.broadcast_report.name"))
           .get();
     private final Optional<Component> info = Optional.of(Component.translatable("recipe.envelope.mailing.mail_service.letter_broadcasting.info"));

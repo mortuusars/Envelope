@@ -54,6 +54,8 @@ public class EnvelopeClient {
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
             ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_UNFOLDED, ItemModelOverrides::isLetterUnfolded);
             ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
+            ItemProperties.register(Envelope.Items.SERVICE_LETTER.get(), LETTER_UNFOLDED, ItemModelOverrides::isLetterUnfolded);
+            ItemProperties.register(Envelope.Items.SERVICE_LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
             ItemProperties.register(Envelope.Items.PAYBACK_TAG.get(), PAYBACK_TAG_DURATION, ItemModelOverrides::getPaybackDuration);
         }

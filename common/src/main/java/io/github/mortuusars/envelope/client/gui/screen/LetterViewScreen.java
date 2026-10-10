@@ -29,10 +29,12 @@ public class LetterViewScreen extends Screen {
     public static final ResourceLocation REGULAR_TEXTURE = Envelope.resource("textures/gui/letter.png");
     public static final ResourceLocation TATTERED_TEXTURE = Envelope.resource("textures/gui/letter_tattered.png");
     public static final ResourceLocation TATTERED_OVERLAY = Envelope.resource("textures/gui/letter_tattered_overlay.png");
+    public static final ResourceLocation SERVICE_TEXTURE = Envelope.resource("textures/gui/letter_service.png");
 
     protected final ItemAndStack<LetterItem> letter;
     protected final @Nullable InteractionHand hand;
     protected final boolean isTattered;
+    protected final boolean isService;
 
     protected int imageWidth, imageHeight, leftPos, topPos;
     protected int maxTextWidth;
@@ -45,8 +47,8 @@ public class LetterViewScreen extends Screen {
         super(Component.empty());
         this.letter = new ItemAndStack<>(letter);
         this.hand = hand;
-//        this.isTattered = letter.has(Envelope.DataComponents.LETTER_TATTERED);
         this.isTattered = letter.is(Envelope.Items.TATTERED_LETTER.get());
+        this.isService = letter.is(Envelope.Items.SERVICE_LETTER.get());
     }
 
     @Override
@@ -85,7 +87,7 @@ public class LetterViewScreen extends Screen {
 
         final int x = leftPos + 17;
         final int y = topPos + 21;
-        int textColor = 0xFF7B593D;
+        int textColor = isService ? 0xFF8A4F3C : 0xFF7B593D;
 
         for (int i = 0; i < Math.min(lines.size(), maxTextLines); i++) {
             guiGraphics.drawString(font, lines.get(i), x, y + i * font.lineHeight, textColor, false);
@@ -116,8 +118,12 @@ public class LetterViewScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
-        ResourceLocation texture = isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
-        guiGraphics.blit(texture, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight);
+    }
+
+    public ResourceLocation getBackgroundTexture() {
+        if (isService) return SERVICE_TEXTURE;
+        return isTattered ? TATTERED_TEXTURE : REGULAR_TEXTURE;
     }
 
     @Nullable

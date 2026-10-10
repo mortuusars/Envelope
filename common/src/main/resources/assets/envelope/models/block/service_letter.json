@@ -1,8 +1,8 @@
 {
 	"parent": "envelope:block/letter",
 	"textures": {
-		"texture": "envelope:block/letter_content",
+		"texture": "envelope:block/service_letter",
 		"pin": "envelope:block/letter_pin",
-		"particle": "envelope:block/letter_content"
+		"particle": "envelope:block/service_letter"
 	}
 }

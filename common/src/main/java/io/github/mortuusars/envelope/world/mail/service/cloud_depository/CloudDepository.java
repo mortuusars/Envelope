@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.util.Colors;
+import io.github.mortuusars.envelope.world.item.component.ServiceLetterMeaning;
 import io.github.mortuusars.envelope.world.item.component.mail.log.DeliveryRecord;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
 import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
@@ -14,10 +15,10 @@ import io.github.mortuusars.envelope.world.mail.address.type.ServiceAddress;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffContext;
 import io.github.mortuusars.envelope.world.mail.dropoff.MailDropOffResult;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -31,9 +32,12 @@ import java.util.ListIterator;
 public class CloudDepository {
     protected static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final ResourceLocation LETTER_MEANING_WITHDRAWAL_REQUEST = Envelope.resource("cloud_depository/withdrawal_request");
-    public static final ResourceLocation LETTER_MEANING_STATUS_REQUEST = Envelope.resource("cloud_depository/status_request");
-    public static final ResourceLocation LETTER_MEANING_EXPANSION_REQUEST = Envelope.resource("cloud_depository/expansion_request");
+    public static final ServiceLetterMeaning LETTER_MEANING_WITHDRAWAL_REQUEST =
+          new ServiceLetterMeaning(Envelope.resource("cloud_depository/withdrawal_request"));
+    public static final ServiceLetterMeaning LETTER_MEANING_STATUS_REQUEST =
+          new ServiceLetterMeaning(Envelope.resource("cloud_depository/status_request"));
+    public static final ServiceLetterMeaning LETTER_MEANING_EXPANSION_REQUEST =
+          new ServiceLetterMeaning(Envelope.resource("cloud_depository/expansion_request"));
 
     public static final Component RETURN_MESSAGE_NO_IDENTITY = Component.translatable(
           "gui.envelope.delivery_log.message.cloud_depository.no_identity").withColor(Colors.TOOLTIP_RED);
@@ -124,7 +128,7 @@ public class CloudDepository {
             return MailDropOffResult.returned(mail, RETURN_MESSAGE_NON_SERVICEABLE_IDENTITY);
         }
 
-        if (mail.get(Envelope.DataComponents.LETTER_MEANING) instanceof ResourceLocation meaning) {
+        if (mail.get(Envelope.DataComponents.SERVICE_LETTER_MEANING) instanceof ServiceLetterMeaning meaning) {
             if (meaning.equals(LETTER_MEANING_WITHDRAWAL_REQUEST)) {
                 return handleWithdrawalRequest(context, account);
             }
@@ -158,7 +162,7 @@ public class CloudDepository {
 
         LOGGER.debug("{} has been put into storage: {}", mail, account);
 
-        ItemStack reply = createDepositReportLetter(getSeal(), mail, accountData.getTotal(), capacity);
+        ItemStack reply = createDepositReportLetter(context.getService(), getSeal(), mail, accountData.getTotal(), capacity);
         return MailDropOffResult.reply(reply);
     }
 
@@ -255,20 +259,20 @@ public class CloudDepository {
               .build();
     }
 
-    public static ItemStack createDepositReportLetter(Seal seal, ItemStack depositedItem, int accountStorageCurrent, int accountStorageCapacity) {
+    public static ItemStack createDepositReportLetter(MailService service, Seal seal, ItemStack depositedItem, int accountStorageCurrent, int accountStorageCapacity) {
         depositedItem = Mail.removeAllDeliveryData(depositedItem.copy());
 
         Component depositedItemComponent = !depositedItem.isEmpty()
               ? depositedItem.getHoverName().plainCopy().withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED).withUnderlined(true).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(depositedItem))))
               : Component.translatable("letter.envelope.cloud_depository.deposit_report.item").withStyle(ChatFormatting.DARK_RED);
 
-        ItemStack withdrawalRequestLetter = createWithdrawalRequestLetter();
+        ItemStack withdrawalRequestLetter = createWithdrawalRequestLetter(service.getLevel().registryAccess());
         Component withdrawalRequestComponent = Component.translatable("letter.envelope.cloud_depository.withdrawal_request.name").withStyle(Style.EMPTY
               .withColor(ChatFormatting.DARK_BLUE)
               .withUnderlined(true)
               .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(withdrawalRequestLetter))));
 
-        return Mail.createSealedLetter(Component.translatable("letter.envelope.cloud_depository.deposit_report.message",
+        return Mail.createSealedServiceLetter(Component.translatable("letter.envelope.cloud_depository.deposit_report.message",
                     depositedItemComponent,
                     withdrawalRequestComponent,
                     Component.literal(accountStorageCurrent + "/" + accountStorageCapacity).withStyle(ChatFormatting.DARK_RED)))
@@ -312,7 +316,7 @@ public class CloudDepository {
                     Component.literal(Integer.toString(maxCapacity)).withStyle(ChatFormatting.DARK_RED))
               : CommonComponents.EMPTY;
 
-        return Mail.createSealedLetter(Component.translatable("letter.envelope.cloud_depository.status_report.message",
+        return Mail.createSealedServiceLetter(Component.translatable("letter.envelope.cloud_depository.status_report.message",
                     Component.literal(account).withStyle(ChatFormatting.DARK_RED),
                     Component.literal(accountStorageCurrent + "/" + accountStorageCapacity).withStyle(ChatFormatting.DARK_RED),
                     indexable, expansion))
@@ -327,7 +331,7 @@ public class CloudDepository {
                     Component.literal(Integer.toString(maxCapacity)).withStyle(ChatFormatting.DARK_RED))
               : CommonComponents.EMPTY;
 
-        return Mail.createSealedLetter(Component.translatable("letter.envelope.cloud_depository.expansion_report.message",
+        return Mail.createSealedServiceLetter(Component.translatable("letter.envelope.cloud_depository.expansion_report.message",
                     Component.literal(account).withStyle(ChatFormatting.DARK_RED),
                     Component.literal(Integer.toString(increasedBy)).withStyle(ChatFormatting.DARK_RED),
                     Component.literal(Integer.toString(accountStorageCapacity)).withStyle(ChatFormatting.DARK_RED),
@@ -337,21 +341,24 @@ public class CloudDepository {
               .get();
     }
 
-    public static ItemStack createWithdrawalRequestLetter() {
-        return Mail.createLetter(Component.translatable("letter.envelope.cloud_depository.withdrawal_request.message"))
-              .set(Envelope.DataComponents.LETTER_MEANING, CloudDepository.LETTER_MEANING_WITHDRAWAL_REQUEST)
+    public static ItemStack createWithdrawalRequestLetter(HolderLookup.Provider registries) {
+        return Mail.createServiceLetter(Component.translatable("letter.envelope.cloud_depository.withdrawal_request.message"))
+              .set(Envelope.DataComponents.SERVICE_LETTER_MEANING, CloudDepository.LETTER_MEANING_WITHDRAWAL_REQUEST)
+              .set(Envelope.DataComponents.MAIL_ADDRESS_TAG, ServiceAddress.getOrThrow(ServiceAddress.CLOUD_DEPOSITORY, registries))
               .get();
     }
 
-    public static ItemStack createStatusRequestLetter() {
-        return Mail.createLetter(Component.translatable("letter.envelope.cloud_depository.status_request.message"))
-              .set(Envelope.DataComponents.LETTER_MEANING, CloudDepository.LETTER_MEANING_STATUS_REQUEST)
+    public static ItemStack createStatusRequestLetter(HolderLookup.Provider registries) {
+        return Mail.createServiceLetter(Component.translatable("letter.envelope.cloud_depository.status_request.message"))
+              .set(Envelope.DataComponents.SERVICE_LETTER_MEANING, CloudDepository.LETTER_MEANING_STATUS_REQUEST)
+              .set(Envelope.DataComponents.MAIL_ADDRESS_TAG, ServiceAddress.getOrThrow(ServiceAddress.CLOUD_DEPOSITORY, registries))
               .get();
     }
 
-    public static ItemStack createExpansionRequestLetter() {
-        return Mail.createLetter(Component.translatable("letter.envelope.cloud_depository.expansion_request.message"))
-              .set(Envelope.DataComponents.LETTER_MEANING, CloudDepository.LETTER_MEANING_EXPANSION_REQUEST)
+    public static ItemStack createExpansionRequestLetter(HolderLookup.Provider registries) {
+        return Mail.createServiceLetter(Component.translatable("letter.envelope.cloud_depository.expansion_request.message"))
+              .set(Envelope.DataComponents.SERVICE_LETTER_MEANING, CloudDepository.LETTER_MEANING_EXPANSION_REQUEST)
+              .set(Envelope.DataComponents.MAIL_ADDRESS_TAG, ServiceAddress.getOrThrow(ServiceAddress.CLOUD_DEPOSITORY, registries))
               .get();
     }
 }

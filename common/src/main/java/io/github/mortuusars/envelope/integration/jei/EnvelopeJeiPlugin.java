@@ -6,7 +6,7 @@ import io.github.mortuusars.envelope.client.gui.screen.MailboxScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PackingScreen;
 import io.github.mortuusars.envelope.client.gui.screen.PaybackTagScreen;
 import io.github.mortuusars.envelope.integration.jei.extensions.*;
-import io.github.mortuusars.envelope.integration.jei.util.LetterMeaningSubtypeInterpreter;
+import io.github.mortuusars.envelope.integration.jei.util.ServiceLetterMeaningSubtypeInterpreter;
 import io.github.mortuusars.envelope.integration.jei.util.PackingRecipeTransferInfo;
 import io.github.mortuusars.envelope.world.item.crafting.*;
 import io.github.mortuusars.envelope.world.mail.service.cloud_depository.CloudDepository;
@@ -69,7 +69,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.registerSubtypeInterpreter(Envelope.Items.LETTER.get(), new LetterMeaningSubtypeInterpreter());
+        registration.registerSubtypeInterpreter(Envelope.Items.SERVICE_LETTER.get(), new ServiceLetterMeaningSubtypeInterpreter());
     }
 
     @Override
@@ -94,9 +94,9 @@ public class EnvelopeJeiPlugin implements IModPlugin {
     public void registerExtraIngredients(IExtraIngredientRegistration registration) {
         if (Config.Server.SERVICE_CLOUD_DEPOSITORY_ENABLED.get()) {
             registration.addExtraItemStacks(List.of(
-                  CloudDepository.createWithdrawalRequestLetter(),
-                  CloudDepository.createStatusRequestLetter(),
-                  CloudDepository.createExpansionRequestLetter()
+                  CloudDepository.createWithdrawalRequestLetter(Minecrft.registryAccess()),
+                  CloudDepository.createStatusRequestLetter(Minecrft.registryAccess()),
+                  CloudDepository.createExpansionRequestLetter(Minecrft.registryAccess())
             ));
 
             registration.addExtraIngredients(SERVICE_ADDRESS_INGREDIENT, List.of(
@@ -141,11 +141,11 @@ public class EnvelopeJeiPlugin implements IModPlugin {
                   .withIcon()
                   .toComponent()
                   .withStyle(ChatFormatting.DARK_BLUE);
-            registration.addItemStackInfo(CloudDepository.createWithdrawalRequestLetter(),
+            registration.addItemStackInfo(CloudDepository.createWithdrawalRequestLetter(Minecrft.registryAccess()),
                   Component.translatable("envelope.jei.info.cloud_depository.withdrawal_request", cloudDepositoryAddress));
-            registration.addItemStackInfo(CloudDepository.createStatusRequestLetter(),
+            registration.addItemStackInfo(CloudDepository.createStatusRequestLetter(Minecrft.registryAccess()),
                   Component.translatable("envelope.jei.info.cloud_depository.status_request", cloudDepositoryAddress));
-            registration.addItemStackInfo(CloudDepository.createExpansionRequestLetter(),
+            registration.addItemStackInfo(CloudDepository.createExpansionRequestLetter(Minecrft.registryAccess()),
                   Component.translatable("envelope.jei.info.cloud_depository.expansion_request", cloudDepositoryAddress,
                         Component.literal(Integer.toString(Config.Server.SERVICE_CLOUD_DEPOSITORY_ACCOUNT_STORAGE_CAPACITY_PER_EXPANSION.get())).withStyle(ChatFormatting.DARK_BLUE)));
 
@@ -154,7 +154,7 @@ public class EnvelopeJeiPlugin implements IModPlugin {
                         Component.translatable("letter.envelope.cloud_depository.withdrawal_request.name").withStyle(Style.EMPTY
                               .withColor(ChatFormatting.DARK_BLUE)
                               .withUnderlined(true)
-                              .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(CloudDepository.createWithdrawalRequestLetter()))))
+                              .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(CloudDepository.createWithdrawalRequestLetter(Minecrft.registryAccess())))))
                   ));
         }
     }
