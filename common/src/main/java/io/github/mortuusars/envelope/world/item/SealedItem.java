@@ -4,6 +4,7 @@ import io.github.mortuusars.envelope.Config;
 import io.github.mortuusars.envelope.Envelope;
 import io.github.mortuusars.envelope.world.block.PackageBlockEntity;
 import io.github.mortuusars.envelope.world.item.component.seal.Seal;
+import io.github.mortuusars.envelope.world.item.component.seal.SealMaterial;
 import io.github.mortuusars.mortaar.client.Minecrft;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -98,7 +99,9 @@ public interface SealedItem {
     // --
 
     class Client {
-        public static int LOCKED_HIGHLIGHT_OVERLAY_COLOR = 0xFF18A2B6;
+        public static int OVERLAY_DEFAULT_RED_COLOR = 0xFFCC4E47;
+        public static int OVERLAY_LOCKED_HIGHLIGHT_COLOR = 0xFF18A2B6;
+        public static int OVERLAY_GOLDEN_HIGHLIGHT_COLOR = 0xFFFFD16E;
 
         public static int getSealOverlayColor(ItemStack stack, int layer) {
             if (layer != 1) {
@@ -107,22 +110,10 @@ public interface SealedItem {
 
             @Nullable Seal seal = stack.get(Envelope.DataComponents.SEAL);
             if (seal != null) {
-                int materialColor = seal.material().value().modelTintColor();
-                return seal.lock()
-                      .map(lock -> {
-                          if (lock.isLocked(Minecrft.level())) {
-                              double time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) / 20.0;
-                              double beat = Math.pow((Math.sin(time * Math.PI * 2 * 1) + 1.0) * 0.5, 10);
-                              float delta = (float) Mth.lerp(beat, 0, 1);
-                              return FastColor.ARGB32.lerp(delta, materialColor, LOCKED_HIGHLIGHT_OVERLAY_COLOR);
-                          } else {
-                              return materialColor;
-                          }
-                      })
-                      .orElse(materialColor);
+                return getSealOverlayColor(seal);
             }
 
-            return 0xFFCC4E47; // Default red color
+            return OVERLAY_DEFAULT_RED_COLOR;
         }
 
         public static int getSealOverlayColor(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int index) {
@@ -133,11 +124,30 @@ public interface SealedItem {
             if (level != null && pos != null && level.getBlockEntity(pos) instanceof PackageBlockEntity blockEntity) {
                 @Nullable Seal seal = blockEntity.getPackage().get(Envelope.DataComponents.SEAL);
                 if (seal != null) {
-                    return seal.material().value().modelTintColor();
+                    return seal.material().value().modelTintColor(); // Can't use tint animation on the block, they only calculate tint once
                 }
             }
 
-            return 0xFFCC4E47; // Default red color
+            return OVERLAY_DEFAULT_RED_COLOR;
+        }
+
+        public static int getSealOverlayColor(Seal seal) {
+            int materialColor = seal.material().value().modelTintColor();
+
+            if (seal.lock().isPresent() && seal.lock().get().isLocked(Minecrft.level())) {
+                double time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) / 20.0;
+                double beat = Math.pow((Math.sin(time * Math.PI * 2 * 1) + 1.0) * 0.5, 10);
+                float delta = (float) Mth.lerp(beat, 0, 1);
+                return FastColor.ARGB32.lerp(delta, materialColor, OVERLAY_LOCKED_HIGHLIGHT_COLOR);
+            }
+
+            if (seal.material().is(SealMaterial.GOLD)) {
+                double time = (Minecrft.level().getGameTime() + Minecrft.get().getTimer().getGameTimeDeltaPartialTick(true)) / 10f;
+                double delta = (Math.sin(time) + 1.0) / 2.0;
+                return FastColor.ARGB32.lerp((float)delta, materialColor, OVERLAY_GOLDEN_HIGHLIGHT_COLOR);
+            }
+
+            return materialColor;
         }
     }
 }
