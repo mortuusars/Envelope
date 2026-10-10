@@ -124,8 +124,7 @@ public class CloudDepository {
             return MailDropOffResult.returned(mail, RETURN_MESSAGE_NON_SERVICEABLE_IDENTITY);
         }
 
-        if (mail.is(Envelope.Items.SEALED_LETTER.get())
-              && mail.get(Envelope.DataComponents.LETTER_MEANING) instanceof ResourceLocation meaning) {
+        if (mail.get(Envelope.DataComponents.LETTER_MEANING) instanceof ResourceLocation meaning) {
             if (meaning.equals(LETTER_MEANING_WITHDRAWAL_REQUEST)) {
                 return handleWithdrawalRequest(context, account);
             }

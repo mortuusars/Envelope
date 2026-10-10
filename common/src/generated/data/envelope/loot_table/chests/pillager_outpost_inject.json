@@ -48,15 +48,9 @@
                 "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
               },
               "function": "minecraft:set_components"
-            },
-            {
-              "components": {
-                "envelope:letter_tattered": {}
-              },
-              "function": "minecraft:set_components"
             }
           ],
-          "name": "envelope:letter"
+          "name": "envelope:tattered_letter"
         },
         {
           "type": "minecraft:item",
@@ -77,15 +71,9 @@
                 "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
               },
               "function": "minecraft:set_components"
-            },
-            {
-              "components": {
-                "envelope:letter_tattered": {}
-              },
-              "function": "minecraft:set_components"
             }
           ],
-          "name": "envelope:letter"
+          "name": "envelope:tattered_letter"
         },
         {
           "type": "minecraft:item",
@@ -106,15 +94,9 @@
                 "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
               },
               "function": "minecraft:set_components"
-            },
-            {
-              "components": {
-                "envelope:letter_tattered": {}
-              },
-              "function": "minecraft:set_components"
             }
           ],
-          "name": "envelope:letter"
+          "name": "envelope:tattered_letter"
         },
         {
           "type": "minecraft:item",
@@ -135,15 +117,9 @@
                 "minecraft:item_name": "{\"font\":\"minecraft:illageralt\",\"translate\":\"letter.envelope.pillager_outpost.report.name\"}"
               },
               "function": "minecraft:set_components"
-            },
-            {
-              "components": {
-                "envelope:letter_tattered": {}
-              },
-              "function": "minecraft:set_components"
             }
           ],
-          "name": "envelope:letter"
+          "name": "envelope:tattered_letter"
         },
         {
           "type": "minecraft:empty",

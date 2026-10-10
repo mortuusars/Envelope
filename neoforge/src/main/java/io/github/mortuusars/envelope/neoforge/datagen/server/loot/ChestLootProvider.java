@@ -13,7 +13,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Unit;
 import net.minecraft.world.item.EitherHolder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.SeededContainerLoot;
@@ -23,7 +22,6 @@ import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
-import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.SetComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -212,9 +210,9 @@ public class ChestLootProvider implements LootTableSubProvider {
                           .add(LootItem.lootTableItem(Envelope.Items.PAPER_BOX.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
                           .add(EmptyLootItem.emptyItem().setWeight(2)))
                     .withPool(LootPool.lootPool()
-                          .add(letter(Component.translatable("letter.envelope.abandoned_mineshaft.journal_page.name"), Component.translatable("letter.envelope.abandoned_mineshaft.journal_page_1")).apply(tattered()))
-                          .add(letter(Component.translatable("letter.envelope.abandoned_mineshaft.journal_page.name"), Component.translatable("letter.envelope.abandoned_mineshaft.journal_page_2")).apply(tattered()))
-                          .add(letter(Component.translatable("letter.envelope.abandoned_mineshaft.journal_page.name"), Component.translatable("letter.envelope.abandoned_mineshaft.journal_page_3")).apply(tattered()))
+                          .add(tatteredLetter(Component.translatable("letter.envelope.abandoned_mineshaft.journal_page.name"), Component.translatable("letter.envelope.abandoned_mineshaft.journal_page_1")))
+                          .add(tatteredLetter(Component.translatable("letter.envelope.abandoned_mineshaft.journal_page.name"), Component.translatable("letter.envelope.abandoned_mineshaft.journal_page_2")))
+                          .add(tatteredLetter(Component.translatable("letter.envelope.abandoned_mineshaft.journal_page.name"), Component.translatable("letter.envelope.abandoned_mineshaft.journal_page_3")))
                           .add(EmptyLootItem.emptyItem().setWeight(16))
                     ));
 
@@ -226,15 +224,17 @@ public class ChestLootProvider implements LootTableSubProvider {
                           .add(LootItem.lootTableItem(Envelope.Items.PAPER_BOX.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
                           .add(EmptyLootItem.emptyItem().setWeight(2)))
                     .withPool(LootPool.lootPool()
-                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_1")).apply(tattered()))
-                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_2")).apply(tattered()))
-                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_3")).apply(tattered()))
-                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_4")).apply(tattered()))
+                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_1")))
+                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_2")))
+                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_3")))
+                          .add(illagerLetter(Component.translatable("letter.envelope.pillager_outpost.report.name"), Component.translatable("letter.envelope.pillager_outpost.report_4")))
                           .add(EmptyLootItem.emptyItem().setWeight(16))
                     ));
     }
 
     // --
+
+    //TODO: refactor with static methods that chain (letter("asd").name("123").illager())?
 
     protected LootPoolSingletonContainer.Builder<?> letter(@Nullable MutableComponent name, @NotNull MutableComponent text) {
         LootPoolSingletonContainer.Builder<?> builder = LootItem.lootTableItem(Envelope.Items.LETTER.get())
@@ -247,8 +247,19 @@ public class ChestLootProvider implements LootTableSubProvider {
         return builder;
     }
 
+    protected LootPoolSingletonContainer.Builder<?> tatteredLetter(@Nullable MutableComponent name, @NotNull MutableComponent text) {
+        LootPoolSingletonContainer.Builder<?> builder = LootItem.lootTableItem(Envelope.Items.TATTERED_LETTER.get())
+              .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text)));
+
+        if (name != null) {
+            builder.apply(SetComponentsFunction.setComponent(DataComponents.ITEM_NAME, name));
+        }
+
+        return builder;
+    }
+
     protected LootPoolSingletonContainer.Builder<?> illagerLetter(@Nullable MutableComponent name, @NotNull MutableComponent text) {
-        LootPoolSingletonContainer.Builder<?> builder = LootItem.lootTableItem(Envelope.Items.LETTER.get())
+        LootPoolSingletonContainer.Builder<?> builder = LootItem.lootTableItem(Envelope.Items.TATTERED_LETTER.get())
               .apply(SetComponentsFunction.setComponent(Envelope.DataComponents.LETTER_CONTENT, new LetterContent(text
                     .withStyle(Style.EMPTY.withFont(ResourceLocation.withDefaultNamespace("illageralt"))))));
 
@@ -258,9 +269,5 @@ public class ChestLootProvider implements LootTableSubProvider {
         }
 
         return builder;
-    }
-
-    private static LootItemConditionalFunction.@NotNull Builder<?> tattered() {
-        return SetComponentsFunction.setComponent(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
     }
 }

@@ -18,20 +18,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SealedLetterItem extends Item implements SealedItem {
-    public SealedLetterItem(Properties properties) {
+    protected final Supplier<? extends Item> baseItem;
+
+    public SealedLetterItem(Supplier<? extends Item> baseItem, Properties properties) {
         super(properties);
+        this.baseItem = baseItem;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        Envelope.Items.LETTER.get().appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        baseItem.get().appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 
     @Override
     public ItemLike getUnsealedItem() {
-        return Envelope.Items.LETTER.get();
+        return baseItem.get();
     }
 
     @Override

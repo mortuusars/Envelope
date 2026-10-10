@@ -12,6 +12,7 @@ import io.github.mortuusars.envelope.world.mail.MailService;
 import io.github.mortuusars.envelope.world.mail.address.type.BlockAddress;
 import net.minecraft.Util;
 import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
@@ -33,11 +34,11 @@ public class StackIngredientTests extends BuggerTests {
 
     private void equality() {
         StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3, DataComponentPredicate.builder()
-              .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
+              .expect(DataComponents.FIRE_RESISTANT, Unit.INSTANCE)
               .build());
 
         StackIngredient ingredient2 = new StackIngredient(Items.FEATHER, 3, DataComponentPredicate.builder()
-              .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
+              .expect(DataComponents.FIRE_RESISTANT, Unit.INSTANCE)
               .build());
 
         add("StackIngredient_EqualsIfSame", Test.isTrue(player -> ingredient.equals(ingredient2)));
@@ -51,7 +52,7 @@ public class StackIngredientTests extends BuggerTests {
         add("StackIngredient_ItemMatches_WhenMoreThanCount", Test.isTrue(player -> ingredient.test(new ItemStack(Items.FEATHER, 23))));
         add("StackIngredient_ItemMatches_WithRandomComponents", Test.isTrue(player -> ingredient.test(Util.make(() -> {
             ItemStack stack = new ItemStack(Items.FEATHER, 3);
-            stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+            stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
             return stack;
         }))));
 
@@ -66,7 +67,7 @@ public class StackIngredientTests extends BuggerTests {
         add("StackIngredient_TagMatches_MoreThanCount", Test.isTrue(player -> ingredient.test(new ItemStack(Items.OAK_LOG, 30))));
         add("StackIngredient_TagMatches_WithRandomComponents", Test.isTrue(player -> ingredient.test(Util.make(() -> {
             ItemStack stack = new ItemStack(Items.OAK_LOG, 12);
-            stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+            stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
             return stack;
         }))));
 
@@ -78,12 +79,12 @@ public class StackIngredientTests extends BuggerTests {
         StackIngredient ingredient = new StackIngredient(Items.FEATHER, 3,
               DataComponentPredicate.builder()
                     .expect(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable())
-                    .expect(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE)
+                    .expect(DataComponents.FIRE_RESISTANT, Unit.INSTANCE)
                     .build());
 
         ItemStack stack = new ItemStack(Items.FEATHER, 3);
         stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable());
-        stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+        stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
         add("StackIngredient_ComponentMatches", Test.isTrue(player -> ingredient.test(stack)));
 
         ItemStack stack2 = stack.copy();
@@ -104,7 +105,7 @@ public class StackIngredientTests extends BuggerTests {
                 "item": "minecraft:emerald",
                 "count": 3,
                 "components": {
-                  "envelope:letter_tattered": {},
+                  "minecraft:fire_resistant": {},
                   "envelope:mail_delivery_info": {
                       "sender": {
                           "type": "service",
@@ -121,7 +122,7 @@ public class StackIngredientTests extends BuggerTests {
         add("StackIngredient_MatchesItemWithComponentsFromJson",
               Test.isTrue(player -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
-                  stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+                  stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable());
                   stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
                   return decodeFromJson(json).test(stack);
@@ -134,7 +135,7 @@ public class StackIngredientTests extends BuggerTests {
                 "item": "minecraft:emerald",
                 "count": 3,
                 "components": {
-                  "envelope:letter_tattered": {},
+                  "minecraft:fire_resistant": {},
                   "envelope:mail_delivery_info": {
                       "sender": {
                           "type": "service",
@@ -152,7 +153,7 @@ public class StackIngredientTests extends BuggerTests {
         add("StackIngredient_MatchesItemWithComponentsStrictFromJson",
               Test.isTrue(player -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
-                  stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+                  stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable());
                   stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
                   return decodeFromJson(json).test(stack);
@@ -161,7 +162,7 @@ public class StackIngredientTests extends BuggerTests {
         add("StackIngredient_MatchesItemWithComponentsStrictFromJson_Fails_with_less",
               Test.isFalse(player -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
-                  stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+                  stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable());
                   return decodeFromJson(json).test(stack);
               }));
@@ -169,7 +170,7 @@ public class StackIngredientTests extends BuggerTests {
         add("StackIngredient_MatchesItemWithComponentsStrictFromJson_Fails_with_additional",
               Test.isFalse(player -> {
                   ItemStack stack = new ItemStack(Items.EMERALD, 3);
-                  stack.set(Envelope.DataComponents.LETTER_TATTERED, Unit.INSTANCE);
+                  stack.set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE);
                   stack.set(Envelope.DataComponents.MAIL_DELIVERY_INFO, DeliveryInfo.create().sender(MailService.of(Platform.getCurrentServerOrThrow().overworld()).getAddress()).immutable());
                   stack.set(Envelope.DataComponents.MAIL_ADDRESS_TAG, new BlockAddress("Mortuusars Laboratory"));
                   stack.set(Envelope.DataComponents.LETTER_MEANING, ResourceLocation.parse("asd:123"));

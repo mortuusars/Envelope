@@ -42,10 +42,14 @@ public class EnvelopeFabricClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(CharredPigeonBackpackLayer.MODEL_LAYER, CharredPigeonModel::createLayerDefinition);
         EntityModelLayerRegistry.registerModelLayer(BatBackpackLayer.MODEL_LAYER, BatBackpackModel::createLayerDefinition);
 
-        BlockRenderLayerMap.INSTANCE.putBlock(Envelope.Blocks.LETTER.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(),
+              Envelope.Blocks.LETTER.get(),
+              Envelope.Blocks.TATTERED_LETTER.get());
 
         ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+        ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_TATTERED_LETTER.get());
         ColorProviderRegistry.ITEM.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
+
         ColorProviderRegistry.BLOCK.register(SealedItem.Client::getSealOverlayColor, Envelope.Blocks.SEALED_PACKAGE.get());
 
         MenuScreens.register(Envelope.MenuTypes.MAILBOX.get(), MailboxScreen::new);

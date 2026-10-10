@@ -5,7 +5,6 @@ import io.github.mortuusars.envelope.EnvelopeClient;
 import io.github.mortuusars.envelope.client.gui.screen.*;
 import io.github.mortuusars.envelope.client.model.BatBackpackModel;
 import io.github.mortuusars.envelope.client.model.CharredPigeonModel;
-import io.github.mortuusars.envelope.client.model.CourierBatModel;
 import io.github.mortuusars.envelope.client.model.PigeonModel;
 import io.github.mortuusars.envelope.client.renderer.entity.CharredPigeonRenderer;
 import io.github.mortuusars.envelope.client.renderer.entity.CourierBatRenderer;
@@ -33,6 +32,7 @@ public class NeoForgeClientEvents {
         event.enqueueWork(() -> {
             EnvelopeClient.init();
             ItemBlockRenderTypes.setRenderLayer(Envelope.Blocks.LETTER.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(Envelope.Blocks.TATTERED_LETTER.get(), RenderType.cutout());
         });
     }
 
@@ -66,6 +66,7 @@ public class NeoForgeClientEvents {
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_LETTER.get());
+        event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_TATTERED_LETTER.get());
         event.register(SealedItem.Client::getSealOverlayColor, Envelope.Items.SEALED_PACKAGE.get());
     }
 

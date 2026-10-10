@@ -225,6 +225,14 @@ public class Envelope {
                     .instabreak()
                     .noCollission()
                     .noOcclusion()));
+        public static final Supplier<LetterBlock> TATTERED_LETTER = REGISTRAR.block("tattered_letter",
+              () -> new LetterBlock(BlockBehaviour.Properties.of()
+                    .pushReaction(PushReaction.DESTROY)
+                    .sound(SoundTypes.PAPER)
+                    .ignitedByLava()
+                    .instabreak()
+                    .noCollission()
+                    .noOcclusion()));
 
         private static Supplier<PigeonholeBlock> pigeonhole(String type, MapColor color) {
             String id = type + "_pigeonhole";
@@ -255,7 +263,7 @@ public class Envelope {
 
         public static final Supplier<BlockEntityType<LetterBlockEntity>> LETTER =
               REGISTRAR.blockEntityType("letter", () -> REGISTRAR.newBlockEntityType(
-                    LetterBlockEntity::new, Blocks.LETTER.get()));
+                    LetterBlockEntity::new, Blocks.LETTER.get(), Blocks.TATTERED_LETTER.get()));
 
         private static PigeonholeBlock[] getPigeonholeBlocks() {
             return Blocks.PIGEONHOLES.values().stream().map(Supplier::get).toArray(PigeonholeBlock[]::new);
@@ -319,8 +327,12 @@ public class Envelope {
               () -> new LetterAndQuillItem(new Item.Properties().stacksTo(1)));
         public static final Supplier<LetterItem> LETTER = REGISTRAR.item("letter",
               () -> new LetterItem(Blocks.LETTER.get(), new Item.Properties()));
+        public static final Supplier<LetterItem> TATTERED_LETTER = REGISTRAR.item("tattered_letter",
+              () -> new TatteredLetterItem(Blocks.TATTERED_LETTER.get(), new Item.Properties()));
         public static final Supplier<SealedLetterItem> SEALED_LETTER = REGISTRAR.item("sealed_letter",
-              () -> new SealedLetterItem(new Item.Properties()));
+              () -> new SealedLetterItem(LETTER, new Item.Properties()));
+        public static final Supplier<SealedLetterItem> SEALED_TATTERED_LETTER = REGISTRAR.item("sealed_tattered_letter",
+              () -> new SealedLetterItem(TATTERED_LETTER, new Item.Properties()));
 
         public static final Supplier<PaperBoxItem> PAPER_BOX = REGISTRAR.item("paper_box",
               () -> new PaperBoxItem(Blocks.PAPER_BOX.get(), new Item.Properties().stacksTo(16)));
@@ -403,6 +415,8 @@ public class Envelope {
                         output.accept(Items.LETTER_AND_QUILL.get());
                         output.accept(Items.LETTER.get());
                         output.accept(Items.SEALED_LETTER.get());
+                        output.accept(Items.TATTERED_LETTER.get());
+                        output.accept(Items.SEALED_TATTERED_LETTER.get());
 
                         output.accept(Items.PAPER_BOX.get());
                         output.accept(Items.PACKAGE.get());
@@ -444,9 +458,6 @@ public class Envelope {
         public static final DataComponentType<LetterContent> LETTER_CONTENT =
               REGISTRAR.dataComponentType("letter_content", b ->
                     b.persistent(LetterContent.CODEC).networkSynchronized(LetterContent.STREAM_CODEC).cacheEncoding());
-        public static final DataComponentType<Unit> LETTER_TATTERED =
-              REGISTRAR.dataComponentType("letter_tattered", b ->
-                    b.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
         public static final DataComponentType<ResourceLocation> LETTER_MEANING =
               REGISTRAR.dataComponentType("letter_meaning", b ->
                     b.persistent(ResourceLocation.CODEC).networkSynchronized(ResourceLocation.STREAM_CODEC));

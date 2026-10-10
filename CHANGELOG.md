@@ -6,6 +6,9 @@ Misc
 - Scooping waste from **Pigeonhole** now has a 50% chance to drop **Feather**  
 - Added particles to **Pigeonhole** waste scooping
 
+### Changes and Fixes
+- Tattered Letter is now a separate item type, instead of a component 
+
 ## 0.8.0-Snapshot2
 ### New Features
 Courier Bat

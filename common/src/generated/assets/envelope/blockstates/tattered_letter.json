@@ -1,33 +1,33 @@
 {
   "variants": {
     "facing=east,has_content=false": {
-      "model": "envelope:block/letter",
+      "model": "envelope:block/tattered_letter",
       "y": 90
     },
     "facing=east,has_content=true": {
-      "model": "envelope:block/letter_content",
+      "model": "envelope:block/tattered_letter_content",
       "y": 90
     },
     "facing=north,has_content=false": {
-      "model": "envelope:block/letter"
+      "model": "envelope:block/tattered_letter"
     },
     "facing=north,has_content=true": {
-      "model": "envelope:block/letter_content"
+      "model": "envelope:block/tattered_letter_content"
     },
     "facing=south,has_content=false": {
-      "model": "envelope:block/letter",
+      "model": "envelope:block/tattered_letter",
       "y": 180
     },
     "facing=south,has_content=true": {
-      "model": "envelope:block/letter_content",
+      "model": "envelope:block/tattered_letter_content",
       "y": 180
     },
     "facing=west,has_content=false": {
-      "model": "envelope:block/letter",
+      "model": "envelope:block/tattered_letter",
       "y": 270
     },
     "facing=west,has_content=true": {
-      "model": "envelope:block/letter_content",
+      "model": "envelope:block/tattered_letter_content",
       "y": 270
     }
   }

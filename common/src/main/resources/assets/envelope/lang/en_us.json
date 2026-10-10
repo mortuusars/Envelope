@@ -12,6 +12,7 @@
   "block.envelope.warped_pigeonhole": "Warped Pigeonhole",
 
   "block.envelope.letter": "Letter",
+  "block.envelope.tattered_letter": "Tattered Letter",
   "block.envelope.paper_box": "Paper Box",
   "block.envelope.package": "Package",
   "block.envelope.sealed_package": "Sealed Package",
@@ -35,6 +36,8 @@
   "item.envelope.letter_and_quill": "Letter and Quill",
   "item.envelope.letter": "Letter",
   "item.envelope.sealed_letter": "Sealed Letter",
+  "item.envelope.tattered_letter": "Tattered Letter",
+  "item.envelope.sealed_tattered_letter": "Sealed Tattered Letter",
   "item.envelope.paper_box": "Payback Box",
   "item.envelope.package": "Package",
   "item.envelope.sealed_package": "Sealed Package",

@@ -1,13 +1,5 @@
 {
   "parent": "minecraft:item/generated",
-  "overrides": [
-    {
-      "model": "envelope:item/sealed_letter_tattered",
-      "predicate": {
-        "envelope:letter_tattered": 1.0
-      }
-    }
-  ],
   "textures": {
     "layer0": "envelope:item/sealed_letter",
     "layer1": "envelope:item/sealed_letter_overlay"

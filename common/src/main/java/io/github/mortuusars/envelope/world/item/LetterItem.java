@@ -18,9 +18,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
@@ -63,6 +65,7 @@ public class LetterItem extends BlockItem implements SealableItem {
         if (!context.isSecondaryUseActive()) {
             return InteractionResult.PASS;
         }
+
         return super.useOn(context);
     }
 
@@ -83,8 +86,31 @@ public class LetterItem extends BlockItem implements SealableItem {
 
     @Override
     public ItemStack seal(Level level, ItemStack stack, Seal seal) {
-        ItemStack sealedLetter = stack.transmuteCopy(Envelope.Items.SEALED_LETTER.get());
+        ItemStack sealedLetter = stack.transmuteCopy(getSealedItem());
         sealedLetter.set(Envelope.DataComponents.SEAL, seal);
         return sealedLetter;
+    }
+
+    public ItemLike getSealedItem() {
+        return Envelope.Items.SEALED_LETTER.get();
+    }
+
+    // --
+
+    public static ItemStack tatterIfApplicable(Level level, ItemStack stack) {
+        if (stack.is(Envelope.Items.TATTERED_LETTER.get()) || stack.is(Envelope.Items.SEALED_TATTERED_LETTER.get())) {
+            return stack;
+        }
+
+        Item item = stack.getItem();
+
+        if (item instanceof LetterItem) {
+            return stack.transmuteCopy(Envelope.Items.TATTERED_LETTER.get());
+        }
+        else if (item instanceof SealedLetterItem) {
+            return stack.transmuteCopy(Envelope.Items.SEALED_TATTERED_LETTER.get());
+        }
+
+        return stack;
     }
 }

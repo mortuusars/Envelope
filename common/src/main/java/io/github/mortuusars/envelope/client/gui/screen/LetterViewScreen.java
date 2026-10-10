@@ -45,7 +45,8 @@ public class LetterViewScreen extends Screen {
         super(Component.empty());
         this.letter = new ItemAndStack<>(letter);
         this.hand = hand;
-        this.isTattered = letter.has(Envelope.DataComponents.LETTER_TATTERED);
+//        this.isTattered = letter.has(Envelope.DataComponents.LETTER_TATTERED);
+        this.isTattered = letter.is(Envelope.Items.TATTERED_LETTER.get());
     }
 
     @Override

@@ -1,0 +1,8 @@
+{
+	"parent": "envelope:block/tattered_letter",
+	"textures": {
+		"texture": "envelope:block/tattered_letter_content",
+		"pin": "envelope:block/letter_pin",
+		"particle": "envelope:block/tattered_letter"
+	}
+}

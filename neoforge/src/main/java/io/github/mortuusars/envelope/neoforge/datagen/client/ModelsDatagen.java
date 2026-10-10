@@ -43,9 +43,15 @@ public class ModelsDatagen extends BlockStateProvider {
         horizontalBlock(Envelope.Blocks.SEALED_PACKAGE.get(), models().getExistingFile(modLoc("block/sealed_package")));
 
         getVariantBuilder(Envelope.Blocks.LETTER.get()).forAllStates(state -> {
-            String model = "letter"
-                  + (state.getValue(LetterBlock.TATTERED) ? "_tattered" : "")
-                  + (state.getValue(LetterBlock.HAS_CONTENT) ? "_content" : "");
+            String model = "letter" + (state.getValue(LetterBlock.HAS_CONTENT) ? "_content" : "");
+            return ConfiguredModel.builder()
+                  .modelFile(models().getExistingFile(modLoc("block/" + model)))
+                  .rotationY(((int)state.getValue(LetterBlock.FACING).toYRot() + 180) % 360)
+                  .build();
+        });
+
+        getVariantBuilder(Envelope.Blocks.TATTERED_LETTER.get()).forAllStates(state -> {
+            String model = "tattered_letter" + (state.getValue(LetterBlock.HAS_CONTENT) ? "_content" : "");
             return ConfiguredModel.builder()
                   .modelFile(models().getExistingFile(modLoc("block/" + model)))
                   .rotationY(((int)state.getValue(LetterBlock.FACING).toYRot() + 180) % 360)
@@ -72,19 +78,31 @@ public class ModelsDatagen extends BlockStateProvider {
               .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
               .model(model(Envelope.resource("letter_and_quill_content")))
               .end();
-        letterTatteredUnfoldedContent(Envelope.Items.LETTER.get());
+
+        letter(Envelope.Items.LETTER.get());
+        letter(Envelope.Items.TATTERED_LETTER.get());
 
         itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
               .parent(new ModelFile.UncheckedModelFile("item/generated"))
               .texture("layer0", Envelope.resource("item/sealed_letter"))
-              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"))
-              .override()
-              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
-              .model(itemModels().getBuilder(Envelope.resource("sealed_letter_tattered").toString())
-                    .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                    .texture("layer0", Envelope.resource("item/sealed_tattered_letter"))
-                    .texture("layer1", Envelope.resource("item/sealed_letter_overlay")))
-              .end();
+              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+
+        itemModels().getBuilder(Envelope.resource("sealed_tattered_letter").toString())
+              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+              .texture("layer0", Envelope.resource("item/sealed_tattered_letter"))
+              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"));
+
+//        itemModels().getBuilder(Envelope.resource("sealed_letter").toString())
+//              .parent(new ModelFile.UncheckedModelFile("item/generated"))
+//              .texture("layer0", Envelope.resource("item/sealed_letter"))
+//              .texture("layer1", Envelope.resource("item/sealed_letter_overlay"))
+//              .override()
+//              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_TATTERED, 1)
+//              .model(itemModels().getBuilder(Envelope.resource("sealed_letter_tattered").toString())
+//                    .parent(new ModelFile.UncheckedModelFile("item/generated"))
+//                    .texture("layer0", Envelope.resource("item/sealed_tattered_letter"))
+//                    .texture("layer1", Envelope.resource("item/sealed_letter_overlay")))
+//              .end();
 
         itemModels().getBuilder(Envelope.resource("sealed_package").toString())
               .parent(new ModelFile.UncheckedModelFile("item/generated"))
@@ -131,7 +149,21 @@ public class ModelsDatagen extends BlockStateProvider {
         itemModels().spawnEggItem(Envelope.Items.CHARRED_PIGEON_SPAWN_EGG.get());
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    protected ItemModelBuilder letter(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        return itemModels().basicItem(id)
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 0)
+              .model(model(id.withSuffix("_unfolded")))
+              .end()
+              .override()
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_UNFOLDED, 1)
+              .predicate(EnvelopeClient.ItemModelOverrides.LETTER_CONTENT, 1)
+              .model(model(id.withSuffix("_unfolded_content")))
+              .end();
+    }
+
     protected ItemModelBuilder letterTatteredUnfoldedContent(Item item) {
         ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
         return itemModels().basicItem(id)

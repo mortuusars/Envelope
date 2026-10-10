@@ -50,17 +50,12 @@ public class EnvelopeClient {
         public static void register() {
             ItemProperties.register(Envelope.Items.LETTER_AND_QUILL.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
-            ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_UNFOLDED, ItemModelOverrides::isLetterUnfolded);
             ItemProperties.register(Envelope.Items.LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
-
-            ItemProperties.register(Envelope.Items.SEALED_LETTER.get(), LETTER_TATTERED, ItemModelOverrides::isLetterTattered);
+            ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_UNFOLDED, ItemModelOverrides::isLetterUnfolded);
+            ItemProperties.register(Envelope.Items.TATTERED_LETTER.get(), LETTER_CONTENT, ItemModelOverrides::hasLetterContent);
 
             ItemProperties.register(Envelope.Items.PAYBACK_TAG.get(), PAYBACK_TAG_DURATION, ItemModelOverrides::getPaybackDuration);
-        }
-
-        public static float isLetterTattered(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-            return stack.has(Envelope.DataComponents.LETTER_TATTERED) ? 1 : 0;
         }
 
         public static float isLetterUnfolded(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {

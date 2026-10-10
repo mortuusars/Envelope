@@ -5,12 +5,9 @@
       "conditions": {
         "items": [
           {
-            "components": {
-              "envelope:letter_tattered": {}
-            },
             "items": [
-              "envelope:letter",
-              "envelope:sealed_letter"
+              "envelope:tattered_letter",
+              "envelope:sealed_tattered_letter"
             ]
           }
         ]
@@ -23,11 +20,8 @@
       "translate": "advancement.envelope.foxtile_environment.description"
     },
     "icon": {
-      "components": {
-        "envelope:letter_tattered": {}
-      },
       "count": 1,
-      "id": "envelope:letter"
+      "id": "envelope:tattered_letter"
     },
     "title": {
       "translate": "advancement.envelope.foxtile_environment.title"
