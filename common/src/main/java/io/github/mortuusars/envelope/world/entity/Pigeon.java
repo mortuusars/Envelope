@@ -575,6 +575,11 @@ public class Pigeon extends Animal implements VariantHolder<Holder<PigeonVariant
 
     @Override
     protected float getFlyingSpeed() {
+        // Some mods seem to request speed on the client, and it crashes if not accounted for
+        if (avoidEntityGoal == null) {
+            return 0.0275f;
+        }
+
         if (isPanicking() || avoidEntityGoal.isAvoiding()) return 0.030f;
         if (isTired()) return 0.0175f;
         return 0.0275f;

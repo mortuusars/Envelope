@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1 - 2026-10-26
+- Fixed client crash caused by some mods that check Pigeon speed
+
 ## 0.8.0 - Echoes In The Dark - 2026-10-20
 
 ### New Features
