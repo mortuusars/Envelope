@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2 - 2026-11-09
+[This version can be skipped if you don't experience any issues]
+- Added a safeguard to fix a rare crash when transitioning a courier bat to background
+
 ## 0.8.1 - 2026-10-26
 - Fixed client crash caused by some mods that check Pigeon speed
 

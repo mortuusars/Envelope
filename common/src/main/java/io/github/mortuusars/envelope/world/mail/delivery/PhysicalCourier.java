@@ -62,6 +62,11 @@ public interface PhysicalCourier extends Courier {
     default void phaseStarted(ServerLevel level, Delivery delivery) {
         Courier.super.phaseStarted(level, delivery);
         if (delivery.getPhase().isTraveling()) {
+            if (asEntity().isRemoved()) {
+                LOGGER.error("Cannot transition entity to background: entity is removed.");
+                asEntity().discard();
+                return;
+            }
             transitionToBackground(level);
         }
         onDeliveryChanged();
