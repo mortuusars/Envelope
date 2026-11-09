@@ -67,6 +67,11 @@ public interface PhysicalCourier extends Courier {
                 asEntity().discard();
                 return;
             }
+            if (asEntity().isPassenger()) {
+                LOGGER.error("Cannot transition entity to background: entity is passenger.");
+                asEntity().discard();
+                return;
+            }
             transitionToBackground(level);
         }
         onDeliveryChanged();

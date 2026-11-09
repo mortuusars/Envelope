@@ -36,8 +36,12 @@ public record SpawnableEntityData(CustomData data) {
     }
 
     public static SpawnableEntityData of(Entity entity, List<String> ignoredTags) {
-        Preconditions.checkArgument(!entity.isPassenger() && !entity.isRemoved() && entity.getType().canSerialize(),
-              "Cannot create SpawnableEntityData: entity '" + entity + "' is passenger, removed or the type is not serializable.");
+        Preconditions.checkArgument(!entity.isRemoved(),
+              "Cannot create SpawnableEntityData: entity '" + entity + "' is removed.");
+        Preconditions.checkArgument(!entity.isPassenger(),
+              "Cannot create SpawnableEntityData: entity '" + entity + "' is passenger.");
+        Preconditions.checkArgument(entity.getType().canSerialize(),
+              "Cannot create SpawnableEntityData: entity '" + entity + "' type is not serializable.");
 
         CompoundTag tag = new CompoundTag();
 
